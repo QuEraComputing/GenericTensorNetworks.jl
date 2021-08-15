@@ -1,6 +1,6 @@
 # GraphTensorNetworks
 
-[![Build Status](https://github.com/HappyDiode/GraphTensorNetworks.jl/workflows/CI/badge.svg)](https://github.com/HappyDiode/GraphTensorNetworks.jl/actions)
+[![Build Status](https://github.com/Happy-Diode/GraphTensorNetworks.jl/workflows/CI/badge.svg)](https://github.com/Happy-Diode/GraphTensorNetworks.jl/actions)
 
 ## Installation
 <p>
@@ -18,7 +18,7 @@ GraphTensorNetworks is a &nbsp;
 pkg> add GraphTensorNetworks
 ```
 
-Please use Julia-1.7, otherwise you will suffer from huge overhead when contracting large tensor networks. If you have to use a lower version,
+Please use Julia-1.7, otherwise you will suffer from huge overheads when contracting large tensor networks. If you have to use a lower version,
 you can avoid the overhead by overriding the `permutedims!` is `LinearAlgebra`.
 
 ```julia

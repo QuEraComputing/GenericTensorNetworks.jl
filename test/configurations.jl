@@ -14,8 +14,8 @@ end
     rawcode = random_regular_eincode(10, 3)
     optcode = OMEinsum.optimize_greedy(rawcode, uniformsize(rawcode, 2))
     for code in [rawcode, optcode]
-        res0 = mis_size(code)
-        res1 = mis_count(code)
+        res0 = GraphTensorNetworks.mis_size(code)
+        res1 = GraphTensorNetworks.mis_count(code)
         res2 = mis_config(code; all=true, bounding=true)[]
         res3 = mis_config(code; all=false, bounding=false)[]
         res4 = mis_config(code; all=true, bounding=false)[]

@@ -13,7 +13,7 @@ OMEinsum.dynamic_einsum(::EinCode{ixs, iy}, xs; kwargs...) where {ixs, iy} = dyn
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 
 include("arithematics.jl")
-include("independence_polynomial.jl")
+include("graph_polynomials.jl")
 include("configurations.jl")
 include("graphs.jl")
 include("bounding.jl")

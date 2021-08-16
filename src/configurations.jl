@@ -1,44 +1,5 @@
 export mis_config, ConfigEnumerator, ConfigTropical
 
-struct ConfigEnumerator{N,C}
-    data::Vector{StaticBitVector{N,C}}
-end
-
-Base.length(x::ConfigEnumerator{N}) where N = length(x.data)
-Base.:(==)(x::ConfigEnumerator{N,C}, y::ConfigEnumerator{N,C}) where {N,C} = x.data == y.data
-
-function Base.:+(x::ConfigEnumerator{N,C}, y::ConfigEnumerator{N,C}) where {N,C}
-    length(x) == 0 && return y
-    length(y) == 0 && return x
-    return ConfigEnumerator{N,C}(vcat(x.data, y.data))
-end
-
-function Base.:*(x::ConfigEnumerator{L,C}, y::ConfigEnumerator{L,C}) where {L,C}
-    M, N = length(x), length(y)
-    M == 0 && return x
-    N == 0 && return y
-    z = Vector{StaticBitVector{L,C}}(undef, M*N)
-    @inbounds for j=1:N, i=1:M
-        z[(j-1)*M+i] = x.data[i] | y.data[j]
-    end
-    return ConfigEnumerator{L,C}(z)
-end
-
-Base.zero(::Type{ConfigEnumerator{N,C}}) where {N,C} = ConfigEnumerator{N,C}(StaticBitVector{N,C}[])
-Base.one(::Type{ConfigEnumerator{N,C}}) where {N,C} = ConfigEnumerator{N,C}([TropicalNumbers.staticfalses(StaticBitVector{N,C})])
-Base.zero(::ConfigEnumerator{N,C}) where {N,C} = zero(ConfigEnumerator{N,C})
-Base.one(::ConfigEnumerator{N,C}) where {N,C} = one(ConfigEnumerator{N,C})
-Base.show(io::IO, x::ConfigEnumerator) = print(io, "{", join(x.data, ", "), "}")
-Base.show(io::IO, ::MIME"text/plain", x::ConfigEnumerator) = Base.show(io, x)
-
-# patch
-
-function Base.:*(a::Int, y::ConfigEnumerator)
-    a == 0 && return zero(y)
-    a == 1 && return y
-    error("multiplication between int and config enumerator is not defined.")
-end
-
 function symbols(::EinCode{ixs}) where ixs
     res = []
     for ix in ixs

@@ -25,7 +25,7 @@ end
     rawcode = random_regular_eincode(10, 3)
     optcode = OMEinsum.optimize_greedy(rawcode, uniformsize(rawcode, 2))
     xs = map(OMEinsum.getixs(rawcode)) do ix
-        length(ix)==1 ? misv(TropicalF64,TropicalF64(1.0)) : misb(TropicalF64)
+        length(ix)==1 ? GraphTensorNetworks.misv(TropicalF64,TropicalF64(1.0)) : GraphTensorNetworks.misb(TropicalF64)
     end
     y1 = rawcode(xs...)
     y2 = bounding_contract(rawcode, xs, BitArray(fill(true)), xs)

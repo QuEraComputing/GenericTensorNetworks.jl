@@ -2,7 +2,7 @@ using GraphTensorNetworks
 using Test
 
 @testset "independence polynomial" begin
-    include("independence_polynomial.jl")
+    include("graph_polynomials.jl")
 end
 
 @testset "configurations" begin

@@ -3,8 +3,8 @@ using Mods, Polynomials, TropicalNumbers
 using LightGraphs, Random
 
 @testset "bond and vertex tensor" begin
-    @test misb(TropicalF64) == [TropicalF64(0) TropicalF64(0); TropicalF64(0) TropicalF64(-Inf)]
-    @test misv(TropicalF64, 2.0) == [TropicalF64(0), TropicalF64(2.0)]
+    @test GraphTensorNetworks.misb(TropicalF64) == [TropicalF64(0) TropicalF64(0); TropicalF64(0) TropicalF64(-Inf)]
+    @test GraphTensorNetworks.misv(TropicalF64, 2.0) == [TropicalF64(0), TropicalF64(2.0)]
 end
 
 @testset "graph generator" begin
@@ -20,10 +20,10 @@ end
     Random.seed!(2)
     code = random_regular_eincode(10, 3)
     code = optimize_kahypar(code, uniformsize(code, 2), sc_target=4, max_group_size=5)
-    p1 = independence_polynomial(Val(:fitting), code)
-    p2 = independence_polynomial(Val(:polynomial), code)[]
-    p3 = independence_polynomial(Val(:fft), code)
-    p4 = independence_polynomial(Val(:finitefield), code)
+    p1 = graph_polynomial(Independence(), Val(:fitting), code)
+    p2 = graph_polynomial(Independence(), Val(:polynomial), code)[]
+    p3 = graph_polynomial(Independence(), Val(:fft), code)
+    p4 = graph_polynomial(Independence(), Val(:finitefield), code)
     @test p1 ≈ p2
     @test p1 ≈ p3
     @test p1 ≈ p4
@@ -47,9 +47,9 @@ end
 
 @testset "counting maximal IS" begin
     g = random_regular_graph(20, 3)
-    cs = maximal_polynomial(Val(:fft), g; r=1.0, method=:greedy)
-    cs2 = maximal_polynomial(Val(:polynomial), g; method=:greedy)[]
-    cs3 = maximal_polynomial(Val(:finitefield), g; method=:greedy)
+    cs = graph_polynomial(MaximalIndependence(), Val(:fft), g; r=1.0, method=:greedy)
+    cs2 = graph_polynomial(MaximalIndependence(), Val(:polynomial), g; method=:greedy)[]
+    cs3 = graph_polynomial(MaximalIndependence(), Val(:finitefield), g; method=:greedy)
     cg = complement(g)
     cliques = maximal_cliques(cg)
     for i=1:20
@@ -67,5 +67,5 @@ end
     for (i,j) in [(1,2),(2,3),(3,4),(4,5),(5,6),(6,1),(1,7)]
         add_edge!(g, i, j)
     end
-    @test match_polynomial(Val(:polynomial), g)[] == Polynomial([1,7,13,5])
+    @test graph_polynomial(Matching(), Val(:polynomial), g)[] == Polynomial([1,7,13,5])
 end

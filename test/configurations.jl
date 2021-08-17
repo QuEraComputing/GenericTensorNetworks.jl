@@ -11,20 +11,20 @@ using OMEinsum
 end
 
 @testset "enumerating" begin
-    rawcode = random_regular_eincode(10, 3)
-    optcode = OMEinsum.optimize_greedy(rawcode, uniformsize(rawcode, 2))
+    rawcode = Independence(random_regular_graph(10, 3))
+    optcode = optimize_code(rawcode; method=:kahypar)
     for code in [rawcode, optcode]
         res0 = GraphTensorNetworks.mis_size(code)
         res1 = GraphTensorNetworks.mis_count(code)
-        res2 = mis_config(code; all=true, bounding=true)[]
-        res3 = mis_config(code; all=false, bounding=false)[]
-        res4 = mis_config(code; all=true, bounding=false)[]
+        res2 = getconfigs_bounded(code; all=true)[]
+        res3 = getconfigs_direct(code; all=false)[]
+        res4 = getconfigs_direct(code; all=true)[]
         @test res0 == res2.n == res3.n == res4.n
         @test res1 == length(res2.c) == length(res4.c)
-        @test res3.config ∈ res2.c.data
-        @test res3.config ∈ res4.c.data
-        res5 = mis_config(code; all=false, bounding=true)[]
+        @test res3.c.data ∈ res2.c.data
+        @test res3.c.data ∈ res4.c.data
+        res5 = getconfigs_bounded(code; all=false)[]
         @test res5.n == res0
-        @test res5.config ∈ res2.c.data
+        @test res5.c.data ∈ res2.c.data
     end
 end

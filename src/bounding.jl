@@ -2,7 +2,16 @@ using TupleTools
 
 export bounding_contract
 
-Base.isnan(x::Tropical) = isnan(x.n)
+"""
+    backward_tropical(mode, ixs, xs, iy, y, ymask, size_dict)
+
+The backward rule for tropical einsum.
+* `mode` can be one of `:all` and `:single`,
+* `ixs` and `xs` are labels and tensor data for input tensors,
+* `iy` and `y` are labels and tensor data for the output tensor,
+* `ymask` is the boolean mask for gradients,
+* `size_dict` is a key-value map from tensor label to dimension size.
+"""
 function backward_tropical(mode, @nospecialize(ixs), @nospecialize(xs), @nospecialize(iy), @nospecialize(y), @nospecialize(ymask), size_dict)
     y .= inv.(y) .* ymask
     masks = []
@@ -25,6 +34,7 @@ function backward_tropical(mode, @nospecialize(ixs), @nospecialize(xs), @nospeci
     return masks
 end
 
+# one of the entry in `A` that equal to the corresponding entry in `X` is masked to true.
 function onehotmask(A::AbstractArray{T}, X::AbstractArray{T}) where T
     @assert length(A) == length(X)
     mask = falses(size(A)...)
@@ -40,6 +50,7 @@ function onehotmask(A::AbstractArray{T}, X::AbstractArray{T}) where T
     return mask
 end
 
+# the data structure storing intermediate `NestedEinsum` contraction results.
 struct CacheTree{T}
     content::AbstractArray{T}
     siblings::Vector{CacheTree{T}}
@@ -50,10 +61,11 @@ function cached_einsum(code::Int, @nospecialize(xs), size_dict)
 end
 function cached_einsum(code::NestedEinsum, @nospecialize(xs), size_dict)
     caches = [cached_einsum(arg, xs, size_dict) for arg in code.args]
-    y = einsum(code.eins, (getfield.(caches, :content)...,), size_dict)
+    y = dynamic_einsum(code.eins, (getfield.(caches, :content)...,); size_info=size_dict)
     CacheTree(y, caches)
 end
 
+# computed mask tree by back propagation
 function generate_masktree(code::Int, cache, mask, size_dict, mode=:all)
     CacheTree(mask, CacheTree{Bool}[])
 end
@@ -62,6 +74,7 @@ function generate_masktree(code::NestedEinsum, cache, mask, size_dict, mode=:all
     return CacheTree(mask, generate_masktree.(code.args, cache.siblings, submasks, Ref(size_dict), mode))
 end
 
+# The masked einsum contraction
 function masked_einsum(code::Int, @nospecialize(xs), masks, size_dict)
     y = copy(xs[code])
     y[OMEinsum.asarray(.!masks.content)] .= Ref(zero(eltype(y))); y

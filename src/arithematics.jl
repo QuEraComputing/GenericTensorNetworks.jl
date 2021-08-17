@@ -1,9 +1,12 @@
 export is_commutative_semiring
-export Max2Poly, Polynomial, Tropical, CountingTropical, ConfigTropical, StaticBitVector, Mod, ConfigEnumerator
+export Max2Poly, Polynomial, Tropical, CountingTropical, StaticBitVector, Mod, ConfigEnumerator, onehotv
 
 using Polynomials: Polynomial
-using TropicalNumbers: Tropical, CountingTropical, ConfigTropical, StaticBitVector
+using TropicalNumbers: Tropical, CountingTropical, StaticBitVector
 using Mods, Primes
+
+# patch for Tropical numbers
+Base.isnan(x::Tropical) = isnan(x.n)
 
 # pirate
 Base.abs(x::Mod) = x
@@ -120,10 +123,61 @@ Base.one(::ConfigEnumerator{N,C}) where {N,C} = one(ConfigEnumerator{N,C})
 Base.show(io::IO, x::ConfigEnumerator) = print(io, "{", join(x.data, ", "), "}")
 Base.show(io::IO, ::MIME"text/plain", x::ConfigEnumerator) = Base.show(io, x)
 
-# patch
+# the algebra sampling one of the configurations
+struct ConfigSampler{N,C}
+    data::StaticBitVector{N,C}
+end
 
+Base.:(==)(x::ConfigSampler{N,C}, y::ConfigSampler{N,C}) where {N,C} = x.data == y.data
+
+function Base.:+(x::ConfigSampler{N,C}, y::ConfigSampler{N,C}) where {N,C}  # biased sampling: return `x`, maybe using random sampler is better.
+    return x
+end
+
+function Base.:*(x::ConfigSampler{L,C}, y::ConfigSampler{L,C}) where {L,C}
+    ConfigSampler(x.data | y.data)
+end
+
+Base.zero(::Type{ConfigSampler{N,C}}) where {N,C} = ConfigSampler{N,C}(TropicalNumbers.statictrues(StaticBitVector{N,C}))
+Base.one(::Type{ConfigSampler{N,C}}) where {N,C} = ConfigSampler{N,C}(TropicalNumbers.staticfalses(StaticBitVector{N,C}))
+Base.zero(::ConfigSampler{N,C}) where {N,C} = zero(ConfigSampler{N,C})
+Base.one(::ConfigSampler{N,C}) where {N,C} = one(ConfigSampler{N,C})
+
+# A patch to make `Polynomial{ConfigEnumerator}` work
 function Base.:*(a::Int, y::ConfigEnumerator)
     a == 0 && return zero(y)
     a == 1 && return y
     error("multiplication between int and config enumerator is not defined.")
 end
+
+# convert from counting type to bitstring type
+for (F,TP) in [(:bitstringset_type, :ConfigEnumerator), (:bitstringsampler_type, :ConfigSampler)]
+    @eval begin
+        function $F(::Type{T}, n::Int) where {T<:Max2Poly}
+            Max2Poly{$F(n)}
+        end
+        function $F(::Type{T}, n::Int) where {TX, T<:Polynomial{C,TX} where C}
+            Polynomial{$F(n),:x}
+        end
+        function $F(::Type{T}, n::Int) where {TV, T<:CountingTropical{TV}}
+            CountingTropical{TV, $F(n)}
+        end
+        function $F(n::Integer)
+            C = TropicalNumbers._nints(n)
+            return $TP{n, C}
+        end
+    end
+end
+
+# utilities for creating onehot vectors
+function onehotv(::Type{Polynomial{BS,X}}, x) where {BS,X}
+    Polynomial{BS,X}([zero(BS), onehotv(BS, x)])
+end
+function onehotv(::Type{Max2Poly{BS}}, x) where {BS}
+    Max2Poly{BS}(zero(BS), onehotv(BS, x),1)
+end
+function onehotv(::Type{CountingTropical{TV,BS}}, x) where {TV,BS}
+    CountingTropical{TV,BS}(one(TV), onehotv(BS, x))
+end
+onehotv(::Type{ConfigEnumerator{N,C}}, i::Integer) where {N,C} = ConfigEnumerator([TropicalNumbers.onehot(StaticBitVector{N,C}, i)])
+onehotv(::Type{ConfigSampler{N,C}}, i::Integer) where {N,C} = ConfigSampler(TropicalNumbers.onehot(StaticBitVector{N,C}, i))

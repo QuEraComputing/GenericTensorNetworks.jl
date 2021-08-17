@@ -4,7 +4,7 @@ using LightGraphs, Random
 
 @testset "bond and vertex tensor" begin
     @test GraphTensorNetworks.misb(TropicalF64) == [TropicalF64(0) TropicalF64(0); TropicalF64(0) TropicalF64(-Inf)]
-    @test GraphTensorNetworks.misv(TropicalF64, 2.0) == [TropicalF64(0), TropicalF64(2.0)]
+    @test GraphTensorNetworks.misv(TropicalF64(2.0)) == [TropicalF64(0), TropicalF64(2.0)]
 end
 
 @testset "graph generator" begin
@@ -12,18 +12,16 @@ end
     @test ne(g) == 20
     g = diagonal_coupled_graph((x = trues(3, 3); x[2,2]=0; x))
     @test ne(g) == 12
-    g = diagonal_coupled_eincode(trues(3, 3))
-    @test length(GraphTensorNetworks.symbols(g)) == 9
+    @test length(GraphTensorNetworks.labels(Independence(g).code)) == 8
 end
 
 @testset "independence_polynomial" begin
     Random.seed!(2)
-    code = random_regular_eincode(10, 3)
-    code = optimize_kahypar(code, uniformsize(code, 2), sc_target=4, max_group_size=5)
-    p1 = graph_polynomial(Independence(), Val(:fitting), code)
-    p2 = graph_polynomial(Independence(), Val(:polynomial), code)[]
-    p3 = graph_polynomial(Independence(), Val(:fft), code)
-    p4 = graph_polynomial(Independence(), Val(:finitefield), code)
+    g = random_regular_graph(10, 3)
+    p1 = graph_polynomial(Independence(g), Val(:fitting))
+    p2 = graph_polynomial(Independence(g), Val(:polynomial))[]
+    p3 = graph_polynomial(Independence(g), Val(:fft))
+    p4 = graph_polynomial(Independence(g), Val(:finitefield))
     @test p1 ≈ p2
     @test p1 ≈ p3
     @test p1 ≈ p4
@@ -47,9 +45,9 @@ end
 
 @testset "counting maximal IS" begin
     g = random_regular_graph(20, 3)
-    cs = graph_polynomial(MaximalIndependence(), Val(:fft), g; r=1.0, method=:greedy)
-    cs2 = graph_polynomial(MaximalIndependence(), Val(:polynomial), g; method=:greedy)[]
-    cs3 = graph_polynomial(MaximalIndependence(), Val(:finitefield), g; method=:greedy)
+    cs = graph_polynomial(MaximalIndependence, Val(:fft), g; r=1.0, method=:greedy)
+    cs2 = graph_polynomial(MaximalIndependence, Val(:polynomial), g; method=:greedy)[]
+    cs3 = graph_polynomial(MaximalIndependence, Val(:finitefield), g; method=:greedy)
     cg = complement(g)
     cliques = maximal_cliques(cg)
     for i=1:20
@@ -67,5 +65,5 @@ end
     for (i,j) in [(1,2),(2,3),(3,4),(4,5),(5,6),(6,1),(1,7)]
         add_edge!(g, i, j)
     end
-    @test graph_polynomial(Matching(), Val(:polynomial), g)[] == Polynomial([1,7,13,5])
+    @test graph_polynomial(Matching, Val(:polynomial), g)[] == Polynomial([1,7,13,5])
 end

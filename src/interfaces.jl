@@ -2,8 +2,13 @@ export case_r3, case_dc, run_task, suboptimal_counting
 
 using Random
 
-mis_size(code; usecuda=false) = sum(contractx(Independence(), TropicalF64(1.0), code; usecuda=usecuda)).n
-mis_count(code; usecuda=false) = sum(contractx(Independence(), CountingTropical{Float64,Float64}(1.0, 1.0), code; usecuda=usecuda)).c
+mis_size(gp::Independence; usecuda=false) = sum(contractx(gp, TropicalF64(1.0); usecuda=usecuda)).n
+mis_count(gp::Independence; usecuda=false) = sum(contractx(gp, CountingTropical{Float64,Float64}(1.0, 1.0); usecuda=usecuda)).c
+
+function graph_polynomial(which, approach::Val, g::SimpleGraph; method=:kahypar, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8, kwargs...)
+    gp = optimize_code(which(g); method=method, sc_target=sc_target, max_group_size=max_group_size, nrepeat=nrepeat, imbalances=imbalances)
+    graph_polynomial(gp, approach; kwargs...)
+end
 
 function case_r3(n, k=3; sc_target, seed=2)
     # generate a random regular graph of size 100, degree 3

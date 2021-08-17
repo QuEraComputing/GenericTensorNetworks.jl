@@ -1,6 +1,14 @@
-export getconfigs_bounded, getconfigs_direct
+export optimalsolutions, solutions
 
-function getconfigs_bounded(gp::GraphProblem; all=false, usecuda=false)
+"""
+    optimalsolutions(problem; all=false, usecuda=false)
+    
+Find optimal solutions with bounding.
+
+* When `all` is true, the program will use set for enumerate all possible solutions, otherwise, it will return one solution for each size.
+* `usecuda` can not be true if you want to use set to enumerate all possible solutions.
+"""
+function optimalsolutions(gp::GraphProblem; all=false, usecuda=false)
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
@@ -18,22 +26,34 @@ function getconfigs_bounded(gp::GraphProblem; all=false, usecuda=false)
         return bounding_contract(gp.code, xst, ymask, xs)
     else
         @assert ndims(ymask) == 0
-        t, res = mis_config_ad(gp.code, xst, ymask)
+        t, res = solution_ad(gp.code, xst, ymask)
         N = length(vertex_index)
         return fill(CountingTropical(asscalar(t).n, ConfigSampler(StaticBitVector(map(l->res[l], 1:N)))))
     end
 end
 
-function getconfigs_direct(gp::GraphProblem; all=false, usecuda=false)
+"""
+    solutions(problem, basetype; all=false, usecuda=false)
+    
+General routine to find solutions without bounding,
+
+* `basetype` can be a type with counting field,
+    * `CountingTropical{Float64,Float64}` for finding optimal solutions,
+    * `Polynomial{Float64, 1.0}` for enumerating all solutions,
+    * `Max2Poly{Float64, 1.0}` for optimal and suboptimal solutions.
+* When `all` is true, the program will use set for enumerate all possible solutions, otherwise, it will return one solution for each size.
+* `usecuda` can not be true if you want to use set to enumerate all possible solutions.
+"""
+function solutions(gp::GraphProblem, ::Type{BT}; all=false, usecuda=false) where BT
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
-    T = (all ? bitstringset_type : bitstringsampler_type)(CountingTropical{Int64}, length(labels(gp.code)))
-    syms = labels(gp.code)
-    vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
-    xs = generate_tensors(l->onehotv(T, vertex_index[l]), gp)
-    if usecuda
-        xs = CuArray.(xs)
-    end
-    dynamic_einsum(gp.code, xs)
+    return contractf(fx_solutions(gp, BT, all), gp; usecuda=usecuda)
+end
+
+# return a mapping from label to variable `x`
+function fx_solutions(gp::GraphProblem, ::Type{BT}, all::Bool) where BT
+    T = (all ? bitstringset_type : bitstringsampler_type)(BT, length(labels(gp.code)))
+    vertex_index = Dict([s=>i for (i, s) in enumerate(labels(gp.code))])
+    return l->onehotv(T, vertex_index[l])
 end

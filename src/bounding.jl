@@ -1,7 +1,5 @@
 using TupleTools
 
-export bounding_contract
-
 """
     backward_tropical(mode, ixs, xs, iy, y, ymask, size_dict)
 
@@ -85,6 +83,15 @@ function masked_einsum(code::NestedEinsum, @nospecialize(xs), masks, size_dict)
     y[OMEinsum.asarray(.!masks.content)] .= Ref(zero(eltype(y))); y
 end
 
+"""
+    bounding_contract(code, xsa, ymask, xsb; size_info=nothing)
+
+Contraction method with bounding.
+
+    * `xsa` are input tensors for bounding, e.g. tropical tensors,
+    * `xsb` are input tensors for computing, e.g. tensors elements are counting tropical with set algebra,
+    * `ymask` is the initial gradient mask for the output tensor.
+"""
 function bounding_contract(@nospecialize(code::EinCode), @nospecialize(xsa), ymask, @nospecialize(xsb); size_info=nothing)
     bounding_contract(NestedEinsum((1:length(xsa)), code), xsa, ymask, xsb; size_info=size_info)
 end
@@ -100,11 +107,12 @@ function bounding_contract(code::NestedEinsum, @nospecialize(xsa), ymask, @nospe
     masked_einsum(code, xsb, mt, size_dict)
 end
 
-function mis_config_ad(@nospecialize(code::EinCode), @nospecialize(xsa), ymask; size_info=nothing)
-    mis_config_ad(NestedEinsum((1:length(xsa)), code), xsa, ymask; size_info=size_info)
+# get the optimal solution with automatic differentiation.
+function solution_ad(@nospecialize(code::EinCode), @nospecialize(xsa), ymask; size_info=nothing)
+    solution_ad(NestedEinsum((1:length(xsa)), code), xsa, ymask; size_info=size_info)
 end
 
-function mis_config_ad(code::NestedEinsum, @nospecialize(xsa), ymask; size_info=nothing)
+function solution_ad(code::NestedEinsum, @nospecialize(xsa), ymask; size_info=nothing)
     size_dict = OMEinsum.get_size_dict(getixs(flatten(code)), xsa, size_info)
     # compute intermediate tensors
     @debug "caching einsum..."

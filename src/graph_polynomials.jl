@@ -3,20 +3,47 @@ using OMEinsum: NestedEinsum, getixs, getiy
 using FFTW
 using LightGraphs
 
-export contractx, graph_polynomial, optimize_code
+export contractx, contractf, graph_polynomial, optimize_code
 export Independence, MaximalIndependence, Matching, Coloring
 const EinTypes = Union{EinCode,NestedEinsum}
 
 abstract type GraphProblem end
+"""
+    Independence{CT<:EinTypes} <: GraphProblem
+    Independence(graph; kwargs...)
+
+Independent set problem. For `kwargs`, check `optimize_code` API.
+"""
 struct Independence{CT<:EinTypes} <: GraphProblem
     code::CT
 end
+
+"""
+    Independence{CT<:EinTypes} <: GraphProblem
+    Independence(graph; kwargs...)
+
+Independent set problem. For `kwargs`, check `optimize_code` API.
+"""
 struct MaximalIndependence{CT<:EinTypes} <: GraphProblem
     code::CT
 end
+
+"""
+    Matching{CT<:EinTypes} <: GraphProblem
+    Matching(graph; kwargs...)
+
+Vertex matching problem. For `kwargs`, check `optimize_code` API.
+"""
 struct Matching{CT<:EinTypes} <: GraphProblem
     code::CT
 end
+
+"""
+    Coloring{K,CT<:EinTypes} <: GraphProblem
+    Coloring{K}(graph; kwargs...)
+
+K-Coloring problem. For `kwargs`, check `optimize_code` API.
+"""
 struct Coloring{K,CT<:EinTypes} <: GraphProblem
     code::CT
 end
@@ -39,7 +66,31 @@ function labels(code::EinTypes)
     return res
 end
 
-function graph_polynomial(gp::GraphProblem, ::Val{:fft}; usecuda=false, maxorder=graph_polynomial_maxorder(gp; usecuda=usecuda), r=1.0)
+"""
+    graph_polynomial(problem, method; usecuda=false, kwargs...)
+
+Computing the graph polynomial for specific problem.
+
+* `problem` can be one of the following instances,
+    * `Independence` for the independence polynomial,
+    * `MaximalIndependence` for the maximal independence polynomial,
+    * `Matching` for the matching polynomial,
+
+* `method` can be one of the following inputs,
+    * `Val(:finitefield)`, compute exactly with the finite field method.
+        It consumes additional kwargs [`max_iter`, `maxorder`], where `maxorder` is maximum order of polynomial
+        and `max_iter` is the maximum number of primes numbers to use in the finitefield algebra.
+        `max_iter` can be determined automatically in most cases.
+    * `Val(:polynomial)`, compute directly with `Polynomial` number type,
+    * `Val(:fft)`, compute with the fast fourier transformation approach, fast but needs to tune the hyperparameter `r`.
+        It Consumes additional kwargs [`maxorder`, `r`]. The larger `r` is,
+        the more accurate the factors of high order terms, and the less accurate the factors of low order terms.
+    * `Val(:fitting)`, compute with the polynomial fitting approach, fast but inaccurate for large graphs.
+"""
+function graph_polynomial end
+
+function graph_polynomial(gp::GraphProblem, ::Val{:fft}; usecuda=false, 
+        maxorder=graph_polynomial_maxorder(gp; usecuda=usecuda), r=1.0)
 	ω = exp(-2im*π/(maxorder+1))
 	xs = r .* collect(ω .^ (0:maxorder))
 	ys = [asscalar(contractx(gp, x; usecuda=usecuda)) for x in xs]
@@ -68,7 +119,8 @@ function _polynomial_single(gp::GraphProblem, ::Type{T}; usecuda, maxorder) wher
 	A \ T.(ys)
 end
 
-function graph_polynomial(gp::GraphProblem, ::Val{:finitefield}; usecuda=false, maxorder=graph_polynomial_maxorder(gp; usecuda=usecuda), max_iter=100)
+function graph_polynomial(gp::GraphProblem, ::Val{:finitefield}; usecuda=false,
+        maxorder=graph_polynomial_maxorder(gp; usecuda=usecuda), max_iter=100)
     TI = Int32  # Int 32 is faster
     N = typemax(TI)
     YS = []
@@ -93,21 +145,38 @@ function improved_counting(sequences)
     map(yi->Mods.CRT(yi...), zip(sequences...))
 end
 
-function optimize_code(code; method=:kahypar, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8)
+"""
+    optimize_code(code; optmethod=:kahypar, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8)
+
+Optimize the contraction order.
+
+* `optmethod` can be one of
+    * `:kahypar`, the kahypar + greedy approach, takes kwargs [`sc_target`, `max_group_size`, `imbalances`].
+    Check `optimize_kahypar` method in package `OMEinsumContractionOrders`.
+    * `:auto`, also the kahypar + greedy approach, but determines `sc_target` automatically. It is slower!
+    * `:greedy`, the greedy approach. Check in `optimize_greedy` in package `OMEinsum`.
+    * `:raw`, do nothing and return the raw EinCode.
+"""
+function optimize_code(code::EinTypes; optmethod=:kahypar, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8)
     size_dict = Dict([s=>2 for s in labels(code)])
-    optcode = if method == :kahypar
+    optcode = if optmethod == :kahypar
         optimize_kahypar(code, size_dict; sc_target=sc_target, max_group_size=max_group_size, imbalances=imbalances)
-    elseif method == :greedy
+    elseif optmethod == :greedy
         optimize_greedy(code, size_dict; nrepeat=nrepeat)
+    elseif optmethod == :auto
+        optimize_kahypar_auto(code, size_dict; max_group_size=max_group_size, effort=500)
+    elseif optmethod == :raw
+        code
     else
-        ArgumentError("optimizer `$method` not defined.")
+        ArgumentError("optimizer `$optmethod` not defined.")
     end
     println("time/space complexity is $(OMEinsum.timespace_complexity(optcode, size_dict))")
     return optcode
 end
 
-function contractx(gp::GraphProblem, x::T; usecuda=false) where T
-    xs = generate_tensors(_->x, gp)
+contractx(gp::GraphProblem, x; usecuda=false) = contractf(_->x, gp; usecuda=usecuda)
+function contractf(f, gp::GraphProblem; usecuda=false)
+    xs = generate_tensors(f, gp)
     if usecuda
         xs = CuArray.(xs)
     end
@@ -116,9 +185,10 @@ end
 
 ############### Problem specific implementations ################
 ### independent set ###
-function Independence(g::SimpleGraph)
-    Independence(EinCode(([(i,) for i in LightGraphs.vertices(g)]..., # labels for vertex tensors
-                    [minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...), ()))  # labels for edge tensors
+function Independence(g::SimpleGraph; kwargs...)
+    rawcode = EinCode(([(i,) for i in LightGraphs.vertices(g)]..., # labels for vertex tensors
+                    [minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...), ())  # labels for edge tensors
+    Independence(optimize_code(rawcode; kwargs...))
 end
 
 function generate_tensors(fx, gp::Independence)
@@ -136,7 +206,7 @@ misv(val::T) where T = [one(T), val]
 graph_polynomial_maxorder(gp::Independence; usecuda) = Int(sum(contractx(gp, TropicalF64(1.0); usecuda=usecuda)).n)
 
 ### coloring ###
-Coloring(g::SimpleGraph) = Coloring(Independence(g).code)
+Coloring(g::SimpleGraph; kwargs...) = Coloring(Independence(g; kwargs...).code)
 function generate_tensors(fx, c::Coloring{K}) where K
     ixs = getixs(flatten(code))
     T = eltype(fx(ixs[1][1]))
@@ -159,9 +229,10 @@ end
 coloringv(vals::Vector{T}) where T = vals
 
 ### matching ###
-function Matching(g::SimpleGraph)
-    Matching(EinCode(([(minmax(e.src,e.dst),) for e in LightGraphs.edges(g)]..., # labels for edge tensors
-                    [([minmax(i,j) for j in neighbors(g, i)]...,) for i in LightGraphs.vertices(g)]...,), ()))        # labels for vertex tensors
+function Matching(g::SimpleGraph; kwargs...)
+    rawcode = EinCode(([(minmax(e.src,e.dst),) for e in LightGraphs.edges(g)]..., # labels for edge tensors
+                    [([minmax(i,j) for j in neighbors(g, i)]...,) for i in LightGraphs.vertices(g)]...,), ())       # labels for vertex tensors
+    Matching(optimize_code(rawcode; kwargs...))
 end
 
 function generate_tensors(fx, m::Matching)
@@ -193,8 +264,9 @@ end
 graph_polynomial_maxorder(m::Matching; usecuda) = Int(sum(contractx(m, TropicalF64(1.0); usecuda=usecuda)).n)
 
 ### maximal independent set ###
-function MaximalIndependence(g::SimpleGraph)
-    MaximalIndependence(EinCode(([(LightGraphs.neighbors(g, v)..., v) for v in LightGraphs.vertices(g)]...,), ()))
+function MaximalIndependence(g::SimpleGraph; kwargs...)
+    rawcode = EinCode(([(LightGraphs.neighbors(g, v)..., v) for v in LightGraphs.vertices(g)]...,), ())
+    MaximalIndependence(optimize_code(rawcode; kwargs...))
 end
 
 function generate_tensors(fx, mi::MaximalIndependence)
@@ -214,7 +286,3 @@ function neighbortensor(x::T, d::Int) where T
 end
 
 graph_polynomial_maxorder(mi::MaximalIndependence; usecuda) = Int(sum(contractx(mi, TropicalF64(1.0); usecuda=usecuda)).n)
-
-for GP in [:Independence, :MaximalIndependence, :Matching, :Coloring]
-    @eval optimize_code(gp::$GP; kwargs...) = $GP(optimize_code(gp.code; kwargs...))
-end

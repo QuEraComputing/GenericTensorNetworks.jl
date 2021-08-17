@@ -1,5 +1,6 @@
 export is_commutative_semiring
 export Max2Poly, Polynomial, Tropical, CountingTropical, StaticBitVector, Mod, ConfigEnumerator, onehotv
+export bitstringset_type, bitstringsampler_type
 
 using Polynomials: Polynomial
 using TropicalNumbers: Tropical, CountingTropical, StaticBitVector

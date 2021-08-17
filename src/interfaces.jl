@@ -1,12 +1,12 @@
-export case_r3, case_dc, run_task, suboptimal_counting
+export case_r3, case_dc, solve, suboptimal_counting
 
 using Random
 
 mis_size(gp::Independence; usecuda=false) = sum(contractx(gp, TropicalF64(1.0); usecuda=usecuda)).n
 mis_count(gp::Independence; usecuda=false) = sum(contractx(gp, CountingTropical{Float64,Float64}(1.0, 1.0); usecuda=usecuda)).c
 
-function graph_polynomial(which, approach::Val, g::SimpleGraph; method=:kahypar, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8, kwargs...)
-    gp = optimize_code(which(g); method=method, sc_target=sc_target, max_group_size=max_group_size, nrepeat=nrepeat, imbalances=imbalances)
+function graph_polynomial(which, approach::Val, g::SimpleGraph; optmethod=:kahypar, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8, kwargs...)
+    gp = which(g; optmethod=optmethod, sc_target=sc_target, max_group_size=max_group_size, nrepeat=nrepeat, imbalances=imbalances)
     graph_polynomial(gp, approach; kwargs...)
 end
 
@@ -38,7 +38,7 @@ function case_sq(L::Int, ρ; sc_target, seed=2)
 end
 
 """
-    run_task(code, task; usecuda=false)
+    solve(problem, , task; usecuda=false)
 
 * `code` is the einsum code,
 * `task` is one of
@@ -53,48 +53,32 @@ end
     * `:config_all`, all MIS configurations,
     * `:config_all_bounded`, all MIS configurations, the bounded approach (much faster),
 """
-function run_task(which, code::NestedEinsum, task; usecuda=false)
+function solve(gp::GraphProblem, task; usecuda=false)
     if task == :totalsize
-        return contractx(which, 1.0, code; usecuda=usecuda)
+        return contractx(gp, 1.0; usecuda=usecuda)
     elseif task == :maxsize
-        return contractx(which, Tropical(1.0), code; usecuda=usecuda)
+        return contractx(gp, Tropical(1.0); usecuda=usecuda)
     elseif task == :counting
-        return contractx(which, CountingTropical(1.0), code; usecuda=usecuda)
+        return contractx(gp, CountingTropical(1.0); usecuda=usecuda)
     elseif task == :idp_polynomial
-        return graph_polynomial(which, Val(:polynomial), code; usecuda=usecuda)
+        return graph_polynomial(gp, Val(:polynomial); usecuda=usecuda)
     elseif task == :idp_fft
-        return graph_polynomial(which, Val(:fft), code; usecuda=usecuda)
+        return graph_polynomial(gp, Val(:fft); usecuda=usecuda)
     elseif task == :idp_finitefield
-        return graph_polynomial(which, Val(:finitefield), code; usecuda=usecuda)
+        return graph_polynomial(gp, Val(:finitefield); usecuda=usecuda)
     elseif task == :config_single
-        return mis_config(code; all=false, bounding=false, usecuda=usecuda)
+        return solutions(gp, CountingTropical{Float64}; all=false, usecuda=usecuda)
     elseif task == :config_single_bounded
-        return mis_config(code; all=false, bounding=true, usecuda=usecuda)
+        return optimalsolutions(gp; all=false, usecuda=usecuda)
     elseif task == :config_all
-        return mis_config(code; all=true, bounding=false, usecuda=usecuda)
+        return solutions(gp, CountingTropical{Float64}; all=true, usecuda=usecuda)
     elseif task == :config_all_bounded
-        return mis_config(code; all=true, bounding=true, usecuda=usecuda)
+        return optimalsolutions(gp; all=true, usecuda=usecuda)
     else
         error("unknown task $task.")
     end
 end
 
-function run_task(g::SimpleGraph, task; usecuda=false, kwargs...)
-    run_task(independence_code(g; kwargs...), task; usecuda=false)
-end
-
-function suboptimal_counting(g::SimpleGraph; kwargs...)
-    res0 = run_task(g, :counting)[]
-    n0, c0 = res0.n, res0.c
-    c1 = 0
-    for v in LightGraphs.vertices(g)
-        code = independence_code(g2; kwargs...)
-        resv = run_task(code, :counting)[]
-        @show resv.n, n0
-        if resv.n == n0 - 1
-            c1 += resv.c
-        end
-    end
-    @show c0, c1
-    return c0 - c1
+function solve_is(g::SimpleGraph, task; usecuda=false)
+    solve(optimize_code(Independence(g); method=:auto), task; usecuda=usecuda)
 end

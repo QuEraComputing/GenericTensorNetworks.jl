@@ -1,5 +1,5 @@
 using Test, OMEinsum, GraphTensorNetworks, TropicalNumbers, Random
-using GraphTensorNetworks: cached_einsum, generate_masktree, masked_einsum, CacheTree
+using GraphTensorNetworks: cached_einsum, generate_masktree, masked_einsum, CacheTree, uniformsize, bounding_contract
 
 @testset "cached einsum" begin
     xs = map(x->Tropical.(x), [randn(2,2), randn(2), randn(2,2), randn(2,2), randn(2,2)])
@@ -22,8 +22,8 @@ end
         y2 = bounding_contract(code, xs, BitArray(ones(Bool,2,2,2)), xs)
         @test y1 ≈ y2
     end
-    rawcode = Independence(random_regular_graph(10, 3)).code
-    optcode = OMEinsum.optimize_greedy(rawcode, uniformsize(rawcode, 2))
+    rawcode = Independence(random_regular_graph(10, 3); optmethod=:raw).code
+    optcode = Independence(random_regular_graph(10, 3); optmethod=:greedy).code
     xs = map(OMEinsum.getixs(rawcode)) do ix
         length(ix)==1 ? GraphTensorNetworks.misv(TropicalF64(1.0)) : GraphTensorNetworks.misb(TropicalF64)
     end

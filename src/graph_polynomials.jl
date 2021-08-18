@@ -4,67 +4,6 @@ using FFTW
 using LightGraphs
 
 export contractx, contractf, graph_polynomial, optimize_code
-export Independence, MaximalIndependence, Matching, Coloring
-const EinTypes = Union{EinCode,NestedEinsum}
-
-abstract type GraphProblem end
-"""
-    Independence{CT<:EinTypes} <: GraphProblem
-    Independence(graph; kwargs...)
-
-Independent set problem. For `kwargs`, check `optimize_code` API.
-"""
-struct Independence{CT<:EinTypes} <: GraphProblem
-    code::CT
-end
-
-"""
-    Independence{CT<:EinTypes} <: GraphProblem
-    Independence(graph; kwargs...)
-
-Independent set problem. For `kwargs`, check `optimize_code` API.
-"""
-struct MaximalIndependence{CT<:EinTypes} <: GraphProblem
-    code::CT
-end
-
-"""
-    Matching{CT<:EinTypes} <: GraphProblem
-    Matching(graph; kwargs...)
-
-Vertex matching problem. For `kwargs`, check `optimize_code` API.
-"""
-struct Matching{CT<:EinTypes} <: GraphProblem
-    code::CT
-end
-
-"""
-    Coloring{K,CT<:EinTypes} <: GraphProblem
-    Coloring{K}(graph; kwargs...)
-
-K-Coloring problem. For `kwargs`, check `optimize_code` API.
-"""
-struct Coloring{K,CT<:EinTypes} <: GraphProblem
-    code::CT
-end
-Coloring{K}(code::ET) where {K,ET<:EinTypes} = Coloring{K,ET}(code)
-
-"""
-    labels(code)
-
-Return a vector of unique labels in an Einsum token.
-"""
-function labels(code::EinTypes)
-    res = []
-    for ix in OMEinsum.getixs(OMEinsum.flatten(code))
-        for l in ix
-            if l ∉ res
-                push!(res, l)
-            end
-        end
-    end
-    return res
-end
 
 """
     graph_polynomial(problem, method; usecuda=false, kwargs...)
@@ -93,8 +32,8 @@ function graph_polynomial(gp::GraphProblem, ::Val{:fft}; usecuda=false,
         maxorder=graph_polynomial_maxorder(gp; usecuda=usecuda), r=1.0)
 	ω = exp(-2im*π/(maxorder+1))
 	xs = r .* collect(ω .^ (0:maxorder))
-	ys = [asscalar(contractx(gp, x; usecuda=usecuda)) for x in xs]
-	Polynomial(ifft(ys) ./ (r .^ (0:maxorder)))
+	ys = [contractx(gp, x; usecuda=usecuda) for x in xs]
+	map(ci->Polynomial(ifft(getindex.(ys, Ref(ci))) ./ (r .^ (0:maxorder))), CartesianIndices(ys[1]))
 end
 
 function graph_polynomial(gp::GraphProblem, ::Val{:fitting}; usecuda=false,
@@ -111,67 +50,45 @@ end
 
 function _polynomial_single(gp::GraphProblem, ::Type{T}; usecuda, maxorder) where T
 	xs = 0:maxorder
-	ys = [asscalar(contractx(gp, T(x); usecuda=usecuda)) for x in xs]
-	A = zeros(T, maxorder+1, maxorder+1)
-	for j=1:maxorder+1, i=1:maxorder+1
-		A[j,i] = T(xs[j])^(i-1)
-	end
-	A \ T.(ys)
+	ys = [contractx(gp, T(x); usecuda=usecuda) for x in xs]
+    res = fill(T[], size(ys[1]))  # contraction result can be a tensor
+    for ci in length(ys[1])
+	    A = zeros(T, maxorder+1, maxorder+1)
+        for j=1:maxorder+1, i=1:maxorder+1
+            A[j,i] = T(xs[j])^(i-1)
+        end
+	    res[ci] = A \ T.(getindex.(ys, Ref(ci)))
+    end
+    return res
 end
 
 function graph_polynomial(gp::GraphProblem, ::Val{:finitefield}; usecuda=false,
         maxorder=graph_polynomial_maxorder(gp; usecuda=usecuda), max_iter=100)
     TI = Int32  # Int 32 is faster
     N = typemax(TI)
-    YS = []
-    local res
+    YS = fill(Any[], (fill(bondsize(gp), length(getiy(flatten(gp.code))))...,))
+    local res, respre
     for k = 1:max_iter
 	    N = prevprime(N-TI(1))
         T = Mods.Mod{N,TI}
         rk = _polynomial_single(gp, T; usecuda=usecuda, maxorder=maxorder)
-        push!(YS, rk)
-        if maxorder==1
-            return Polynomial(Mods.value.(YS[1]))
+        push!.(YS, rk)
+        if max_iter==1
+            return map(Polynomial, map(x->BigInt.(Mods.value.(x)), YS[1]))
         elseif k != 1
-            ra = improved_counting(YS[1:end-1])
-            res = improved_counting(YS)
-            ra == res && return Polynomial(res)
+            res = map(improved_counting, YS)
+            all(respre .== res) && return map(Polynomial, res)
+            respre = res
+        else
+            respre = map(x->BigInt.(value.(x)), YS[1])
         end
     end
     @warn "result is potentially inconsistent."
-    return Polynomial(res)
+    return map(Polynomial, res)
 end
+
 function improved_counting(sequences)
     map(yi->Mods.CRT(yi...), zip(sequences...))
-end
-
-"""
-    optimize_code(code; optmethod=:kahypar, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8)
-
-Optimize the contraction order.
-
-* `optmethod` can be one of
-    * `:kahypar`, the kahypar + greedy approach, takes kwargs [`sc_target`, `max_group_size`, `imbalances`].
-    Check `optimize_kahypar` method in package `OMEinsumContractionOrders`.
-    * `:auto`, also the kahypar + greedy approach, but determines `sc_target` automatically. It is slower!
-    * `:greedy`, the greedy approach. Check in `optimize_greedy` in package `OMEinsum`.
-    * `:raw`, do nothing and return the raw EinCode.
-"""
-function optimize_code(code::EinTypes; optmethod=:kahypar, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8)
-    size_dict = Dict([s=>2 for s in labels(code)])
-    optcode = if optmethod == :kahypar
-        optimize_kahypar(code, size_dict; sc_target=sc_target, max_group_size=max_group_size, imbalances=imbalances)
-    elseif optmethod == :greedy
-        optimize_greedy(code, size_dict; nrepeat=nrepeat)
-    elseif optmethod == :auto
-        optimize_kahypar_auto(code, size_dict; max_group_size=max_group_size, effort=500)
-    elseif optmethod == :raw
-        code
-    else
-        ArgumentError("optimizer `$optmethod` not defined.")
-    end
-    println("time/space complexity is $(OMEinsum.timespace_complexity(optcode, size_dict))")
-    return optcode
 end
 
 contractx(gp::GraphProblem, x; usecuda=false) = contractf(_->x, gp; usecuda=usecuda)
@@ -185,12 +102,6 @@ end
 
 ############### Problem specific implementations ################
 ### independent set ###
-function Independence(g::SimpleGraph; kwargs...)
-    rawcode = EinCode(([(i,) for i in LightGraphs.vertices(g)]..., # labels for vertex tensors
-                    [minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...), ())  # labels for edge tensors
-    Independence(optimize_code(rawcode; kwargs...))
-end
-
 function generate_tensors(fx, gp::Independence)
     ixs = getixs(flatten(gp.code))
     T = typeof(fx(ixs[1][1]))
@@ -206,9 +117,8 @@ misv(val::T) where T = [one(T), val]
 graph_polynomial_maxorder(gp::Independence; usecuda) = Int(sum(contractx(gp, TropicalF64(1.0); usecuda=usecuda)).n)
 
 ### coloring ###
-Coloring(g::SimpleGraph; kwargs...) = Coloring(Independence(g; kwargs...).code)
 function generate_tensors(fx, c::Coloring{K}) where K
-    ixs = getixs(flatten(code))
+    ixs = getixs(flatten(c.code))
     T = eltype(fx(ixs[1][1]))
     return map(ixs) do ix
         # if the tensor rank is 1, create a vertex tensor.
@@ -229,12 +139,6 @@ end
 coloringv(vals::Vector{T}) where T = vals
 
 ### matching ###
-function Matching(g::SimpleGraph; kwargs...)
-    rawcode = EinCode(([(minmax(e.src,e.dst),) for e in LightGraphs.edges(g)]..., # labels for edge tensors
-                    [([minmax(i,j) for j in neighbors(g, i)]...,) for i in LightGraphs.vertices(g)]...,), ())       # labels for vertex tensors
-    Matching(optimize_code(rawcode; kwargs...))
-end
-
 function generate_tensors(fx, m::Matching)
     ixs = OMEinsum.getixs(flatten(m.code))
     T = typeof(fx(ixs[1][1]))
@@ -264,11 +168,6 @@ end
 graph_polynomial_maxorder(m::Matching; usecuda) = Int(sum(contractx(m, TropicalF64(1.0); usecuda=usecuda)).n)
 
 ### maximal independent set ###
-function MaximalIndependence(g::SimpleGraph; kwargs...)
-    rawcode = EinCode(([(LightGraphs.neighbors(g, v)..., v) for v in LightGraphs.vertices(g)]...,), ())
-    MaximalIndependence(optimize_code(rawcode; kwargs...))
-end
-
 function generate_tensors(fx, mi::MaximalIndependence)
     ixs = OMEinsum.getixs(flatten(mi.code))
     T = eltype(fx(ixs[1][end]))

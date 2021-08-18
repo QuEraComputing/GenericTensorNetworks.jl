@@ -38,7 +38,7 @@ function case_sq(L::Int, ρ; sc_target, seed=2)
 end
 
 """
-    solve(problem, , task; usecuda=false)
+    solve(problem, task; usecuda=false)
 
 * `code` is the einsum code,
 * `task` is one of
@@ -54,25 +54,32 @@ end
     * `:config_all_bounded`, all MIS configurations, the bounded approach (much faster),
 """
 function solve(gp::GraphProblem, task; usecuda=false)
-    if task == :totalsize
-        return contractx(gp, 1.0; usecuda=usecuda)
-    elseif task == :maxsize
+    if task == "size max"
         return contractx(gp, Tropical(1.0); usecuda=usecuda)
-    elseif task == :counting
+    elseif task == "counting sum"
+        return contractx(gp, 1.0; usecuda=usecuda)
+    elseif task == "counting max"
         return contractx(gp, CountingTropical(1.0); usecuda=usecuda)
-    elseif task == :idp_polynomial
+    elseif task == "counting max2"
+        return contractx(gp, Max2Poly(0.0, 1.0, 1.0); usecuda=usecuda)
+    elseif task == "counting all"
         return graph_polynomial(gp, Val(:polynomial); usecuda=usecuda)
-    elseif task == :idp_fft
+    elseif task == "config max"
+        return solutions(gp, CountingTropical{Float64,Float64}; all=false, usecuda=usecuda)
+    elseif task == "configs max"
+        return solutions(gp, CountingTropical{Float64,Float64}; all=true, usecuda=usecuda)
+    elseif task == "configs max2"
+        return solutions(gp, Max2Poly{Float64,Float64}; all=true, usecuda=usecuda)
+    elseif task == "configs all"
+        return solutions(gp, Polynomial{Float64,:x}; all=true, usecuda=usecuda)
+    # extra methods
+    elseif task == "counting all (fft)"
         return graph_polynomial(gp, Val(:fft); usecuda=usecuda)
-    elseif task == :idp_finitefield
+    elseif task == "counting all (finitefield)"
         return graph_polynomial(gp, Val(:finitefield); usecuda=usecuda)
-    elseif task == :config_single
-        return solutions(gp, CountingTropical{Float64}; all=false, usecuda=usecuda)
-    elseif task == :config_single_bounded
+    elseif task == "config max (bounded)"
         return optimalsolutions(gp; all=false, usecuda=usecuda)
-    elseif task == :config_all
-        return solutions(gp, CountingTropical{Float64}; all=true, usecuda=usecuda)
-    elseif task == :config_all_bounded
+    elseif task == "configs max (bounded)"
         return optimalsolutions(gp; all=true, usecuda=usecuda)
     else
         error("unknown task $task.")

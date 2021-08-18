@@ -2,22 +2,22 @@ using Viznet
 export vizeinsum, vizconfig
 using Compose
 
-function vizconfig(g::SimpleGraph; locs, config=zeros(Int, length(nodes)), unit=1.0, graphsize=12cm)
+function vizconfig(g::SimpleGraph; locs, config=zeros(Int, length(locs)), unit=1.0, graphsize=12cm)
     vizconfig([string(v)=>locs[v] for v in LightGraphs.vertices(g)], [(e.src, e.dst) for e in edges(g)]; config=config, unit=unit, graphsize=graphsize)
 end
 
 function vizconfig(nodes, edges; config=zeros(Int, length(nodes)), unit=1.0, graphsize=12cm)
-	tb = textstyle(:default, fill("white"))
-	nb = nodestyle(:circle, fill("black"), r=0.02*unit)
-	nb2 = nodestyle(:circle, fill("red"),r=0.02*unit)
-	eb = bondstyle(:default)
+	tb = textstyle(:default, fill("white"), fontsize(10pt*unit))
+	nb = nodestyle(:circle, fill("black"), r=0.03*unit)
+	nb2 = nodestyle(:circle, fill("red"),r=0.03*unit)
+	eb = bondstyle(:default, linewidth(0.4mm*unit))
 	img = canvas() do
 		for (i, (t, p)) in enumerate(nodes)
-			(config[i]==1 ? nb2 : nb) >> p
-			tb >> (p, t)
+			(config[i]==1 ? nb2 : nb) >> (p...,)
+			tb >> ((p...,), t)
 		end
 		for (i,j) in edges
-			eb >> (nodes[i].second, nodes[j].second)
+			eb >> ((nodes[i].second...,), (nodes[j].second...,))
 		end
 	end
     XMIN = minimum(x->x.second[1], nodes)

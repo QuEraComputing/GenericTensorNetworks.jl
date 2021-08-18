@@ -18,10 +18,10 @@ end
 @testset "independence_polynomial" begin
     Random.seed!(2)
     g = random_regular_graph(10, 3)
-    p1 = graph_polynomial(Independence(g), Val(:fitting))
+    p1 = graph_polynomial(Independence(g), Val(:fitting))[]
     p2 = graph_polynomial(Independence(g), Val(:polynomial))[]
-    p3 = graph_polynomial(Independence(g), Val(:fft))
-    p4 = graph_polynomial(Independence(g), Val(:finitefield))
+    p3 = graph_polynomial(Independence(g), Val(:fft))[]
+    p4 = graph_polynomial(Independence(g), Val(:finitefield))[]
     @test p1 ≈ p2
     @test p1 ≈ p3
     @test p1 ≈ p4
@@ -45,9 +45,9 @@ end
 
 @testset "counting maximal IS" begin
     g = random_regular_graph(20, 3)
-    cs = graph_polynomial(MaximalIndependence, Val(:fft), g; r=1.0, optmethod=:greedy)
+    cs = graph_polynomial(MaximalIndependence, Val(:fft), g; r=1.0, optmethod=:greedy)[]
     cs2 = graph_polynomial(MaximalIndependence, Val(:polynomial), g; optmethod=:greedy)[]
-    cs3 = graph_polynomial(MaximalIndependence, Val(:finitefield), g; optmethod=:greedy)
+    cs3 = graph_polynomial(MaximalIndependence, Val(:finitefield), g; optmethod=:greedy)[]
     cg = complement(g)
     cliques = maximal_cliques(cg)
     for i=1:20

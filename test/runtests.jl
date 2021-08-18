@@ -12,3 +12,7 @@ end
 @testset "bounding" begin
     include("bounding.jl")
 end
+
+@testset "interfaces" begin
+    include("interfaces.jl")
+end

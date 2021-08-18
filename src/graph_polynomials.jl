@@ -39,8 +39,8 @@ end
 function graph_polynomial(gp::GraphProblem, ::Val{:fitting}; usecuda=false,
         maxorder = graph_polynomial_maxorder(gp; usecuda=usecuda))
 	xs = (0:maxorder)
-	ys = [asscalar(contractx(gp, x; usecuda=usecuda)) for x in xs]
-	fit(xs, ys, maxorder)
+	ys = [contractx(gp, x; usecuda=usecuda) for x in xs]
+	map(ci->fit(xs, getindex.(ys, Ref(ci))), CartesianIndices(ys[1]))
 end
 
 function graph_polynomial(gp::GraphProblem, ::Val{:polynomial}; usecuda=false)

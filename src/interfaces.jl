@@ -40,18 +40,21 @@ end
 """
     solve(problem, task; usecuda=false)
 
-* `code` is the einsum code,
-* `task` is one of
-    * `:totalsize`, total number of independent sets,
-    * `:maxsize`, the maximum independent set size,
-    * `:counting`, the dengeneracy is MIS,
-    * `:idp_polynomial`, independence polynomial, the polynomial number approach,
-    * `:idp_fft`, independence polynomial, the fast fourier transformation approach,
-    * `:idp_finitefield`, independence polynomial, the finite field approach,
-    * `:config_single`, single MIS configuration,
-    * `:config_single_bounded`, single MIS configuration, the bounded approach (maybe faster),
-    * `:config_all`, all MIS configurations,
-    * `:config_all_bounded`, all MIS configurations, the bounded approach (much faster),
+* `problem` is the graph problem with tensor network information,
+* `task` is string specifying the task. Using the maximum independent set problem as an example, it can be one of
+    * "size max", the maximum independent set size,
+    * "counting sum", total number of independent sets,
+    * "counting max", the dengeneracy of maximum independent sets (MIS),
+    * "counting max2", the dengeneracy of MIS and MIS-1,
+    * "counting all", independence polynomial, the polynomial number approach,
+    * "counting all (fft)", independence polynomial, the fourier transformation approach,
+    * "counting all (finitefield)", independence polynomial, the finite field approach,
+    * "config max", one of the maximum independent set,
+    * "config max (bounded)", one of the maximum independent set, the bounded version,
+    * "configs max", all MIS configurations,
+    * "configs max2", all MIS configurations and MIS-1 configurations,
+    * "configs all", all MIS configurations,
+    * "configs max (bounded)", all MIS configurations, the bounded approach (much faster),
 """
 function solve(gp::GraphProblem, task; usecuda=false)
     if task == "size max"
@@ -87,5 +90,5 @@ function solve(gp::GraphProblem, task; usecuda=false)
 end
 
 function solve_is(g::SimpleGraph, task; usecuda=false)
-    solve(optimize_code(Independence(g); method=:auto), task; usecuda=usecuda)
+    solve(optimize_code(Independence(g); optmethod=:auto), task; usecuda=usecuda)
 end

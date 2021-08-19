@@ -11,6 +11,9 @@ begin
 	using Revise, GraphTensorNetworks
 end
 
+# ╔═╡ 6c7f88d2-2491-4272-b0b6-83fe7778f81a
+md"## High level interfaces"
+
 # ╔═╡ 83fc0a3c-ef51-4d5c-9c46-baa645f80fd2
 locs = [rand(2) for i=1:70];
 
@@ -23,14 +26,20 @@ vizconfig(g; locs=locs, unit=0.5)
 # ╔═╡ b6e916e2-7d43-4085-a3c8-5c57069e8384
 gp = Independence(g; optmethod=:auto);
 
+# ╔═╡ 1a58dea3-14fa-4be7-b087-45ed9bad2407
+gp
+
 # ╔═╡ 03840394-3a5b-4c24-8b52-15f7e400f900
 timespace_complexity(gp)
 
 # ╔═╡ 11c71de9-caa9-40c6-84cb-a0f29d873805
-results = solutions(gp, CountingTropical{Float64}; all=false)
+results = solve(gp, "config max"; usecuda=false)
 
 # ╔═╡ edfc5600-9a4a-4657-b165-8eb3e8540edf
 vizconfig(g; locs=locs, unit=0.5, config=results[].c.data)
+
+# ╔═╡ 47e7a144-44c0-4770-8f82-1292b0aad8bc
+md"## Lower level interfaces"
 
 # ╔═╡ 3666f629-7a87-4b50-aaf1-cc128d598aaf
 md"## Different Algebras"
@@ -150,13 +159,16 @@ one(typeof(ce2))
 
 # ╔═╡ Cell order:
 # ╠═54d71646-ffad-11eb-3866-5f1c0bc5d0bf
+# ╟─6c7f88d2-2491-4272-b0b6-83fe7778f81a
 # ╠═83fc0a3c-ef51-4d5c-9c46-baa645f80fd2
 # ╠═1522938d-d60b-4133-8625-5a09615a7b26
 # ╠═05ac5610-4a1d-4433-ba0d-1d13fd8a6733
 # ╠═b6e916e2-7d43-4085-a3c8-5c57069e8384
+# ╠═1a58dea3-14fa-4be7-b087-45ed9bad2407
 # ╠═03840394-3a5b-4c24-8b52-15f7e400f900
 # ╠═11c71de9-caa9-40c6-84cb-a0f29d873805
 # ╠═edfc5600-9a4a-4657-b165-8eb3e8540edf
+# ╟─47e7a144-44c0-4770-8f82-1292b0aad8bc
 # ╟─3666f629-7a87-4b50-aaf1-cc128d598aaf
 # ╟─51f0f187-d14d-48ab-ab30-96e71d796959
 # ╟─a5b63d08-2917-4e9f-9c5c-b5f17181d2aa

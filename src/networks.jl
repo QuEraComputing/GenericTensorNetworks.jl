@@ -1,4 +1,4 @@
-export Independence, MaximalIndependence, Matching, Coloring
+export Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing
 const EinTypes = Union{EinCode,NestedEinsum}
 
 abstract type GraphProblem end
@@ -115,3 +115,26 @@ for T in [:Independence, :Matching, :MaximalIndependence]
     @eval bondsize(gp::$T) = 2
 end
 bondsize(gp::Coloring{K}) where K = K
+
+"""
+    set_packing(sets; kwargs...)
+
+Set packing is a generalization of independent set problem to hypergraphs.
+Calling this function will return you an `Independence` instance.
+`sets` are a vector of vectors, each element being a vertex in the independent set problem. `kwargs` are code optimization parameters.
+
+### Example
+```julia
+julia> sets = [[1, 2, 5], [1, 3], [2, 4], [3, 6], [2, 3, 6]];  # each set is a vertex
+
+julia> gp = set_packing(sets; optmethod=:auto);
+
+julia> res = optimalsolutions(gp; all=true)[]
+(2, {10010, 00110, 01100})ₜ
+```
+"""
+function set_packing(sets; kwargs...)
+    n = length(sets)
+    code = EinCode(([(i,) for i=1:n]..., [(i,j) for i=1:n,j=1:n if j>i && !isempty(sets[i] ∩ sets[j])]...), ())
+    Independence(optimize_code(code; kwargs...))
+end

@@ -3,7 +3,7 @@ using OMEinsum: NestedEinsum, getixs, getiy
 using FFTW
 using LightGraphs
 
-export contractx, contractf, graph_polynomial, optimize_code
+export contractx, contractf, graph_polynomial
 
 """
     graph_polynomial(problem, method; usecuda=false, kwargs...)
@@ -103,15 +103,26 @@ end
 ############### Problem specific implementations ################
 ### independent set ###
 function generate_tensors(fx, gp::Independence)
-    ixs = getixs(flatten(gp.code))
+    flatten_code = flatten(gp.code)
+    ixs = getixs(flatten_code)
+    n = length(labels(flatten_code))
     T = typeof(fx(ixs[1][1]))
-    return map(ixs) do ix
-        # if the tensor rank is 1, create a vertex tensor.
-        # otherwise the tensor rank must be 2, create a bond tensor.
-        length(ix)==1 ? misv(fx(ix[1])) : misb(T)
-    end
+    return Tuple(map(enumerate(ixs)) do (i, ix)
+        if i <= n
+            misv(fx(ix[1]))
+        else
+            misb(T, length(ix)) # if n!=2, it corresponds to set packing problem.
+        end
+    end)
 end
-misb(::Type{T}) where T = [one(T) one(T); one(T) zero(T)]
+function misb(::Type{T}, n::Integer=2) where T
+    res = zeros(T, fill(2, n)...)
+    res[1] = one(T)
+    for i=1:n
+        res[1+1<<(i-1)] = one(T)
+    end
+    return res
+end
 misv(val::T) where T = [one(T), val]
 
 graph_polynomial_maxorder(gp::Independence; usecuda) = Int(sum(contractx(gp, TropicalF64(1.0); usecuda=usecuda)).n)

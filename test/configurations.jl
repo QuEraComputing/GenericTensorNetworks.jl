@@ -43,3 +43,13 @@ end
         @test res5.c.data ∈ res2.c.data
     end
 end
+
+@testset "set packing" begin
+    sets = [[1, 2, 5], [1, 3], [2, 4], [3, 6], [2, 3, 6]]  # each set is a vertex
+    gp = set_packing(sets; optmethod=:auto)
+    res = optimalsolutions(gp; all=true)[]
+    @test res.n == 2
+    @test BitVector(Bool[0,0,1,1,0]) ∈ res.c.data
+    @test BitVector(Bool[1,0,0,1,0]) ∈ res.c.data
+    @test BitVector(Bool[0,1,1,0,0]) ∈ res.c.data
+end

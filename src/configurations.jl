@@ -13,7 +13,7 @@ function optimalsolutions(gp::GraphProblem; all=false, usecuda=false)
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
     syms = symbols(gp)
-    T = (all ? bitstringset_type : bitstringsampler_type)(CountingTropical{Int64}, length(syms))
+    T = (all ? set_type : sampler_type)(CountingTropical{Int64}, length(syms), bondsize(gp))
     vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
     xst = generate_tensors(l->TropicalF64(1.0), gp)
     ymask = trues(fill(2, length(OMEinsum.getiy(flatten(gp.code))))...)
@@ -22,7 +22,7 @@ function optimalsolutions(gp::GraphProblem; all=false, usecuda=false)
         ymask = CuArray(ymask)
     end
     if all
-        xs = generate_tensors(l->onehotv(T, vertex_index[l]), gp)
+        xs = generate_tensors(l->onehotv(T, vertex_index[l], 1), gp)
         return bounding_contract(gp.code, xst, ymask, xs)
     else
         @assert ndims(ymask) == 0
@@ -52,13 +52,26 @@ function solutions(gp::GraphProblem, ::Type{BT}; all=false, usecuda=false) where
 end
 
 # return a mapping from label to variable `x`
-function fx_solutions(gp::GraphProblem, ::Type{BT}, all::Bool) where BT
-    syms = symbols(gp)
-    T = (all ? bitstringset_type : bitstringsampler_type)(BT, length(syms))
-    vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
-    return l->onehotv(T, vertex_index[l])
+for GP in [:Independence, :Matching, :MaximalIndependence, :MaxCut]
+    @eval function fx_solutions(gp::$GP, ::Type{BT}, all::Bool) where BT
+        syms = symbols(gp)
+        T = (all ? set_type : sampler_type)(BT, length(syms), bondsize(gp))
+        vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
+        return l->onehotv(T, vertex_index[l], 1)
+    end
 end
-for GP in [:Independence, :Matching, :MaximalIndependence]
+function fx_solutions(gp::Coloring{K}, ::Type{BT}, all::Bool) where {K,BT}
+    syms = symbols(gp)
+    T = (all ? set_type : sampler_type)(BT, length(syms), bondsize(gp))
+    vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
+    return function (l)
+        map(1:K) do k
+            onehotv(T, vertex_index[l], k)
+        end
+    end
+end
+
+for GP in [:Independence, :Matching, :MaximalIndependence, :Coloring]
     @eval symbols(gp::$GP) = labels(gp.code)
 end
 symbols(gp::MaxCut) = collect(OMEinsum.getixs(OMEinsum.flatten(gp.code)))

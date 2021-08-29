@@ -75,7 +75,7 @@ struct Coloring{K,CT<:EinTypes} <: GraphProblem
 end
 Coloring{K}(code::ET) where {K,ET<:EinTypes} = Coloring{K,ET}(code)
 # same network layout as independent set.
-Coloring(g::SimpleGraph; outputs=(), kwargs...) = Coloring(Independence(g; outputs=outputs, kwargs...).code)
+Coloring{K}(g::SimpleGraph; outputs=(), kwargs...) where K = Coloring{K}(Independence(g; outputs=outputs, kwargs...).code)
 
 """
     labels(code)

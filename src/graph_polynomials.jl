@@ -134,7 +134,7 @@ function generate_tensors(fx, c::Coloring{K}) where K
     return map(ixs) do ix
         # if the tensor rank is 1, create a vertex tensor.
         # otherwise the tensor rank must be 2, create a bond tensor.
-        length(ix)==1 ? coloringv(f(ix[1])) : coloringb(T, K)
+        length(ix)==1 ? coloringv(fx(ix[1])) : coloringb(T, K)
     end
 end
 

@@ -3,7 +3,7 @@ export Max2Poly, Polynomial, Tropical, CountingTropical, StaticBitVector, Mod, C
 export bitstringset_type, bitstringsampler_type
 
 using Polynomials: Polynomial
-using TropicalNumbers: Tropical, CountingTropical, StaticBitVector
+using TropicalNumbers: Tropical, CountingTropical
 using Mods, Primes
 
 # patch for Tropical numbers
@@ -127,7 +127,7 @@ function Base.:*(x::ConfigEnumerator{L,C}, y::ConfigEnumerator{L,C}) where {L,C}
 end
 
 Base.zero(::Type{ConfigEnumerator{N,C}}) where {N,C} = ConfigEnumerator{N,C}(StaticBitVector{N,C}[])
-Base.one(::Type{ConfigEnumerator{N,C}}) where {N,C} = ConfigEnumerator{N,C}([TropicalNumbers.staticfalses(StaticBitVector{N,C})])
+Base.one(::Type{ConfigEnumerator{N,C}}) where {N,C} = ConfigEnumerator{N,C}([staticfalses(StaticBitVector{N,C})])
 Base.zero(::ConfigEnumerator{N,C}) where {N,C} = zero(ConfigEnumerator{N,C})
 Base.one(::ConfigEnumerator{N,C}) where {N,C} = one(ConfigEnumerator{N,C})
 Base.show(io::IO, x::ConfigEnumerator) = print(io, "{", join(x.data, ", "), "}")
@@ -148,8 +148,8 @@ function Base.:*(x::ConfigSampler{L,C}, y::ConfigSampler{L,C}) where {L,C}
     ConfigSampler(x.data | y.data)
 end
 
-Base.zero(::Type{ConfigSampler{N,C}}) where {N,C} = ConfigSampler{N,C}(TropicalNumbers.statictrues(StaticBitVector{N,C}))
-Base.one(::Type{ConfigSampler{N,C}}) where {N,C} = ConfigSampler{N,C}(TropicalNumbers.staticfalses(StaticBitVector{N,C}))
+Base.zero(::Type{ConfigSampler{N,C}}) where {N,C} = ConfigSampler{N,C}(statictrues(StaticBitVector{N,C}))
+Base.one(::Type{ConfigSampler{N,C}}) where {N,C} = ConfigSampler{N,C}(staticfalses(StaticBitVector{N,C}))
 Base.zero(::ConfigSampler{N,C}) where {N,C} = zero(ConfigSampler{N,C})
 Base.one(::ConfigSampler{N,C}) where {N,C} = one(ConfigSampler{N,C})
 
@@ -178,7 +178,7 @@ for (F,TP) in [(:bitstringset_type, :ConfigEnumerator), (:bitstringsampler_type,
             CountingTropical{TV, $F(n)}
         end
         function $F(n::Integer)
-            C = TropicalNumbers._nints(n)
+            C = _nints(n)
             return $TP{n, C}
         end
     end
@@ -194,5 +194,5 @@ end
 function onehotv(::Type{CountingTropical{TV,BS}}, x) where {TV,BS}
     CountingTropical{TV,BS}(one(TV), onehotv(BS, x))
 end
-onehotv(::Type{ConfigEnumerator{N,C}}, i::Integer) where {N,C} = ConfigEnumerator([TropicalNumbers.onehot(StaticBitVector{N,C}, i)])
-onehotv(::Type{ConfigSampler{N,C}}, i::Integer) where {N,C} = ConfigSampler(TropicalNumbers.onehot(StaticBitVector{N,C}, i))
+onehotv(::Type{ConfigEnumerator{N,C}}, i::Integer) where {N,C} = ConfigEnumerator([onehotv(StaticBitVector{N,C}, i)])
+onehotv(::Type{ConfigSampler{N,C}}, i::Integer) where {N,C} = ConfigSampler(onehotv(StaticBitVector{N,C}, i))

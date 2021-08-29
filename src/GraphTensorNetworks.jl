@@ -15,6 +15,7 @@ OMEinsum.dynamic_einsum(::EinCode{ixs, iy}, xs; kwargs...) where {ixs, iy} = dyn
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 
+include("bitvector.jl")
 include("arithematics.jl")
 include("networks.jl")
 include("graph_polynomials.jl")

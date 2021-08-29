@@ -1,4 +1,4 @@
-export Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing
+export Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing, SpinGlass
 const EinTypes = Union{EinCode,NestedEinsum}
 
 abstract type GraphProblem end
@@ -20,10 +20,26 @@ function Independence(g::SimpleGraph; outputs=(), kwargs...)
 end
 
 """
-    Independence{CT<:EinTypes} <: GraphProblem
-    Independence(graph; kwargs...)
+    SpinGlass{Q, CT<:EinTypes} <: GraphProblem
+    SpinGlass{Q}(graph; kwargs...)
+    SpinGlass(graph; kwargs...)
 
-Independent set problem. For `kwargs`, check `optimize_code` API.
+Q-state spin glass problem (or Potts model). For `kwargs`, check `optimize_code` API.
+When Q=2, it corresponds to the {0, 1} spin glass model.
+"""
+struct SpinGlass{Q, CT<:EinTypes} <: GraphProblem
+    code::CT
+end
+
+SpinGlass(g::SimpleGraph; outputs=(), kwargs...) = SpinGlass{2}(g; outputs=outputs, kwargs...)
+SpinGlass{Q}(g::SimpleGraph; outputs=(), kwargs...) where Q = SpinGlass{Q}(Independence(g; outputs=outputs, kwargs...).code)
+SpinGlass{Q}(code::EinTypes) where Q = SpinGlass{Q,typeof(code)}(code)
+
+"""
+    MaximalIndependence{CT<:EinTypes} <: GraphProblem
+    MaximalIndependence(graph; kwargs...)
+
+Maximal independent set problem. For `kwargs`, check `optimize_code` API.
 """
 struct MaximalIndependence{CT<:EinTypes} <: GraphProblem
     code::CT
@@ -115,6 +131,7 @@ for T in [:Independence, :Matching, :MaximalIndependence]
     @eval bondsize(gp::$T) = 2
 end
 bondsize(gp::Coloring{K}) where K = K
+bondsize(gp::SpinGlass{Q}) where Q = Q
 
 """
     set_packing(sets; kwargs...)

@@ -1,6 +1,7 @@
 using GraphTensorNetworks, Test, OMEinsum, OMEinsumContractionOrders
 using Mods, Polynomials, TropicalNumbers
 using LightGraphs, Random
+using GraphTensorNetworks: StaticBitVector
 
 @testset "bond and vertex tensor" begin
     @test GraphTensorNetworks.misb(TropicalF64) == [TropicalF64(0) TropicalF64(0); TropicalF64(0) TropicalF64(-Inf)]
@@ -66,4 +67,13 @@ end
         add_edge!(g, i, j)
     end
     @test graph_polynomial(Matching, Val(:polynomial), g)[] == Polynomial([1,7,13,5])
+end
+
+@testset "spinglass" begin
+    g = SimpleGraph(5)
+    for (i,j) in [(1,2),(2,3),(3,4),(4,1),(1,5),(2,4)]
+        add_edge!(g, i, j)
+    end
+    @test graph_polynomial(SpinGlass{2}, Val(:polynomial), g)[] == Polynomial([2,2,4,12,10,2])
+    @test graph_polynomial(SpinGlass{2}, Val(:finitefield), g)[] == Polynomial([2,2,4,12,10,2])
 end

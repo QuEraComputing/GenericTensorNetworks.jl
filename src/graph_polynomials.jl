@@ -197,23 +197,16 @@ end
 
 graph_polynomial_maxorder(mi::MaximalIndependence; usecuda) = Int(sum(contractx(mi, TropicalF64(1.0); usecuda=usecuda)).n)
 
-### spin glass problem ###
-function generate_tensors(fx, gp::SpinGlass{2})
+### max cut/spin glass problem ###
+function generate_tensors(fx, gp::MaxCut)
     flatten_code = flatten(gp.code)
     ixs = getixs(flatten_code)
-    n = length(labels(flatten_code))
-    T = typeof(fx(ixs[1][1]))
     return Tuple(map(enumerate(ixs)) do (i, ix)
-        if i <= n
-            spinglassv(one(T))
-        else
-            spinglassb(fx(ix)) # if n!=2, it corresponds to set packing problem.
-        end
+        maxcutb(fx(ix)) # if n!=2, it corresponds to set packing problem.
     end)
 end
-function spinglassb(expJ::T) where T
+function maxcutb(expJ::T) where T
     return T[one(T) expJ; expJ one(T)]
 end
-spinglassv(h::T) where T = T[one(T), h]
 
-graph_polynomial_maxorder(mi::SpinGlass; usecuda) = Int(sum(contractx(mi, TropicalF64(1.0); usecuda=usecuda)).n)
+graph_polynomial_maxorder(mi::MaxCut; usecuda) = Int(sum(contractx(mi, TropicalF64(1.0); usecuda=usecuda)).n)

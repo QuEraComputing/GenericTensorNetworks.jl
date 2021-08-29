@@ -53,3 +53,14 @@ end
     @test BitVector(Bool[1,0,0,1,0]) ∈ res.c.data
     @test BitVector(Bool[0,1,1,0,0]) ∈ res.c.data
 end
+
+@testset "enumerating - max cut" begin
+    g = SimpleGraph(5)
+    for (i,j) in [(1,2),(2,3),(3,4),(4,1),(1,5),(2,4)]
+        add_edge!(g, i, j)
+    end
+    code = MaxCut(g; optmethod=:greedy)
+    res = optimalsolutions(code; all=true)[]
+    @test length(res.c.data) == 2
+    @test sum(res.c.data[1]) == 5
+end

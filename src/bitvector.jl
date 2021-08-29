@@ -44,3 +44,4 @@ function Base.iterate(x::StaticBitVector{N,C}, state=1) where {N,C}
     end
 end
 
+Base.show(io::IO, t::StaticBitVector) = Base.print(io, "$(join(Int.(t), ""))")

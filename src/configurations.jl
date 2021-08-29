@@ -12,8 +12,8 @@ function optimalsolutions(gp::GraphProblem; all=false, usecuda=false)
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
-    T = (all ? bitstringset_type : bitstringsampler_type)(CountingTropical{Int64}, length(labels(gp.code)))
-    syms = labels(gp.code)
+    syms = symbols(gp)
+    T = (all ? bitstringset_type : bitstringsampler_type)(CountingTropical{Int64}, length(syms))
     vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
     xst = generate_tensors(l->TropicalF64(1.0), gp)
     ymask = trues(fill(2, length(OMEinsum.getiy(flatten(gp.code))))...)
@@ -53,7 +53,13 @@ end
 
 # return a mapping from label to variable `x`
 function fx_solutions(gp::GraphProblem, ::Type{BT}, all::Bool) where BT
-    T = (all ? bitstringset_type : bitstringsampler_type)(BT, length(labels(gp.code)))
-    vertex_index = Dict([s=>i for (i, s) in enumerate(labels(gp.code))])
+    syms = symbols(gp)
+    T = (all ? bitstringset_type : bitstringsampler_type)(BT, length(syms))
+    vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
     return l->onehotv(T, vertex_index[l])
 end
+for GP in [:Independence, :Matching, :MaximalIndependence]
+    @eval symbols(gp::$GP) = labels(gp.code)
+end
+symbols(gp::MaxCut) = collect(OMEinsum.getixs(OMEinsum.flatten(gp.code)))
+# TODO: coloring

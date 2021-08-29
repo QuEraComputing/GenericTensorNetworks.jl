@@ -1,4 +1,4 @@
-export Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing, SpinGlass
+export Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing, MaxCut
 const EinTypes = Union{EinCode,NestedEinsum}
 
 abstract type GraphProblem end
@@ -20,20 +20,18 @@ function Independence(g::SimpleGraph; outputs=(), kwargs...)
 end
 
 """
-    SpinGlass{Q, CT<:EinTypes} <: GraphProblem
-    SpinGlass{Q}(graph; kwargs...)
-    SpinGlass(graph; kwargs...)
+    MaxCut{CT<:EinTypes} <: GraphProblem
+    MaxCut(graph; kwargs...)
 
-Q-state spin glass problem (or Potts model). For `kwargs`, check `optimize_code` API.
-When Q=2, it corresponds to the {0, 1} spin glass model.
+Max cut problem (or spin glass problem). For `kwargs`, check `optimize_code` API.
 """
-struct SpinGlass{Q, CT<:EinTypes} <: GraphProblem
+struct MaxCut{CT<:EinTypes} <: GraphProblem
     code::CT
 end
-
-SpinGlass(g::SimpleGraph; outputs=(), kwargs...) = SpinGlass{2}(g; outputs=outputs, kwargs...)
-SpinGlass{Q}(g::SimpleGraph; outputs=(), kwargs...) where Q = SpinGlass{Q}(Independence(g; outputs=outputs, kwargs...).code)
-SpinGlass{Q}(code::EinTypes) where Q = SpinGlass{Q,typeof(code)}(code)
+function MaxCut(g::SimpleGraph; outputs=(), kwargs...)
+    rawcode = EinCode(([minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...,), outputs)  # labels for edge tensors
+    MaxCut(optimize_code(rawcode; kwargs...))
+end
 
 """
     MaximalIndependence{CT<:EinTypes} <: GraphProblem
@@ -127,11 +125,10 @@ end
 
 OMEinsum.timespace_complexity(gp::GraphProblem) = timespace_complexity(gp.code, uniformsize(gp.code, bondsize(gp)))
 
-for T in [:Independence, :Matching, :MaximalIndependence]
+for T in [:Independence, :Matching, :MaximalIndependence, :MaxCut]
     @eval bondsize(gp::$T) = 2
 end
 bondsize(gp::Coloring{K}) where K = K
-bondsize(gp::SpinGlass{Q}) where Q = Q
 
 """
     set_packing(sets; kwargs...)

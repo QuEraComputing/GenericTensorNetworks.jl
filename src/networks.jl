@@ -100,7 +100,7 @@ function labels(code::EinTypes)
 end
 
 """
-    optimize_code(code; optmethod=:kahypar, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8)
+    optimize_code(code; optmethod=:kahypar, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8, βs=0.01:0.05:10.0, ntrials=50, niters=1000)
 
 Optimize the contraction order.
 
@@ -108,17 +108,20 @@ Optimize the contraction order.
     * `:kahypar`, the kahypar + greedy approach, takes kwargs [`sc_target`, `max_group_size`, `imbalances`].
     Check `optimize_kahypar` method in package `OMEinsumContractionOrders`.
     * `:auto`, also the kahypar + greedy approach, but determines `sc_target` automatically. It is slower!
-    * `:greedy`, the greedy approach. Check in `optimize_greedy` in package `OMEinsum`.
+    * `:greedy`, the greedy approach. Check `optimize_greedy` in package `OMEinsum`.
+    * `:sa`, the simulated annealing approach. Check `optimize_sa` in package `OMEinsumContractionOrders`.
     * `:raw`, do nothing and return the raw EinCode.
 """
-function optimize_code(code::EinTypes; optmethod=:auto, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8)
+function optimize_code(code::EinTypes; optmethod=:auto, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8, initializer=:random, βs=0.01:0.05:10.0, ntrials=50, niters=1000)
     size_dict = Dict([s=>2 for s in labels(code)])
     optcode = if optmethod == :kahypar
-        optimize_kahypar(code, size_dict; sc_target=sc_target, max_group_size=max_group_size, imbalances=imbalances)
+        optimize_kahypar(code, size_dict; sc_target=sc_target, max_group_size=max_group_size, imbalances=imbalances, greedy_nrepeat=nrepeat)
+    elseif optmethod == :sa
+        optimize_sa(code, size_dict; sc_target=sc_target, max_group_size=max_group_size, βs=βs, ntrials=ntrials, niters=niters, initializer=initializer, greedy_nrepeat=nrepeat)
     elseif optmethod == :greedy
         optimize_greedy(code, size_dict; nrepeat=nrepeat)
     elseif optmethod == :auto
-        optimize_kahypar_auto(code, size_dict; max_group_size=max_group_size, effort=500)
+        optimize_kahypar_auto(code, size_dict; max_group_size=max_group_size, effort=500, greedy_nrepeat=nrepeat)
     elseif optmethod == :raw
         code
     else

@@ -46,8 +46,8 @@ end
 
 @testset "counting maximal IS" begin
     g = random_regular_graph(20, 3)
-    cs = graph_polynomial(MaximalIndependence, Val(:fft), g; r=1.0, optmethod=:greedy)[]
-    cs2 = graph_polynomial(MaximalIndependence, Val(:polynomial), g; optmethod=:greedy)[]
+    cs = graph_polynomial(MaximalIndependence, Val(:fft), g; r=1.0, optmethod=:kahypar)[]
+    cs2 = graph_polynomial(MaximalIndependence, Val(:polynomial), g; optmethod=:sa)[]
     cs3 = graph_polynomial(MaximalIndependence, Val(:finitefield), g; optmethod=:greedy)[]
     cg = complement(g)
     cliques = maximal_cliques(cg)

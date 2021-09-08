@@ -67,7 +67,7 @@ const StaticBitVector{N,C} = StaticElementVector{N,1,C}
     @boundscheck i <= N || throw(BoundsError(x, i))  # TODO: make this @boundscheck work.
     i -= 1
     ii = i ÷ 64
-    (x.data[ii+1] >> (i-ii*64)) & 1
+    @inbounds (x.data[ii+1] >> (i-ii*64)) & 1
 end
 
 function StaticBitVector(x::AbstractVector)

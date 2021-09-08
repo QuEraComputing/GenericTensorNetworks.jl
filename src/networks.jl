@@ -53,6 +53,11 @@ end
     Matching(graph; kwargs...)
 
 Vertex matching problem. For `kwargs`, check `optimize_code` API.
+The matching polynomial adopts the first definition in wiki page: https://en.wikipedia.org/wiki/Matching_polynomial
+```math
+m_G(x) := \\sum_{k\\geq 0}m_kx^k,
+```
+where `m_k` is the number of k-edge matchings.
 """
 struct Matching{CT<:EinTypes} <: GraphProblem
     code::CT

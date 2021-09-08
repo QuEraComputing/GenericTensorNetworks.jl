@@ -81,3 +81,11 @@ end
     res = solutions(code, CountingTropicalF64; all=true)[]
     @test length(res.c.data) == 120
 end
+
+@testset "enumerating - matching" begin
+    g = smallgraph(:petersen)
+    code = Matching(g; optmethod=:greedy)
+    res = solutions(code, CountingTropicalF64; all=true)[]
+    @test res.n == 5
+    @test length(res.c.data) == 6
+end

@@ -67,6 +67,8 @@ end
         add_edge!(g, i, j)
     end
     @test graph_polynomial(Matching, Val(:polynomial), g)[] == Polynomial([1,7,13,5])
+    g = smallgraph(:petersen)
+    @test graph_polynomial(Matching, Val(:polynomial), g)[].coeffs == [6, 90, 145, 75, 15, 1][end:-1:1]
 end
 
 @testset "spinglass" begin

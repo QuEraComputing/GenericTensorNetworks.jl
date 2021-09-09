@@ -152,7 +152,7 @@ julia> sets = [[1, 2, 5], [1, 3], [2, 4], [3, 6], [2, 3, 6]];  # each set is a v
 
 julia> gp = set_packing(sets; optmethod=:auto);
 
-julia> res = optimalsolutions(gp; all=true)[]
+julia> res = best_solutions(gp; all=true)[]
 (2, {10010, 00110, 01100})ₜ
 ```
 """

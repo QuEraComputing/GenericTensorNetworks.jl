@@ -7,7 +7,7 @@ using OMEinsum
 using OMEinsum: flatten, timespace_complexity
 using LightGraphs
 
-export timespace_complexity
+export timespace_complexity, @ein_str
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 

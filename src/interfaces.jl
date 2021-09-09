@@ -44,9 +44,9 @@ function solve(gp::GraphProblem, task; usecuda=false, kwargs...)
     elseif task == "counting all (finitefield)"
         return graph_polynomial(gp, Val(:finitefield); usecuda=usecuda, kwargs...)
     elseif task == "config max (bounded)"
-        return optimalsolutions(gp; all=false, usecuda=usecuda)
+        return best_solutions(gp; all=false, usecuda=usecuda)
     elseif task == "configs max (bounded)"
-        return optimalsolutions(gp; all=true, usecuda=usecuda)
+        return best_solutions(gp; all=true, usecuda=usecuda)
     else
         error("unknown task $task.")
     end

@@ -1,41 +1,4 @@
-export case_r3, case_dc, solve, suboptimal_counting
-
-using Random
-
-mis_size(gp::Independence; usecuda=false) = sum(contractx(gp, TropicalF64(1.0); usecuda=usecuda)).n
-mis_count(gp::Independence; usecuda=false) = sum(contractx(gp, CountingTropical{Float64,Float64}(1.0, 1.0); usecuda=usecuda)).c
-
-function graph_polynomial(which, approach::Val, g::SimpleGraph; optmethod=:kahypar, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8, kwargs...)
-    gp = which(g; optmethod=optmethod, sc_target=sc_target, max_group_size=max_group_size, nrepeat=nrepeat, imbalances=imbalances)
-    graph_polynomial(gp, approach; kwargs...)
-end
-
-function case_r3(n, k=3; sc_target, seed=2)
-    # generate a random regular graph of size 100, degree 3
-    graph = (Random.seed!(seed); LightGraphs.random_regular_graph(n, k))
-    @assert length(connected_components(graph)) == 1  # connected graph
-    # optimize the contraction order using KaHyPar + Greedy
-    optcode = independence_code(graph; method=:kahypar, sc_target=sc_target, max_group_size=40, imbalances=0:0.001:1)
-    return optcode
-end
-
-function case_dc(L::Int, ρ; sc_target, seed=2)
-    # generate a random regular graph of size 100, degree 3
-    Random.seed!(seed)
-    graph = diagonal_coupled_graph(rand(L, L) .< ρ)
-    # optimize the contraction order using KaHyPar + Greedy, target space complexity is 2^20
-    optcode = independence_code(graph; method=:kahypar, sc_target=sc_target, max_group_size=40)
-    return optcode
-end
-
-function case_sq(L::Int, ρ; sc_target, seed=2)
-    # generate a random regular graph of size 100, degree 3
-    Random.seed!(seed)
-    graph = square_lattice_graph(rand(L, L) .< ρ)
-    # optimize the contraction order using KaHyPar + Greedy, target space complexity is 2^20
-    optcode = independence_code(graph; method=:kahypar, sc_target=sc_target, max_group_size=40)
-    return optcode
-end
+export solve
 
 """
     solve(problem, task; usecuda=false)
@@ -56,7 +19,7 @@ end
     * "configs all", all MIS configurations,
     * "configs max (bounded)", all MIS configurations, the bounded approach (much faster),
 """
-function solve(gp::GraphProblem, task; usecuda=false)
+function solve(gp::GraphProblem, task; usecuda=false, kwargs...)
     if task == "size max"
         return contractx(gp, Tropical(1.0); usecuda=usecuda)
     elseif task == "counting sum"
@@ -77,9 +40,9 @@ function solve(gp::GraphProblem, task; usecuda=false)
         return solutions(gp, Polynomial{Float64,:x}; all=true, usecuda=usecuda)
     # extra methods
     elseif task == "counting all (fft)"
-        return graph_polynomial(gp, Val(:fft); usecuda=usecuda)
+        return graph_polynomial(gp, Val(:fft); usecuda=usecuda, kwargs...)
     elseif task == "counting all (finitefield)"
-        return graph_polynomial(gp, Val(:finitefield); usecuda=usecuda)
+        return graph_polynomial(gp, Val(:finitefield); usecuda=usecuda, kwargs...)
     elseif task == "config max (bounded)"
         return optimalsolutions(gp; all=false, usecuda=usecuda)
     elseif task == "configs max (bounded)"
@@ -87,8 +50,4 @@ function solve(gp::GraphProblem, task; usecuda=false)
     else
         error("unknown task $task.")
     end
-end
-
-function solve_is(g::SimpleGraph, task; usecuda=false)
-    solve(optimize_code(Independence(g); optmethod=:auto), task; usecuda=usecuda)
 end

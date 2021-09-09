@@ -7,7 +7,7 @@ abstract type GraphProblem end
     Independence{CT<:EinTypes} <: GraphProblem
     Independence(graph; kwargs...)
 
-Independent set problem. For `kwargs`, check `optimize_code` API.
+Independent set problem. `kwargs` is forwarded to `optimize_code`.
 """
 struct Independence{CT<:EinTypes} <: GraphProblem
     code::CT
@@ -23,7 +23,7 @@ end
     MaxCut{CT<:EinTypes} <: GraphProblem
     MaxCut(graph; kwargs...)
 
-Max cut problem (or spin glass problem). For `kwargs`, check `optimize_code` API.
+Max cut problem (or spin glass problem). `kwargs` is forwarded to `optimize_code`.
 """
 struct MaxCut{CT<:EinTypes} <: GraphProblem
     code::CT
@@ -37,7 +37,7 @@ end
     MaximalIndependence{CT<:EinTypes} <: GraphProblem
     MaximalIndependence(graph; kwargs...)
 
-Maximal independent set problem. For `kwargs`, check `optimize_code` API.
+Maximal independent set problem. `kwargs` is forwarded to `optimize_code`.
 """
 struct MaximalIndependence{CT<:EinTypes} <: GraphProblem
     code::CT
@@ -52,7 +52,7 @@ end
     Matching{CT<:EinTypes} <: GraphProblem
     Matching(graph; kwargs...)
 
-Vertex matching problem. For `kwargs`, check `optimize_code` API.
+Vertex matching problem. `kwargs` is forwarded to `optimize_code`.
 The matching polynomial adopts the first definition in wiki page: https://en.wikipedia.org/wiki/Matching_polynomial
 ```math
 m_G(x) := \\sum_{k\\geq 0}m_kx^k,
@@ -73,7 +73,7 @@ end
     Coloring{K,CT<:EinTypes} <: GraphProblem
     Coloring{K}(graph; kwargs...)
 
-K-Coloring problem. For `kwargs`, check `optimize_code` API.
+K-Coloring problem. `kwargs` is forwarded to `optimize_code`.
 """
 struct Coloring{K,CT<:EinTypes} <: GraphProblem
     code::CT
@@ -143,7 +143,8 @@ bondsize(gp::Coloring{K}) where K = K
 
 Set packing is a generalization of independent set problem to hypergraphs.
 Calling this function will return you an `Independence` instance.
-`sets` are a vector of vectors, each element being a vertex in the independent set problem. `kwargs` are code optimization parameters.
+`sets` are a vector of vectors, each element being a vertex in the independent set problem.
+`kwargs` is forwarded to `optimize_code`.
 
 ### Example
 ```julia

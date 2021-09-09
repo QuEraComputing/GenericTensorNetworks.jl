@@ -1,10 +1,11 @@
-# StaticBitVector
-export StaticBitVector, StaticElementVector
+export StaticBitVector, StaticElementVector, @bv_str
 
 """
     StaticElementVector{N,S,C}
 
-`N` is the length of vector, `C` is the size of storage in unit of `UInt64`, `S` is the stride defined as the `log2(# of flavors)`.
+`N` is the length of vector, `C` is the size of storage in unit of `UInt64`,
+`S` is the stride defined as the `log2(# of flavors)`.
+When the number of flavors is 2, it is a `StaticBitVector`.
 """
 struct StaticElementVector{N,S,C}
     data::NTuple{C,UInt64}
@@ -102,3 +103,33 @@ function Base.iterate(x::StaticElementVector{N,S,C}, state=1) where {N,S,C}
 end
 
 Base.show(io::IO, t::StaticElementVector) = Base.print(io, "$(join(Int.(t), ""))")
+
+function Base.count_ones(x::StaticBitVector)
+    sum(v->count_ones(v),x.data)
+end
+
+"""
+Constructing a static bit vector.
+"""
+macro bv_str(str)
+    return parse_vector(2, str)
+end
+
+function parse_vector(nflavor::Int, str::String)
+    val = Int[]
+    k = 1
+    for each in filter(x -> x != '_', str)
+        if each == '1'
+            push!(val, 1)
+            k += 1
+        elseif each == '0'
+            push!(val, 0)
+            k += 1
+        elseif each == '_'
+            continue
+        else
+            error("expect 0 or 1, got $each at $k-th bit")
+        end
+    end
+    return StaticElementVector(nflavor, val)
+end

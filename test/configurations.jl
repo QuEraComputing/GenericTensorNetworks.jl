@@ -32,8 +32,8 @@ end
     rawcode = Independence(random_regular_graph(10, 3); optmethod=:raw)
     optcode = Independence(optimize_code(rawcode.code; optmethod=:auto))
     for code in [rawcode, optcode]
-        res0 = GraphTensorNetworks.mis_size(code)
-        res1 = GraphTensorNetworks.mis_count(code)
+        res0 = max_size(code)
+        _, res1 = max_size_count(code)
         res2 = optimalsolutions(code; all=true)[]
         res3 = solutions(code, CountingTropical{Float64}; all=false)[]
         res4 = solutions(code, CountingTropical{Float64}; all=true)[]

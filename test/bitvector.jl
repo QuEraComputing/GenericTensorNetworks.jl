@@ -23,5 +23,7 @@ using GraphTensorNetworks: statictrues, staticfalses, StaticBitVector, onehotv
     xl = StaticElementVector(16, bl)
     @test typeof(xl) == StaticElementVector{100,4,7}
     @test [xl...] == bl
+
+    @test bv"110_111" == StaticBitVector([1,1,0,1,1,1])
 end
 

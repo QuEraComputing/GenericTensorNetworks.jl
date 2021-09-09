@@ -9,10 +9,6 @@ using LightGraphs
 
 export timespace_complexity
 
-# patches for OMEinsum
-OMEinsum.asarray(x, ::AbstractArray) = fill(x)
-OMEinsum.dynamic_einsum(::EinCode{ixs, iy}, xs; kwargs...) where {ixs, iy} = dynamic_einsum(ixs, xs, iy; kwargs...)
-
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 
 include("bitvector.jl")

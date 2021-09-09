@@ -3,7 +3,7 @@ using OMEinsum: NestedEinsum, getixs, getiy
 using FFTW
 using LightGraphs
 
-export contractx, contractf, graph_polynomial
+export contractx, contractf, graph_polynomial, max_size, max_size_count
 
 """
     graph_polynomial(problem, method; usecuda=false, kwargs...)
@@ -29,7 +29,7 @@ Computing the graph polynomial for specific problem.
 function graph_polynomial end
 
 function graph_polynomial(gp::GraphProblem, ::Val{:fft}; usecuda=false, 
-        maxorder=graph_polynomial_maxorder(gp; usecuda=usecuda), r=1.0)
+        maxorder=max_size(gp; usecuda=usecuda), r=1.0)
 	ω = exp(-2im*π/(maxorder+1))
 	xs = r .* collect(ω .^ (0:maxorder))
 	ys = [contractx(gp, x; usecuda=usecuda) for x in xs]
@@ -37,7 +37,7 @@ function graph_polynomial(gp::GraphProblem, ::Val{:fft}; usecuda=false,
 end
 
 function graph_polynomial(gp::GraphProblem, ::Val{:fitting}; usecuda=false,
-        maxorder = graph_polynomial_maxorder(gp; usecuda=usecuda))
+        maxorder = max_size(gp; usecuda=usecuda))
 	xs = (0:maxorder)
 	ys = [contractx(gp, x; usecuda=usecuda) for x in xs]
 	map(ci->fit(xs, getindex.(ys, Ref(ci))), CartesianIndices(ys[1]))
@@ -63,7 +63,7 @@ function _polynomial_single(gp::GraphProblem, ::Type{T}; usecuda, maxorder) wher
 end
 
 function graph_polynomial(gp::GraphProblem, ::Val{:finitefield}; usecuda=false,
-        maxorder=graph_polynomial_maxorder(gp; usecuda=usecuda), max_iter=100)
+        maxorder=max_size(gp; usecuda=usecuda), max_iter=100)
     TI = Int32  # Int 32 is faster
     N = typemax(TI)
     YS = fill(Any[], (fill(bondsize(gp), length(getiy(flatten(gp.code))))...,))
@@ -125,8 +125,6 @@ function misb(::Type{T}, n::Integer=2) where T
 end
 misv(val::T) where T = [one(T), val]
 
-graph_polynomial_maxorder(gp::Independence; usecuda) = Int(sum(contractx(gp, TropicalF64(1.0); usecuda=usecuda)).n)
-
 ### coloring ###
 function generate_tensors(fx, c::Coloring{K}) where K
     ixs = getixs(flatten(c.code))
@@ -176,8 +174,6 @@ function match_tensor(::Type{T}, n::Int) where T
     return t
 end
 
-graph_polynomial_maxorder(m::Matching; usecuda) = Int(sum(contractx(m, TropicalF64(1.0); usecuda=usecuda)).n)
-
 ### maximal independent set ###
 function generate_tensors(fx, mi::MaximalIndependence)
     ixs = OMEinsum.getixs(flatten(mi.code))
@@ -195,8 +191,6 @@ function neighbortensor(x::T, d::Int) where T
     return t
 end
 
-graph_polynomial_maxorder(mi::MaximalIndependence; usecuda) = Int(sum(contractx(mi, TropicalF64(1.0); usecuda=usecuda)).n)
-
 ### max cut/spin glass problem ###
 function generate_tensors(fx, gp::MaxCut)
     flatten_code = flatten(gp.code)
@@ -209,4 +203,7 @@ function maxcutb(expJ::T) where T
     return T[one(T) expJ; expJ one(T)]
 end
 
-graph_polynomial_maxorder(mi::MaxCut; usecuda) = Int(sum(contractx(mi, TropicalF64(1.0); usecuda=usecuda)).n)
+for TP in [:MaximalIndependence, :Independence, :Matching, :MaxCut]
+    @eval max_size(m::$TP; usecuda=false) = Int(sum(contractx(m, TropicalF64(1.0); usecuda=usecuda)).n)  # floating point number is faster (BLAS)
+    @eval max_size_count(m::$TP; usecuda=false) = (r = sum(contractx(m, CountingTropical{Float64,Float64}(1.0, 1.0); usecuda=usecuda)); (Int(r.n), Int(r.c)))
+end

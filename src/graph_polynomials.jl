@@ -50,7 +50,7 @@ end
 
 function _polynomial_single(gp::GraphProblem, ::Type{T}; usecuda, maxorder) where T
 	xs = 0:maxorder
-	ys = [contractx(gp, T(x); usecuda=usecuda) for x in xs]
+    ys = [Array(contractx(gp, T(x); usecuda=usecuda)) for x in xs]  # download to CPU
     res = fill(T[], size(ys[1]))  # contraction result can be a tensor
     for ci in length(ys[1])
 	    A = zeros(T, maxorder+1, maxorder+1)

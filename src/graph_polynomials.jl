@@ -30,17 +30,17 @@ function graph_polynomial end
 
 function graph_polynomial(gp::GraphProblem, ::Val{:fft}; usecuda=false, 
         maxorder=max_size(gp; usecuda=usecuda), r=1.0)
-	ω = exp(-2im*π/(maxorder+1))
-	xs = r .* collect(ω .^ (0:maxorder))
-	ys = [contractx(gp, x; usecuda=usecuda) for x in xs]
-	map(ci->Polynomial(ifft(getindex.(ys, Ref(ci))) ./ (r .^ (0:maxorder))), CartesianIndices(ys[1]))
+    ω = exp(-2im*π/(maxorder+1))
+    xs = r .* collect(ω .^ (0:maxorder))
+    ys = [Array(contractx(gp, x; usecuda=usecuda)) for x in xs]
+    map(ci->Polynomial(ifft(getindex.(ys, Ref(ci))) ./ (r .^ (0:maxorder))), CartesianIndices(ys[1]))
 end
 
 function graph_polynomial(gp::GraphProblem, ::Val{:fitting}; usecuda=false,
         maxorder = max_size(gp; usecuda=usecuda))
-	xs = (0:maxorder)
-	ys = [contractx(gp, x; usecuda=usecuda) for x in xs]
-	map(ci->fit(xs, getindex.(ys, Ref(ci))), CartesianIndices(ys[1]))
+    xs = (0:maxorder)
+    ys = [Array(contractx(gp, x; usecuda=usecuda)) for x in xs]
+    map(ci->fit(xs, getindex.(ys, Ref(ci))), CartesianIndices(ys[1]))
 end
 
 function graph_polynomial(gp::GraphProblem, ::Val{:polynomial}; usecuda=false)

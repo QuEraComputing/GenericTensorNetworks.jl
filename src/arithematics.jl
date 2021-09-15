@@ -99,6 +99,10 @@ function Base.show(io::IO, ::MIME"text/plain", x::Max2Poly)
     end
 end
 
+# patch for CUDA matmul
+Base.:*(a::Bool, y::Max2Poly{T,TO}) where {T,TO} = a ? y : zero(y)
+Base.:*(y::Max2Poly{T,TO}, a::Bool) where {T,TO} = a ? y : zero(y)
+
 struct ConfigEnumerator{N,S,C}
     data::Vector{StaticElementVector{N,S,C}}
 end

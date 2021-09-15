@@ -109,6 +109,7 @@ Optimize the contraction order.
     Check `optimize_kahypar` method in package `OMEinsumContractionOrders`.
     * `:auto`, also the kahypar + greedy approach, but determines `sc_target` automatically. It is slower!
     * `:greedy`, the greedy approach. Check `optimize_greedy` in package `OMEinsum`.
+    * `:tree`, the approach of running simulated annealing on expression tree. Check `optimize_tree` in package `OMEinsumContractionOrders`.
     * `:sa`, the simulated annealing approach. Check `optimize_sa` in package `OMEinsumContractionOrders`.
     * `:raw`, do nothing and return the raw EinCode.
 """

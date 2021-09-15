@@ -112,7 +112,7 @@ Optimize the contraction order.
     * `:sa`, the simulated annealing approach. Check `optimize_sa` in package `OMEinsumContractionOrders`.
     * `:raw`, do nothing and return the raw EinCode.
 """
-function optimize_code(code::EinTypes; optmethod=:auto, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8, initializer=:random, βs=0.01:0.05:10.0, ntrials=50, niters=1000)
+function optimize_code(code::EinTypes; optmethod=:auto, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8, initializer=:random, βs=0.01:0.05:10.0, ntrials=50, niters=1000, sc_weight=5.0)
     size_dict = Dict([s=>2 for s in labels(code)])
     optcode = if optmethod == :kahypar
         optimize_kahypar(code, size_dict; sc_target=sc_target, max_group_size=max_group_size, imbalances=imbalances, greedy_nrepeat=nrepeat)
@@ -120,6 +120,8 @@ function optimize_code(code::EinTypes; optmethod=:auto, sc_target=17, max_group_
         optimize_sa(code, size_dict; sc_target=sc_target, max_group_size=max_group_size, βs=βs, ntrials=ntrials, niters=niters, initializer=initializer, greedy_nrepeat=nrepeat)
     elseif optmethod == :greedy
         optimize_greedy(code, size_dict; nrepeat=nrepeat)
+    elseif optmethod == :tree
+        optimize_tree(code, size_dict; sc_target=sc_target, βs=βs, niters=niters, ntrials=ntrials, sc_weight=sc_weight, initializer=initializer)
     elseif optmethod == :auto
         optimize_kahypar_auto(code, size_dict; max_group_size=max_group_size, effort=500, greedy_nrepeat=nrepeat)
     elseif optmethod == :raw

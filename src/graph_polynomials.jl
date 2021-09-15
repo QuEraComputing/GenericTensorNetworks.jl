@@ -196,7 +196,7 @@ function generate_tensors(fx, gp::MaxCut)
     flatten_code = flatten(gp.code)
     ixs = getixs(flatten_code)
     return Tuple(map(enumerate(ixs)) do (i, ix)
-        maxcutb(fx(ix)) # if n!=2, it corresponds to set packing problem.
+        maxcutb(fx(ix))
     end)
 end
 function maxcutb(expJ::T) where T

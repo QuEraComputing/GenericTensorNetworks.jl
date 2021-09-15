@@ -16,7 +16,7 @@ export solve
     * "config max (bounded)", one of the maximum independent set, the bounded version,
     * "configs max", all MIS configurations,
     * "configs max2", all MIS configurations and MIS-1 configurations,
-    * "configs all", all MIS configurations,
+    * "configs all", all IS configurations,
     * "configs max (bounded)", all MIS configurations, the bounded approach (much faster),
 """
 function solve(gp::GraphProblem, task; usecuda=false, kwargs...)

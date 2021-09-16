@@ -1,5 +1,5 @@
 using .CUDA
-using TropicalGEMM: XTranspose, NativeTypes, Tropical
+using TropicalGEMM: XTranspose, NativeTypes, Tropical, TropicalTypes
 using LinearAlgebra
 
 function onehotmask(A::CuArray{T}, X::CuArray{T}) where T
@@ -12,13 +12,14 @@ end
 
 # fix the matrix multiplication ambiguity
 const CTranspose{T} = Transpose{T, <:StridedCuVecOrMat{T}}
-for RT in [:Tropical, :Real]
-    for (TA, CTA) in [(:CuMatrix, :CuMatrix), (:CTranspose, :(Transpose{<:Any, <:StridedCuVecOrMat}))]
-        for (TB, CTB) in [(:CuMatrix, :CuMatrix), (:CTranspose, :(Transpose{<:Any, <:StridedCuVecOrMat}))]
-            @eval function LinearAlgebra.mul!(o::CuMatrix{T}, a::$TA{T}, b::$TB{T}, α::$RT, β::$RT) where {T<:Tropical{<:NativeTypes}}
-                #invoke(LinearAlgebra.mul!, Tuple{CuMatrix, $CTA, $CTB, Number, Number}, o, a, b, α, β)
-                CUDA.CUBLAS.gemm_dispatch!(o, a, b, α, β)
-            end
-        end
-    end
+for TT in [:(Tropical{<:NativeTypes}), :TropicalTypes]
+   for RT in [TT, :Real]
+       for (TA, CTA) in [(:CuMatrix, :CuMatrix), (:CTranspose, :(Transpose{<:Any, <:StridedCuVecOrMat}))]
+           for (TB, CTB) in [(:CuMatrix, :CuMatrix), (:CTranspose, :(Transpose{<:Any, <:StridedCuVecOrMat}))]
+               @eval function LinearAlgebra.mul!(o::CuMatrix{T}, a::$TA{T}, b::$TB{T}, α::$RT, β::$RT) where {T<:$TT}
+                   CUDA.CUBLAS.gemm_dispatch!(o, a, b, α, β)
+               end
+           end
+       end
+   end
 end

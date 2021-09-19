@@ -24,8 +24,6 @@ for TT in [:(Tropical{<:NativeTypes}), :TropicalTypes]
    end
 end
 
-<<<<<<< HEAD
-=======
 using .CUDA: @cartesianidx, AbstractGPUArray, gpu_call
 
 @inline @generated function map_index(dest, src, I, perm::NTuple{N,T}) where {N,T}
@@ -42,4 +40,3 @@ function LinearAlgebra.permutedims!(dest::AbstractGPUArray, src::AbstractGPUArra
     gpu_call(permutedims_kernel, dest, src, perm)
     return dest
 end
->>>>>>> 22e8c5179a33a94ddc43baa995933d109050d502

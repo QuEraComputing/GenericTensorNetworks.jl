@@ -108,6 +108,7 @@ struct ConfigEnumerator{N,S,C}
 end
 
 Base.length(x::ConfigEnumerator{N}) where N = length(x.data)
+Base.getindex(x::ConfigEnumerator, i) = x.data[i]
 Base.:(==)(x::ConfigEnumerator{N,S,C}, y::ConfigEnumerator{N,S,C}) where {N,S,C} = x.data == y.data
 
 function Base.:+(x::ConfigEnumerator{N,S,C}, y::ConfigEnumerator{N,S,C}) where {N,S,C}

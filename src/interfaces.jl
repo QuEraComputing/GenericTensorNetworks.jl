@@ -51,3 +51,75 @@ function solve(gp::GraphProblem, task; usecuda=false, kwargs...)
         error("unknown task $task.")
     end
 end
+
+export save_configs, load_configs
+using DelimitedFiles
+function save_configs(filename, data::ConfigEnumerator{N,S,C}; format::Symbol=:binary) where {N,S,C}
+    if format == :binary
+        write(filename, raw_matrix(data))
+    elseif format == :text
+        writedlm(filename, plain_matrix(data))
+    else
+        error("format must be `:binary` or `:text`, got `:$format`")
+    end
+end
+function load_configs(filename; len=nothing, format::Symbol=:binary, nflavors=2)
+    if format == :binary
+        len === nothing && error("you need to specify `len` for reading configurations from binary files.")
+        S = ceil(Int, log2(nflavors))
+        C = _nints(len, S)
+        return _from_raw_matrix(StaticElementVector{len,S,C}, reshape(reinterpret(UInt64, read(filename)),C,:))
+    elseif format == :text
+        return from_plain_matrix(readdlm(filename); nflavors=nflavors)
+    else
+        error("format must be `:binary` or `:text`, got `:$format`")
+    end
+end
+
+function raw_matrix(x::ConfigEnumerator{N,S,C}) where {N,S,C}
+    m = zeros(UInt64, C, length(x))
+    @inbounds for i=1:length(x), j=1:C
+        m[j,i] = x.data[i].data[j]
+    end
+    return m
+end
+function plain_matrix(x::ConfigEnumerator{N,S,C}) where {N,S,C}
+    m = zeros(UInt8, N, length(x))
+    @inbounds for i=1:length(x), j=1:N
+        m[j,i] = x.data[i][j]
+    end
+    return m
+end
+
+function from_raw_matrix(m; len, nflavors=2)
+    S = ceil(Int,log2(nflavors))
+    C = size(m, 1)
+    T = StaticElementVector{len,S,C}
+    @assert len*S <= C*64
+    _from_raw_matrix(T, m)
+end
+function _from_raw_matrix(::Type{StaticElementVector{N,S,C}}, m::AbstractMatrix) where {N,S,C}
+    data = zeros(StaticElementVector{N,S,C}, size(m, 2))
+    @inbounds for i=1:size(m, 2)
+        data[i] = StaticElementVector{N,S,C}(NTuple{C,UInt64}(view(m,:,i)))
+    end
+    return ConfigEnumerator(data)
+end
+function from_plain_matrix(m::Matrix; nflavors=2)
+    S = ceil(Int,log2(nflavors))
+    N = size(m, 1)
+    C = _nints(N, S)
+    T = StaticElementVector{N,S,C}
+    _from_plain_matrix(T, m)
+end
+function _from_plain_matrix(::Type{StaticElementVector{N,S,C}}, m::AbstractMatrix) where {N,S,C}
+    data = zeros(StaticElementVector{N,S,C}, size(m, 2))
+    @inbounds for i=1:size(m, 2)
+        data[i] = convert(StaticElementVector{N,S,C}, view(m, :, i))
+    end
+    return ConfigEnumerator(data)
+end
+
+# convert to Matrix
+Base.Matrix(ce::ConfigEnumerator) = plain_matrix(ce)
+Base.Vector(ce::StaticElementVector) = collect(ce)

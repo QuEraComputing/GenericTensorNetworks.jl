@@ -31,3 +31,42 @@ using LightGraphs, Test
     @test res12.c.data ∈ res13.c.data
     @test res13.c.data == res7.c.data
 end
+
+@testset "save load" begin
+    M = 10
+    m = ConfigEnumerator([StaticBitVector(rand(Bool, 300)) for i=1:M])
+    bm = GraphTensorNetworks.plain_matrix(m)
+    rm = GraphTensorNetworks.raw_matrix(m)
+    m1 = GraphTensorNetworks.from_raw_matrix(rm; len=300, nflavors=2)
+    m2 = GraphTensorNetworks.from_plain_matrix(bm; nflavors=2)
+    @test m1 == m
+    @test m2 == m
+    save_configs("_test.bin", m; format=:binary)
+    @test_throws ErrorException load_configs("_test.bin"; format=:binary)
+    ma = load_configs("_test.bin"; format=:binary, len=300, nflavors=2)
+    @test ma == m
+
+    save_configs("_test.txt", m; format=:text)
+    mb = load_configs("_test.txt"; format=:text, nflavors=2)
+    @test mb == m
+
+    M = 10
+    m = ConfigEnumerator([StaticElementVector(3, rand(1:3, 300)) for i=1:M])
+    bm = GraphTensorNetworks.plain_matrix(m)
+    rm = GraphTensorNetworks.raw_matrix(m)
+    m1 = GraphTensorNetworks.from_raw_matrix(rm; len=300, nflavors=3)
+    m2 = GraphTensorNetworks.from_plain_matrix(bm; nflavors=3)
+    @test m1 == m
+    @test m2 == m
+    @test Matrix(m) == bm
+    @test Vector(m.data[1]) == bm[:,1]
+
+    save_configs("_test.bin", m; format=:binary)
+    @test_throws ErrorException load_configs("_test.bin"; format=:binary)
+    ma = load_configs("_test.bin"; format=:binary, len=300, nflavors=3)
+    @test ma == m
+
+    save_configs("_test.txt", m; format=:text)
+    mb = load_configs("_test.txt"; format=:text, nflavors=3)
+    @test mb == m
+end

@@ -90,4 +90,3 @@ for GP in [:Independence, :Matching, :MaximalIndependence, :Coloring]
     @eval symbols(gp::$GP) = labels(gp.code)
 end
 symbols(gp::MaxCut) = collect(OMEinsum.getixs(OMEinsum.flatten(gp.code)))
-# TODO: coloring

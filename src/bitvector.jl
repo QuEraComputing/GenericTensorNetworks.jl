@@ -65,10 +65,10 @@ end
 ##### BitVectors
 const StaticBitVector{N,C} = StaticElementVector{N,1,C}
 @inline function Base.getindex(x::StaticBitVector{N,C}, i::Integer) where {N,C}
-    @boundscheck i <= N || throw(BoundsError(x, i))  # TODO: make this @boundscheck work.
+    @boundscheck (i <= N || throw(BoundsError(x, i)))  # NOTE: still checks bounds in global scope, why?
     i -= 1
     ii = i ÷ 64
-    @inbounds (x.data[ii+1] >> (i-ii*64)) & 1
+    return @inbounds (x.data[ii+1] >> (i-ii*64)) & 1
 end
 
 function StaticBitVector(x::AbstractVector)

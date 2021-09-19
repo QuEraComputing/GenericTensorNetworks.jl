@@ -1,3 +1,5 @@
 /Manifest.toml
 *.swp
 _*
+_test.bin
+_test.txt

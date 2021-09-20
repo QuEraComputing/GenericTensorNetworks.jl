@@ -51,7 +51,7 @@ Here, the `problem` is a `Independence` instance, it contains the tensor network
 Here, we choose the `:tree` optimizer to optimize the tensor network contraciton tree, it is a local search based algorithm, check [arXiv: 2108.05665](https://arxiv.org/abs/2108.05665). You will see some warnings, do not panic, this is because we set `sc_target` (target space complex) to 1 for agressive optimization of space complexity. Type `?Independence` in a Julia REPL for more information about the key word arguments.
 Similarly, one can select tensor network structures for solving other problems like `MaximalIndependence`, `MaxCut`, `Matching`, `Coloring{K}` and `set_packing`.
 
-Then we can solve graph properties
+#### 1. find MIS size, count MISs and count ISs
 ```julia
 # maximum independent set size
 julia> solve(problem, "size max")
@@ -77,7 +77,7 @@ julia> solve(problem, "counting max2")
 Here, `solve` function returns you a 0-dimensional array.
 For open graphs, this output tensor can have higher dimensions. Each entry corresponds to a different boundary condition.
 
-We provide 3 approaches to compute the independence polynomials.
+#### 2. compute the independence polynomial
 
 ```julia
 # using `Polynomial` type
@@ -109,6 +109,7 @@ Polynomial(1 + 10*x + 30*x^2 + 30*x^3 + 5*x^4)
 The `fft` approach is fast but with round off errors. Its imaginary part can be regarded as the precision,
 keyword argument `r` controls the round off errors in high/low IS size region.
 
+#### 3. find/enumerate solutions
 ```julia
 # one of MISs
 julia> solve(problem, "config max")

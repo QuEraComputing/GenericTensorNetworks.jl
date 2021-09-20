@@ -18,7 +18,7 @@ function diagonal_coupled_graph(mask::AbstractMatrix{Bool})
     unitdisk_graph(locs, 1.5)
 end
 
-function unitdisk_graph(locs::Vector, unit::Real)
+function unitdisk_graph(locs::AbstractVector, unit::Real)
     n = length(locs)
     g = SimpleGraph(n)
     for i=1:n, j=i+1:n

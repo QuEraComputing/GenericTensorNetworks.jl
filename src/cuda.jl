@@ -2,6 +2,9 @@ using .CUDA
 using TropicalGEMM: XTranspose, NativeTypes, Tropical, TropicalTypes
 using LinearAlgebra
 
+# patch
+Base.ndims(::Base.Broadcast.Broadcasted{CUDA.CuArrayStyle{0}}) = 0
+
 function onehotmask(A::CuArray{T}, X::CuArray{T}) where T
     mask = X .== inv.(A)
     ci = argmax(mask)

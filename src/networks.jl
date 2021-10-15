@@ -5,7 +5,7 @@ abstract type GraphProblem end
 
 """
     Independence{CT<:EinTypes} <: GraphProblem
-    Independence(graph; openvertices=(), kwargs...)
+    Independence(graph; openvertices=(), optmethod=:tree, kwargs...)
 
 Independent set problem. `kwargs` is forwarded to `optimize_code`.
 """
@@ -13,30 +13,30 @@ struct Independence{CT<:EinTypes} <: GraphProblem
     code::CT
 end
 
-function Independence(g::SimpleGraph; openvertices=(), kwargs...)
+function Independence(g::SimpleGraph; openvertices=(), optmethod=:tree, kwargs...)
     rawcode = EinCode(([(i,) for i in LightGraphs.vertices(g)]..., # labels for vertex tensors
                     [minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...), openvertices)  # labels for edge tensors
-    code = optimize_code(rawcode; kwargs...)
+    code = optimize_code(rawcode, Val(optmethod); kwargs...)
     Independence(code)
 end
 
 """
     MaxCut{CT<:EinTypes} <: GraphProblem
-    MaxCut(graph; openvertices=(), kwargs...)
+    MaxCut(graph; openvertices=(), optmethod=:tree, kwargs...)
 
 Max cut problem (or spin glass problem). `kwargs` is forwarded to `optimize_code`.
 """
 struct MaxCut{CT<:EinTypes} <: GraphProblem
     code::CT
 end
-function MaxCut(g::SimpleGraph; openvertices=(), kwargs...)
+function MaxCut(g::SimpleGraph; openvertices=(), optmethod=:tree, kwargs...)
     rawcode = EinCode(([minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...,), openvertices)  # labels for edge tensors
-    MaxCut(optimize_code(rawcode; kwargs...))
+    MaxCut(optimize_code(rawcode, Val(optmethod); kwargs...))
 end
 
 """
     MaximalIndependence{CT<:EinTypes} <: GraphProblem
-    MaximalIndependence(graph; openvertices=(), kwargs...)
+    MaximalIndependence(graph; openvertices=(), optmethod=:tree, kwargs...)
 
 Maximal independent set problem. `kwargs` is forwarded to `optimize_code`.
 """
@@ -44,14 +44,14 @@ struct MaximalIndependence{CT<:EinTypes} <: GraphProblem
     code::CT
 end
 
-function MaximalIndependence(g::SimpleGraph; openvertices=(), kwargs...)
+function MaximalIndependence(g::SimpleGraph; openvertices=(), optmethod=:tree, kwargs...)
     rawcode = EinCode(([(LightGraphs.neighbors(g, v)..., v) for v in LightGraphs.vertices(g)]...,), openvertices)
-    MaximalIndependence(optimize_code(rawcode; kwargs...))
+    MaximalIndependence(optimize_code(rawcode, Val(optmethod); kwargs...))
 end
 
 """
     Matching{CT<:EinTypes} <: GraphProblem
-    Matching(graph; openvertices=(), kwargs...)
+    Matching(graph; openvertices=(), optmethod=:tree, kwargs...)
 
 Vertex matching problem. `kwargs` is forwarded to `optimize_code`.
 The matching polynomial adopts the first definition in wiki page: https://en.wikipedia.org/wiki/Matching_polynomial
@@ -64,15 +64,15 @@ struct Matching{CT<:EinTypes} <: GraphProblem
     code::CT
 end
 
-function Matching(g::SimpleGraph; openvertices=(), kwargs...)
+function Matching(g::SimpleGraph; openvertices=(), optmethod=:tree, kwargs...)
     rawcode = EinCode(([(minmax(e.src,e.dst),) for e in LightGraphs.edges(g)]..., # labels for edge tensors
                     [([minmax(i,j) for j in neighbors(g, i)]...,) for i in LightGraphs.vertices(g)]...,), openvertices)       # labels for vertex tensors
-    Matching(optimize_code(rawcode; kwargs...))
+    Matching(optimize_code(rawcode, Val(optmethod); kwargs...))
 end
 
 """
     Coloring{K,CT<:EinTypes} <: GraphProblem
-    Coloring{K}(graph; openvertices=(), kwargs...)
+    Coloring{K}(graph; openvertices=(), optmethod=:tree, kwargs...)
 
 K-Coloring problem. `kwargs` is forwarded to `optimize_code`.
 """
@@ -81,7 +81,7 @@ struct Coloring{K,CT<:EinTypes} <: GraphProblem
 end
 Coloring{K}(code::ET) where {K,ET<:EinTypes} = Coloring{K,ET}(code)
 # same network layout as independent set.
-Coloring{K}(g::SimpleGraph; openvertices=(), kwargs...) where K = Coloring{K}(Independence(g; openvertices=openvertices, kwargs...).code)
+Coloring{K}(g::SimpleGraph; openvertices=(), optmethod=:tree, kwargs...) where K = Coloring{K}(Independence(g; openvertices=openvertices, kwargs...).code)
 
 """
     labels(code)
@@ -131,7 +131,7 @@ Optimize the contraction order.
     * `:sa`, the simulated annealing approach, takes kwargs [`rw_weight`, `βs`, `ntrials`, `niters`]. Check `optimize_sa` in package `OMEinsumContractionOrders`.
     * `:raw`, do nothing and return the raw EinCode.
 """
-function optimize_code(code::EinTypes; optmethod=:auto, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8, initializer=:random, βs=0.01:0.05:10.0, ntrials=50, niters=1000, sc_weight=2.0, rw_weight=1.0)
+function optimize_code(@nospecialize(code::EinTypes), ::Val{optmethod}; sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8, initializer=:random, βs=0.01:0.05:10.0, ntrials=50, niters=1000, sc_weight=2.0, rw_weight=1.0) where optmethod
     size_dict = Dict([s=>2 for s in labels(code)])
     optcode = if optmethod == :kahypar
         optimize_kahypar(code, size_dict; sc_target=sc_target, max_group_size=max_group_size, imbalances=imbalances, greedy_nrepeat=nrepeat)
@@ -160,7 +160,7 @@ end
 bondsize(gp::Coloring{K}) where K = K
 
 """
-    set_packing(sets; kwargs...)
+set_packing(sets; openvertices=(), optmethod=:tree, kwargs...)
 
 Set packing is a generalization of independent set problem to hypergraphs.
 Calling this function will return you an `Independence` instance.
@@ -177,8 +177,8 @@ julia> res = best_solutions(gp; all=true)[]
 (2, {10010, 00110, 01100})ₜ
 ```
 """
-function set_packing(sets; kwargs...)
+function set_packing(sets; openvertices=(), optmethod=:tree, kwargs...)
     n = length(sets)
     code = EinCode(([(i,) for i=1:n]..., [(i,j) for i=1:n,j=1:n if j>i && !isempty(sets[i] ∩ sets[j])]...), ())
-    Independence(optimize_code(code; kwargs...))
+    Independence(optimize_code(code, Val(optmethod); kwargs...))
 end

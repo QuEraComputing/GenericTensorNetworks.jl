@@ -65,8 +65,8 @@ function vizeinsum(nodes, edges; config=zeros(Int, length(nodes)), unit=1.0, gra
     zoom_into(img, XMIN, XMAX, YMIN, YMAX; graphsize=graphsize, rescale=rescale)
 end
 
-function vizeinsum(::EinCode{ixs, iy}, locs::AbstractVector{<:Pair}; kwargs...) where {ixs, iy}
-	vizeinsum(ixs, iy, Dict(locs); kwargs...)
+function vizeinsum(code::EinCode, locs::AbstractVector{<:Pair}; kwargs...)
+    vizeinsum(getixs(code), getiy(code), Dict(locs); kwargs...)
 end
 function vizeinsum(code::NestedEinsum, locs::AbstractVector{<:Pair}; kwargs...)
 	vizeinsum(OMEinsum.flatten(code), locs; kwargs...)

@@ -59,7 +59,7 @@ function cached_einsum(code::Int, @nospecialize(xs), size_dict)
 end
 function cached_einsum(code::NestedEinsum, @nospecialize(xs), size_dict)
     caches = [cached_einsum(arg, xs, size_dict) for arg in code.args]
-    y = dynamic_einsum(code.eins, (getfield.(caches, :content)...,); size_info=size_dict)
+    y = code.eins(getfield.(caches, :content)...; size_info=size_dict)
     CacheTree(y, caches)
 end
 

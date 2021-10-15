@@ -99,7 +99,7 @@ function contractf(f, gp::GraphProblem; usecuda=false)
     if usecuda
         xs = CuArray.(xs)
     end
-    dynamic_einsum(gp.code, xs)
+    gp.code(xs...)
 end
 
 ############### Problem specific implementations ################
@@ -115,22 +115,6 @@ function generate_tensors(fx, gp::Independence)
             misb(T, length(ix)) # if n!=2, it corresponds to set packing problem.
         end
     end)
-end
-
-function collect_ixs(ne::NestedEinsum)
-    d = collect_ixs!(ne, Dict{Int,Vector{OMEinsum.labeltype(ne.eins)}}())
-    return [d[i] for i=1:length(d)]
-end
-
-function collect_ixs!(ne::NestedEinsum, d::Dict)
-    for i=1:length(ne.args)
-        if ne.args[i] isa Integer
-            d[ne.args[i]] = collect(OMEinsum.getixs(ne.eins)[i])
-        else
-            collect_ixs!(ne.args[i], d)
-        end
-    end
-    return d
 end
 
 function misb(::Type{T}, n::Integer=2) where T

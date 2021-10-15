@@ -97,7 +97,7 @@ function contractf(f, gp::GraphProblem; usecuda=false)
     if usecuda
         xs = CuArray.(xs)
     end
-    dynamic_einsum(gp.code, xs)
+    gp.code(xs...)
 end
 
 ############### Problem specific implementations ################

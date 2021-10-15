@@ -59,7 +59,7 @@ function cached_einsum(code::Int, @nospecialize(xs), size_dict)
 end
 function cached_einsum(code::NestedEinsum, @nospecialize(xs), size_dict)
     caches = [cached_einsum(arg, xs, size_dict) for arg in code.args]
-    y = dynamic_einsum(code.eins, (getfield.(caches, :content)...,); size_info=size_dict)
+    y = code.eins(getfield.(caches, :content)...; size_info=size_dict)
     CacheTree(y, caches)
 end
 
@@ -96,7 +96,7 @@ function bounding_contract(@nospecialize(code::EinCode), @nospecialize(xsa), yma
     bounding_contract(NestedEinsum((1:length(xsa)), code), xsa, ymask, xsb; size_info=size_info)
 end
 function bounding_contract(code::NestedEinsum, @nospecialize(xsa), ymask, @nospecialize(xsb); size_info=nothing)
-    size_dict = OMEinsum.get_size_dict(getixs(flatten(code)), xsa, size_info)
+    size_dict = OMEinsum.get_size_dict(getixs(flatten(code)), (xsa...,), size_info)
     # compute intermediate tensors
     @debug "caching einsum..."
     c = cached_einsum(code, xsa, size_dict)

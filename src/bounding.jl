@@ -68,7 +68,7 @@ function generate_masktree(code::Int, cache, mask, size_dict, mode=:all)
     CacheTree(mask, CacheTree{Bool}[])
 end
 function generate_masktree(code::NestedEinsum, cache, mask, size_dict, mode=:all)
-    submasks = backward_tropical(mode, OMEinsum.getixs(code.eins), (getfield.(cache.siblings, :content)...,), OMEinsum.getiy(code.eins), cache.content, mask, size_dict)
+    submasks = backward_tropical(mode, getixs(code.eins), (getfield.(cache.siblings, :content)...,), OMEinsum.getiy(code.eins), cache.content, mask, size_dict)
     return CacheTree(mask, generate_masktree.(code.args, cache.siblings, submasks, Ref(size_dict), mode))
 end
 
@@ -96,7 +96,7 @@ function bounding_contract(@nospecialize(code::EinCode), @nospecialize(xsa), yma
     bounding_contract(NestedEinsum((1:length(xsa)), code), xsa, ymask, xsb; size_info=size_info)
 end
 function bounding_contract(code::NestedEinsum, @nospecialize(xsa), ymask, @nospecialize(xsb); size_info=nothing)
-    size_dict = OMEinsum.get_size_dict(getixs(flatten(code)), xsa, size_info)
+    size_dict = OMEinsum.get_size_dict(collect_ixs(code), xsa, size_info)
     # compute intermediate tensors
     @debug "caching einsum..."
     c = cached_einsum(code, xsa, size_dict)
@@ -113,7 +113,7 @@ function solution_ad(@nospecialize(code::EinCode), @nospecialize(xsa), ymask; si
 end
 
 function solution_ad(code::NestedEinsum, @nospecialize(xsa), ymask; size_info=nothing)
-    size_dict = OMEinsum.get_size_dict(getixs(flatten(code)), xsa, size_info)
+    size_dict = OMEinsum.get_size_dict(collect_ixs(code), xsa, size_info)
     # compute intermediate tensors
     @debug "caching einsum..."
     c = cached_einsum(code, xsa, size_dict)
@@ -125,7 +125,7 @@ function solution_ad(code::NestedEinsum, @nospecialize(xsa), ymask; size_info=no
 end
 
 function read_config!(code::NestedEinsum, mt, out)
-    for (arg, ix, sibling) in zip(code.args, OMEinsum.getixs(code.eins), mt.siblings)
+    for (arg, ix, sibling) in zip(code.args, getixs(code.eins), mt.siblings)
         if arg isa Int
             assign = convert(Array, sibling.content)  # note: the content can be CuArray
             if length(ix) == 1

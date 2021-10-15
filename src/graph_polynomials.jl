@@ -62,11 +62,13 @@ function _polynomial_single(gp::GraphProblem, ::Type{T}; usecuda, maxorder) wher
     return res
 end
 
+_getiy(code::EinCode) = getiy(code)
+_getiy(code::NestedEinsum) = getiy(code.eins)
 function graph_polynomial(gp::GraphProblem, ::Val{:finitefield}; usecuda=false,
         maxorder=max_size(gp; usecuda=usecuda), max_iter=100)
     TI = Int32  # Int 32 is faster
     N = typemax(TI)
-    YS = fill(Any[], (fill(bondsize(gp), length(getiy(flatten(gp.code))))...,))
+    YS = fill(Any[], (fill(bondsize(gp), length(_getiy(gp.code)))...,))
     local res, respre
     for k = 1:max_iter
 	    N = prevprime(N-TI(1))
@@ -103,9 +105,8 @@ end
 ############### Problem specific implementations ################
 ### independent set ###
 function generate_tensors(fx, gp::Independence)
-    flatten_code = flatten(gp.code)
-    ixs = getixs(flatten_code)
-    n = length(labels(flatten_code))
+    ixs = collect_ixs(gp.code)
+    n = length(unique!(vcat(ixs...)))
     T = typeof(fx(ixs[1][1]))
     return Tuple(map(enumerate(ixs)) do (i, ix)
         if i <= n
@@ -115,6 +116,23 @@ function generate_tensors(fx, gp::Independence)
         end
     end)
 end
+
+function collect_ixs(ne::NestedEinsum)
+    d = collect_ixs!(ne, Dict{Int,Vector{OMEinsum.labeltype(ne.eins)}}())
+    return [d[i] for i=1:length(d)]
+end
+
+function collect_ixs!(ne::NestedEinsum, d::Dict)
+    for i=1:length(ne.args)
+        if ne.args[i] isa Integer
+            d[ne.args[i]] = collect(OMEinsum.getixs(ne.eins)[i])
+        else
+            collect_ixs!(ne.args[i], d)
+        end
+    end
+    return d
+end
+
 function misb(::Type{T}, n::Integer=2) where T
     res = zeros(T, fill(2, n)...)
     res[1] = one(T)
@@ -127,7 +145,7 @@ misv(val::T) where T = [one(T), val]
 
 ### coloring ###
 function generate_tensors(fx, c::Coloring{K}) where K
-    ixs = getixs(flatten(c.code))
+    ixs = collect_ixs(c.code)
     T = eltype(fx(ixs[1][1]))
     return map(ixs) do ix
         # if the tensor rank is 1, create a vertex tensor.
@@ -149,9 +167,9 @@ coloringv(vals::Vector{T}) where T = vals
 
 ### matching ###
 function generate_tensors(fx, m::Matching)
-    ixs = OMEinsum.getixs(flatten(m.code))
+    ixs = collect_ixs(m.code)
     T = typeof(fx(ixs[1][1]))
-    n = length(unique(vcat(collect.(ixs)...)))  # number of vertices
+    n = length(unique!(vcat(ixs...)))  # number of vertices
     tensors = []
     for i=1:length(ixs)
         if i<=n
@@ -176,7 +194,7 @@ end
 
 ### maximal independent set ###
 function generate_tensors(fx, mi::MaximalIndependence)
-    ixs = OMEinsum.getixs(flatten(mi.code))
+    ixs = collect_ixs(mi.code)
     T = eltype(fx(ixs[1][end]))
 	return map(ixs) do ix
         neighbortensor(fx(ix[end]), length(ix))
@@ -193,11 +211,10 @@ end
 
 ### max cut/spin glass problem ###
 function generate_tensors(fx, gp::MaxCut)
-    flatten_code = flatten(gp.code)
-    ixs = getixs(flatten_code)
-    return Tuple(map(enumerate(ixs)) do (i, ix)
+    ixs = collect_ixs(gp.code)
+    return map(enumerate(ixs)) do (i, ix)
         maxcutb(fx(ix))
-    end)
+    end
 end
 function maxcutb(expJ::T) where T
     return T[one(T) expJ; expJ one(T)]

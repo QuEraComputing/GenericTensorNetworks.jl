@@ -16,7 +16,7 @@ function best_solutions(gp::GraphProblem; all=false, usecuda=false)
     T = (all ? set_type : sampler_type)(CountingTropical{Int64}, length(syms), bondsize(gp))
     vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
     xst = generate_tensors(l->TropicalF64(1.0), gp)
-    ymask = trues(fill(2, length(OMEinsum.getiy(flatten(gp.code))))...)
+    ymask = trues(fill(2, length(_getiy(gp.code)))...)
     if usecuda
         xst = CuArray.(xst)
         ymask = CuArray(ymask)
@@ -89,4 +89,4 @@ end
 for GP in [:Independence, :Matching, :MaximalIndependence, :Coloring]
     @eval symbols(gp::$GP) = labels(gp.code)
 end
-symbols(gp::MaxCut) = collect(OMEinsum.getixs(OMEinsum.flatten(gp.code)))
+symbols(gp::MaxCut) = collect_ixs(gp.code)

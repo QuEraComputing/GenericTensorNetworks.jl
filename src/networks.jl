@@ -5,7 +5,7 @@ abstract type GraphProblem end
 
 """
     Independence{CT<:EinTypes} <: GraphProblem
-    Independence(graph; kwargs...)
+    Independence(graph; openvertices=(), kwargs...)
 
 Independent set problem. `kwargs` is forwarded to `optimize_code`.
 """
@@ -13,29 +13,30 @@ struct Independence{CT<:EinTypes} <: GraphProblem
     code::CT
 end
 
-function Independence(g::SimpleGraph; outputs=(), kwargs...)
+function Independence(g::SimpleGraph; openvertices=(), kwargs...)
     rawcode = EinCode(([(i,) for i in LightGraphs.vertices(g)]..., # labels for vertex tensors
-                    [minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...), outputs)  # labels for edge tensors
-    Independence(optimize_code(rawcode; kwargs...))
+                    [minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...), openvertices)  # labels for edge tensors
+    code = optimize_code(rawcode; kwargs...)
+    Independence(code)
 end
 
 """
     MaxCut{CT<:EinTypes} <: GraphProblem
-    MaxCut(graph; kwargs...)
+    MaxCut(graph; openvertices=(), kwargs...)
 
 Max cut problem (or spin glass problem). `kwargs` is forwarded to `optimize_code`.
 """
 struct MaxCut{CT<:EinTypes} <: GraphProblem
     code::CT
 end
-function MaxCut(g::SimpleGraph; outputs=(), kwargs...)
-    rawcode = EinCode(([minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...,), outputs)  # labels for edge tensors
+function MaxCut(g::SimpleGraph; openvertices=(), kwargs...)
+    rawcode = EinCode(([minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...,), openvertices)  # labels for edge tensors
     MaxCut(optimize_code(rawcode; kwargs...))
 end
 
 """
     MaximalIndependence{CT<:EinTypes} <: GraphProblem
-    MaximalIndependence(graph; kwargs...)
+    MaximalIndependence(graph; openvertices=(), kwargs...)
 
 Maximal independent set problem. `kwargs` is forwarded to `optimize_code`.
 """
@@ -43,14 +44,14 @@ struct MaximalIndependence{CT<:EinTypes} <: GraphProblem
     code::CT
 end
 
-function MaximalIndependence(g::SimpleGraph; outputs=(), kwargs...)
-    rawcode = EinCode(([(LightGraphs.neighbors(g, v)..., v) for v in LightGraphs.vertices(g)]...,), outputs)
+function MaximalIndependence(g::SimpleGraph; openvertices=(), kwargs...)
+    rawcode = EinCode(([(LightGraphs.neighbors(g, v)..., v) for v in LightGraphs.vertices(g)]...,), openvertices)
     MaximalIndependence(optimize_code(rawcode; kwargs...))
 end
 
 """
     Matching{CT<:EinTypes} <: GraphProblem
-    Matching(graph; kwargs...)
+    Matching(graph; openvertices=(), kwargs...)
 
 Vertex matching problem. `kwargs` is forwarded to `optimize_code`.
 The matching polynomial adopts the first definition in wiki page: https://en.wikipedia.org/wiki/Matching_polynomial
@@ -63,15 +64,15 @@ struct Matching{CT<:EinTypes} <: GraphProblem
     code::CT
 end
 
-function Matching(g::SimpleGraph; outputs=(), kwargs...)
+function Matching(g::SimpleGraph; openvertices=(), kwargs...)
     rawcode = EinCode(([(minmax(e.src,e.dst),) for e in LightGraphs.edges(g)]..., # labels for edge tensors
-                    [([minmax(i,j) for j in neighbors(g, i)]...,) for i in LightGraphs.vertices(g)]...,), outputs)       # labels for vertex tensors
+                    [([minmax(i,j) for j in neighbors(g, i)]...,) for i in LightGraphs.vertices(g)]...,), openvertices)       # labels for vertex tensors
     Matching(optimize_code(rawcode; kwargs...))
 end
 
 """
     Coloring{K,CT<:EinTypes} <: GraphProblem
-    Coloring{K}(graph; kwargs...)
+    Coloring{K}(graph; openvertices=(), kwargs...)
 
 K-Coloring problem. `kwargs` is forwarded to `optimize_code`.
 """
@@ -80,7 +81,7 @@ struct Coloring{K,CT<:EinTypes} <: GraphProblem
 end
 Coloring{K}(code::ET) where {K,ET<:EinTypes} = Coloring{K,ET}(code)
 # same network layout as independent set.
-Coloring{K}(g::SimpleGraph; outputs=(), kwargs...) where K = Coloring{K}(Independence(g; outputs=outputs, kwargs...).code)
+Coloring{K}(g::SimpleGraph; openvertices=(), kwargs...) where K = Coloring{K}(Independence(g; openvertices=openvertices, kwargs...).code)
 
 """
     labels(code)
@@ -89,7 +90,7 @@ Return a vector of unique labels in an Einsum token.
 """
 function labels(code::EinTypes)
     res = []
-    for ix in OMEinsum.getixs(OMEinsum.flatten(code))
+    for ix in collect_ixs(code)
         for l in ix
             if l ∉ res
                 push!(res, l)

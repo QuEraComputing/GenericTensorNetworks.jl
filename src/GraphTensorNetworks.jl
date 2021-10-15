@@ -4,7 +4,7 @@ using OMEinsumContractionOrders: OMEinsum
 using Core: Argument
 using TropicalGEMM, TropicalNumbers
 using OMEinsum
-using OMEinsum: flatten, timespace_complexity
+using OMEinsum: timespace_complexity
 using LightGraphs
 
 export timespace_complexity, @ein_str

@@ -2,14 +2,14 @@ using Viznet
 export vizeinsum, vizconfig
 using Compose
 
-function vizconfig(g::SimpleGraph; locs, config=zeros(Int, length(locs)), unit=1.0, graphsize=12cm)
-    vizconfig([string(v)=>locs[v] for v in LightGraphs.vertices(g)], [(e.src, e.dst) for e in edges(g)]; config=config, unit=unit, graphsize=graphsize)
+function vizconfig(g::SimpleGraph; locs, config=zeros(Int, length(locs)), unit=1.0, graphsize=12cm, radius=0.03)
+    vizconfig([string(v)=>locs[v] for v in LightGraphs.vertices(g)], [(e.src, e.dst) for e in edges(g)]; config=config, unit=unit, graphsize=graphsize, radius=radius)
 end
 
-function vizconfig(nodes, edges; config=zeros(Int, length(nodes)), unit=1.0, graphsize=12cm)
+function vizconfig(nodes, edges; config=zeros(Int, length(nodes)), unit=1.0, graphsize=12cm, radius=0.03)
 	tb = textstyle(:default, fill("white"), fontsize(10pt*unit))
-	nb = nodestyle(:circle, fill("black"), r=0.03*unit)
-	nb2 = nodestyle(:circle, fill("red"),r=0.03*unit)
+	nb = nodestyle(:circle, fill("black"), r=radius*unit)
+	nb2 = nodestyle(:circle, fill("red"),r=radius*unit)
 	eb = bondstyle(:default, linewidth(0.4mm*unit))
 	img = canvas() do
 		for (i, (t, p)) in enumerate(nodes)
@@ -69,7 +69,7 @@ function vizeinsum(::EinCode{ixs, iy}, locs::AbstractVector{<:Pair}; kwargs...) 
 	vizeinsum(ixs, iy, Dict(locs); kwargs...)
 end
 function vizeinsum(code::NestedEinsum, locs::AbstractVector{<:Pair}; kwargs...)
-	vizeinsum(flatten(code), locs; kwargs...)
+	vizeinsum(OMEinsum.flatten(code), locs; kwargs...)
 end
 function vizeinsum(ixs::Tuple, iy::Tuple, locs::Dict; kwargs...)
 	legs = unique!([Iterators.flatten(ixs)..., iy...])

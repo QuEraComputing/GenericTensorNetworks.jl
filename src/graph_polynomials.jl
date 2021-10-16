@@ -72,6 +72,7 @@ function graph_polynomial(gp::GraphProblem, ::Val{:finitefield}; usecuda=false,
     local res, respre
     for k = 1:max_iter
 	    N = prevprime(N-TI(1))
+        @debug "iteration $k, computing on GP$(N) ..."
         T = Mods.Mod{N,TI}
         rk = _polynomial_single(gp, T; usecuda=usecuda, maxorder=maxorder)
         push!.(YS, rk)
@@ -95,10 +96,12 @@ end
 
 contractx(gp::GraphProblem, x; usecuda=false) = contractf(_->x, gp; usecuda=usecuda)
 function contractf(f, gp::GraphProblem; usecuda=false)
+    @debug "generating tensors ..."
     xs = generate_tensors(f, gp)
     if usecuda
         xs = CuArray.(xs)
     end
+    @debug "contracting tensors ..."
     gp.code(xs...)
 end
 
@@ -108,13 +111,13 @@ function generate_tensors(fx, gp::Independence)
     ixs = collect_ixs(gp.code)
     n = length(unique!(vcat(ixs...)))
     T = typeof(fx(ixs[1][1]))
-    return Tuple(map(enumerate(ixs)) do (i, ix)
+    return map(enumerate(ixs)) do (i, ix)
         if i <= n
             misv(fx(ix[1]))
         else
             misb(T, length(ix)) # if n!=2, it corresponds to set packing problem.
         end
-    end)
+    end
 end
 
 function misb(::Type{T}, n::Integer=2) where T

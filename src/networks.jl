@@ -148,7 +148,7 @@ function optimize_code(@nospecialize(code::EinTypes), ::Val{optmethod}; sc_targe
     else
         ArgumentError("optimizer `$optmethod` not defined.")
     end
-    println("time/space complexity is $(OMEinsum.timespace_complexity(optcode, size_dict))")
+    @info "time/space complexity is $(OMEinsum.timespace_complexity(optcode, size_dict))"
     return optcode
 end
 

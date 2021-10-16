@@ -98,11 +98,12 @@ contractx(gp::GraphProblem, x; usecuda=false) = contractf(_->x, gp; usecuda=usec
 function contractf(f, gp::GraphProblem; usecuda=false)
     @debug "generating tensors ..."
     xs = generate_tensors(f, gp)
-    if usecuda
-        xs = CuArray.(xs)
-    end
     @debug "contracting tensors ..."
-    gp.code(xs...)
+    if usecuda
+        gp.code([CuArray(x) for x in xs]...)
+    else
+        gp.code(xs...)
+    end
 end
 
 ############### Problem specific implementations ################

@@ -23,7 +23,7 @@ TupleTools = "9d95972d-f1c8-5527-a6e0-b4b365fa01f6"
 Viznet = "52a3aca4-6234-47fd-b74a-806bdf78ede9"
 
 [compat]
-CUDA = "3.3"
+CUDA = "3.5"
 Compose = "0.9"
 FFTW = "1.4"
 LightGraphs = "1.3"

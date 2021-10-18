@@ -102,19 +102,8 @@ end
 
 collect_ixs(ne::EinCode) = [collect(ix) for ix in getixs(ne)]
 function collect_ixs(ne::NestedEinsum)
-    d = collect_ixs!(ne, Dict{Int,Vector{OMEinsum.labeltype(ne.eins)}}())
+    d = OMEinsum.collect_ixs!(ne, Dict{Int,Vector{OMEinsum.labeltype(ne.eins)}}())
     return [d[i] for i=1:length(d)]
-end
-
-function collect_ixs!(ne::NestedEinsum, d::Dict)
-    for i=1:length(ne.args)
-        if ne.args[i] isa Integer
-            d[ne.args[i]] = collect(OMEinsum.getixs(ne.eins)[i])
-        else
-            collect_ixs!(ne.args[i], d)
-        end
-    end
-    return d
 end
 
 """

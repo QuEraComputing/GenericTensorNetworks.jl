@@ -5,7 +5,7 @@ abstract type GraphProblem end
 
 """
     Independence{CT<:EinTypes} <: GraphProblem
-    Independence(graph; openvertices=(), optmethod=:tree, kwargs...)
+    Independence(graph; openvertices=(), optmethod=:greedy, kwargs...)
 
 Independent set problem. `kwargs` is forwarded to `optimize_code`.
 """
@@ -13,7 +13,7 @@ struct Independence{CT<:EinTypes} <: GraphProblem
     code::CT
 end
 
-function Independence(g::SimpleGraph; openvertices=(), optmethod=:tree, kwargs...)
+function Independence(g::SimpleGraph; openvertices=(), optmethod=:greedy, kwargs...)
     rawcode = EinCode(([(i,) for i in LightGraphs.vertices(g)]..., # labels for vertex tensors
                     [minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...), openvertices)  # labels for edge tensors
     code = optimize_code(rawcode, Val(optmethod); kwargs...)
@@ -22,21 +22,21 @@ end
 
 """
     MaxCut{CT<:EinTypes} <: GraphProblem
-    MaxCut(graph; openvertices=(), optmethod=:tree, kwargs...)
+    MaxCut(graph; openvertices=(), optmethod=:greedy, kwargs...)
 
 Max cut problem (or spin glass problem). `kwargs` is forwarded to `optimize_code`.
 """
 struct MaxCut{CT<:EinTypes} <: GraphProblem
     code::CT
 end
-function MaxCut(g::SimpleGraph; openvertices=(), optmethod=:tree, kwargs...)
+function MaxCut(g::SimpleGraph; openvertices=(), optmethod=:greedy, kwargs...)
     rawcode = EinCode(([minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...,), openvertices)  # labels for edge tensors
     MaxCut(optimize_code(rawcode, Val(optmethod); kwargs...))
 end
 
 """
     MaximalIndependence{CT<:EinTypes} <: GraphProblem
-    MaximalIndependence(graph; openvertices=(), optmethod=:tree, kwargs...)
+    MaximalIndependence(graph; openvertices=(), optmethod=:greedy, kwargs...)
 
 Maximal independent set problem. `kwargs` is forwarded to `optimize_code`.
 """
@@ -44,14 +44,14 @@ struct MaximalIndependence{CT<:EinTypes} <: GraphProblem
     code::CT
 end
 
-function MaximalIndependence(g::SimpleGraph; openvertices=(), optmethod=:tree, kwargs...)
+function MaximalIndependence(g::SimpleGraph; openvertices=(), optmethod=:greedy, kwargs...)
     rawcode = EinCode(([(LightGraphs.neighbors(g, v)..., v) for v in LightGraphs.vertices(g)]...,), openvertices)
     MaximalIndependence(optimize_code(rawcode, Val(optmethod); kwargs...))
 end
 
 """
     Matching{CT<:EinTypes} <: GraphProblem
-    Matching(graph; openvertices=(), optmethod=:tree, kwargs...)
+    Matching(graph; openvertices=(), optmethod=:greedy, kwargs...)
 
 Vertex matching problem. `kwargs` is forwarded to `optimize_code`.
 The matching polynomial adopts the first definition in wiki page: https://en.wikipedia.org/wiki/Matching_polynomial
@@ -64,7 +64,7 @@ struct Matching{CT<:EinTypes} <: GraphProblem
     code::CT
 end
 
-function Matching(g::SimpleGraph; openvertices=(), optmethod=:tree, kwargs...)
+function Matching(g::SimpleGraph; openvertices=(), optmethod=:greedy, kwargs...)
     rawcode = EinCode(([(minmax(e.src,e.dst),) for e in LightGraphs.edges(g)]..., # labels for edge tensors
                     [([minmax(i,j) for j in neighbors(g, i)]...,) for i in LightGraphs.vertices(g)]...,), openvertices)       # labels for vertex tensors
     Matching(optimize_code(rawcode, Val(optmethod); kwargs...))
@@ -72,7 +72,7 @@ end
 
 """
     Coloring{K,CT<:EinTypes} <: GraphProblem
-    Coloring{K}(graph; openvertices=(), optmethod=:tree, kwargs...)
+    Coloring{K}(graph; openvertices=(), optmethod=:greedy, kwargs...)
 
 K-Coloring problem. `kwargs` is forwarded to `optimize_code`.
 """
@@ -81,7 +81,7 @@ struct Coloring{K,CT<:EinTypes} <: GraphProblem
 end
 Coloring{K}(code::ET) where {K,ET<:EinTypes} = Coloring{K,ET}(code)
 # same network layout as independent set.
-Coloring{K}(g::SimpleGraph; openvertices=(), optmethod=:tree, kwargs...) where K = Coloring{K}(Independence(g; openvertices=openvertices, kwargs...).code)
+Coloring{K}(g::SimpleGraph; openvertices=(), optmethod=:greedy, kwargs...) where K = Coloring{K}(Independence(g; openvertices=openvertices, optmethod=optmethod, D=K, kwargs...).code)
 
 """
     labels(code)
@@ -103,7 +103,8 @@ end
 collect_ixs(ne::EinCode) = [collect(ix) for ix in getixs(ne)]
 function collect_ixs(ne::NestedEinsum)
     d = OMEinsum.collect_ixs!(ne, Dict{Int,Vector{OMEinsum.labeltype(ne.eins)}}())
-    return [d[i] for i=1:length(d)]
+    ks = sort!(collect(keys(d)))
+    return @inbounds [d[i] for i in ks]
 end
 
 """
@@ -120,23 +121,26 @@ Optimize the contraction order.
     * `:sa`, the simulated annealing approach, takes kwargs [`rw_weight`, `βs`, `ntrials`, `niters`]. Check `optimize_sa` in package `OMEinsumContractionOrders`.
     * `:raw`, do nothing and return the raw EinCode.
 """
-function optimize_code(@nospecialize(code::EinTypes), ::Val{optmethod}; sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8, initializer=:random, βs=0.01:0.05:10.0, ntrials=50, niters=1000, sc_weight=2.0, rw_weight=1.0) where optmethod
-    size_dict = Dict([s=>2 for s in labels(code)])
-    optcode = if optmethod == :kahypar
+function optimize_code(@nospecialize(code::EinTypes), ::Val{optmethod}; sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8, initializer=:random, βs=0.01:0.05:10.0, ntrials=50, niters=1000, sc_weight=2.0, rw_weight=1.0, D=2) where optmethod
+    if optmethod === :raw
+        return code
+    end
+    size_dict = Dict([s=>D for s in labels(code)])
+    simplifier, code = merge_vectors(code)
+    optcode = if optmethod === :kahypar
         optimize_kahypar(code, size_dict; sc_target=sc_target, max_group_size=max_group_size, imbalances=imbalances, greedy_nrepeat=nrepeat)
-    elseif optmethod == :sa
+    elseif optmethod === :sa
         optimize_sa(code, size_dict; sc_target=sc_target, max_group_size=max_group_size, βs=βs, ntrials=ntrials, niters=niters, initializer=initializer, greedy_nrepeat=nrepeat)
-    elseif optmethod == :greedy
+    elseif optmethod === :greedy
         optimize_greedy(code, size_dict; nrepeat=nrepeat)
-    elseif optmethod == :tree
+    elseif optmethod === :tree
         optimize_tree(code, size_dict; sc_target=sc_target, βs=βs, niters=niters, ntrials=ntrials, sc_weight=sc_weight, initializer=initializer, rw_weight=rw_weight)
-    elseif optmethod == :auto
+    elseif optmethod === :auto
         optimize_kahypar_auto(code, size_dict; max_group_size=max_group_size, effort=500, greedy_nrepeat=nrepeat)
-    elseif optmethod == :raw
-        code
     else
         ArgumentError("optimizer `$optmethod` not defined.")
     end
+    optcode = embed_simplifier(optcode, simplifier)
     @info "time/space complexity is $(OMEinsum.timespace_complexity(optcode, size_dict))"
     return optcode
 end
@@ -149,7 +153,7 @@ end
 bondsize(gp::Coloring{K}) where K = K
 
 """
-set_packing(sets; openvertices=(), optmethod=:tree, kwargs...)
+set_packing(sets; openvertices=(), optmethod=:greedy, kwargs...)
 
 Set packing is a generalization of independent set problem to hypergraphs.
 Calling this function will return you an `Independence` instance.
@@ -166,8 +170,8 @@ julia> res = best_solutions(gp; all=true)[]
 (2, {10010, 00110, 01100})ₜ
 ```
 """
-function set_packing(sets; openvertices=(), optmethod=:tree, kwargs...)
+function set_packing(sets; openvertices=(), optmethod=:greedy, kwargs...)
     n = length(sets)
-    code = EinCode(([(i,) for i=1:n]..., [(i,j) for i=1:n,j=1:n if j>i && !isempty(sets[i] ∩ sets[j])]...), ())
+    code = EinCode(([(i,) for i=1:n]..., [(i,j) for i=1:n,j=1:n if j>i && !isempty(sets[i] ∩ sets[j])]...), openvertices)
     Independence(optimize_code(code, Val(optmethod); kwargs...))
 end

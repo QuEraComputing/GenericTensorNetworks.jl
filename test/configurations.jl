@@ -30,7 +30,7 @@ end
 
 @testset "enumerating" begin
     rawcode = Independence(random_regular_graph(10, 3); optmethod=:raw)
-    optcode = Independence(optimize_code(rawcode.code; optmethod=:auto))
+    optcode = Independence(optimize_code(rawcode.code, Val(:greedy)))
     for code in [rawcode, optcode]
         res0 = max_size(code)
         _, res1 = max_size_count(code)

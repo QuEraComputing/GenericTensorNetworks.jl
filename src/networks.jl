@@ -100,13 +100,6 @@ function labels(code::EinTypes)
     return res
 end
 
-collect_ixs(ne::EinCode) = [collect(ix) for ix in getixs(ne)]
-function collect_ixs(ne::NestedEinsum)
-    d = OMEinsum.collect_ixs!(ne, Dict{Int,Vector{OMEinsum.labeltype(ne.eins)}}())
-    ks = sort!(collect(keys(d)))
-    return @inbounds [d[i] for i in ks]
-end
-
 """
     optimize_code(code; optmethod=:kahypar, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8, βs=0.01:0.05:10.0, ntrials=50, niters=1000, sc_weight=2.0, rw_weight=1.0)
 

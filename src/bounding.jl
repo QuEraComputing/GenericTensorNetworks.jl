@@ -1,4 +1,5 @@
 using TupleTools
+using OMEinsum: DynamicEinCode
 
 """
     backward_tropical(mode, ixs, xs, iy, y, ymask, size_dict)
@@ -10,12 +11,12 @@ The backward rule for tropical einsum.
 * `ymask` is the boolean mask for gradients,
 * `size_dict` is a key-value map from tensor label to dimension size.
 """
-function backward_tropical(mode, @nospecialize(ixs), @nospecialize(xs), @nospecialize(iy), @nospecialize(y), @nospecialize(ymask), size_dict)
+function backward_tropical(mode, ixs, @nospecialize(xs::Tuple), iy, @nospecialize(y), @nospecialize(ymask), size_dict)
     y .= inv.(y) .* ymask
     masks = []
     for i=1:length(ixs)
-        nixs = TupleTools.insertat(ixs, i, (iy,))
-        nxs  = TupleTools.insertat( xs, i, (y,))
+        nixs = OMEinsum._insertat(ixs, i, iy)
+        nxs  = OMEinsum._insertat( xs, i, y)
         niy = ixs[i]
         if mode == :all
             mask = zeros(Bool, size(xs[i]))
@@ -53,34 +54,39 @@ struct CacheTree{T}
     content::AbstractArray{T}
     siblings::Vector{CacheTree{T}}
 end
-function cached_einsum(code::Int, @nospecialize(xs), size_dict)
-    y = xs[code]
-    CacheTree(y, CacheTree{eltype(y)}[])
-end
 function cached_einsum(code::NestedEinsum, @nospecialize(xs), size_dict)
-    caches = [cached_einsum(arg, xs, size_dict) for arg in code.args]
-    y = code.eins(getfield.(caches, :content)...; size_info=size_dict)
-    CacheTree(y, caches)
+    if OMEinsum.isleaf(code)
+        y = xs[code.tensorindex]
+        return CacheTree(y, CacheTree{eltype(y)}[])
+    else
+        caches = [cached_einsum(arg, xs, size_dict) for arg in code.args]
+        y = einsum(code.eins, ntuple(i->caches[i].content, length(caches)), size_dict)
+        return CacheTree(y, caches)
+    end
 end
 
 # computed mask tree by back propagation
-function generate_masktree(code::Int, cache, mask, size_dict, mode=:all)
-    CacheTree(mask, CacheTree{Bool}[])
-end
 function generate_masktree(code::NestedEinsum, cache, mask, size_dict, mode=:all)
-    submasks = backward_tropical(mode, getixs(code.eins), (getfield.(cache.siblings, :content)...,), OMEinsum.getiy(code.eins), cache.content, mask, size_dict)
-    return CacheTree(mask, generate_masktree.(code.args, cache.siblings, submasks, Ref(size_dict), mode))
+    if OMEinsum.isleaf(code)
+        return CacheTree(mask, CacheTree{Bool}[])
+    else
+        submasks = backward_tropical(mode, getixs(code.eins), (getfield.(cache.siblings, :content)...,), OMEinsum.getiy(code.eins), cache.content, mask, size_dict)
+        return CacheTree(mask, generate_masktree.(code.args, cache.siblings, submasks, Ref(size_dict), mode))
+    end
 end
 
 # The masked einsum contraction
-function masked_einsum(code::Int, @nospecialize(xs), masks, size_dict)
-    y = copy(xs[code])
-    y[OMEinsum.asarray(.!masks.content)] .= Ref(zero(eltype(y))); y
-end
 function masked_einsum(code::NestedEinsum, @nospecialize(xs), masks, size_dict)
-    xs = [masked_einsum(arg, xs, mask, size_dict) for (arg, mask) in zip(code.args, masks.siblings)]
-    y = einsum(code.eins, (xs...,), size_dict)
-    y[OMEinsum.asarray(.!masks.content)] .= Ref(zero(eltype(y))); y
+    if OMEinsum.isleaf(code)
+        y = copy(xs[code.tensorindex])
+        y[OMEinsum.asarray(.!masks.content)] .= Ref(zero(eltype(y)))
+        return y
+    else
+        xs = [masked_einsum(arg, xs, mask, size_dict) for (arg, mask) in zip(code.args, masks.siblings)]
+        y = einsum(code.eins, (xs...,), size_dict)
+        y[OMEinsum.asarray(.!masks.content)] .= Ref(zero(eltype(y)))
+        return y
+    end
 end
 
 """
@@ -92,8 +98,9 @@ Contraction method with bounding.
     * `xsb` are input tensors for computing, e.g. tensors elements are counting tropical with set algebra,
     * `ymask` is the initial gradient mask for the output tensor.
 """
-function bounding_contract(@nospecialize(code::EinCode), @nospecialize(xsa), ymask, @nospecialize(xsb); size_info=nothing)
-    bounding_contract(NestedEinsum((1:length(xsa)), code), xsa, ymask, xsb; size_info=size_info)
+function bounding_contract(code::EinCode, @nospecialize(xsa), ymask, @nospecialize(xsb); size_info=nothing)
+    LT = OMEinsum.labeltype(code)
+    bounding_contract(NestedEinsum(NestedEinsum{DynamicEinCode{LT}}.(1:length(xsa)), code), xsa, ymask, xsb; size_info=size_info)
 end
 function bounding_contract(code::NestedEinsum, @nospecialize(xsa), ymask, @nospecialize(xsb); size_info=nothing)
     size_dict = size_info===nothing ? Dict{OMEinsum.labeltype(code.eins),Int}() : copy(size_info)
@@ -109,8 +116,9 @@ function bounding_contract(code::NestedEinsum, @nospecialize(xsa), ymask, @nospe
 end
 
 # get the optimal solution with automatic differentiation.
-function solution_ad(@nospecialize(code::EinCode), @nospecialize(xsa), ymask; size_info=nothing)
-    solution_ad(NestedEinsum((1:length(xsa)), code), xsa, ymask; size_info=size_info)
+function solution_ad(code::EinCode, @nospecialize(xsa), ymask; size_info=nothing)
+    LT = OMEinsum.labeltype(code)
+    solution_ad(NestedEinsum(NestedEinsum{DynamicEinCode{LT}}.(1:length(xsa)), code), xsa, ymask; size_info=size_info)
 end
 
 function solution_ad(code::NestedEinsum, @nospecialize(xsa), ymask; size_info=nothing)
@@ -128,7 +136,7 @@ end
 
 function read_config!(code::NestedEinsum, mt, out)
     for (arg, ix, sibling) in zip(code.args, getixs(code.eins), mt.siblings)
-        if arg isa Int
+        if OMEinsum.isleaf(arg)
             assign = convert(Array, sibling.content)  # note: the content can be CuArray
             if length(ix) == 1
                 if !assign[1] && assign[2]

@@ -41,7 +41,7 @@ julia> using GraphTensorNetworks, Random, LightGraphs
 julia> graph = (Random.seed!(2); LightGraphs.smallgraph(:petersen))
 {10, 15} undirected simple Int64 graph
 
-julia> problem = Independence(graph; optmethod=:tree, sc_target=0, sc_weight=1.0, ntrials=10, βs=0.01:0.1:15.0, niters=20, rw_weight=0.2);
+julia> problem = Independence(graph; optimizer=TreeSA(sc_target=0, sc_weight=1.0, ntrials=10, βs=0.01:0.1:15.0, niters=20, rw_weight=0.2));
 ┌ Warning: target space complexity not found, got: 4.0, with time complexity 7.965784284662087, read-right complexity 8.661778097771988.
 └ @ OMEinsumContractionOrders ~/.julia/dev/OMEinsumContractionOrders/src/treesa.jl:71
 time/space complexity is (7.965784284662086, 4.0)

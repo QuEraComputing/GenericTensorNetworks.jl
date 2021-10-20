@@ -8,6 +8,7 @@ using OMEinsum: timespace_complexity, collect_ixs
 using LightGraphs
 
 export timespace_complexity, @ein_str
+export GreedyMethod, TreeSA, SABipartite, KaHyParBipartite, MergeVectors, MergeGreedy
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 

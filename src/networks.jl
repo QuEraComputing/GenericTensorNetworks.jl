@@ -5,55 +5,59 @@ abstract type GraphProblem end
 
 """
     Independence{CT<:EinTypes} <: GraphProblem
-    Independence(graph; openvertices=(), optmethod=:greedy, kwargs...)
+    Independence(graph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
 
-Independent set problem. `kwargs` is forwarded to `optimize_code`.
+Independent set problem. `openvertices` specifies the output tensor.
+`optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
 """
 struct Independence{CT<:EinTypes} <: GraphProblem
     code::CT
 end
 
-function Independence(g::SimpleGraph; openvertices=(), optmethod=:greedy, kwargs...)
+function Independence(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
     rawcode = EinCode(([(i,) for i in LightGraphs.vertices(g)]..., # labels for vertex tensors
                     [minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...), openvertices)  # labels for edge tensors
-    code = optimize_code(rawcode, Val(optmethod); kwargs...)
+    code = _optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier)
     Independence(code)
 end
 
 """
     MaxCut{CT<:EinTypes} <: GraphProblem
-    MaxCut(graph; openvertices=(), optmethod=:greedy, kwargs...)
+    MaxCut(graph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
 
-Max cut problem (or spin glass problem). `kwargs` is forwarded to `optimize_code`.
+Max cut problem (or spin glass problem).
+`optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
 """
 struct MaxCut{CT<:EinTypes} <: GraphProblem
     code::CT
 end
-function MaxCut(g::SimpleGraph; openvertices=(), optmethod=:greedy, kwargs...)
+function MaxCut(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
     rawcode = EinCode(([minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...,), openvertices)  # labels for edge tensors
-    MaxCut(optimize_code(rawcode, Val(optmethod); kwargs...))
+    MaxCut(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier))
 end
 
 """
     MaximalIndependence{CT<:EinTypes} <: GraphProblem
-    MaximalIndependence(graph; openvertices=(), optmethod=:greedy, kwargs...)
+    MaximalIndependence(graph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
 
-Maximal independent set problem. `kwargs` is forwarded to `optimize_code`.
+Maximal independent set problem. 
+`optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
 """
 struct MaximalIndependence{CT<:EinTypes} <: GraphProblem
     code::CT
 end
 
-function MaximalIndependence(g::SimpleGraph; openvertices=(), optmethod=:greedy, kwargs...)
+function MaximalIndependence(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
     rawcode = EinCode(([(LightGraphs.neighbors(g, v)..., v) for v in LightGraphs.vertices(g)]...,), openvertices)
-    MaximalIndependence(optimize_code(rawcode, Val(optmethod); kwargs...))
+    MaximalIndependence(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier))
 end
 
 """
     Matching{CT<:EinTypes} <: GraphProblem
-    Matching(graph; openvertices=(), optmethod=:greedy, kwargs...)
+    Matching(graph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
 
-Vertex matching problem. `kwargs` is forwarded to `optimize_code`.
+Vertex matching problem.
+`optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
 The matching polynomial adopts the first definition in wiki page: https://en.wikipedia.org/wiki/Matching_polynomial
 ```math
 m_G(x) := \\sum_{k\\geq 0}m_kx^k,
@@ -64,24 +68,25 @@ struct Matching{CT<:EinTypes} <: GraphProblem
     code::CT
 end
 
-function Matching(g::SimpleGraph; openvertices=(), optmethod=:greedy, kwargs...)
+function Matching(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
     rawcode = EinCode(([(minmax(e.src,e.dst),) for e in LightGraphs.edges(g)]..., # labels for edge tensors
                     [([minmax(i,j) for j in neighbors(g, i)]...,) for i in LightGraphs.vertices(g)]...,), openvertices)       # labels for vertex tensors
-    Matching(optimize_code(rawcode, Val(optmethod); kwargs...))
+    Matching(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier))
 end
 
 """
     Coloring{K,CT<:EinTypes} <: GraphProblem
-    Coloring{K}(graph; openvertices=(), optmethod=:greedy, kwargs...)
+    Coloring{K}(graph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
 
-K-Coloring problem. `kwargs` is forwarded to `optimize_code`.
+K-Coloring problem.
+`optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
 """
 struct Coloring{K,CT<:EinTypes} <: GraphProblem
     code::CT
 end
 Coloring{K}(code::ET) where {K,ET<:EinTypes} = Coloring{K,ET}(code)
 # same network layout as independent set.
-Coloring{K}(g::SimpleGraph; openvertices=(), optmethod=:greedy, kwargs...) where K = Coloring{K}(Independence(g; openvertices=openvertices, optmethod=optmethod, D=K, kwargs...).code)
+Coloring{K}(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing) where K = Coloring{K}(Independence(g; openvertices=openvertices, optimizer=optimizer, simplifier=simplifier).code)
 
 """
     labels(code)
@@ -100,44 +105,6 @@ function labels(code::EinTypes)
     return res
 end
 
-"""
-    optimize_code(code; optmethod=:kahypar, sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8, βs=0.01:0.05:10.0, ntrials=50, niters=1000, sc_weight=2.0, rw_weight=1.0)
-
-Optimize the contraction order.
-
-* `optmethod` can be one of
-    * `:kahypar`, the kahypar + greedy approach, takes kwargs [`sc_target`, `max_group_size`, `imbalances`, `nrepeat`].
-    Check `optimize_kahypar` method in package `OMEinsumContractionOrders`.
-    * `:auto`, also the kahypar + greedy approach, but determines `sc_target` automatically. It is slower!
-    * `:greedy`, the greedy approach. Check `optimize_greedy` in package `OMEinsum`.
-    * `:tree`, the approach of running simulated annealing on expression tree, takes kwargs [`sc_target`, `sc_weight`, `rw_weight`, `βs`, `ntrials`, `niters`]. Check `optimize_tree` in package `OMEinsumContractionOrders`.
-    * `:sa`, the simulated annealing approach, takes kwargs [`rw_weight`, `βs`, `ntrials`, `niters`]. Check `optimize_sa` in package `OMEinsumContractionOrders`.
-    * `:raw`, do nothing and return the raw EinCode.
-"""
-function optimize_code(@nospecialize(code::EinTypes), ::Val{optmethod}; sc_target=17, max_group_size=40, nrepeat=10, imbalances=0.0:0.001:0.8, initializer=:random, βs=0.01:0.05:10.0, ntrials=50, niters=1000, sc_weight=2.0, rw_weight=1.0, D=2) where optmethod
-    if optmethod === :raw
-        return code
-    end
-    size_dict = Dict([s=>D for s in labels(code)])
-    simplifier, code = merge_vectors(code)
-    optcode = if optmethod === :kahypar
-        optimize_kahypar(code, size_dict; sc_target=sc_target, max_group_size=max_group_size, imbalances=imbalances, greedy_nrepeat=nrepeat)
-    elseif optmethod === :sa
-        optimize_sa(code, size_dict; sc_target=sc_target, max_group_size=max_group_size, βs=βs, ntrials=ntrials, niters=niters, initializer=initializer, greedy_nrepeat=nrepeat)
-    elseif optmethod === :greedy
-        optimize_greedy(code, size_dict; nrepeat=nrepeat)
-    elseif optmethod === :tree
-        optimize_tree(code, size_dict; sc_target=sc_target, βs=βs, niters=niters, ntrials=ntrials, sc_weight=sc_weight, initializer=initializer, rw_weight=rw_weight)
-    elseif optmethod === :auto
-        optimize_kahypar_auto(code, size_dict; max_group_size=max_group_size, effort=500, greedy_nrepeat=nrepeat)
-    else
-        ArgumentError("optimizer `$optmethod` not defined.")
-    end
-    optcode = embed_simplifier(optcode, simplifier)
-    @info "time/space complexity is $(OMEinsum.timespace_complexity(optcode, size_dict))"
-    return optcode
-end
-
 OMEinsum.timespace_complexity(gp::GraphProblem) = timespace_complexity(gp.code, uniformsize(gp.code, bondsize(gp)))
 
 for T in [:Independence, :Matching, :MaximalIndependence, :MaxCut]
@@ -146,25 +113,28 @@ end
 bondsize(gp::Coloring{K}) where K = K
 
 """
-set_packing(sets; openvertices=(), optmethod=:greedy, kwargs...)
+set_packing(sets; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
 
 Set packing is a generalization of independent set problem to hypergraphs.
 Calling this function will return you an `Independence` instance.
 `sets` are a vector of vectors, each element being a vertex in the independent set problem.
-`kwargs` is forwarded to `optimize_code`.
+`optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
 
 ### Example
 ```julia
 julia> sets = [[1, 2, 5], [1, 3], [2, 4], [3, 6], [2, 3, 6]];  # each set is a vertex
 
-julia> gp = set_packing(sets; optmethod=:auto);
+julia> gp = set_packing(sets);
 
 julia> res = best_solutions(gp; all=true)[]
 (2, {10010, 00110, 01100})ₜ
 ```
 """
-function set_packing(sets; openvertices=(), optmethod=:greedy, kwargs...)
+function set_packing(sets; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
     n = length(sets)
     code = EinCode(([(i,) for i=1:n]..., [(i,j) for i=1:n,j=1:n if j>i && !isempty(sets[i] ∩ sets[j])]...), openvertices)
-    Independence(optimize_code(code, Val(optmethod); kwargs...))
+    Independence(_optimize_code(code, uniformsize(code, 2), optimizer, simplifier))
 end
+
+_optimize_code(code, size_dict, optimizer::Nothing, simplifier) = code
+_optimize_code(code, size_dict, optimizer, simplifier) = optimize_code(code, size_dict, optimizer, simplifier)

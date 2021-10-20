@@ -29,8 +29,8 @@ using TropicalNumbers: CountingTropicalF64
 end
 
 @testset "enumerating" begin
-    rawcode = Independence(random_regular_graph(10, 3); optmethod=:raw)
-    optcode = Independence(optimize_code(rawcode.code, Val(:greedy)))
+    rawcode = Independence(random_regular_graph(10, 3); optimizer=nothing)
+    optcode = Independence(optimize_code(rawcode.code, uniformsize(rawcode.code, 2), GreedyMethod()))
     for code in [rawcode, optcode]
         res0 = max_size(code)
         _, res1 = max_size_count(code)
@@ -58,7 +58,7 @@ end
 
 @testset "set packing" begin
     sets = [[1, 2, 5], [1, 3], [2, 4], [3, 6], [2, 3, 6]]  # each set is a vertex
-    gp = set_packing(sets; optmethod=:auto)
+    gp = set_packing(sets; optimizer=GreedyMethod())
     res = best_solutions(gp; all=true)[]
     @test res.n == 2
     @test BitVector(Bool[0,0,1,1,0]) ∈ res.c.data
@@ -71,7 +71,7 @@ end
     for (i,j) in [(1,2),(2,3),(3,4),(4,1),(1,5),(2,4)]
         add_edge!(g, i, j)
     end
-    code = MaxCut(g; optmethod=:greedy)
+    code = MaxCut(g; optimizer=GreedyMethod())
     res = best_solutions(code; all=true)[]
     @test length(res.c.data) == 2
     @test sum(res.c.data[1]) == 5
@@ -82,18 +82,18 @@ end
     for (i,j) in [(1,2),(2,3),(3,4),(4,1),(1,5),(2,4)]
         add_edge!(g, i, j)
     end
-    code = Coloring{3}(g; optmethod=:greedy)
+    code = Coloring{3}(g; optimizer=GreedyMethod())
     res = solutions(code, CountingTropicalF64; all=true)[]
     @test length(res.c.data) == 12
     g = smallgraph(:petersen)
-    code = Coloring{3}(g; optmethod=:greedy)
+    code = Coloring{3}(g; optimizer=GreedyMethod())
     res = solutions(code, CountingTropicalF64; all=true)[]
     @test length(res.c.data) == 120
 end
 
 @testset "enumerating - matching" begin
     g = smallgraph(:petersen)
-    code = Matching(g; optmethod=:greedy)
+    code = Matching(g; optimizer=GreedyMethod())
     res = solutions(code, CountingTropicalF64; all=true)[]
     @test res.n == 5
     @test length(res.c.data) == 6

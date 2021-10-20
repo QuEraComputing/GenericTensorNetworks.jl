@@ -3,7 +3,7 @@ using LightGraphs, Test
 
 @testset "independence problem" begin
     g = LightGraphs.smallgraph("petersen")
-    gp = Independence(g; optmethod=:greedy)
+    gp = Independence(g; optimizer=GreedyMethod())
     res1 = solve(gp, "size max")[]
     res2 = solve(gp, "counting sum")[]
     res3 = solve(gp, "counting max")[]

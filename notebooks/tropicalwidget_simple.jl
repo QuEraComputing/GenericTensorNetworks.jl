@@ -50,7 +50,7 @@ graph = unitdisk_graph(locs, 0.23) # SimpleGraph
 vizconfig(graph; locs=locs, config=rand(Bool, 12), graphsize=8cm)
 
 # ╔═╡ e068f0b8-7b2c-49b2-94d1-83dead406326
-gp = Independence(graph; outputs=(1,2,3,4), optmethod=:greedy)
+gp = Independence(graph; outputs=(1,2,3,4))
 
 # ╔═╡ 90c88c7f-e0c7-4845-a8b9-7f7562bd256f
 solve(gp, :config_single)

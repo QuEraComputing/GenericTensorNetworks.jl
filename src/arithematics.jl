@@ -1,5 +1,5 @@
 export is_commutative_semiring
-export Max2Poly, Polynomial, Tropical, CountingTropical, StaticElementVector, Mod, ConfigEnumerator, onehotv, ConfigSampler
+export Max2Poly, TruncatedPoly, Polynomial, Tropical, CountingTropical, StaticElementVector, Mod, ConfigEnumerator, onehotv, ConfigSampler
 export set_type, sampler_type
 
 using Polynomials: Polynomial
@@ -60,19 +60,22 @@ function is_commutative_semiring(a::T, b::T, c::T) where T
 end
 
 # get maximum two countings (polynomial truncated to largest two orders)
-struct Max2Poly{T,TO} <: Number
-    a::T
-    b::T
+struct TruncatedPoly{K,T,TO} <: Number
+    coeffs::NTuple{K,T}
     maxorder::TO
 end
+const Max2Poly{T,TO} = TruncatedPoly{2,T,TO}
+Max2Poly(a, b, maxorder) = TruncatedPoly((a, b), maxorder)
 
 function Base.:+(a::Max2Poly, b::Max2Poly)
+    aa, ab = a.coeffs
+    ba, bb = b.coeffs
     if a.maxorder == b.maxorder
-        return Max2Poly(a.a+b.a, a.b+b.b, a.maxorder)
+        return Max2Poly(aa+ba, ab+bb, a.maxorder)
     elseif a.maxorder == b.maxorder-1
-        return Max2Poly(a.b+b.a, b.b, b.maxorder)
+        return Max2Poly(ab+ba, bb, b.maxorder)
     elseif a.maxorder == b.maxorder+1
-        return Max2Poly(a.a+b.b, a.b, a.maxorder)
+        return Max2Poly(aa+bb, ab, a.maxorder)
     elseif a.maxorder < b.maxorder
         return b
     else
@@ -80,28 +83,53 @@ function Base.:+(a::Max2Poly, b::Max2Poly)
     end
 end
 
-function Base.:*(a::Max2Poly, b::Max2Poly)
-    maxorder = a.maxorder + b.maxorder
-    Max2Poly(a.a*b.b + a.b*b.a, a.b * b.b, maxorder)
+function Base.:+(a::TruncatedPoly{K}, b::TruncatedPoly{K}) where K
+    if a.maxorder == b.maxorder
+        return TruncatedPoly(a.coeffs .+ b.coeffs, a.maxorder)
+    elseif a.maxorder > b.maxorder
+        offset = a.maxorder - b.maxorder
+        return TruncatedPoly(ntuple(i->i+offset <= K ? a.coeffs[i] + b.coeffs[i+offset] : a.coeffs[i], K), a.maxorder)
+    else
+        offset = b.maxorder - a.maxorder
+        return TruncatedPoly(ntuple(i->i+offset <= K ? b.coeffs[i] + a.coeffs[i+offset] : b.coeffs[i], K), b.maxorder)
+    end
 end
 
-Base.zero(::Type{Max2Poly{T,TO}}) where {T,TO} = Max2Poly(zero(T), zero(T), zero(Tropical{TO}).n)
-Base.one(::Type{Max2Poly{T,TO}}) where {T,TO} = Max2Poly(zero(T), one(T), zero(TO))
-Base.zero(::Max2Poly{T,TO}) where {T,TO} = zero(Max2Poly{T,TO})
-Base.one(::Max2Poly{T,TO}) where {T,TO} = one(Max2Poly{T,TO})
+function Base.:*(a::Max2Poly, b::Max2Poly)
+    maxorder = a.maxorder + b.maxorder
+    aa, ab = a.coeffs
+    ba, bb = b.coeffs
+    Max2Poly(aa*bb + ab*ba, ab * bb, maxorder)
+end
 
-Base.show(io::IO, x::Max2Poly) = show(io, MIME"text/plain"(), x)
-function Base.show(io::IO, ::MIME"text/plain", x::Max2Poly)
+function Base.:*(a::TruncatedPoly{K,T}, b::TruncatedPoly{K,T}) where {K,T}
+    maxorder = a.maxorder + b.maxorder
+    TruncatedPoly(ntuple(K) do k
+            r = zero(T)
+            for i=1:K-k+1
+                r += a.coeffs[i+k-1]*b.coeffs[K-i+1]
+            end
+            return r
+        end, maxorder)
+end
+
+Base.zero(::Type{TruncatedPoly{K,T,TO}}) where {K,T,TO} = TruncatedPoly(ntuple(i->zero(T), K), zero(Tropical{TO}).n)
+Base.one(::Type{TruncatedPoly{K,T,TO}}) where {K,T,TO} = TruncatedPoly(ntuple(i->i==K ? one(T) : zero(T), K), zero(TO))
+Base.zero(::TruncatedPoly{K,T,TO}) where {K,T,TO} = zero(TruncatedPoly{T,TO})
+Base.one(::TruncatedPoly{K,T,TO}) where {K,T,TO} = one(TruncatedPoly{T,TO})
+
+Base.show(io::IO, x::TruncatedPoly) = show(io, MIME"text/plain"(), x)
+function Base.show(io::IO, ::MIME"text/plain", x::TruncatedPoly{K}) where K
     if isinf(x.maxorder)
         print(io, 0)
     else
-        printpoly(io, Polynomial([x.a, x.b], :x), offset=Int(x.maxorder-1))
+        printpoly(io, Polynomial([x.coeffs...], :x), offset=Int(x.maxorder-K+1))
     end
 end
 
 # patch for CUDA matmul
-Base.:*(a::Bool, y::Max2Poly{T,TO}) where {T,TO} = a ? y : zero(y)
-Base.:*(y::Max2Poly{T,TO}, a::Bool) where {T,TO} = a ? y : zero(y)
+Base.:*(a::Bool, y::TruncatedPoly{K,T,TO}) where {K,T,TO} = a ? y : zero(y)
+Base.:*(y::TruncatedPoly{K,T,TO}, a::Bool) where {K,T,TO} = a ? y : zero(y)
 
 struct ConfigEnumerator{N,S,C}
     data::Vector{StaticElementVector{N,S,C}}

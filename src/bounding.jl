@@ -1,4 +1,3 @@
-using TupleTools
 using OMEinsum: DynamicEinCode
 
 """

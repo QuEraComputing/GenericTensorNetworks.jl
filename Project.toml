@@ -19,7 +19,6 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 TropicalGEMM = "a4ad3063-64a7-4bad-8738-34ed09bc0236"
 TropicalNumbers = "b3a74e9c-7526-4576-a4eb-79c0d4c32334"
-TupleTools = "9d95972d-f1c8-5527-a6e0-b4b365fa01f6"
 Viznet = "52a3aca4-6234-47fd-b74a-806bdf78ede9"
 
 [compat]
@@ -35,7 +34,6 @@ Primes = "0.5"
 Requires = "1"
 TropicalGEMM = "0.1"
 TropicalNumbers = "0.4, 0.5"
-TupleTools = "1.2"
 Viznet = "0.3"
 julia = "1"
 

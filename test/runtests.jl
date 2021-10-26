@@ -5,6 +5,10 @@ using Test
     include("bitvector.jl")
 end
 
+@testset "arithematics" begin
+    include("arithematics.jl")
+end
+
 @testset "independence polynomial" begin
     include("graph_polynomials.jl")
 end

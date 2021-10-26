@@ -66,6 +66,7 @@ struct TruncatedPoly{K,T,TO} <: Number
 end
 const Max2Poly{T,TO} = TruncatedPoly{2,T,TO}
 Max2Poly(a, b, maxorder) = TruncatedPoly((a, b), maxorder)
+Max2Poly{T,TO}(a, b, maxorder) where {T,TO} = TruncatedPoly{2,T,TO}((a, b), maxorder)
 
 function Base.:+(a::Max2Poly, b::Max2Poly)
     aa, ab = a.coeffs
@@ -83,40 +84,32 @@ function Base.:+(a::Max2Poly, b::Max2Poly)
     end
 end
 
-function Base.:+(a::TruncatedPoly{K}, b::TruncatedPoly{K}) where K
-    if a.maxorder == b.maxorder
-        return TruncatedPoly(a.coeffs .+ b.coeffs, a.maxorder)
-    elseif a.maxorder > b.maxorder
-        offset = a.maxorder - b.maxorder
-        return TruncatedPoly(ntuple(i->i+offset <= K ? a.coeffs[i] + b.coeffs[i+offset] : a.coeffs[i], K), a.maxorder)
-    else
-        offset = b.maxorder - a.maxorder
-        return TruncatedPoly(ntuple(i->i+offset <= K ? b.coeffs[i] + a.coeffs[i+offset] : b.coeffs[i], K), b.maxorder)
+@generated function Base.:+(a::TruncatedPoly{K}, b::TruncatedPoly{K}) where K
+    quote
+        if a.maxorder == b.maxorder
+            return TruncatedPoly(a.coeffs .+ b.coeffs, a.maxorder)
+        elseif a.maxorder > b.maxorder
+            offset = a.maxorder - b.maxorder
+            return TruncatedPoly((@ntuple $K i->i+offset <= $K ? a.coeffs[i] + b.coeffs[i+offset] : a.coeffs[i]), a.maxorder)
+        else
+            offset = b.maxorder - a.maxorder
+            return TruncatedPoly((@ntuple $K i->i+offset <= $K ? b.coeffs[i] + a.coeffs[i+offset] : b.coeffs[i]), b.maxorder)
+        end
     end
 end
 
-function Base.:*(a::Max2Poly, b::Max2Poly)
-    maxorder = a.maxorder + b.maxorder
-    aa, ab = a.coeffs
-    ba, bb = b.coeffs
-    Max2Poly(aa*bb + ab*ba, ab * bb, maxorder)
-end
-
-function Base.:*(a::TruncatedPoly{K,T}, b::TruncatedPoly{K,T}) where {K,T}
-    maxorder = a.maxorder + b.maxorder
-    TruncatedPoly(ntuple(K) do k
-            r = zero(T)
-            for i=1:K-k+1
-                r += a.coeffs[i+k-1]*b.coeffs[K-i+1]
-            end
-            return r
-        end, maxorder)
+@generated function Base.:*(a::TruncatedPoly{K,T}, b::TruncatedPoly{K,T}) where {K,T}
+    tupleexpr = Expr(:tuple, [K-k+1 > 1 ? Expr(:call, :+, [:(a.coeffs[$(i+k-1)]*b.coeffs[$(K-i+1)]) for i=1:K-k+1]...) : :(a.coeffs[$k]*b.coeffs[$K]) for k=1:K]...)
+    quote
+        maxorder = a.maxorder + b.maxorder
+        TruncatedPoly($tupleexpr, maxorder)
+    end
 end
 
 Base.zero(::Type{TruncatedPoly{K,T,TO}}) where {K,T,TO} = TruncatedPoly(ntuple(i->zero(T), K), zero(Tropical{TO}).n)
 Base.one(::Type{TruncatedPoly{K,T,TO}}) where {K,T,TO} = TruncatedPoly(ntuple(i->i==K ? one(T) : zero(T), K), zero(TO))
-Base.zero(::TruncatedPoly{K,T,TO}) where {K,T,TO} = zero(TruncatedPoly{T,TO})
-Base.one(::TruncatedPoly{K,T,TO}) where {K,T,TO} = one(TruncatedPoly{T,TO})
+Base.zero(::TruncatedPoly{K,T,TO}) where {K,T,TO} = zero(TruncatedPoly{K,T,TO})
+Base.one(::TruncatedPoly{K,T,TO}) where {K,T,TO} = one(TruncatedPoly{K,T,TO})
 
 Base.show(io::IO, x::TruncatedPoly) = show(io, MIME"text/plain"(), x)
 function Base.show(io::IO, ::MIME"text/plain", x::TruncatedPoly{K}) where K

@@ -47,8 +47,8 @@ end
         res6 = best2_solutions(code; all=true)[]
         res7 = all_solutions(code)[]
         idp = graph_polynomial(code, Val(:finitefield))[]
-        @test all(x->x ∈ res7.coeffs[end-1].data, res6.a.data)
-        @test all(x->x ∈ res7.coeffs[end].data, res6.b.data)
+        @test all(x->x ∈ res7.coeffs[end-1].data, res6.coeffs[1].data)
+        @test all(x->x ∈ res7.coeffs[end].data, res6.coeffs[2].data)
         for (i, (s, c)) in enumerate(zip(res7.coeffs, idp.coeffs))
             @test length(s) == c
             @test all(x->count_ones(x)==(i-1), s.data)

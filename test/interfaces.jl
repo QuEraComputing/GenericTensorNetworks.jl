@@ -20,11 +20,11 @@ using LightGraphs, Test
     @test res1.n == 4
     @test res2 == 76
     @test res3.n == 4 && res3.c == 5
-    @test res4.maxorder == 4 && res4.a == 30 && res4.b==5
+    @test res4.maxorder == 4 && res4.coeffs[1] == 30 && res4.coeffs[2]==5
     @test res5 == Polynomial([1.0, 10.0, 30, 30, 5])
     @test res6.c.data ∈ res7.c.data
     @test all(x->sum(x) == 4, res7.c.data)
-    @test all(x->sum(x) == 3, res8.a.data) && all(x->sum(x) == 4, res8.b.data) && length(res8.a.data) == 30 && length(res8.b.data) == 5
+    @test all(x->sum(x) == 3, res8.coeffs[1].data) && all(x->sum(x) == 4, res8.coeffs[2].data) && length(res8.coeffs[1].data) == 30 && length(res8.coeffs[2].data) == 5
     @test all(x->all(c->sum(c) == x[1]-1, x[2].data), enumerate(res9.coeffs))
     @test res10 ≈ res5
     @test res11 == res5

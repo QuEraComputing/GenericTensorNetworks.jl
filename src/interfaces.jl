@@ -28,6 +28,8 @@ function solve(gp::GraphProblem, task; usecuda=false, kwargs...)
         return contractx(gp, CountingTropical(1.0); usecuda=usecuda)
     elseif task == "counting max2"
         return contractx(gp, Max2Poly(0.0, 1.0, 1.0); usecuda=usecuda)
+    elseif task == "counting max3"
+        return contractx(gp, TruncatedPoly((0.0, 0.0, 1.0), 1.0); usecuda=usecuda)
     elseif task == "counting all"
         return graph_polynomial(gp, Val(:polynomial); usecuda=usecuda)
     elseif task == "config max"
@@ -36,6 +38,8 @@ function solve(gp::GraphProblem, task; usecuda=false, kwargs...)
         return solutions(gp, CountingTropical{Float64,Float64}; all=true, usecuda=usecuda)
     elseif task == "configs max2"
         return solutions(gp, Max2Poly{Float64,Float64}; all=true, usecuda=usecuda)
+    elseif task == "configs max3"
+        return solutions(gp, TruncatedPoly{3,Float64,Float64}; all=true, usecuda=usecuda)
     elseif task == "configs all"
         return solutions(gp, Polynomial{Float64,:x}; all=true, usecuda=usecuda)
     # extra methods

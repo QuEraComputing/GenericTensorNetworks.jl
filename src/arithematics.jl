@@ -191,8 +191,8 @@ end
 # convert from counting type to bitstring type
 for (F,TP) in [(:set_type, :ConfigEnumerator), (:sampler_type, :ConfigSampler)]
     @eval begin
-        function $F(::Type{T}, n::Int, nflavor::Int) where {OT, T<:Max2Poly{C,OT} where C}
-            Max2Poly{$F(n,nflavor),OT}
+        function $F(::Type{T}, n::Int, nflavor::Int) where {OT, K, T<:TruncatedPoly{K,C,OT} where C}
+            TruncatedPoly{K, $F(n,nflavor),OT}
         end
         function $F(::Type{T}, n::Int, nflavor::Int) where {TX, T<:Polynomial{C,TX} where C}
             Polynomial{$F(n,nflavor),:x}
@@ -212,8 +212,8 @@ end
 function onehotv(::Type{Polynomial{BS,X}}, x, v) where {BS,X}
     Polynomial{BS,X}([zero(BS), onehotv(BS, x, v)])
 end
-function onehotv(::Type{Max2Poly{BS,OS}}, x, v) where {BS,OS}
-    Max2Poly{BS,OS}(zero(BS), onehotv(BS, x, v),one(OS))
+function onehotv(::Type{TruncatedPoly{K,BS,OS}}, x, v) where {K,BS,OS}
+    TruncatedPoly{K,BS,OS}(ntuple(i->i<K ? zero(BS) : onehotv(BS, x, v), K),one(OS))
 end
 function onehotv(::Type{CountingTropical{TV,BS}}, x, v) where {TV,BS}
     CountingTropical{TV,BS}(one(TV), onehotv(BS, x, v))

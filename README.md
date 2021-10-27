@@ -36,9 +36,9 @@ end
 
 Let us use the Petersen graph as an example, we first generate its tensor network contraction tree.
 ```julia
-julia> using GraphTensorNetworks, Random, LightGraphs
+julia> using GraphTensorNetworks, Random, Graphs
 
-julia> graph = (Random.seed!(2); LightGraphs.smallgraph(:petersen))
+julia> graph = (Random.seed!(2); Graphs.smallgraph(:petersen))
 {10, 15} undirected simple Int64 graph
 
 julia> problem = Independence(graph; optimizer=TreeSA(sc_target=0, sc_weight=1.0, ntrials=10, βs=0.01:0.1:15.0, niters=20, rw_weight=0.2));

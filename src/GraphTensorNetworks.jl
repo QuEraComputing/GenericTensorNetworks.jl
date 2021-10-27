@@ -5,7 +5,7 @@ using Core: Argument
 using TropicalGEMM, TropicalNumbers
 using OMEinsum
 using OMEinsum: timespace_complexity, collect_ixs
-using LightGraphs
+using Graphs
 
 export timespace_complexity, @ein_str
 export GreedyMethod, TreeSA, SABipartite, KaHyParBipartite, MergeVectors, MergeGreedy

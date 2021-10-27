@@ -1,4 +1,4 @@
-using GraphTensorNetworks, Test, LightGraphs
+using GraphTensorNetworks, Test, Graphs
 using OMEinsum
 using TropicalNumbers: CountingTropicalF64
 

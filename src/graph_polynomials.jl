@@ -1,7 +1,7 @@
 using Polynomials
 using OMEinsum: NestedEinsum, getixs, getiy
 using FFTW
-using LightGraphs
+using Graphs
 
 export contractx, contractf, graph_polynomial, max_size, max_size_count
 

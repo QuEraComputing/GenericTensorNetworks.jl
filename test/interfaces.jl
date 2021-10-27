@@ -1,8 +1,8 @@
 using GraphTensorNetworks
-using LightGraphs, Test
+using Graphs, Test
 
 @testset "independence problem" begin
-    g = LightGraphs.smallgraph("petersen")
+    g = Graphs.smallgraph("petersen")
     gp = Independence(g; optimizer=GreedyMethod())
     res1 = solve(gp, "size max")[]
     res2 = solve(gp, "counting sum")[]

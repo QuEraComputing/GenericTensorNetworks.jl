@@ -3,7 +3,7 @@ export vizeinsum, vizconfig
 using Compose
 
 function vizconfig(g::SimpleGraph; locs, config=zeros(Int, length(locs)), unit=1.0, graphsize=12cm, radius=0.03)
-    vizconfig([string(v)=>locs[v] for v in LightGraphs.vertices(g)], [(e.src, e.dst) for e in edges(g)]; config=config, unit=unit, graphsize=graphsize, radius=radius)
+    vizconfig([string(v)=>locs[v] for v in Graphs.vertices(g)], [(e.src, e.dst) for e in edges(g)]; config=config, unit=unit, graphsize=graphsize, radius=radius)
 end
 
 function vizconfig(nodes, edges; config=zeros(Int, length(nodes)), unit=1.0, graphsize=12cm, radius=0.03)

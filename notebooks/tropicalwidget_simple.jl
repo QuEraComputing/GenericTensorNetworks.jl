@@ -18,7 +18,7 @@ begin
 	using Revise
 	using Pkg
 	Pkg.activate(dirname(pwd()))
-	using LightGraphs # graph support
+	using Graphs # graph support
 	using PlutoUI
 	using Viznet, Compose
 	using TropicalNumbers, OMEinsum, GraphTensorNetworks#, TropicalGEMM

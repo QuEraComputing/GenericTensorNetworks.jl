@@ -15,8 +15,8 @@ struct Independence{CT<:EinTypes} <: GraphProblem
 end
 
 function Independence(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
-    rawcode = EinCode(([(i,) for i in LightGraphs.vertices(g)]..., # labels for vertex tensors
-                    [minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...), openvertices)  # labels for edge tensors
+    rawcode = EinCode(([(i,) for i in Graphs.vertices(g)]..., # labels for vertex tensors
+                    [minmax(e.src,e.dst) for e in Graphs.edges(g)]...), openvertices)  # labels for edge tensors
     code = _optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier)
     Independence(code)
 end
@@ -32,7 +32,7 @@ struct MaxCut{CT<:EinTypes} <: GraphProblem
     code::CT
 end
 function MaxCut(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
-    rawcode = EinCode(([minmax(e.src,e.dst) for e in LightGraphs.edges(g)]...,), openvertices)  # labels for edge tensors
+    rawcode = EinCode(([minmax(e.src,e.dst) for e in Graphs.edges(g)]...,), openvertices)  # labels for edge tensors
     MaxCut(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier))
 end
 
@@ -48,7 +48,7 @@ struct MaximalIndependence{CT<:EinTypes} <: GraphProblem
 end
 
 function MaximalIndependence(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
-    rawcode = EinCode(([(LightGraphs.neighbors(g, v)..., v) for v in LightGraphs.vertices(g)]...,), openvertices)
+    rawcode = EinCode(([(Graphs.neighbors(g, v)..., v) for v in Graphs.vertices(g)]...,), openvertices)
     MaximalIndependence(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier))
 end
 
@@ -69,8 +69,8 @@ struct Matching{CT<:EinTypes} <: GraphProblem
 end
 
 function Matching(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
-    rawcode = EinCode(([(minmax(e.src,e.dst),) for e in LightGraphs.edges(g)]..., # labels for edge tensors
-                    [([minmax(i,j) for j in neighbors(g, i)]...,) for i in LightGraphs.vertices(g)]...,), openvertices)       # labels for vertex tensors
+    rawcode = EinCode(([(minmax(e.src,e.dst),) for e in Graphs.edges(g)]..., # labels for edge tensors
+                    [([minmax(i,j) for j in neighbors(g, i)]...,) for i in Graphs.vertices(g)]...,), openvertices)       # labels for vertex tensors
     Matching(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier))
 end
 

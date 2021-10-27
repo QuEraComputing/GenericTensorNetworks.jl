@@ -1,4 +1,4 @@
-using LightGraphs, OMEinsumContractionOrders
+using Graphs, OMEinsumContractionOrders
 export random_regular_graph, diagonal_coupled_graph, isindependentset
 export square_lattice_graph, unitdisk_graph
 

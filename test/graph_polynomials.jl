@@ -1,6 +1,6 @@
 using GraphTensorNetworks, Test, OMEinsum, OMEinsumContractionOrders
 using Mods, Polynomials, TropicalNumbers
-using LightGraphs, Random
+using Graphs, Random
 using GraphTensorNetworks: StaticBitVector
 
 @testset "bond and vertex tensor" begin

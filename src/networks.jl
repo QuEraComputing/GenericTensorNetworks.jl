@@ -15,8 +15,8 @@ struct Independence{CT<:EinTypes} <: GraphProblem
 end
 
 function Independence(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
-    rawcode = EinCode(([(i,) for i in Graphs.vertices(g)]..., # labels for vertex tensors
-                    [minmax(e.src,e.dst) for e in Graphs.edges(g)]...), openvertices)  # labels for edge tensors
+    rawcode = EinCode(([[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
+                       [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...), collect(Int, openvertices))  # labels for edge tensors
     code = _optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier)
     Independence(code)
 end
@@ -32,7 +32,7 @@ struct MaxCut{CT<:EinTypes} <: GraphProblem
     code::CT
 end
 function MaxCut(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
-    rawcode = EinCode(([minmax(e.src,e.dst) for e in Graphs.edges(g)]...,), openvertices)  # labels for edge tensors
+    rawcode = EinCode([[minmax(e.src,e.dst)...] for e in Graphs.edges(g)], collect(Int, openvertices))  # labels for edge tensors
     MaxCut(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier))
 end
 
@@ -48,7 +48,7 @@ struct MaximalIndependence{CT<:EinTypes} <: GraphProblem
 end
 
 function MaximalIndependence(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
-    rawcode = EinCode(([(Graphs.neighbors(g, v)..., v) for v in Graphs.vertices(g)]...,), openvertices)
+    rawcode = EinCode(([[Graphs.neighbors(g, v)..., v] for v in Graphs.vertices(g)]...,), collect(Int, openvertices))
     MaximalIndependence(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier))
 end
 
@@ -69,8 +69,9 @@ struct Matching{CT<:EinTypes} <: GraphProblem
 end
 
 function Matching(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
-    rawcode = EinCode(([(minmax(e.src,e.dst),) for e in Graphs.edges(g)]..., # labels for edge tensors
-                    [([minmax(i,j) for j in neighbors(g, i)]...,) for i in Graphs.vertices(g)]...,), openvertices)       # labels for vertex tensors
+    rawcode = EinCode(vcat([[minmax(e.src,e.dst)] for e in Graphs.edges(g)], # labels for edge tensors
+                [[minmax(i,j) for j in neighbors(g, i)] for i in Graphs.vertices(g)]),
+                collect(Tuple{Int,Int}, openvertices))
     Matching(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier))
 end
 
@@ -132,7 +133,7 @@ julia> res = best_solutions(gp; all=true)[]
 """
 function set_packing(sets; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
     n = length(sets)
-    code = EinCode(([(i,) for i=1:n]..., [(i,j) for i=1:n,j=1:n if j>i && !isempty(sets[i] ∩ sets[j])]...), openvertices)
+    code = EinCode(vcat([[i] for i=1:n], [[i,j] for i=1:n,j=1:n if j>i && !isempty(sets[i] ∩ sets[j])]), collect(Int,openvertices))
     Independence(_optimize_code(code, uniformsize(code, 2), optimizer, simplifier))
 end
 

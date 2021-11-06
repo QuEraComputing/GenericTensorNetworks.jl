@@ -19,6 +19,8 @@ using Graphs, Test
     res13 = solve(gp, "configs max (bounded)")[]
     res14 = solve(gp, "counting max3")[]
     res15 = solve(gp, "configs max3")[]
+    res16 = solve(gp, "configs max2 (bounded)")[]
+    res17 = solve(gp, "configs max3 (bounded)")[]
     @test res1.n == 4
     @test res2 == 76
     @test res3.n == 4 && res3.c == 5
@@ -35,6 +37,9 @@ using Graphs, Test
     @test res14.maxorder == 4 && res14.coeffs[1]==30 && res14.coeffs[2] == 30 && res14.coeffs[3]==5
     @test all(x->sum(x) == 2, res15.coeffs[1].data) && all(x->sum(x) == 3, res15.coeffs[2].data) && all(x->sum(x) == 4, res15.coeffs[3].data) &&
             length(res15.coeffs[1].data) == 30 && length(res15.coeffs[2].data) == 30 && length(res15.coeffs[3].data) == 5
+    @test all(x->sum(x) == 3, res16.coeffs[1].data) && all(x->sum(x) == 4, res16.coeffs[2].data) && length(res16.coeffs[1].data) == 30 && length(res16.coeffs[2].data) == 5
+    @test all(x->sum(x) == 2, res17.coeffs[1].data) && all(x->sum(x) == 3, res17.coeffs[2].data) && all(x->sum(x) == 4, res17.coeffs[3].data) &&
+            length(res17.coeffs[1].data) == 30 && length(res17.coeffs[2].data) == 30 && length(res17.coeffs[3].data) == 5
 end
 
 @testset "save load" begin

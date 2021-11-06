@@ -220,3 +220,5 @@ function onehotv(::Type{CountingTropical{TV,BS}}, x, v) where {TV,BS}
 end
 onehotv(::Type{ConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigEnumerator([onehotv(StaticElementVector{N,S,C}, i, v)])
 onehotv(::Type{ConfigSampler{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigSampler(onehotv(StaticElementVector{N,S,C}, i, v))
+Base.transpose(c::ConfigEnumerator) = c
+Base.copy(c::ConfigEnumerator) = ConfigEnumerator(copy(c.data))

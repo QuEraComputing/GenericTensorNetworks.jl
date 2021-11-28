@@ -2,15 +2,15 @@ using Viznet
 export vizeinsum, vizconfig
 using Compose
 
-function vizconfig(g::SimpleGraph; locs, config=zeros(Int, length(locs)), unit=1.0, graphsize=12cm, radius=0.03)
-    vizconfig([string(v)=>locs[v] for v in Graphs.vertices(g)], [(e.src, e.dst) for e in edges(g)]; config=config, unit=unit, graphsize=graphsize, radius=radius)
+function vizconfig(g::SimpleGraph; locs, kwargs...)
+    vizconfig([string(v)=>locs[v] for v in Graphs.vertices(g)], [(e.src, e.dst) for e in edges(g)]; kwargs...)
 end
 
-function vizconfig(nodes, edges; config=zeros(Int, length(nodes)), unit=1.0, graphsize=12cm, radius=0.03)
-	tb = textstyle(:default, fill("white"), fontsize(10pt*unit))
-	nb = nodestyle(:circle, fill("black"), r=radius*unit)
-	nb2 = nodestyle(:circle, fill("red"),r=radius*unit)
-	eb = bondstyle(:default, linewidth(0.4mm*unit))
+function vizconfig(nodes, edges; config=zeros(Int, length(nodes)), unit=1.0, graphsize=12cm, radius=0.03, edgecolor="white", nodecolor="black", nodecolor2="red", textcolor="white")
+	tb = textstyle(:default, fill(textcolor), fontsize(10pt*unit))
+	nb = nodestyle(:circle, fill(nodecolor), r=radius*unit)
+	nb2 = nodestyle(:circle, fill(nodecolor2),r=radius*unit)
+	eb = bondstyle(:default, stroke(edgecolor), linewidth(0.4mm*unit))
 	img = canvas() do
 		for (i, (t, p)) in enumerate(nodes)
 			(config[i]==1 ? nb2 : nb) >> (p...,)

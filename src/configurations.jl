@@ -1,4 +1,5 @@
 export best_solutions, best2_solutions, solutions, all_solutions
+export bestk_solutions
 
 """
     best_solutions(problem; all=false, usecuda=false)
@@ -23,7 +24,7 @@ function best_solutions(gp::GraphProblem; all=false, usecuda=false)
     end
     if all
         xs = generate_tensors(l->onehotv(T, vertex_index[l], 1), gp)
-        return bounding_contract(gp.code, xst, ymask, xs)
+        return bounding_contract(AllConfigs{1}(), gp.code, xst, ymask, xs)
     else
         @assert ndims(ymask) == 0
         t, res = solution_ad(gp.code, xst, ymask)
@@ -57,6 +58,16 @@ end
 Finding optimal and suboptimal solutions.
 """
 best2_solutions(gp::GraphProblem; all=true, usecuda=false) = solutions(gp, Max2Poly{Float64,Float64}; all=all, usecuda=usecuda)
+
+function bestk_solutions(gp::GraphProblem, k::Int)
+    syms = symbols(gp)
+    vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
+    xst = generate_tensors(l->TropicalF64(1.0), gp)
+    ymask = trues(fill(2, length(_getiy(gp.code)))...)
+    T = set_type(TruncatedPoly{k,Float64,Float64}, length(syms), bondsize(gp))
+    xs = generate_tensors(l->onehotv(T, vertex_index[l], 1), gp)
+    return bounding_contract(AllConfigs{k}(), gp.code, xst, ymask, xs)
+end
 
 """
     all_solutions(problem)

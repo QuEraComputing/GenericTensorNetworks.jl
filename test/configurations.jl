@@ -1,6 +1,7 @@
 using GraphTensorNetworks, Test, Graphs
 using OMEinsum
 using TropicalNumbers: CountingTropicalF64
+using OMEinsumContractionOrders: uniformsize
 
 @testset "Config types" begin
     T = sampler_type(CountingTropical{Float32}, 5, 2)
@@ -45,10 +46,13 @@ end
         @test res5.n == res0
         @test res5.c.data ∈ res2.c.data
         res6 = best2_solutions(code; all=true)[]
+        res6_ = bestk_solutions(code, 2)[]
         res7 = all_solutions(code)[]
         idp = graph_polynomial(code, Val(:finitefield))[]
         @test all(x->x ∈ res7.coeffs[end-1].data, res6.coeffs[1].data)
         @test all(x->x ∈ res7.coeffs[end].data, res6.coeffs[2].data)
+        @test all(x->x ∈ res7.coeffs[end-1].data, res6_.coeffs[1].data)
+        @test all(x->x ∈ res7.coeffs[end].data, res6_.coeffs[2].data)
         for (i, (s, c)) in enumerate(zip(res7.coeffs, idp.coeffs))
             @test length(s) == c
             @test all(x->count_ones(x)==(i-1), s.data)

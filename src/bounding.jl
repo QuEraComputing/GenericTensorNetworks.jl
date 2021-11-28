@@ -1,5 +1,9 @@
 using OMEinsum: DynamicEinCode
 
+struct AllConfigs{K} end
+largest_k(::AllConfigs{K}) where K = K
+struct SingleConfig end
+
 """
     backward_tropical(mode, ixs, xs, iy, y, ymask, size_dict)
 
@@ -17,11 +21,11 @@ function backward_tropical(mode, ixs, @nospecialize(xs::Tuple), iy, @nospecializ
         nixs = OMEinsum._insertat(ixs, i, iy)
         nxs  = OMEinsum._insertat( xs, i, y)
         niy = ixs[i]
-        if mode == :all
+        if mode isa AllConfigs
             mask = zeros(Bool, size(xs[i]))
-            mask .= inv.(einsum(EinCode(nixs, niy), nxs, size_dict)) .== xs[i]
+            mask .= inv.(einsum(EinCode(nixs, niy), nxs, size_dict)) .<= xs[i] .* Tropical(largest_k(mode)-1)
             push!(masks, mask)
-        elseif mode == :single  # wrong, need `B` matching `A`.
+        elseif mode isa SingleConfig
             A = zeros(eltype(xs[i]), size(xs[i]))
             A = einsum(EinCode(nixs, niy), nxs, size_dict)
             push!(masks, onehotmask(A, xs[i]))
@@ -65,12 +69,12 @@ function cached_einsum(code::NestedEinsum, @nospecialize(xs), size_dict)
 end
 
 # computed mask tree by back propagation
-function generate_masktree(code::NestedEinsum, cache, mask, size_dict, mode=:all)
+function generate_masktree(mode, code::NestedEinsum, cache, mask, size_dict)
     if OMEinsum.isleaf(code)
         return CacheTree(mask, CacheTree{Bool}[])
     else
         submasks = backward_tropical(mode, getixs(code.eins), (getfield.(cache.siblings, :content)...,), OMEinsum.getiy(code.eins), cache.content, mask, size_dict)
-        return CacheTree(mask, generate_masktree.(code.args, cache.siblings, submasks, Ref(size_dict), mode))
+        return CacheTree(mask, generate_masktree.(Ref(mode), code.args, cache.siblings, submasks, Ref(size_dict)))
     end
 end
 
@@ -89,19 +93,20 @@ function masked_einsum(code::NestedEinsum, @nospecialize(xs), masks, size_dict)
 end
 
 """
-    bounding_contract(code, xsa, ymask, xsb; size_info=nothing)
+    bounding_contract(mode, code, xsa, ymask, xsb; size_info=nothing)
 
 Contraction method with bounding.
 
+    * `mode` is a `AllConfigs{K}` instance, where `MIS-K+1` is the largest IS size that you care about.
     * `xsa` are input tensors for bounding, e.g. tropical tensors,
     * `xsb` are input tensors for computing, e.g. tensors elements are counting tropical with set algebra,
     * `ymask` is the initial gradient mask for the output tensor.
 """
-function bounding_contract(code::EinCode, @nospecialize(xsa), ymask, @nospecialize(xsb); size_info=nothing)
+function bounding_contract(mode::AllConfigs, code::EinCode, @nospecialize(xsa), ymask, @nospecialize(xsb); size_info=nothing)
     LT = OMEinsum.labeltype(code)
-    bounding_contract(NestedEinsum(NestedEinsum{DynamicEinCode{LT}}.(1:length(xsa)), code), xsa, ymask, xsb; size_info=size_info)
+    bounding_contract(mode, NestedEinsum(NestedEinsum{DynamicEinCode{LT}}.(1:length(xsa)), code), xsa, ymask, xsb; size_info=size_info)
 end
-function bounding_contract(code::NestedEinsum, @nospecialize(xsa), ymask, @nospecialize(xsb); size_info=nothing)
+function bounding_contract(mode::AllConfigs, code::NestedEinsum, @nospecialize(xsa), ymask, @nospecialize(xsb); size_info=nothing)
     size_dict = size_info===nothing ? Dict{OMEinsum.labeltype(code.eins),Int}() : copy(size_info)
     OMEinsum.get_size_dict!(code, xsa, size_dict)
     # compute intermediate tensors
@@ -109,7 +114,7 @@ function bounding_contract(code::NestedEinsum, @nospecialize(xsa), ymask, @nospe
     c = cached_einsum(code, xsa, size_dict)
     # compute masks from cached tensors
     @debug "generating masked tree..."
-    mt = generate_masktree(code, c, ymask, size_dict, :all)
+    mt = generate_masktree(mode, code, c, ymask, size_dict)
     # compute results with masks
     masked_einsum(code, xsb, mt, size_dict)
 end
@@ -129,7 +134,7 @@ function solution_ad(code::NestedEinsum, @nospecialize(xsa), ymask; size_info=no
     n = asscalar(c.content)
     # compute masks from cached tensors
     @debug "generating masked tree..."
-    mt = generate_masktree(code, c, ymask, size_dict, :single)
+    mt = generate_masktree(SingleConfig(), code, c, ymask, size_dict)
     n, read_config!(code, mt, Dict())
 end
 

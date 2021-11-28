@@ -51,6 +51,10 @@ function solve(gp::GraphProblem, task; usecuda=false, kwargs...)
         return best_solutions(gp; all=false, usecuda=usecuda)
     elseif task == "configs max (bounded)"
         return best_solutions(gp; all=true, usecuda=usecuda)
+    elseif task == "configs max2 (bounded)"
+        return bestk_solutions(gp, 2)
+    elseif task == "configs max3 (bounded)"
+        return bestk_solutions(gp, 3)
     else
         error("unknown task $task.")
     end

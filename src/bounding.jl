@@ -1,5 +1,7 @@
 using OMEinsum: DynamicEinCode
 
+export AllConfigs, SingleConfig
+
 struct AllConfigs{K} end
 largest_k(::AllConfigs{K}) where K = K
 struct SingleConfig end
@@ -57,6 +59,10 @@ struct CacheTree{T}
     content::AbstractArray{T}
     siblings::Vector{CacheTree{T}}
 end
+function cached_einsum(se::SlicedEinsum, @nospecialize(xs), size_dict)
+    length(se.slicing) == 0 && return cached_einsum(se.eins, xs, size_dict)
+    error("Slicing is not supported!")
+end
 function cached_einsum(code::NestedEinsum, @nospecialize(xs), size_dict)
     if OMEinsum.isleaf(code)
         y = xs[code.tensorindex]
@@ -69,6 +75,10 @@ function cached_einsum(code::NestedEinsum, @nospecialize(xs), size_dict)
 end
 
 # computed mask tree by back propagation
+function generate_masktree(mode, se::SlicedEinsum, cache, mask, size_dict)
+    length(se.slicing) == 0 && return generate_masktree(mode, se.eins, cache, mask, size_dict)
+    error("Slicing is not supported!")
+end
 function generate_masktree(mode, code::NestedEinsum, cache, mask, size_dict)
     if OMEinsum.isleaf(code)
         return CacheTree(mask, CacheTree{Bool}[])
@@ -79,6 +89,10 @@ function generate_masktree(mode, code::NestedEinsum, cache, mask, size_dict)
 end
 
 # The masked einsum contraction
+function masked_einsum(se::SlicedEinsum, @nospecialize(xs), masks, size_dict)
+    length(se.slicing) == 0 && return masked_einsum(se.eins, xs, masks, size_dict)
+    error("Slicing is not supported!")
+end
 function masked_einsum(code::NestedEinsum, @nospecialize(xs), masks, size_dict)
     if OMEinsum.isleaf(code)
         y = copy(xs[code.tensorindex])
@@ -106,7 +120,7 @@ function bounding_contract(mode::AllConfigs, code::EinCode, @nospecialize(xsa), 
     LT = OMEinsum.labeltype(code)
     bounding_contract(mode, NestedEinsum(NestedEinsum{DynamicEinCode{LT}}.(1:length(xsa)), code), xsa, ymask, xsb; size_info=size_info)
 end
-function bounding_contract(mode::AllConfigs, code::NestedEinsum, @nospecialize(xsa), ymask, @nospecialize(xsb); size_info=nothing)
+function bounding_contract(mode::AllConfigs, code::Union{NestedEinsum,SlicedEinsum}, @nospecialize(xsa), ymask, @nospecialize(xsb); size_info=nothing)
     size_dict = size_info===nothing ? Dict{OMEinsum.labeltype(code.eins),Int}() : copy(size_info)
     OMEinsum.get_size_dict!(code, xsa, size_dict)
     # compute intermediate tensors
@@ -125,7 +139,7 @@ function solution_ad(code::EinCode, @nospecialize(xsa), ymask; size_info=nothing
     solution_ad(NestedEinsum(NestedEinsum{DynamicEinCode{LT}}.(1:length(xsa)), code), xsa, ymask; size_info=size_info)
 end
 
-function solution_ad(code::NestedEinsum, @nospecialize(xsa), ymask; size_info=nothing)
+function solution_ad(code::Union{NestedEinsum,SlicedEinsum}, @nospecialize(xsa), ymask; size_info=nothing)
     size_dict = size_info===nothing ? Dict{OMEinsum.labeltype(code.eins),Int}() : copy(size_info)
     OMEinsum.get_size_dict!(code, xsa, size_dict)
     # compute intermediate tensors
@@ -138,6 +152,10 @@ function solution_ad(code::NestedEinsum, @nospecialize(xsa), ymask; size_info=no
     n, read_config!(code, mt, Dict())
 end
 
+# get the solution configuration from gradients.
+function read_config!(code::SlicedEinsum, mt, out)
+    read_config!(code.eins, mt, out)
+end
 function read_config!(code::NestedEinsum, mt, out)
     for (arg, ix, sibling) in zip(code.args, getixs(code.eins), mt.siblings)
         if OMEinsum.isleaf(arg)

@@ -1,6 +1,6 @@
 module GraphTensorNetworks
 
-using OMEinsumContractionOrders: OMEinsum
+using OMEinsumContractionOrders: SlicedEinsum
 using Core: Argument
 using TropicalGEMM, TropicalNumbers
 using OMEinsum

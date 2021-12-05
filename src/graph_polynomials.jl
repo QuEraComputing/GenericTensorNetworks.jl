@@ -62,13 +62,11 @@ function _polynomial_single(gp::GraphProblem, ::Type{T}; usecuda, maxorder) wher
     return res
 end
 
-_getiy(code::EinCode) = getiy(code)
-_getiy(code::NestedEinsum) = getiy(code.eins)
 function graph_polynomial(gp::GraphProblem, ::Val{:finitefield}; usecuda=false,
         maxorder=max_size(gp; usecuda=usecuda), max_iter=100)
     TI = Int32  # Int 32 is faster
     N = typemax(TI)
-    YS = fill(Any[], (fill(bondsize(gp), length(_getiy(gp.code)))...,))
+    YS = fill(Any[], (fill(bondsize(gp), length(getiyv(gp.code)))...,))
     local res, respre
     for k = 1:max_iter
 	    N = prevprime(N-TI(1))

@@ -1,5 +1,5 @@
 export Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing, MaxCut
-const EinTypes = Union{EinCode,NestedEinsum}
+const EinTypes = Union{EinCode,NestedEinsum,SlicedEinsum}
 
 abstract type GraphProblem end
 

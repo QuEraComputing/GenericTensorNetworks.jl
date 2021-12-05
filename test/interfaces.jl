@@ -34,7 +34,7 @@ using Graphs, Test
         @test res10 ≈ res5
         @test res11 == res5
         @test res12.c.data ∈ res13.c.data
-        @test res13.c.data == res7.c.data
+        @test res13.c == res7.c
         @test res14.maxorder == 4 && res14.coeffs[1]==30 && res14.coeffs[2] == 30 && res14.coeffs[3]==5
         @test all(x->sum(x) == 2, res15.coeffs[1].data) && all(x->sum(x) == 3, res15.coeffs[2].data) && all(x->sum(x) == 4, res15.coeffs[3].data) &&
                 length(res15.coeffs[1].data) == 30 && length(res15.coeffs[2].data) == 30 && length(res15.coeffs[3].data) == 5
@@ -97,8 +97,12 @@ end
     res9 = solve(gp, "configs all")[]
     res10 = solve(gp, "counting all (fft)")[]
     res11 = solve(gp, "counting all (finitefield)")[]
+    res12 = solve(gp, "config max (bounded)")[]
+    res13 = solve(gp, "configs max (bounded)")[]
     res14 = solve(gp, "counting max3")[]
     res15 = solve(gp, "configs max3")[]
+    res16 = solve(gp, "configs max2 (bounded)")[]
+    res17 = solve(gp, "configs max3 (bounded)")[]
     @test res1.n == 4
     @test res2 == 76
     @test res3.n == 4 && res3.c == 5
@@ -110,28 +114,20 @@ end
     @test all(x->all(c->sum(c) == x[1]-1, x[2].data), enumerate(res9.coeffs))
     @test res10 ≈ res5
     @test res11 == res5
+    @test res12.c.data ∈ res13.c.data
+    @test res13.c == res7.c
     @test res14.maxorder == 4 && res14.coeffs[1]==30 && res14.coeffs[2] == 30 && res14.coeffs[3]==5
     @test all(x->sum(x) == 2, res15.coeffs[1].data) && all(x->sum(x) == 3, res15.coeffs[2].data) && all(x->sum(x) == 4, res15.coeffs[3].data) &&
             length(res15.coeffs[1].data) == 30 && length(res15.coeffs[2].data) == 30 && length(res15.coeffs[3].data) == 5
+    @test all(x->sum(x) == 3, res16.coeffs[1].data) && all(x->sum(x) == 4, res16.coeffs[2].data) && length(res16.coeffs[1].data) == 30 && length(res16.coeffs[2].data) == 5
+    @test all(x->sum(x) == 2, res17.coeffs[1].data) && all(x->sum(x) == 3, res17.coeffs[2].data) && all(x->sum(x) == 4, res17.coeffs[3].data) &&
+            length(res17.coeffs[1].data) == 30 && length(res17.coeffs[2].data) == 30 && length(res17.coeffs[3].data) == 5
 
     # sliced masked contraction is not supported yet.
-    @test_throws ErrorException begin
-        res12 = solve(gp, "config max (bounded)")[]
-        res12.c.data ∈ res13.c.data
-    end
-    @test_throws ErrorException begin
-        res13 = solve(gp, "configs max (bounded)")[]
-        res13.c.data == res7.c.data
-    end
+    @test_logs (:warn,) (:warn,) (:warn,) solve(gp, "configs max (bounded)")
+    @test_logs (:warn,) (:warn,) solve(gp, "config max (bounded)")
 
-    @test_throws ErrorException begin
-        res16 = solve(gp, "configs max2 (bounded)")[]
-        all(x->sum(x) == 3, res16.coeffs[1].data) && all(x->sum(x) == 4, res16.coeffs[2].data) && length(res16.coeffs[1].data) == 30 && length(res16.coeffs[2].data) == 5
-    end
-    @test_throws ErrorException begin
-        res17 = solve(gp, "configs max3 (bounded)")[]
-        all(x->sum(x) == 2, res17.coeffs[1].data) && all(x->sum(x) == 3, res17.coeffs[2].data) && all(x->sum(x) == 4, res17.coeffs[3].data) &&
-                length(res17.coeffs[1].data) == 30 && length(res17.coeffs[2].data) == 30 && length(res17.coeffs[3].data) == 5
-    end
+    @test_logs (:warn,) (:warn,) (:warn,) solve(gp, "configs max2 (bounded)")
+    @test_logs (:warn,) (:warn,) (:warn,) solve(gp, "configs max3 (bounded)")
 end
 

@@ -60,8 +60,10 @@ struct CacheTree{T}
     siblings::Vector{CacheTree{T}}
 end
 function cached_einsum(se::SlicedEinsum, @nospecialize(xs), size_dict)
-    length(se.slicing) == 0 && return cached_einsum(se.eins, xs, size_dict)
-    error("Slicing is not supported!")
+    if length(se.slicing) != 0
+        @warn "Slicing is not supported for caching! Fallback to `NestedEinsum`."
+    end
+    return cached_einsum(se.eins, xs, size_dict)
 end
 function cached_einsum(code::NestedEinsum, @nospecialize(xs), size_dict)
     if OMEinsum.isleaf(code)
@@ -76,8 +78,10 @@ end
 
 # computed mask tree by back propagation
 function generate_masktree(mode, se::SlicedEinsum, cache, mask, size_dict)
-    length(se.slicing) == 0 && return generate_masktree(mode, se.eins, cache, mask, size_dict)
-    error("Slicing is not supported!")
+    if length(se.slicing) != 0
+        @warn "Slicing is not supported for generating masked tree! Fallback to `NestedEinsum`."
+    end
+    return generate_masktree(mode, se.eins, cache, mask, size_dict)
 end
 function generate_masktree(mode, code::NestedEinsum, cache, mask, size_dict)
     if OMEinsum.isleaf(code)
@@ -90,8 +94,10 @@ end
 
 # The masked einsum contraction
 function masked_einsum(se::SlicedEinsum, @nospecialize(xs), masks, size_dict)
-    length(se.slicing) == 0 && return masked_einsum(se.eins, xs, masks, size_dict)
-    error("Slicing is not supported!")
+    if length(se.slicing) != 0
+        @warn "Slicing is not supported for masked contraction! Fallback to `NestedEinsum`."
+    end
+    return masked_einsum(se.eins, xs, masks, size_dict)
 end
 function masked_einsum(code::NestedEinsum, @nospecialize(xs), masks, size_dict)
     if OMEinsum.isleaf(code)

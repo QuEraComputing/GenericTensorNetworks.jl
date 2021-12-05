@@ -130,7 +130,7 @@ end
 
 Base.length(x::ConfigEnumerator{N}) where N = length(x.data)
 Base.getindex(x::ConfigEnumerator, i) = x.data[i]
-Base.:(==)(x::ConfigEnumerator{N,S,C}, y::ConfigEnumerator{N,S,C}) where {N,S,C} = x.data == y.data
+Base.:(==)(x::ConfigEnumerator{N,S,C}, y::ConfigEnumerator{N,S,C}) where {N,S,C} = Set(x.data) == Set(y.data)
 
 function Base.:+(x::ConfigEnumerator{N,S,C}, y::ConfigEnumerator{N,S,C}) where {N,S,C}
     length(x) == 0 && return y

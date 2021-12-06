@@ -3,43 +3,45 @@ using Graphs, Test
 
 @testset "independence problem" begin
     g = Graphs.smallgraph("petersen")
-    gp = Independence(g; optimizer=GreedyMethod())
-    res1 = solve(gp, "size max")[]
-    res2 = solve(gp, "counting sum")[]
-    res3 = solve(gp, "counting max")[]
-    res4 = solve(gp, "counting max2")[]
-    res5 = solve(gp, "counting all")[]
-    res6 = solve(gp, "config max")[]
-    res7 = solve(gp, "configs max")[]
-    res8 = solve(gp, "configs max2")[]
-    res9 = solve(gp, "configs all")[]
-    res10 = solve(gp, "counting all (fft)")[]
-    res11 = solve(gp, "counting all (finitefield)")[]
-    res12 = solve(gp, "config max (bounded)")[]
-    res13 = solve(gp, "configs max (bounded)")[]
-    res14 = solve(gp, "counting max3")[]
-    res15 = solve(gp, "configs max3")[]
-    res16 = solve(gp, "configs max2 (bounded)")[]
-    res17 = solve(gp, "configs max3 (bounded)")[]
-    @test res1.n == 4
-    @test res2 == 76
-    @test res3.n == 4 && res3.c == 5
-    @test res4.maxorder == 4 && res4.coeffs[1] == 30 && res4.coeffs[2]==5
-    @test res5 == Polynomial([1.0, 10.0, 30, 30, 5])
-    @test res6.c.data ∈ res7.c.data
-    @test all(x->sum(x) == 4, res7.c.data)
-    @test all(x->sum(x) == 3, res8.coeffs[1].data) && all(x->sum(x) == 4, res8.coeffs[2].data) && length(res8.coeffs[1].data) == 30 && length(res8.coeffs[2].data) == 5
-    @test all(x->all(c->sum(c) == x[1]-1, x[2].data), enumerate(res9.coeffs))
-    @test res10 ≈ res5
-    @test res11 == res5
-    @test res12.c.data ∈ res13.c.data
-    @test res13.c.data == res7.c.data
-    @test res14.maxorder == 4 && res14.coeffs[1]==30 && res14.coeffs[2] == 30 && res14.coeffs[3]==5
-    @test all(x->sum(x) == 2, res15.coeffs[1].data) && all(x->sum(x) == 3, res15.coeffs[2].data) && all(x->sum(x) == 4, res15.coeffs[3].data) &&
-            length(res15.coeffs[1].data) == 30 && length(res15.coeffs[2].data) == 30 && length(res15.coeffs[3].data) == 5
-    @test all(x->sum(x) == 3, res16.coeffs[1].data) && all(x->sum(x) == 4, res16.coeffs[2].data) && length(res16.coeffs[1].data) == 30 && length(res16.coeffs[2].data) == 5
-    @test all(x->sum(x) == 2, res17.coeffs[1].data) && all(x->sum(x) == 3, res17.coeffs[2].data) && all(x->sum(x) == 4, res17.coeffs[3].data) &&
-            length(res17.coeffs[1].data) == 30 && length(res17.coeffs[2].data) == 30 && length(res17.coeffs[3].data) == 5
+    for optimizer in (GreedyMethod(), TreeSA(ntrials=1))
+        gp = Independence(g; optimizer=optimizer)
+        res1 = solve(gp, "size max")[]
+        res2 = solve(gp, "counting sum")[]
+        res3 = solve(gp, "counting max")[]
+        res4 = solve(gp, "counting max2")[]
+        res5 = solve(gp, "counting all")[]
+        res6 = solve(gp, "config max")[]
+        res7 = solve(gp, "configs max")[]
+        res8 = solve(gp, "configs max2")[]
+        res9 = solve(gp, "configs all")[]
+        res10 = solve(gp, "counting all (fft)")[]
+        res11 = solve(gp, "counting all (finitefield)")[]
+        res12 = solve(gp, "config max (bounded)")[]
+        res13 = solve(gp, "configs max (bounded)")[]
+        res14 = solve(gp, "counting max3")[]
+        res15 = solve(gp, "configs max3")[]
+        res16 = solve(gp, "configs max2 (bounded)")[]
+        res17 = solve(gp, "configs max3 (bounded)")[]
+        @test res1.n == 4
+        @test res2 == 76
+        @test res3.n == 4 && res3.c == 5
+        @test res4.maxorder == 4 && res4.coeffs[1] == 30 && res4.coeffs[2]==5
+        @test res5 == Polynomial([1.0, 10.0, 30, 30, 5])
+        @test res6.c.data ∈ res7.c.data
+        @test all(x->sum(x) == 4, res7.c.data)
+        @test all(x->sum(x) == 3, res8.coeffs[1].data) && all(x->sum(x) == 4, res8.coeffs[2].data) && length(res8.coeffs[1].data) == 30 && length(res8.coeffs[2].data) == 5
+        @test all(x->all(c->sum(c) == x[1]-1, x[2].data), enumerate(res9.coeffs))
+        @test res10 ≈ res5
+        @test res11 == res5
+        @test res12.c.data ∈ res13.c.data
+        @test res13.c == res7.c
+        @test res14.maxorder == 4 && res14.coeffs[1]==30 && res14.coeffs[2] == 30 && res14.coeffs[3]==5
+        @test all(x->sum(x) == 2, res15.coeffs[1].data) && all(x->sum(x) == 3, res15.coeffs[2].data) && all(x->sum(x) == 4, res15.coeffs[3].data) &&
+                length(res15.coeffs[1].data) == 30 && length(res15.coeffs[2].data) == 30 && length(res15.coeffs[3].data) == 5
+        @test all(x->sum(x) == 3, res16.coeffs[1].data) && all(x->sum(x) == 4, res16.coeffs[2].data) && length(res16.coeffs[1].data) == 30 && length(res16.coeffs[2].data) == 5
+        @test all(x->sum(x) == 2, res17.coeffs[1].data) && all(x->sum(x) == 3, res17.coeffs[2].data) && all(x->sum(x) == 4, res17.coeffs[3].data) &&
+                length(res17.coeffs[1].data) == 30 && length(res17.coeffs[2].data) == 30 && length(res17.coeffs[3].data) == 5
+    end
 end
 
 @testset "save load" begin
@@ -80,3 +82,45 @@ end
     mb = load_configs("_test.txt"; format=:text, nflavors=3)
     @test mb == m
 end
+
+@testset "slicing" begin
+    g = Graphs.smallgraph("petersen")
+    gp = Independence(g; optimizer=TreeSA(nslices=5, ntrials=1))
+    res1 = solve(gp, "size max")[]
+    res2 = solve(gp, "counting sum")[]
+    res3 = solve(gp, "counting max")[]
+    res4 = solve(gp, "counting max2")[]
+    res5 = solve(gp, "counting all")[]
+    res6 = solve(gp, "config max")[]
+    res7 = solve(gp, "configs max")[]
+    res8 = solve(gp, "configs max2")[]
+    res9 = solve(gp, "configs all")[]
+    res10 = solve(gp, "counting all (fft)")[]
+    res11 = solve(gp, "counting all (finitefield)")[]
+    res12 = solve(gp, "config max (bounded)")[]
+    res13 = solve(gp, "configs max (bounded)")[]
+    res14 = solve(gp, "counting max3")[]
+    res15 = solve(gp, "configs max3")[]
+    res16 = solve(gp, "configs max2 (bounded)")[]
+    res17 = solve(gp, "configs max3 (bounded)")[]
+    @test res1.n == 4
+    @test res2 == 76
+    @test res3.n == 4 && res3.c == 5
+    @test res4.maxorder == 4 && res4.coeffs[1] == 30 && res4.coeffs[2]==5
+    @test res5 == Polynomial([1.0, 10.0, 30, 30, 5])
+    @test res6.c.data ∈ res7.c.data
+    @test all(x->sum(x) == 4, res7.c.data)
+    @test all(x->sum(x) == 3, res8.coeffs[1].data) && all(x->sum(x) == 4, res8.coeffs[2].data) && length(res8.coeffs[1].data) == 30 && length(res8.coeffs[2].data) == 5
+    @test all(x->all(c->sum(c) == x[1]-1, x[2].data), enumerate(res9.coeffs))
+    @test res10 ≈ res5
+    @test res11 == res5
+    @test res12.c.data ∈ res13.c.data
+    @test res13.c == res7.c
+    @test res14.maxorder == 4 && res14.coeffs[1]==30 && res14.coeffs[2] == 30 && res14.coeffs[3]==5
+    @test all(x->sum(x) == 2, res15.coeffs[1].data) && all(x->sum(x) == 3, res15.coeffs[2].data) && all(x->sum(x) == 4, res15.coeffs[3].data) &&
+            length(res15.coeffs[1].data) == 30 && length(res15.coeffs[2].data) == 30 && length(res15.coeffs[3].data) == 5
+    @test all(x->sum(x) == 3, res16.coeffs[1].data) && all(x->sum(x) == 4, res16.coeffs[2].data) && length(res16.coeffs[1].data) == 30 && length(res16.coeffs[2].data) == 5
+    @test all(x->sum(x) == 2, res17.coeffs[1].data) && all(x->sum(x) == 3, res17.coeffs[2].data) && all(x->sum(x) == 4, res17.coeffs[3].data) &&
+            length(res17.coeffs[1].data) == 30 && length(res17.coeffs[2].data) == 30 && length(res17.coeffs[3].data) == 5
+end
+

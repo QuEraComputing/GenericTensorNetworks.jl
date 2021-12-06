@@ -122,12 +122,5 @@ end
     @test all(x->sum(x) == 3, res16.coeffs[1].data) && all(x->sum(x) == 4, res16.coeffs[2].data) && length(res16.coeffs[1].data) == 30 && length(res16.coeffs[2].data) == 5
     @test all(x->sum(x) == 2, res17.coeffs[1].data) && all(x->sum(x) == 3, res17.coeffs[2].data) && all(x->sum(x) == 4, res17.coeffs[3].data) &&
             length(res17.coeffs[1].data) == 30 && length(res17.coeffs[2].data) == 30 && length(res17.coeffs[3].data) == 5
-
-    # sliced masked contraction is not supported yet.
-    @test_logs (:warn,) (:warn,) (:warn,) solve(gp, "configs max (bounded)")
-    @test_logs (:warn,) (:warn,) solve(gp, "config max (bounded)")
-
-    @test_logs (:warn,) (:warn,) (:warn,) solve(gp, "configs max2 (bounded)")
-    @test_logs (:warn,) (:warn,) (:warn,) solve(gp, "configs max3 (bounded)")
 end
 

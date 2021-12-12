@@ -2,7 +2,7 @@ module GraphTensorNetworks
 
 using OMEinsumContractionOrders: SlicedEinsum
 using Core: Argument
-using TropicalGEMM, TropicalNumbers
+using TropicalNumbers
 using OMEinsum
 using OMEinsum: timespace_complexity, collect_ixs
 using Graphs

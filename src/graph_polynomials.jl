@@ -107,7 +107,7 @@ end
 ############### Problem specific implementations ################
 ### independent set ###
 function generate_tensors(fx, gp::Independence)
-    ixs = collect_ixs(gp.code)
+    ixs = getixsv(gp.code)
     n = length(unique!(vcat(ixs...)))
     T = typeof(fx(ixs[1][1]))
     return map(enumerate(ixs)) do (i, ix)
@@ -131,7 +131,7 @@ misv(val::T) where T = [one(T), val]
 
 ### coloring ###
 function generate_tensors(fx, c::Coloring{K}) where K
-    ixs = collect_ixs(c.code)
+    ixs = getixsv(c.code)
     T = eltype(fx(ixs[1][1]))
     return map(ixs) do ix
         # if the tensor rank is 1, create a vertex tensor.
@@ -153,7 +153,7 @@ coloringv(vals::Vector{T}) where T = vals
 
 ### matching ###
 function generate_tensors(fx, m::Matching)
-    ixs = collect_ixs(m.code)
+    ixs = getixsv(m.code)
     T = typeof(fx(ixs[1][1]))
     n = length(unique!(vcat(ixs...)))  # number of vertices
     tensors = []
@@ -180,7 +180,7 @@ end
 
 ### maximal independent set ###
 function generate_tensors(fx, mi::MaximalIndependence)
-    ixs = collect_ixs(mi.code)
+    ixs = getixsv(mi.code)
     T = eltype(fx(ixs[1][end]))
 	return map(ixs) do ix
         neighbortensor(fx(ix[end]), length(ix))
@@ -197,7 +197,7 @@ end
 
 ### max cut/spin glass problem ###
 function generate_tensors(fx, gp::MaxCut)
-    ixs = collect_ixs(gp.code)
+    ixs = getixsv(gp.code)
     return map(enumerate(ixs)) do (i, ix)
         maxcutb(fx(ix))
     end

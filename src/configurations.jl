@@ -100,4 +100,4 @@ end
 for GP in [:Independence, :Matching, :MaximalIndependence, :Coloring]
     @eval symbols(gp::$GP) = labels(gp.code)
 end
-symbols(gp::MaxCut) = collect_ixs(gp.code)
+symbols(gp::MaxCut) = getixsv(gp.code)

@@ -1,5 +1,6 @@
 using .CUDA
-using TropicalGEMM: XTranspose, NativeTypes, Tropical, TropicalTypes
+using SIMDTypes: NativeTypes  # avoid ambiguity error when using `TropicalGEMM`
+using TropicalNumbers: Tropical, TropicalTypes
 using LinearAlgebra
 
 # patch

@@ -1,7 +1,7 @@
 name = "GraphTensorNetworks"
 uuid = "0978c8c2-34f6-49c7-9826-ea2cc20dabd2"
 authors = ["GiggleLiu <cacate0129@gmail.com> and contributors"]
-version = "0.1.2"
+version = "0.1.3"
 
 [deps]
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"

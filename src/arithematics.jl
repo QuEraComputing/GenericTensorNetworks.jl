@@ -5,6 +5,7 @@ export set_type, sampler_type
 using Polynomials: Polynomial
 using TropicalNumbers: Tropical, CountingTropical
 using Mods, Primes
+using Base.Cartesian
 
 # pirate
 Base.abs(x::Mod) = x

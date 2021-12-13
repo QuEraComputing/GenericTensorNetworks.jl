@@ -96,7 +96,7 @@ Return a vector of unique labels in an Einsum token.
 """
 function labels(code::EinTypes)
     res = []
-    for ix in collect_ixs(code)
+    for ix in getixsv(code)
         for l in ix
             if l ∉ res
                 push!(res, l)

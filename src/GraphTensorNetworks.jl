@@ -4,7 +4,7 @@ using OMEinsumContractionOrders: SlicedEinsum
 using Core: Argument
 using TropicalNumbers
 using OMEinsum
-using OMEinsum: timespace_complexity, collect_ixs
+using OMEinsum: timespace_complexity, getixsv
 using Graphs
 
 export timespace_complexity, @ein_str

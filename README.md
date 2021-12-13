@@ -76,6 +76,11 @@ julia> solve(problem, "counting max2")
 
 Here, `solve` function returns you a 0-dimensional array.
 For open graphs, this output tensor can have higher dimensions. Each entry corresponds to a different boundary condition.
+You can speed up the Tropical number computation when computing "size max" on CPU by using the `TropicalGEMM`
+
+```julia
+julia> using TropicalGEMM
+```
 
 #### 2. compute the independence polynomial
 

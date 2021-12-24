@@ -23,9 +23,18 @@ end
     p2 = graph_polynomial(Independence(g), Val(:polynomial))[]
     p3 = graph_polynomial(Independence(g), Val(:fft))[]
     p4 = graph_polynomial(Independence(g), Val(:finitefield))[]
+    p5 = graph_polynomial(Independence(g), Val(:finitefield); max_iter=1)[]
     @test p1 ≈ p2
     @test p1 ≈ p3
     @test p1 ≈ p4
+    @test p1 ≈ p5
+
+    # test overflow
+    g = random_regular_graph(120, 3)
+    gp = Independence(g, optimizer=TreeSA(; ntrials=1); simplifier=MergeGreedy())
+    p6 = graph_polynomial(gp, Val(:polynomial))[]
+    p7 = graph_polynomial(gp, Val(:finitefield))[]
+    @test p6 ≈ p7
 end
 
 @testset "counting maximal IS" begin

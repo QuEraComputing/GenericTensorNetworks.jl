@@ -64,33 +64,39 @@ end
 
 function graph_polynomial(gp::GraphProblem, ::Val{:finitefield}; usecuda=false,
         maxorder=max_size(gp; usecuda=usecuda), max_iter=100)
-    TI = Int32  # Int 32 is faster
+    return map(Polynomial, big_integer_solve(T->_polynomial_single(gp, T; usecuda=usecuda, maxorder=maxorder), Int32, max_iter))
+end
+
+function big_integer_solve(f, ::Type{TI}, max_iter::Int=100) where TI
     N = typemax(TI)
-    YS = fill(Any[], (fill(bondsize(gp), length(getiyv(gp.code)))...,))
-    local res, respre
+    local res, respre, YS
     for k = 1:max_iter
 	    N = prevprime(N-TI(1))
-        @debug "iteration $k, computing on GP$(N) ..."
+        @debug "iteration $k, computing on GP($(N)) ..."
         T = Mods.Mod{N,TI}
-        rk = _polynomial_single(gp, T; usecuda=usecuda, maxorder=maxorder)
-        push!.(YS, rk)
+        rk = f(T)
         if max_iter==1
-            return map(Polynomial, map(x->BigInt.(Mods.value.(x)), YS[1]))
-        elseif k != 1
-            res = map(improved_counting, YS)
-            all(respre .== res) && return map(Polynomial, res)
+            return map(x->BigInt.(Mods.value.(x)), rk)  # needs test
+        end
+        if k != 1
+            push!.(YS, rk)
+            res = map(x->improved_counting(x...), YS)
+            all(respre .== res) && return res
             respre = res
-        else
-            respre = map(x->BigInt.(value.(x)), YS[1])
+        else  # k=1
+            YS = reshape([Any[] for i=1:length(rk)], size(rk))
+            push!.(YS, rk)
+            respre = map(x->BigInt.(value.(x)), rk)
         end
     end
     @warn "result is potentially inconsistent."
-    return map(Polynomial, res)
+    return res
 end
 
-function improved_counting(sequences)
-    map(yi->Mods.CRT(yi...), zip(sequences...))
+function improved_counting(ys::AbstractArray...)
+    map(yi->improved_counting(yi...), zip(ys...))
 end
+improved_counting(ys::Mod...) = Mods.CRT(ys...)
 
 contractx(gp::GraphProblem, x; usecuda=false) = contractf(_->x, gp; usecuda=usecuda)
 function contractf(f, gp::GraphProblem; usecuda=false)

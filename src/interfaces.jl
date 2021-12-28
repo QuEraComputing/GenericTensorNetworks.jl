@@ -18,6 +18,8 @@ export solve
     * "configs max2", all MIS configurations and MIS-1 configurations,
     * "configs all", all IS configurations,
     * "configs max (bounded)", all MIS configurations, the bounded approach (much faster),
+    * "configs max2 (bounded)", all MIS and MIS-1 configurations, the bounded approach (much faster),
+    * "configs max3 (bounded)", all MIS, MIS-1 and MIS-2 configurations, the bounded approach (much faster),
 """
 function solve(gp::GraphProblem, task; usecuda=false, kwargs...)
     if task == "size max"
@@ -62,6 +64,12 @@ end
 
 export save_configs, load_configs
 using DelimitedFiles
+
+"""
+    save_configs(filename, data::ConfigEnumerator; format=:binary)
+
+Save configurations `data` to file `filename`. The format is `:binary` or `:text`.
+"""
 function save_configs(filename, data::ConfigEnumerator{N,S,C}; format::Symbol=:binary) where {N,S,C}
     if format == :binary
         write(filename, raw_matrix(data))
@@ -71,12 +79,20 @@ function save_configs(filename, data::ConfigEnumerator{N,S,C}; format::Symbol=:b
         error("format must be `:binary` or `:text`, got `:$format`")
     end
 end
-function load_configs(filename; len=nothing, format::Symbol=:binary, nflavors=2)
+
+"""
+    load_configs(filename; format=:binary, bitlength=nothing, nflavors=2)
+
+Load configurations from file `filename`. The format is `:binary` or `:text`.
+If the format is `:binary`, the bitstring length `bitlength` must be specified,
+`nflavors` specifies the degree of freedom.
+"""
+function load_configs(filename; bitlength=nothing, format::Symbol=:binary, nflavors=2)
     if format == :binary
-        len === nothing && error("you need to specify `len` for reading configurations from binary files.")
+        bitlength === nothing && error("you need to specify `bitlength` for reading configurations from binary files.")
         S = ceil(Int, log2(nflavors))
-        C = _nints(len, S)
-        return _from_raw_matrix(StaticElementVector{len,S,C}, reshape(reinterpret(UInt64, read(filename)),C,:))
+        C = _nints(bitlength, S)
+        return _from_raw_matrix(StaticElementVector{bitlength,S,C}, reshape(reinterpret(UInt64, read(filename)),C,:))
     elseif format == :text
         return from_plain_matrix(readdlm(filename); nflavors=nflavors)
     else

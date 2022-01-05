@@ -115,11 +115,11 @@ function plain_matrix(x::ConfigEnumerator{N,S,C}) where {N,S,C}
     return m
 end
 
-function from_raw_matrix(m; len, nflavors=2)
+function from_raw_matrix(m; bitlength, nflavors=2)
     S = ceil(Int,log2(nflavors))
     C = size(m, 1)
-    T = StaticElementVector{len,S,C}
-    @assert len*S <= C*64
+    T = StaticElementVector{bitlength,S,C}
+    @assert bitlength*S <= C*64
     _from_raw_matrix(T, m)
 end
 function _from_raw_matrix(::Type{StaticElementVector{N,S,C}}, m::AbstractMatrix) where {N,S,C}

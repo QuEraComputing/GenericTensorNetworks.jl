@@ -49,13 +49,13 @@ end
     m = ConfigEnumerator([StaticBitVector(rand(Bool, 300)) for i=1:M])
     bm = GraphTensorNetworks.plain_matrix(m)
     rm = GraphTensorNetworks.raw_matrix(m)
-    m1 = GraphTensorNetworks.from_raw_matrix(rm; len=300, nflavors=2)
+    m1 = GraphTensorNetworks.from_raw_matrix(rm; bitlength=300, nflavors=2)
     m2 = GraphTensorNetworks.from_plain_matrix(bm; nflavors=2)
     @test m1 == m
     @test m2 == m
     save_configs("_test.bin", m; format=:binary)
     @test_throws ErrorException load_configs("_test.bin"; format=:binary)
-    ma = load_configs("_test.bin"; format=:binary, len=300, nflavors=2)
+    ma = load_configs("_test.bin"; format=:binary, bitlength=300, nflavors=2)
     @test ma == m
 
     save_configs("_test.txt", m; format=:text)
@@ -66,7 +66,7 @@ end
     m = ConfigEnumerator([StaticElementVector(3, rand(1:3, 300)) for i=1:M])
     bm = GraphTensorNetworks.plain_matrix(m)
     rm = GraphTensorNetworks.raw_matrix(m)
-    m1 = GraphTensorNetworks.from_raw_matrix(rm; len=300, nflavors=3)
+    m1 = GraphTensorNetworks.from_raw_matrix(rm; bitlength=300, nflavors=3)
     m2 = GraphTensorNetworks.from_plain_matrix(bm; nflavors=3)
     @test m1 == m
     @test m2 == m
@@ -75,7 +75,7 @@ end
 
     save_configs("_test.bin", m; format=:binary)
     @test_throws ErrorException load_configs("_test.bin"; format=:binary)
-    ma = load_configs("_test.bin"; format=:binary, len=300, nflavors=3)
+    ma = load_configs("_test.bin"; format=:binary, bitlength=300, nflavors=3)
     @test ma == m
 
     save_configs("_test.txt", m; format=:text)

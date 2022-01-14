@@ -12,17 +12,24 @@ GraphTensorNetworks is a &nbsp;
     </a>
     &nbsp; package. To install GraphTensorNetworks,
     please <a href="https://docs.julialang.org/en/v1/manual/getting-started/">open
-    Julia's interactive session (known as REPL)</a> and press <kbd>]</kbd> key in the REPL to use the package mode, then type the following command
+    Julia's interactive session (known as REPL)</a> and press <kbd>]</kbd> key in the REPL to use the package mode, then
 </p>
 
+1. if you have access to the a registry
 ```julia
 pkg> add GraphTensorNetworks
 ```
 
+2. otherwise (e.g. if you are an external collaborator), you can install in develop mode
+```julia
+pkg> dev https://github.com/Happy-Diode/GraphTensorNetworks.jl.git  # if you have access to the registry
+```
+
 Please use **Julia-1.7**, otherwise you will suffer from huge overheads when contracting large tensor networks. If you have to use a lower version,
-you can avoid the overhead by overriding the `permutedims!` is `LinearAlgebra`.
+you can avoid the overhead by overriding the `permutedims!` is `LinearAlgebra`, i.e. add the following code to your own project.
 
 ```julia
+# only required when your Julia version < 1.7
 using TensorOperations, LinearAlgebra
 function LinearAlgebra.permutedims!(C::Array{T,N}, A::StridedArray{T,N}, perm) where {T,N}
     if isbitstype(T)

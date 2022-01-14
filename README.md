@@ -15,7 +15,7 @@ GraphTensorNetworks is a &nbsp;
     Julia's interactive session (known as REPL)</a> and press <kbd>]</kbd> key in the REPL to use the package mode, then
 </p>
 
-1. if you have access to the a registry
+1. if you have access to our registry
 ```julia
 pkg> add GraphTensorNetworks
 ```

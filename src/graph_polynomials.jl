@@ -214,7 +214,7 @@ end
 
 ### paint shop ###
 function generate_tensors(fx, c::PaintShop)
-    ixs = collect_ixs(c.code)
+    ixs = getixsv(c.code)
     T = eltype(fx(ixs[1]))
     [paintshop_bond_tensor(fx(ixs[i]), c.isfirst[i], c.isfirst[i+1]) for i=1:length(ixs)]
 end

@@ -78,7 +78,7 @@ e.g. when the problem is `MaximalIndependence`, it computes all maximal independ
 all_solutions(gp::GraphProblem) = solutions(gp, Polynomial{Float64,:x}, all=true, usecuda=false)
 
 # return a mapping from label to variable `x`
-for GP in [:Independence, :Matching, :MaximalIndependence, :MaxCut]
+for GP in [:Independence, :Matching, :MaximalIndependence, :MaxCut, :PaintShop]
     @eval function fx_solutions(gp::$GP, ::Type{BT}, all::Bool) where BT
         syms = symbols(gp)
         T = (all ? set_type : sampler_type)(BT, length(syms), bondsize(gp))
@@ -101,3 +101,4 @@ for GP in [:Independence, :Matching, :MaximalIndependence, :Coloring]
     @eval symbols(gp::$GP) = labels(gp.code)
 end
 symbols(gp::MaxCut) = getixsv(gp.code)
+symbols(gp::PaintShop) = getixsv(gp.code)

@@ -1,4 +1,4 @@
-export Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing, MaxCut
+export Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing, MaxCut, PaintShop, paintshop_from_pairs
 const EinTypes = Union{EinCode,NestedEinsum,SlicedEinsum}
 
 abstract type GraphProblem end
@@ -90,6 +90,59 @@ Coloring{K}(code::ET) where {K,ET<:EinTypes} = Coloring{K,ET}(code)
 Coloring{K}(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing) where K = Coloring{K}(Independence(g; openvertices=openvertices, optimizer=optimizer, simplifier=simplifier).code)
 
 """
+    PaintShop{CT<:EinTypes} <: GraphProblem
+    PaintShop(labels::AbstractVector; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+
+The binary paint shop problem: http://m-hikari.com/ams/ams-2012/ams-93-96-2012/popovAMS93-96-2012-2.pdf.
+
+Example
+-----------------------------------------
+One can encode the paint shop problem `abaccb` as the following
+
+```jldoctest; setup=:(using GraphTensorNetworks)
+julia> symbols = collect("abaccb");
+
+julia> pb = PaintShop(symbols);
+
+julia> solve(pb, "size max")[]
+3.0ₜ
+
+julia> solve(pb, "configs max")[].c.data
+2-element Vector{StaticBitVector{5, 1}}:
+ 01101
+ 01101
+```
+In our definition, we find the maximum number of unchanged color in this sequence, i.e. (n-1) - (minimum number of color changes)
+In the output of maximum configurations, the two configurations are defined on 5 bonds i.e. pairs of (i, i+1), `0` means color changed, while `1` means color not changed.
+If we denote two "colors" as `r` and `b`, then the optimal painting is `rbbbrr` or `brrrbb`, both change the colors twice.
+"""
+struct PaintShop{CT<:EinTypes,LT} <: GraphProblem
+    code::CT
+    labels::Vector{LT}
+    isfirst::Vector{Bool}
+end
+
+function paintshop_from_pairs(pairs::AbstractVector{Tuple{Int,Int}}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+    n = length(pairs)
+    @assert sort!(vcat(collect.(pairs)...)) == collect(1:2n)
+    labels = zeros(Int, 2*n)
+    @inbounds for i=1:n
+        labels[pairs[i]] .= i
+    end
+    return PaintShop(pairs; openvertices, optimizer, simplifier)
+end
+function PaintShop(labels::AbstractVector{T}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing) where T
+    @assert all(l->count(==(l), labels)==2, labels)
+    n = length(labels)
+    isfirst = [findfirst(==(labels[i]), labels) == i for i=1:n]
+    rawcode = EinCode(vcat(
+                [[labels[i], labels[i+1]] for i=1:n-1], # labels for edge tensors
+                ),
+                collect(T, openvertices))
+    PaintShop(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), labels, isfirst)
+end
+
+"""
     labels(code)
 
 Return a vector of unique labels in an Einsum token.
@@ -108,7 +161,7 @@ end
 
 OMEinsum.timespace_complexity(gp::GraphProblem) = timespace_complexity(gp.code, uniformsize(gp.code, bondsize(gp)))
 
-for T in [:Independence, :Matching, :MaximalIndependence, :MaxCut]
+for T in [:Independence, :Matching, :MaximalIndependence, :MaxCut, :PaintShop]
     @eval bondsize(gp::$T) = 2
 end
 bondsize(gp::Coloring{K}) where K = K

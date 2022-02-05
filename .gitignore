@@ -1,5 +1,4 @@
-/Manifest.toml
-docs/Manifest.toml
+Manifest.toml
 *.swp
 _*
 _test.bin

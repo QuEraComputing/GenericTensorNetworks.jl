@@ -75,3 +75,10 @@ end
     @test graph_polynomial(MaxCut(g), Val(:polynomial))[] == Polynomial([2,2,4,12,10,2])
     @test graph_polynomial(MaxCut(g), Val(:finitefield))[] == Polynomial([2,2,4,12,10,2])
 end
+
+@testset "paint shop" begin
+    labels = collect("abaccb")
+    pb = PaintShop(labels)
+    @test solve(pb, "size max")[] == Tropical(3.0)
+    @test StaticBitVector(Bool[0,1,1,0,1]) ∈ solve(pb, "configs max")[].c.data
+end

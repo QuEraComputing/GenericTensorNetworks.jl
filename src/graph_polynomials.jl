@@ -212,6 +212,20 @@ function maxcutb(expJ::T) where T
     return T[one(T) expJ; expJ one(T)]
 end
 
+### paint shop ###
+function generate_tensors(fx, c::PaintShop)
+    ixs = getixsv(c.code)
+    T = eltype(fx(ixs[1]))
+    [paintshop_bond_tensor(fx(ixs[i]), c.isfirst[i], c.isfirst[i+1]) for i=1:length(ixs)]
+end
+
+function paintshop_bond_tensor(x::T, if1::Bool, if2::Bool) where T
+    m = T[x one(T); one(T) x]
+    m = if1 ? m : m[[2,1],:]
+    m = if2 ? m : m[:,[2,1]]
+    return m
+end
+
 for TP in [:MaximalIndependence, :Independence, :Matching, :MaxCut]
     @eval max_size(m::$TP; usecuda=false) = Int(sum(contractx(m, TropicalF64(1.0); usecuda=usecuda)).n)  # floating point number is faster (BLAS)
     @eval max_size_count(m::$TP; usecuda=false) = (r = sum(contractx(m, CountingTropical{Float64,Float64}(1.0, 1.0); usecuda=usecuda)); (Int(r.n), Int(r.c)))

@@ -1,5 +1,5 @@
 using GraphTensorNetworks
-using Test
+using Test, Documenter
 
 @testset "bitvector" begin
     include("bitvector.jl")
@@ -23,4 +23,11 @@ end
 
 @testset "interfaces" begin
     include("interfaces.jl")
+end
+
+# --------------
+# doctests
+# --------------
+@static if VERSION >= v"1.1.0"
+    doctest(GraphTensorNetworks)
 end

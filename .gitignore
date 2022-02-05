@@ -1,5 +1,8 @@
 /Manifest.toml
+docs/Manifest.toml
 *.swp
 _*
 _test.bin
 _test.txt
+docs/build/
+docs/src/tutorials/

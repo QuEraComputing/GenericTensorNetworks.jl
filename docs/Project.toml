@@ -1,0 +1,6 @@
+[deps]
+DocThemeIndigo = "8bac0ac5-51bf-41f9-885e-2bf1ac2bec5f"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+GraphTensorNetworks = "0978c8c2-34f6-49c7-9826-ea2cc20dabd2"
+Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
+Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"

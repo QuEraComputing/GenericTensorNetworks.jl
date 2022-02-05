@@ -2,6 +2,7 @@
 
 [![Build Status](https://github.com/Happy-Diode/GraphTensorNetworks.jl/workflows/CI/badge.svg)](https://github.com/Happy-Diode/GraphTensorNetworks.jl/actions)
 [![Coverage Status](https://coveralls.io/repos/github/Happy-Diode/GraphTensorNetworks.jl/badge.svg?branch=fix-test-coverage&t=rIJIK2)](https://coveralls.io/github/Happy-Diode/GraphTensorNetworks.jl?branch=fix-test-coverage)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://psychic-meme-f4d866f8.pages.github.io/dev/)
 
 ## Installation
 <p>

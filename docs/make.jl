@@ -10,13 +10,10 @@ for each in readdir(pkgdir(GraphTensorNetworks, "examples"))
     @info "building" project_dir
     input_file = pkgdir(GraphTensorNetworks, "examples", each, "main.jl")
     output_dir = pkgdir(GraphTensorNetworks, "docs", "src", "tutorials")
-    Pkg.activate(project_dir)
-    Pkg.instantiate()
     @info "executing" input_file
     Literate.markdown(input_file, output_dir; name=each, execute=true)
 end
 
-Pkg.activate(@__DIR__)
 indigo = DocThemeIndigo.install(GraphTensorNetworks)
 DocMeta.setdocmeta!(GraphTensorNetworks, :DocTestSetup, :(using GraphTensorNetworks); recursive=true)
 

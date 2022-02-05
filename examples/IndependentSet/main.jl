@@ -12,7 +12,8 @@ using GraphTensorNetworks, Graphs
 
 graph = Graphs.smallgraph(:petersen)
 
-problem = Independence(graph; optimizer=TreeSA(sc_weight=1.0, ntrials=10, βs=0.01:0.1:15.0, niters=20, rw_weight=0.2));
+problem = Independence(graph; optimizer=TreeSA(sc_weight=1.0, ntrials=10,
+                         βs=0.01:0.1:15.0, niters=20, rw_weight=0.2));
 
 # maximum independent set size
 maximum_independent_set_size = solve(problem, "size max")

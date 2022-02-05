@@ -30,7 +30,8 @@ makedocs(;
     pages=[
         "Home" => "index.md",
         "Tutorials" => [
-            "Adiabatic Evolution" => "tutorials/MaxCut.md",
+            "Independent Set Problem" => "tutorials/IndependentSet.md",
+            "Max-Cut Problem" => "tutorials/MaxCut.md",
         ],
         "References" => "ref.md",
     ],

@@ -7,8 +7,38 @@ using OMEinsum
 using OMEinsum: timespace_complexity, getixsv
 using Graphs
 
+# OMEinsum
 export timespace_complexity, @ein_str
 export GreedyMethod, TreeSA, SABipartite, KaHyParBipartite, MergeVectors, MergeGreedy
+
+# Algebras
+export StaticBitVector, StaticElementVector, @bv_str
+export is_commutative_semiring
+export Max2Poly, TruncatedPoly, Polynomial, Tropical, CountingTropical, StaticElementVector, Mod, ConfigEnumerator, onehotv, ConfigSampler
+
+# Lower level APIs
+export AllConfigs, SingleConfig
+export best_solutions, best2_solutions, solutions, all_solutions
+export bestk_solutions
+export contractx, contractf, graph_polynomial, max_size, max_size_count
+
+# Graphs
+export random_regular_graph, diagonal_coupled_graph, isindependentset
+export square_lattice_graph, unitdisk_graph
+
+# Tensor Networks (Graph problems)
+export Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing, MaxCut, PaintShop, paintshop_from_pairs, UnWeighted
+
+# Interfaces
+export solve, SizeMax, CountingAll, CountingMax, GraphPolynomial, SingleConfigMax, ConfigsAll, ConfigsMax
+
+# Utilities
+export is_independent_set
+export mis_compactify!
+export save_configs, load_configs
+
+# Visualization
+export vizeinsum, vizconfig
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 

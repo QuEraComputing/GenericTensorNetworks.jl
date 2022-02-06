@@ -1,10 +1,8 @@
 # # Independent set problem
 
 # ## Problem definition
-# An independent set is defined in the monadic second order language as
-# ```math
-# \exists x_i,\ldots,x_M\left[\bigwedge_{i\neq j} (x_i\neq x_j \wedge \neg \textbf{adj}(x_i, x_j))\right]
-# ```
+
+# Please check the docstring of [`Independence`](@ref).
 
 # ## Solving properties
 
@@ -16,25 +14,22 @@ problem = Independence(graph; optimizer=TreeSA(sc_weight=1.0, ntrials=10,
                          βs=0.01:0.1:15.0, niters=20, rw_weight=0.2));
 
 # maximum independent set size
-maximum_independent_set_size = solve(problem, "size max")
+maximum_independent_set_size = solve(problem, SizeMax())
 
 # all independent sets
-count_all_independent_sets = solve(problem, "counting sum")
-
-# counting maximum independent sets
-count_maximum_independent_sets = solve(problem, "counting max")
+count_all_independent_sets = solve(problem, CountingAll())
 
 # counting independent sets of max two sizes
-count_max2_independent_sets = solve(problem, "counting max2")
+count_max2_independent_sets = solve(problem, CountingMax(2))
 
 # compute the independence polynomial
-independence_polynomial = solve(problem, "counting all (finitefield)")
+independence_polynomial = solve(problem, GraphPolynomial(; method=:finitefield))
 
 # find one MIS
-max_config = solve(problem, "config max")
+max_config = solve(problem, SingleConfigMax(; bounded=false))
 
 # enumerate all MISs
-all_max_configs = solve(problem, "configs max (bounded)")
+all_max_configs = solve(problem, ConfigsMax(; bounded=true))
 
 # enumerate all IS configurations
-all_independent_sets = solve(problem, "configs all")
+all_independent_sets = solve(problem, ConfigsAll())

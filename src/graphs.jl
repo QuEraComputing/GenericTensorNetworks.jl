@@ -1,6 +1,4 @@
 using Graphs, OMEinsumContractionOrders
-export random_regular_graph, diagonal_coupled_graph, isindependentset
-export square_lattice_graph, unitdisk_graph
 
 isindependentset(g, v) = !any(e->v[e.src] == 1 && v[e.dst] == 1, edges(g))
 

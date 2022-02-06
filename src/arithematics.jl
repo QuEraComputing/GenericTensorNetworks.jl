@@ -1,7 +1,3 @@
-export is_commutative_semiring
-export Max2Poly, TruncatedPoly, Polynomial, Tropical, CountingTropical, StaticElementVector, Mod, ConfigEnumerator, onehotv, ConfigSampler
-export set_type, sampler_type
-
 using Polynomials: Polynomial
 using TropicalNumbers: Tropical, CountingTropical
 using Mods, Primes
@@ -60,7 +56,16 @@ function is_commutative_semiring(a::T, b::T, c::T) where T
     return true
 end
 
-# get maximum two countings (polynomial truncated to largest two orders)
+"""
+    TruncatedPoly{K,T,TO} <: Number
+
+Polynomial truncated to largest `K` orders. `T` is the coefficients type and `TO` is the orders type.
+
+```jldoctest; setup=(using GraphTensorNetworks)
+julia> TruncatedPoly((1,2,3), 6)
+x^4 + 2*x^5 + 3*x^6
+```
+"""
 struct TruncatedPoly{K,T,TO} <: Number
     coeffs::NTuple{K,T}
     maxorder::TO
@@ -125,6 +130,24 @@ end
 Base.:*(a::Bool, y::TruncatedPoly{K,T,TO}) where {K,T,TO} = a ? y : zero(y)
 Base.:*(y::TruncatedPoly{K,T,TO}, a::Bool) where {K,T,TO} = a ? y : zero(y)
 
+"""
+    ConfigEnumerator{N,S,C}
+
+Set algebra for enumerating configurations, where `N` is the length of configurations,
+`C` is the size of storage in unit of `UInt64`,
+`S` is the bit width to store a single element in a configuration, i.e. `log2(# of flavors)`, for bitstrings, it is `1``.
+
+```jldoctest; setup=:(using GraphTensorNetworks)
+julia> a = ConfigEnumerator([StaticBitVector([1,1,1,0,0]), StaticBitVector([1,0,0,0,1])])
+{11100, 10001}
+
+julia> b = ConfigEnumerator([StaticBitVector([0,0,0,0,0]), StaticBitVector([1,0,1,0,1])])
+{00000, 10101}
+
+julia> a + b
+{11100, 10001, 00000, 10101}
+```
+"""
 struct ConfigEnumerator{N,S,C}
     data::Vector{StaticElementVector{N,S,C}}
 end
@@ -158,6 +181,18 @@ Base.show(io::IO, x::ConfigEnumerator) = print(io, "{", join(x.data, ", "), "}")
 Base.show(io::IO, ::MIME"text/plain", x::ConfigEnumerator) = Base.show(io, x)
 
 # the algebra sampling one of the configurations
+"""
+    ConfigSampler{N,S,C}
+
+The algebra for sampling one configuration, where `N` is the length of configurations,
+`C` is the size of storage in unit of `UInt64`,
+`S` is the bit width to store a single element in a configuration, i.e. `log2(# of flavors)`, for bitstrings, it is `1``.
+
+```jldoctest; setup=:(using GraphTensorNetworks)
+julia> ConfigSampler(StaticBitVector([1,1,1,0,0]))
+ConfigSampler{5, 1, 1}(11100)
+```
+"""
 struct ConfigSampler{N,S,C}
     data::StaticElementVector{N,S,C}
 end

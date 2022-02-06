@@ -1,6 +1,3 @@
-export best_solutions, best2_solutions, solutions, all_solutions
-export bestk_solutions
-
 """
     best_solutions(problem; all=false, usecuda=false)
     

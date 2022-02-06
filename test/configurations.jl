@@ -2,7 +2,7 @@ using GraphTensorNetworks, Test, Graphs
 using OMEinsum
 using TropicalNumbers: CountingTropicalF64
 using OMEinsumContractionOrders: uniformsize
-using GraphTensorNetworks: _onehotv
+using GraphTensorNetworks: _onehotv, sampler_type, set_type
 
 @testset "Config types" begin
     T = sampler_type(CountingTropical{Float32}, 5, 2)

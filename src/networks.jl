@@ -1,4 +1,3 @@
-export Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing, MaxCut, PaintShop, paintshop_from_pairs, UnWeighted
 const EinTypes = Union{EinCode,NestedEinsum,SlicedEinsum}
 
 abstract type GraphProblem end
@@ -9,9 +8,15 @@ struct UnWeighted end
     Independence{CT<:EinTypes,WT<:Union{UnWeighted, Vector}} <: GraphProblem
     Independence(graph; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
 
-Independent set problem. In the constructor, `weights` are the weights of vertices.
+The [Independent set problem](https://en.wikipedia.org/wiki/Independent_set_(graph_theory)).
+In the constructor, `weights` are the weights of vertices.
 `openvertices` specifies labels for the output tensor.
 `optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
+
+An independent set is defined in the [monadic second order logic](https://digitalcommons.oberlin.edu/cgi/viewcontent.cgi?article=1678&context=honors) as
+```math
+\\exists x_i,\\ldots,x_M\\left[\\bigwedge_{i\\neq j} (x_i\\neq x_j \\wedge \\neg \\textbf{adj}(x_i, x_j))\\right]
+```
 """
 struct Independence{CT<:EinTypes,WT<:Union{UnWeighted, Vector}} <: GraphProblem
     code::CT
@@ -67,7 +72,7 @@ end
 
 Vertex matching problem.
 `optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
-The matching polynomial adopts the first definition in wiki page: https://en.wikipedia.org/wiki/Matching_polynomial
+The matching polynomial adopts the first definition in [wiki page](https://en.wikipedia.org/wiki/Matching_polynomial)
 ```math
 m_G(x) := \\sum_{k\\geq 0}m_kx^k,
 ```
@@ -102,7 +107,7 @@ Coloring{K}(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifie
     PaintShop{CT<:EinTypes} <: GraphProblem
     PaintShop(labels::AbstractVector; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
 
-The binary paint shop problem: http://m-hikari.com/ams/ams-2012/ams-93-96-2012/popovAMS93-96-2012-2.pdf.
+The [binary paint shop problem](http://m-hikari.com/ams/ams-2012/ams-93-96-2012/popovAMS93-96-2012-2.pdf).
 
 Example
 -----------------------------------------

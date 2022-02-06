@@ -1,5 +1,3 @@
-export solve, SizeMax, CountingAll, CountingMax, GraphPolynomial, SingleConfigMax, ConfigsAll, ConfigsMax
-
 abstract type AbstractProperty end
 _support_weight(::AbstractProperty) = false
 
@@ -22,7 +20,7 @@ _support_weight(::SizeMax) = true
 
 Counting the total number of sets. e.g. for [`Independence`](@ref) problem, it counts the independent sets.
 
-* The corresponding tensor element type is [`Base.Real`](@ref).
+* The corresponding tensor element type is `Base.Real`.
 * The weights on graph does not have effect.
 * BLAS (GPU and CPU) and GPU are supported,
 """
@@ -36,7 +34,7 @@ _support_weight(::CountingAll) = true
 Counting the number of sets with `K` largest size. e.g. for [`Independence`](@ref) problem,
 it counts independent sets of size ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
 
-* The corresponding tensor element type is [`CountingTropical`](@ref) for `K == 1`, and [`TruncatedPoly{K}`](@ref) for `K > 1`.
+* The corresponding tensor element type is [`CountingTropical`](@ref) for `K == 1`, and [`TruncatedPoly`](@ref)`{K}` for `K > 1`.
 * Weighted graph problems is only supported for `K == 1`.
 * GPU is supported,
 """
@@ -62,7 +60,7 @@ The `METHOD` type parameter can be one of the following symbols
     * It might have small round-off error depending on the data type for storing the counting.
     * It has memory overhead that linear to the graph size.
 * `:fft`, 
-    * The corresponding tensor element type is [`Base.Complex`](@ref).
+    * The corresponding tensor element type is `Base.Complex`.
     * It has (controllable) round-off error.
     * BLAS and GPU are supported.
     * It accepts keyword arguments `maxorder` (optional) and `r`,
@@ -110,7 +108,7 @@ _support_weight(::ConfigsAll) = true
 Find configurations with largest sizes, e.g. for [`Independence`](@ref) problem,
 it is finding all independent sets of sizes ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
 
-* The corresponding data type is [`CountingTropical{Float64,<:ConfigEnumerator}`](@ref) for `K == 1` and [`TruncatedPoly{K,<:ConfigEnumerator}`] for `K > 1`.
+* The corresponding data type is [`CountingTropical`](@ref)`{Float64,<:ConfigEnumerator}` for `K == 1` and [`TruncatedPoly`](@ref)`{K,<:ConfigEnumerator}` for `K > 1`.
 * Weighted graph problems is only supported for `K == 1`.
 """
 struct ConfigsMax{K, BOUNDED} <:AbstractProperty end
@@ -187,7 +185,6 @@ for TP in [:MaximalIndependence, :Independence, :Matching, :MaxCut, :PaintShop]
     @eval max_size_count(m::$TP; usecuda=false) = (r = sum(solve(m, CountingMax(); usecuda=usecuda)); (Int(r.n), Int(r.c)))
 end
 
-export save_configs, load_configs
 using DelimitedFiles
 
 """
@@ -274,8 +271,6 @@ Base.Matrix(ce::ConfigEnumerator) = plain_matrix(ce)
 Base.Vector(ce::StaticElementVector) = collect(ce)
 
 # some useful API
-export mis_compactify!
-
 """
     mis_compactify!(tropicaltensor)
 

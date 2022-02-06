@@ -1,5 +1,6 @@
 using Pkg
 using GraphTensorNetworks
+using GraphTensorNetworks: TropicalNumbers, Polynomials, Mods
 using Documenter
 using DocThemeIndigo
 using Literate
@@ -18,7 +19,7 @@ indigo = DocThemeIndigo.install(GraphTensorNetworks)
 DocMeta.setdocmeta!(GraphTensorNetworks, :DocTestSetup, :(using GraphTensorNetworks); recursive=true)
 
 makedocs(;
-    modules=[GraphTensorNetworks],
+    modules=[GraphTensorNetworks, TropicalNumbers, Polynomials, Mods],
     authors="Jinguo Liu",
     repo="https://github.com/Happy-Diode/GraphTensorNetworks.jl/blob/{commit}{path}#{line}",
     sitename="GraphTensorNetworks.jl",
@@ -37,6 +38,7 @@ makedocs(;
         "Method Selection Guide" => "methodselection.md",
         "References" => "ref.md",
     ],
+    doctest=false,
 )
 
 deploydocs(;

@@ -1,5 +1,4 @@
 using Viznet
-export vizeinsum, vizconfig
 using Compose
 
 function vizconfig(g::SimpleGraph; locs, kwargs...)

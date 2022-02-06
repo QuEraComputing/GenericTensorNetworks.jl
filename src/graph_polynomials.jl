@@ -3,8 +3,6 @@ using OMEinsum: NestedEinsum, getixs, getiy
 using FFTW
 using Graphs
 
-export contractx, contractf, graph_polynomial, max_size, max_size_count
-
 """
     graph_polynomial(problem, method; usecuda=false, kwargs...)
 

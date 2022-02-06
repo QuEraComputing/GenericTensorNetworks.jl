@@ -1,5 +1,3 @@
-export StaticBitVector, StaticElementVector, @bv_str
-
 """
     StaticElementVector{N,S,C}
 

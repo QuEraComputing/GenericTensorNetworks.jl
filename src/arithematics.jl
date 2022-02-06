@@ -210,15 +210,6 @@ for (F,TP) in [(:set_type, :ConfigEnumerator), (:sampler_type, :ConfigSampler)]
 end
 
 # utilities for creating onehot vectors
-function onehotv(::Type{Polynomial{BS,X}}, x, v) where {BS,X}
-    Polynomial{BS,X}([zero(BS), onehotv(BS, x, v)])
-end
-function onehotv(::Type{TruncatedPoly{K,BS,OS}}, x, v) where {K,BS,OS}
-    TruncatedPoly{K,BS,OS}(ntuple(i->i<K ? zero(BS) : onehotv(BS, x, v), K),one(OS))
-end
-function onehotv(::Type{CountingTropical{TV,BS}}, x, v) where {TV,BS}
-    CountingTropical{TV,BS}(one(TV), onehotv(BS, x, v))
-end
 onehotv(::Type{ConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigEnumerator([onehotv(StaticElementVector{N,S,C}, i, v)])
 onehotv(::Type{ConfigSampler{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigSampler(onehotv(StaticElementVector{N,S,C}, i, v))
 Base.transpose(c::ConfigEnumerator) = c

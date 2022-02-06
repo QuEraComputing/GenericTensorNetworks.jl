@@ -1,55 +1,64 @@
-export Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing, MaxCut, PaintShop, paintshop_from_pairs
+export Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing, MaxCut, PaintShop, paintshop_from_pairs, UnWeighted
 const EinTypes = Union{EinCode,NestedEinsum,SlicedEinsum}
 
 abstract type GraphProblem end
 
-"""
-    Independence{CT<:EinTypes} <: GraphProblem
-    Independence(graph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+struct UnWeighted end
 
-Independent set problem. `openvertices` specifies the output tensor.
+"""
+    Independence{CT<:EinTypes,WT<:Union{UnWeighted, Vector}} <: GraphProblem
+    Independence(graph; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+
+Independent set problem. In the constructor, `weights` are the weights of vertices.
+`openvertices` specifies labels for the output tensor.
 `optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
 """
-struct Independence{CT<:EinTypes} <: GraphProblem
+struct Independence{CT<:EinTypes,WT<:Union{UnWeighted, Vector}} <: GraphProblem
     code::CT
+    weights::WT
 end
 
-function Independence(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+function Independence(g::SimpleGraph; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+    @assert weights isa UnWeighted || length(weights) == nv(g)
     rawcode = EinCode(([[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
                        [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...), collect(Int, openvertices))  # labels for edge tensors
     code = _optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier)
-    Independence(code)
+    Independence(code, weights)
 end
 
 """
-    MaxCut{CT<:EinTypes} <: GraphProblem
-    MaxCut(graph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+    MaxCut{CT<:EinTypes,WT<:Union{UnWeighted, Vector}} <: GraphProblem
+    MaxCut(graph; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
 
-Max cut problem (or spin glass problem).
+Max cut problem (or spin glass problem). In the constructor, `weights` are the weights of edges.
 `optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
 """
-struct MaxCut{CT<:EinTypes} <: GraphProblem
+struct MaxCut{CT<:EinTypes,WT<:Union{UnWeighted, Vector}} <: GraphProblem
     code::CT
+    weights::WT
 end
-function MaxCut(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+function MaxCut(g::SimpleGraph; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+    @assert weights isa UnWeighted || length(weights) == ne(g)
     rawcode = EinCode([[minmax(e.src,e.dst)...] for e in Graphs.edges(g)], collect(Int, openvertices))  # labels for edge tensors
-    MaxCut(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier))
+    MaxCut(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), weights)
 end
 
 """
-    MaximalIndependence{CT<:EinTypes} <: GraphProblem
-    MaximalIndependence(graph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+    MaximalIndependence{CT<:EinTypes,WT<:Union{UnWeighted, Vector}} <: GraphProblem
+    MaximalIndependence(graph; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
 
-Maximal independent set problem. 
+Maximal independent set problem. In the constructor, `weights` are the weights of vertices.
 `optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
 """
-struct MaximalIndependence{CT<:EinTypes} <: GraphProblem
+struct MaximalIndependence{CT<:EinTypes,WT<:Union{UnWeighted, Vector}} <: GraphProblem
     code::CT
+    weights::WT
 end
 
-function MaximalIndependence(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+function MaximalIndependence(g::SimpleGraph; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+    @assert weights isa UnWeighted || length(weights) == nv(g)
     rawcode = EinCode(([[Graphs.neighbors(g, v)..., v] for v in Graphs.vertices(g)]...,), collect(Int, openvertices))
-    MaximalIndependence(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier))
+    MaximalIndependence(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), weights)
 end
 
 """
@@ -164,7 +173,12 @@ OMEinsum.timespace_complexity(gp::GraphProblem) = timespace_complexity(gp.code, 
 for T in [:Independence, :Matching, :MaximalIndependence, :MaxCut, :PaintShop]
     @eval bondsize(gp::$T) = 2
 end
-bondsize(gp::Coloring{K}) where K = K
+bondsize(::Coloring{K}) where K = K
+
+get_weight(gp::GraphProblem, x::Int) = 1
+for T in [:Independence, :MaximalIndependence, :MaxCut]
+    @eval get_weight(gp::$T, x::Int) = gp.weights isa UnWeighted ? 1 : gp.weights[x]
+end
 
 """
 set_packing(sets; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
@@ -174,7 +188,8 @@ Calling this function will return you an `Independence` instance.
 `sets` are a vector of vectors, each element being a vertex in the independent set problem.
 `optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
 
-### Example
+Example
+-----------------------------------
 ```julia
 julia> sets = [[1, 2, 5], [1, 3], [2, 4], [3, 6], [2, 3, 6]];  # each set is a vertex
 
@@ -184,11 +199,18 @@ julia> res = best_solutions(gp; all=true)[]
 (2, {10010, 00110, 01100})ₜ
 ```
 """
-function set_packing(sets; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+function set_packing(sets; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
     n = length(sets)
     code = EinCode(vcat([[i] for i=1:n], [[i,j] for i=1:n,j=1:n if j>i && !isempty(sets[i] ∩ sets[j])]), collect(Int,openvertices))
-    Independence(_optimize_code(code, uniformsize(code, 2), optimizer, simplifier))
+    Independence(_optimize_code(code, uniformsize(code, 2), optimizer, simplifier), weights)
 end
 
 _optimize_code(code, size_dict, optimizer::Nothing, simplifier) = code
 _optimize_code(code, size_dict, optimizer, simplifier) = optimize_code(code, size_dict, optimizer, simplifier)
+
+# TODO:
+# 1. Dominating set
+# \exists x_i,\ldots,x_K \forall y\left[\bigwedge_{i=1}^{K}(y=x_i\wedge \textbf{adj}(y, x_i))\right]
+# 2. Polish reading data
+#     * consistent configuration assign of max-cut
+# 3. Support transverse field in max-cut

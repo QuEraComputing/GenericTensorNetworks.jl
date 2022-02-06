@@ -1,4 +1,35 @@
-export solve
+export solve, SizeMax, CountingAll, CountingMax, GraphPolynomial, SingleConfigMax, ConfigsAll, ConfigsMax
+
+abstract type AbstractProperty end
+_support_weight(::AbstractProperty) = false
+
+struct SizeMax <: AbstractProperty end
+_support_weight(::SizeMax) = true
+
+struct CountingAll <: AbstractProperty end
+_support_weight(::CountingAll) = true
+
+struct CountingMax{K} <: AbstractProperty end
+CountingMax(; K=1) = CountingMax{K}()
+max_k(::CountingMax{K}) where K = K
+_support_weight(::CountingMax{1}) = true
+
+struct GraphPolynomial{METHOD} <: AbstractProperty
+    kwargs
+end
+GraphPolynomial(; method::Symbol = :finitefield, kwargs...) = GraphPolynomial{METHOD}(kwargs)
+
+struct SingleConfigMax{BOUNDED} <:AbstractProperty end
+SingleConfigMax(; bounded::Bool=false) = SingleConfigMax{bounded}()
+_support_weight(::SingleConfigMax) = true
+
+struct ConfigsAll <:AbstractProperty end
+_support_weight(::ConfigsAll) = true
+
+struct ConfigsMax{K, BOUNDED} <:AbstractProperty end
+ConfigsMax(; K=1, bounded::Bool=true) = ConfigsMax{K,bounded}()
+max_k(::ConfigsMax{K}) where K = K
+_support_weight(::ConfigsMax{1}) = true
 
 """
     solve(problem, task; usecuda=false)
@@ -21,45 +52,47 @@ export solve
     * "configs max2 (bounded)", all MIS and MIS-1 configurations, the bounded approach (much faster),
     * "configs max3 (bounded)", all MIS, MIS-1 and MIS-2 configurations, the bounded approach (much faster),
 """
-function solve(gp::GraphProblem, task; usecuda=false, kwargs...)
-    if task == "size max"
-        return contractx(gp, Tropical(1.0); usecuda=usecuda)
-    elseif task == "counting sum"
-        return contractx(gp, 1.0; usecuda=usecuda)
-    elseif task == "counting max"
-        return contractx(gp, CountingTropical(1.0); usecuda=usecuda)
-    elseif task == "counting max2"
-        return contractx(gp, Max2Poly(0.0, 1.0, 1.0); usecuda=usecuda)
-    elseif task == "counting max3"
-        return contractx(gp, TruncatedPoly((0.0, 0.0, 1.0), 1.0); usecuda=usecuda)
-    elseif task == "counting all"
-        return graph_polynomial(gp, Val(:polynomial); usecuda=usecuda)
-    elseif task == "config max"
-        return solutions(gp, CountingTropical{Float64,Float64}; all=false, usecuda=usecuda)
-    elseif task == "configs max"
-        return solutions(gp, CountingTropical{Float64,Float64}; all=true, usecuda=usecuda)
-    elseif task == "configs max2"
-        return solutions(gp, Max2Poly{Float64,Float64}; all=true, usecuda=usecuda)
-    elseif task == "configs max3"
-        return solutions(gp, TruncatedPoly{3,Float64,Float64}; all=true, usecuda=usecuda)
-    elseif task == "configs all"
-        return solutions(gp, Polynomial{Float64,:x}; all=true, usecuda=usecuda)
-    # extra methods
-    elseif task == "counting all (fft)"
-        return graph_polynomial(gp, Val(:fft); usecuda=usecuda, kwargs...)
-    elseif task == "counting all (finitefield)"
-        return graph_polynomial(gp, Val(:finitefield); usecuda=usecuda, kwargs...)
-    elseif task == "config max (bounded)"
-        return best_solutions(gp; all=false, usecuda=usecuda)
-    elseif task == "configs max (bounded)"
-        return best_solutions(gp; all=true, usecuda=usecuda)
-    elseif task == "configs max2 (bounded)"
-        return bestk_solutions(gp, 2)
-    elseif task == "configs max3 (bounded)"
-        return bestk_solutions(gp, 3)
-    else
-        error("unknown task $task.")
+function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=false)
+    if !_support_weight(property) && _has_weight(gp)
+        throw(ArgumentError("weighted instance of type $(typeof(gp)) is not supported in computing $(property)"))
     end
+    if property isa SizeMax
+        syms = symbols(gp)
+        vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
+        return contractf(x->Tropical(T(get_weight(gp, vertex_index[x]))), gp; usecuda=usecuda)
+    elseif property isa CountingAll
+        return contractx(gp, one(T); usecuda=usecuda)
+    elseif property isa CountingMax{1}
+        syms = symbols(gp)
+        vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
+        return contractf(x->CountingTropical(T(get_weight(gp, vertex_index[x])), one(T)), gp; usecuda=usecuda)
+    elseif property isa CountingMax
+        return contractx(gp, TruncatedPoly(ntuple(i->i == max_k(property) ? one(T) : zero(T), max_k(property)), one(T)); usecuda=usecuda)
+    elseif property isa GraphPolynomial
+        return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, property.kwargs...)
+    elseif property isa SingleConfigMax{false}
+        return solutions(gp, CountingTropical{T,T}; all=false, usecuda=usecuda)
+    elseif property isa ConfigsMax{1,false}
+        return solutions(gp, CountingTropical{T,T}; all=true, usecuda=usecuda)
+    elseif property isa (ConfigsMax{K, false} where K)
+        return solutions(gp, TruncatedPoly{max_k(property),T,T}; all=true, usecuda=usecuda)
+    elseif property isa ConfigsAll
+        return solutions(gp, Polynomial{T,:x}; all=true, usecuda=usecuda)
+    elseif property isa SingleConfigMax{true}
+        return best_solutions(gp; all=false, usecuda=usecuda)
+    elseif property isa ConfigsMax{1,true}
+        return best_solutions(gp; all=true, usecuda=usecuda)
+    elseif property isa (ConfigsMax{K,true} where K)
+        return bestk_solutions(gp, max_k(property))
+    else
+        error("unknown property $property.")
+    end
+end
+_has_weight(gp::AbstractProperty) = hasfield(gp, :weights) && gp.weights isa Vector # ugly but makes life easier
+
+for TP in [:MaximalIndependence, :Independence, :Matching, :MaxCut, :PaintShop]
+    @eval max_size(m::$TP; usecuda=false) = Int(sum(solve(m, SizeMax(); usecuda=usecuda)).n)  # floating point number is faster (BLAS)
+    @eval max_size_count(m::$TP; usecuda=false) = (r = sum(solve(m, CountingMax(); usecuda=usecuda)); (Int(r.n), Int(r.c)))
 end
 
 export save_configs, load_configs

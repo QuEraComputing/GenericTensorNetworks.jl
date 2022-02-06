@@ -79,6 +79,6 @@ end
 @testset "paint shop" begin
     labels = collect("abaccb")
     pb = PaintShop(labels)
-    @test solve(pb, "size max")[] == Tropical(3.0)
-    @test StaticBitVector(Bool[0,1,1,0,1]) ∈ solve(pb, "configs max")[].c.data
+    @test solve(pb, SizeMax())[] == Tropical(3.0)
+    @test StaticBitVector(Bool[0,1,1,0,1]) ∈ solve(pb, ConfigsMax())[].c.data
 end

@@ -1,6 +1,7 @@
 using Pkg
 using GraphTensorNetworks
 using Documenter
+using DocThemeIndigo
 using Literate
 
 for each in readdir(pkgdir(GraphTensorNetworks, "examples"))
@@ -10,9 +11,10 @@ for each in readdir(pkgdir(GraphTensorNetworks, "examples"))
     input_file = pkgdir(GraphTensorNetworks, "examples", each, "main.jl")
     output_dir = pkgdir(GraphTensorNetworks, "docs", "src", "tutorials")
     @info "executing" input_file
-    Literate.markdown(input_file, output_dir; name=each)
+    Literate.markdown(input_file, output_dir; name=each, execute=false)
 end
 
+indigo = DocThemeIndigo.install(GraphTensorNetworks)
 DocMeta.setdocmeta!(GraphTensorNetworks, :DocTestSetup, :(using GraphTensorNetworks); recursive=true)
 
 makedocs(;
@@ -23,14 +25,16 @@ makedocs(;
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://Happy-Diode.github.io/GraphTensorNetworks.jl",
-        assets=String[],
+        assets=String[indigo],
     ),
     pages=[
         "Home" => "index.md",
         "Tutorials" => [
             "Independent Set Problem" => "tutorials/IndependentSet.md",
             "Max-Cut Problem" => "tutorials/MaxCut.md",
+            "Other Problems" => "tutorials/Others.md",
         ],
+        "Method Selection Guide" => "methodselection.md",
         "References" => "ref.md",
     ],
 )

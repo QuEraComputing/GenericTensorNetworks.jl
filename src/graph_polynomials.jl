@@ -225,8 +225,3 @@ function paintshop_bond_tensor(x::T, if1::Bool, if2::Bool) where T
     m = if2 ? m : m[:,[2,1]]
     return m
 end
-
-for TP in [:MaximalIndependence, :Independence, :Matching, :MaxCut]
-    @eval max_size(m::$TP; usecuda=false) = Int(sum(contractx(m, TropicalF64(1.0); usecuda=usecuda)).n)  # floating point number is faster (BLAS)
-    @eval max_size_count(m::$TP; usecuda=false) = (r = sum(contractx(m, CountingTropical{Float64,Float64}(1.0, 1.0); usecuda=usecuda)); (Int(r.n), Int(r.c)))
-end

@@ -3,7 +3,7 @@
 # ## Problem definition
 # An independent set is defined in the monadic second order language as
 # ```math
-# \exists x_i,\ldots,x_M\left[\wedge_{i\neq j} (x_i\neq x_j \wedge \neg \textbf{adj}(x_i, x_j))\right]
+# \exists x_i,\ldots,x_M\left[\bigwedge_{i\neq j} (x_i\neq x_j \wedge \neg \textbf{adj}(x_i, x_j))\right]
 # ```
 
 # ## Solving properties

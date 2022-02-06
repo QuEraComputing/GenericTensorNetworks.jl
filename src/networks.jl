@@ -6,7 +6,8 @@ struct UnWeighted end
 
 """
     Independence{CT<:EinTypes,WT<:Union{UnWeighted, Vector}} <: GraphProblem
-    Independence(graph; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+    Independence(graph; weights=UnWeighted(), openvertices=(),
+                 optimizer=GreedyMethod(), simplifier=nothing)
 
 The [Independent set problem](https://en.wikipedia.org/wiki/Independent_set_(graph_theory)).
 In the constructor, `weights` are the weights of vertices.
@@ -16,6 +17,22 @@ In the constructor, `weights` are the weights of vertices.
 An independent set is defined in the [monadic second order logic](https://digitalcommons.oberlin.edu/cgi/viewcontent.cgi?article=1678&context=honors) as
 ```math
 \\exists x_i,\\ldots,x_M\\left[\\bigwedge_{i\\neq j} (x_i\\neq x_j \\wedge \\neg \\textbf{adj}(x_i, x_j))\\right]
+```
+
+In tensor network representation, we define a vertex tensors on vertex `i` (labeled by ``s_i``) as
+```math
+W(x_i)_{s_i} = \\left(\\begin{matrix}
+    1 \\\\
+    x_i
+\\end{matrix}\\right)_{s_i}
+```
+
+and a bond tensor on edge `(i, j)` as
+```math
+B_{s_i s_j} = \\left(\\begin{matrix}
+    1  & 1\\\\
+    1 & 0
+\\end{matrix}\\right)_{s_is_j}
 ```
 """
 struct Independence{CT<:EinTypes,WT<:Union{UnWeighted, Vector}} <: GraphProblem
@@ -33,7 +50,8 @@ end
 
 """
     MaxCut{CT<:EinTypes,WT<:Union{UnWeighted, Vector}} <: GraphProblem
-    MaxCut(graph; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+    MaxCut(graph; weights=UnWeighted(), openvertices=(),
+                optimizer=GreedyMethod(), simplifier=nothing)
 
 Max cut problem (or spin glass problem). In the constructor, `weights` are the weights of edges.
 `optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
@@ -50,7 +68,8 @@ end
 
 """
     MaximalIndependence{CT<:EinTypes,WT<:Union{UnWeighted, Vector}} <: GraphProblem
-    MaximalIndependence(graph; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+    MaximalIndependence(graph; weights=UnWeighted(), openvertices=(),
+                 optimizer=GreedyMethod(), simplifier=nothing)
 
 Maximal independent set problem. In the constructor, `weights` are the weights of vertices.
 `optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
@@ -105,7 +124,8 @@ Coloring{K}(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifie
 
 """
     PaintShop{CT<:EinTypes} <: GraphProblem
-    PaintShop(labels::AbstractVector; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+    PaintShop(labels::AbstractVector; openvertices=(),
+             optimizer=GreedyMethod(), simplifier=nothing)
 
 The [binary paint shop problem](http://m-hikari.com/ams/ams-2012/ams-93-96-2012/popovAMS93-96-2012-2.pdf).
 

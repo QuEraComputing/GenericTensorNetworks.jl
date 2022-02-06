@@ -8,6 +8,7 @@ struct SingleConfig end
     backward_tropical(mode, ixs, xs, iy, y, ymask, size_dict)
 
 The backward rule for tropical einsum.
+
 * `mode` can be one of `:all` and `:single`,
 * `ixs` and `xs` are labels and tensor data for input tensors,
 * `iy` and `y` are labels and tensor data for the output tensor,
@@ -115,10 +116,10 @@ end
 
 Contraction method with bounding.
 
-    * `mode` is a `AllConfigs{K}` instance, where `MIS-K+1` is the largest IS size that you care about.
-    * `xsa` are input tensors for bounding, e.g. tropical tensors,
-    * `xsb` are input tensors for computing, e.g. tensors elements are counting tropical with set algebra,
-    * `ymask` is the initial gradient mask for the output tensor.
+* `mode` is a `AllConfigs{K}` instance, where `MIS-K+1` is the largest IS size that you care about.
+* `xsa` are input tensors for bounding, e.g. tropical tensors,
+* `xsb` are input tensors for computing, e.g. tensors elements are counting tropical with set algebra,
+* `ymask` is the initial gradient mask for the output tensor.
 """
 function bounding_contract(mode::AllConfigs, code::EinCode, @nospecialize(xsa), ymask, @nospecialize(xsb); size_info=nothing)
     LT = OMEinsum.labeltype(code)

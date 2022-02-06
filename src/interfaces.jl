@@ -3,55 +3,146 @@ export solve, SizeMax, CountingAll, CountingMax, GraphPolynomial, SingleConfigMa
 abstract type AbstractProperty end
 _support_weight(::AbstractProperty) = false
 
+"""
+    SizeMax <: AbstractProperty
+    SizeMax()
+
+The maximum independent set size.
+
+* The corresponding tensor element type is [`Tropical`](@ref).
+* It is compatible with weighted graph problems.
+* BLAS (on CPU) and GPU are supported,
+"""
 struct SizeMax <: AbstractProperty end
 _support_weight(::SizeMax) = true
 
+"""
+    CountingAll <: AbstractProperty
+    CountingAll()
+
+Counting the total number of sets. e.g. for [`Independence`](@ref) problem, it counts the independent sets.
+
+* The corresponding tensor element type is [`Base.Real`](@ref).
+* The weights on graph does not have effect.
+* BLAS (GPU and CPU) and GPU are supported,
+"""
 struct CountingAll <: AbstractProperty end
 _support_weight(::CountingAll) = true
 
+"""
+    CountingMax{K} <: AbstractProperty
+    CountingMax(K=1)
+
+Counting the number of sets with `K` largest size. e.g. for [`Independence`](@ref) problem,
+it counts independent sets of size ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
+
+* The corresponding tensor element type is [`CountingTropical`](@ref) for `K == 1`, and [`TruncatedPoly{K}`](@ref) for `K > 1`.
+* Weighted graph problems is only supported for `K == 1`.
+* GPU is supported,
+"""
 struct CountingMax{K} <: AbstractProperty end
 CountingMax(K::Int=1) = CountingMax{K}()
 max_k(::CountingMax{K}) where K = K
 _support_weight(::CountingMax{1}) = true
 
+"""
+    GraphPolynomial{METHOD} <: AbstractProperty
+    GraphPolynomial(; method=:finitefield, kwargs...)
+
+Compute the graph polynomial, e.g. for [`Independence`](@ref) problem, it is the independence polynomial.
+The `METHOD` type parameter can be one of the following symbols
+
+* `:finitefield`, it uses finite field algebra to fit the polynomial.
+    * The corresponding tensor element type is [`Mods.Mod`](@ref),
+    * It does not have round-off error,
+    * GPU is supported,
+    * It accepts keyword arguments `maxorder` (optional, e.g. the MIS size in the [`Independence`](@ref) problem).
+* `:polynomial`, the program uses polynomial numbers to solve the polynomial directly.
+    * The corresponding tensor element type is [`Polynomials.Polynomial`](@ref).
+    * It might have small round-off error depending on the data type for storing the counting.
+    * It has memory overhead that linear to the graph size.
+* `:fft`, 
+    * The corresponding tensor element type is [`Base.Complex`](@ref).
+    * It has (controllable) round-off error.
+    * BLAS and GPU are supported.
+    * It accepts keyword arguments `maxorder` (optional) and `r`,
+        if `r > 1`, one has better precision for coefficients of large order, if `r < 1`,
+        one has better precision for coefficients of small order.
+
+Graph polynomials are not defined for weighted graph problems.
+"""
 struct GraphPolynomial{METHOD} <: AbstractProperty
     kwargs
 end
 GraphPolynomial(; method::Symbol = :finitefield, kwargs...) = GraphPolynomial{method}(kwargs)
 graph_polynomial_method(::GraphPolynomial{METHOD}) where METHOD = METHOD
 
+"""
+    SingleConfigMax{BOUNDED} <: AbstractProperty
+    SingleConfigMax(; bounded=false)
+
+Finding single best solution, e.g. for [`Independence`](@ref) problem, it is one of the maximum independent sets.
+
+* The corresponding data type is [`CountingTropical{Float64,<:ConfigSampler}`](@ref) if `BOUNDED` is `true`, [`Tropical`](@ref) otherwise.
+* Weighted graph problems is supported.
+* GPU is supported,
+"""
 struct SingleConfigMax{BOUNDED} <:AbstractProperty end
 SingleConfigMax(; bounded::Bool=false) = SingleConfigMax{bounded}()
 _support_weight(::SingleConfigMax) = true
 
+"""
+    ConfigsAll <:AbstractProperty
+    ConfigsAll()
+
+Find all valid configurations, e.g. for [`Independence`](@ref) problem, it is finding all independent sets.
+
+* The corresponding data type is [`ConfigEnumerator`](@ref).
+* Weights do not take effect.
+"""
 struct ConfigsAll <:AbstractProperty end
 _support_weight(::ConfigsAll) = true
 
+"""
+    ConfigsMax{K, BOUNDED} <:AbstractProperty
+    ConfigsMax(K=1; bounded=true)
+
+Find configurations with largest sizes, e.g. for [`Independence`](@ref) problem,
+it is finding all independent sets of sizes ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
+
+* The corresponding data type is [`CountingTropical{Float64,<:ConfigEnumerator}`](@ref) for `K == 1` and [`TruncatedPoly{K,<:ConfigEnumerator}`] for `K > 1`.
+* Weighted graph problems is only supported for `K == 1`.
+"""
 struct ConfigsMax{K, BOUNDED} <:AbstractProperty end
 ConfigsMax(K::Int=1; bounded::Bool=true) = ConfigsMax{K,bounded}()
 max_k(::ConfigsMax{K}) where K = K
 _support_weight(::ConfigsMax{1}) = true
 
 """
-    solve(problem, task; usecuda=false)
+    solve(problem, property; usecuda=false, T=Float64)
 
+Solving a certain property of a graph problem.
+
+Positional Arguments
+---------------------------
 * `problem` is the graph problem with tensor network information,
-* `task` is string specifying the task. Using the maximum independent set problem as an example, it can be one of
-    * "size max", the maximum independent set size,
-    * "counting sum", total number of independent sets,
-    * "counting max", the dengeneracy of maximum independent sets (MIS),
-    * "counting max2", the dengeneracy of MIS and MIS-1,
-    * "counting all", independence polynomial, the polynomial number approach,
-    * "counting all (fft)", independence polynomial, the fourier transformation approach,
-    * "counting all (finitefield)", independence polynomial, the finite field approach,
-    * "config max", one of the maximum independent set,
-    * "config max (bounded)", one of the maximum independent set, the bounded version,
-    * "configs max", all MIS configurations,
-    * "configs max2", all MIS configurations and MIS-1 configurations,
-    * "configs all", all IS configurations,
-    * "configs max (bounded)", all MIS configurations, the bounded approach (much faster),
-    * "configs max2 (bounded)", all MIS and MIS-1 configurations, the bounded approach (much faster),
-    * "configs max3 (bounded)", all MIS, MIS-1 and MIS-2 configurations, the bounded approach (much faster),
+* `property` is string specifying the task. Using the maximum independent set problem as an example, it can be one of
+
+    * [`SizeMax`](@ref) for finding maximum configuration size,
+
+    * [`CountingMax`](@ref) for counting configurations with top `K` sizes,
+    * [`CountingAll`](@ref) for counting all configurations,
+    * [`GraphPolynomial`](@ref) for evaluating the graph polynomial,
+
+    * [`SingleConfigMax`](@ref) for finding one maximum configuration,
+    * [`ConfigsMax`](@ref) for enumerating configurations with top `K` sizes,
+    * [`ConfigsAll`](@ref) for enumerating all configurations,
+
+
+Keyword arguments
+-------------------------------------
+* `usecuda` is a switch to use CUDA (if possible), user need to call statement `using CUDA` before turning on this switch.
+* `T` is the "base" element type, sometimes can be used to reduce the memory cost.
 """
 function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=false)
     if !_support_weight(property) && _has_weight(gp)
@@ -78,7 +169,7 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
     elseif property isa (ConfigsMax{K, false} where K)
         return solutions(gp, TruncatedPoly{max_k(property),T,T}; all=true, usecuda=usecuda)
     elseif property isa ConfigsAll
-        return solutions(gp, Polynomial{T,:x}; all=true, usecuda=usecuda)
+        return solutions(gp, Real; all=true, usecuda=usecuda)
     elseif property isa SingleConfigMax{true}
         return best_solutions(gp; all=false, usecuda=usecuda)
     elseif property isa ConfigsMax{1,true}

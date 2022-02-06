@@ -208,7 +208,7 @@ end
 _optimize_code(code, size_dict, optimizer::Nothing, simplifier) = code
 _optimize_code(code, size_dict, optimizer, simplifier) = optimize_code(code, size_dict, optimizer, simplifier)
 
-# TODO:
+# TODOs:
 # 1. Dominating set
 # \exists x_i,\ldots,x_K \forall y\left[\bigwedge_{i=1}^{K}(y=x_i\wedge \textbf{adj}(y, x_i))\right]
 # 2. Polish reading data

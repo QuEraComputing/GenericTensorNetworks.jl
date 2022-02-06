@@ -201,6 +201,9 @@ for (F,TP) in [(:set_type, :ConfigEnumerator), (:sampler_type, :ConfigSampler)]
         function $F(::Type{T}, n::Int, nflavor::Int) where {TV, T<:CountingTropical{TV}}
             CountingTropical{TV, $F(n,nflavor)}
         end
+        function $F(::Type{Real}, n::Int, nflavor::Int) where {TV}
+            $F(n, nflavor)
+        end
         function $F(n::Integer, nflavor::Integer)
             s = ceil(Int, log2(nflavor))
             c = _nints(n,s)

@@ -30,7 +30,7 @@ using Graphs, Test
         @test res6.c.data ∈ res7.c.data
         @test all(x->sum(x) == 4, res7.c.data)
         @test all(x->sum(x) == 3, res8.coeffs[1].data) && all(x->sum(x) == 4, res8.coeffs[2].data) && length(res8.coeffs[1].data) == 30 && length(res8.coeffs[2].data) == 5
-        @test all(x->all(c->sum(c) == x[1]-1, x[2].data), enumerate(res9.coeffs))
+        @test length(unique(res9.data)) == 76 && all(c->is_independent_set(g, c), res9.data)
         @test res10 ≈ res5
         @test res11 == res5
         @test res12.c.data ∈ res13.c.data
@@ -111,7 +111,7 @@ end
     @test res6.c.data ∈ res7.c.data
     @test all(x->sum(x) == 4, res7.c.data)
     @test all(x->sum(x) == 3, res8.coeffs[1].data) && all(x->sum(x) == 4, res8.coeffs[2].data) && length(res8.coeffs[1].data) == 30 && length(res8.coeffs[2].data) == 5
-    @test all(x->all(c->sum(c) == x[1]-1, x[2].data), enumerate(res9.coeffs))
+    @test length(unique(res9.data)) == 76 && all(c->is_independent_set(g, c), res9.data)
     @test res10 ≈ res5
     @test res11 == res5
     @test res12.c.data ∈ res13.c.data
@@ -124,3 +124,20 @@ end
             length(res17.coeffs[1].data) == 30 && length(res17.coeffs[2].data) == 30 && length(res17.coeffs[3].data) == 5
 end
 
+@testset "Weighted" begin
+    g = Graphs.smallgraph("petersen")
+    gp = Independence(g; weights=collect(1:10))
+    res1 = solve(gp, SizeMax())[]
+    @test res1 == Tropical(24.0)
+    res2 = solve(gp, CountingMax(1))[]
+    @test res2 == CountingTropical(24.0, 1.0)
+    @test_throws ArgumentError solve(gp, CountingMax(2))[]
+    res3 = solve(gp, SingleConfigMax(; bounded=false))[]
+    res3b = solve(gp, SingleConfigMax(; bounded=true))[]
+    @test res3 == res3b
+    @test sum(collect(res3.c.data) .* (1:10))  == 24.0
+    res4 = solve(gp, ConfigsMax(1; bounded=false))[]
+    res4b = solve(gp, ConfigsMax(1; bounded=true))[]
+    @test res4 == res4b
+    @test res4.c.data[] == res3.c.data
+end

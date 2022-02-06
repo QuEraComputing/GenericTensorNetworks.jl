@@ -16,7 +16,7 @@ function best_solutions(gp::GraphProblem; all=false, usecuda=false)
     syms = symbols(gp)
     T = (all ? set_type : sampler_type)(CountingTropical{Int64}, length(syms), bondsize(gp))
     vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
-    xst = generate_tensors(l->TropicalF64(1.0), gp)
+    xst = generate_tensors(l->TropicalF64(get_weight(gp, vertex_index[l])), gp)
     ymask = trues(fill(2, length(getiyv(gp.code)))...)
     if usecuda
         xst = CuArray.(xst)
@@ -62,7 +62,7 @@ best2_solutions(gp::GraphProblem; all=true, usecuda=false) = solutions(gp, Max2P
 function bestk_solutions(gp::GraphProblem, k::Int)
     syms = symbols(gp)
     vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
-    xst = generate_tensors(l->TropicalF64(1.0), gp)
+    xst = generate_tensors(l->TropicalF64(get_weight(gp, vertex_index[l])), gp)
     ymask = trues(fill(2, length(getiyv(gp.code)))...)
     T = set_type(TruncatedPoly{k,Float64,Float64}, length(syms), bondsize(gp))
     xs = generate_tensors(l->_onehotv(T, vertex_index[l], 1, get_weight(gp, vertex_index[l])), gp)
@@ -106,6 +106,9 @@ function _onehotv(::Type{TruncatedPoly{K,BS,OS}}, x, v, w) where {K,BS,OS}
 end
 function _onehotv(::Type{CountingTropical{TV,BS}}, x, v, w) where {TV,BS}
     CountingTropical{TV,BS}(TV(w), onehotv(BS, x, v))
+end
+function _onehotv(::Type{BS}, x, v, w) where {BS<:ConfigEnumerator}
+    onehotv(BS, x, v)
 end
 
 for GP in [:Independence, :Matching, :MaximalIndependence, :Coloring]

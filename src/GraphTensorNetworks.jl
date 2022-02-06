@@ -12,6 +12,7 @@ export GreedyMethod, TreeSA, SABipartite, KaHyParBipartite, MergeVectors, MergeG
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 
+include("utils.jl")
 include("bitvector.jl")
 include("arithematics.jl")
 include("networks.jl")

@@ -10,14 +10,15 @@ struct CountingAll <: AbstractProperty end
 _support_weight(::CountingAll) = true
 
 struct CountingMax{K} <: AbstractProperty end
-CountingMax(; K=1) = CountingMax{K}()
+CountingMax(K::Int=1) = CountingMax{K}()
 max_k(::CountingMax{K}) where K = K
 _support_weight(::CountingMax{1}) = true
 
 struct GraphPolynomial{METHOD} <: AbstractProperty
     kwargs
 end
-GraphPolynomial(; method::Symbol = :finitefield, kwargs...) = GraphPolynomial{METHOD}(kwargs)
+GraphPolynomial(; method::Symbol = :finitefield, kwargs...) = GraphPolynomial{method}(kwargs)
+graph_polynomial_method(::GraphPolynomial{METHOD}) where METHOD = METHOD
 
 struct SingleConfigMax{BOUNDED} <:AbstractProperty end
 SingleConfigMax(; bounded::Bool=false) = SingleConfigMax{bounded}()
@@ -27,7 +28,7 @@ struct ConfigsAll <:AbstractProperty end
 _support_weight(::ConfigsAll) = true
 
 struct ConfigsMax{K, BOUNDED} <:AbstractProperty end
-ConfigsMax(; K=1, bounded::Bool=true) = ConfigsMax{K,bounded}()
+ConfigsMax(K::Int=1; bounded::Bool=true) = ConfigsMax{K,bounded}()
 max_k(::ConfigsMax{K}) where K = K
 _support_weight(::ConfigsMax{1}) = true
 
@@ -88,7 +89,7 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
         error("unknown property $property.")
     end
 end
-_has_weight(gp::AbstractProperty) = hasfield(gp, :weights) && gp.weights isa Vector # ugly but makes life easier
+_has_weight(gp::GraphProblem) = hasfield(typeof(gp), :weights) && gp.weights isa Vector # ugly but makes life easier
 
 for TP in [:MaximalIndependence, :Independence, :Matching, :MaxCut, :PaintShop]
     @eval max_size(m::$TP; usecuda=false) = Int(sum(solve(m, SizeMax(); usecuda=usecuda)).n)  # floating point number is faster (BLAS)

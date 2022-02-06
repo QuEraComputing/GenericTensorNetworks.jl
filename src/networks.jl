@@ -113,10 +113,10 @@ julia> symbols = collect("abaccb");
 
 julia> pb = PaintShop(symbols);
 
-julia> solve(pb, "size max")[]
+julia> solve(pb, SizeMax())[]
 3.0ₜ
 
-julia> solve(pb, "configs max")[].c.data
+julia> solve(pb, ConfigsMax())[].c.data
 2-element Vector{StaticBitVector{5, 1}}:
  01101
  01101

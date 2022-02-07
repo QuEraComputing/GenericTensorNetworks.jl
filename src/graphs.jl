@@ -1,4 +1,5 @@
-using Graphs, OMEinsumContractionOrders, StatsBase
+using Graphs, OMEinsumContractionOrders
+import StatsBase
 
 """
     is_independent_set(g::SimpleGraph, vertices)
@@ -28,7 +29,7 @@ function random_diagonal_coupled_graph(m::Int, n::Int, ρ::Real)
 end
 function generate_mask(Nx::Int, Ny::Int, natoms::Int)
     mask = zeros(Bool, Nx, Ny)
-    mask[sample(1:Nx*Ny, natoms; replace=false)] .= true
+    mask[StatsBase.sample(1:Nx*Ny, natoms; replace=false)] .= true
     return mask
 end
 

@@ -170,13 +170,40 @@ end
     Matching{CT<:EinTypes} <: GraphProblem
     Matching(graph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
 
-Vertex matching problem.
+[Vertex matching](https://mathworld.wolfram.com/Matching.html) problem.
 `optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
+
+Problem definition
+---------------------------
+A ``k``-matching in a graph ``G`` is a set of k edges, no two of which have a vertex in common.
+
+Graph polynomial
+---------------------------
 The matching polynomial adopts the first definition in [wiki page](https://en.wikipedia.org/wiki/Matching_polynomial)
 ```math
-m_G(x) := \\sum_{k\\geq 0}m_kx^k,
+M(G, x) = \\sum\\limits_{k=1}^{|V|/2} c_k x^k,
 ```
-where `m_k` is the number of k-edge matchings.
+where ``k`` is the number of matches, and coefficients ``c_k`` are the corresponding counting.
+
+Tensor network
+---------------------------
+We map an edge ``(u, v) \\in E`` to a label ``\\langle u, v\\rangle \\in \\{0, 1\\}`` in a tensor network,
+where 1 means two vertices of an edge are matched, 0 means otherwise.
+Then we define a tensor of rank ``d(v) = |N(v)|`` on vertex ``v`` such that,
+```math
+W_{\\langle v, n_1\\rangle, \\langle v, n_2 \\rangle, \\ldots, \\langle v, n_{d(v)}\\rangle} = \\begin{cases}
+    1, & \\sum_{i=1}^{d(v)} \\langle v, n_i \\rangle \\leq 1,\\\\
+    0, & \\text{otherwise},
+\\end{cases}
+```
+and a tensor of rank 1 on the bond
+```math
+B_{\\langle v, w\\rangle} = \\begin{cases}
+1, & \\langle v, w \\rangle = 0 \\\\
+x, & \\langle v, w \\rangle = 1,
+\\end{cases}
+```
+where label ``\\langle v, w \\rangle`` is equivalent to ``\\langle w,v\\rangle``.
 """
 struct Matching{CT<:EinTypes} <: GraphProblem
     code::CT
@@ -193,8 +220,33 @@ end
     Coloring{K,CT<:EinTypes} <: GraphProblem
     Coloring{K}(graph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
 
-K-Coloring problem.
+[Vertex Coloring](https://en.wikipedia.org/wiki/Graph_coloring) problem.
 `optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
+
+Problem definition
+---------------------------
+A vertex coloring is an assignment of labels or colors to each vertex of a graph such that no edge connects two identically colored vertices. 
+
+Tensor network
+---------------------------
+Let us use 3-colouring problem defined on vertices as an example.
+For a vertex ``v``, we define the degree of freedoms ``c_v\\in\\{1,2,3\\}`` and a vertex tensor labelled by it as
+```math
+W(v) = \\left(\\begin{matrix}
+    r_v\\\\
+    g_v\\\\
+    b_v
+\\end{matrix}\\right).
+```
+For an edge ``(u, v)``, we define an edge tensor as a matrix labelled by ``(c_u, c_v)`` to specify the constraint
+```math
+B = \\left(\\begin{matrix}
+    0 & 1 & 1\\\\
+    1 & 0 & 1\\\\
+    1 & 1 & 0
+\\end{matrix}\\right).
+```
+The number of possible colouring can be obtained by contracting this tensor network by setting vertex tensor elements ``r_v, g_v`` and ``b_v`` to 1.
 """
 struct Coloring{K,CT<:EinTypes} <: GraphProblem
     code::CT

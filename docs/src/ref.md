@@ -2,6 +2,7 @@
 ## Graph problems
 ```@docs
 solve
+GraphProblem
 Independence
 MaximalIndependence
 Matching
@@ -13,6 +14,20 @@ PaintShop
 ```@docs
 set_packing
 ```
+
+#### Graph Problem Interfaces
+```@docs
+generate_tensors
+symbols
+flavors
+get_weights
+nflavor
+```
+
+To subtype [`GraphProblem`](@ref), the new type must contain a `code` field to represent the (optimized) tensor network.
+Interfaces [`generate_tensors`](@ref), [`symbols`](@ref) and [`flavors`](@ref) are required.
+[`get_weights`] and [`nflavor`] are optimal.
+
 
 ## Properties
 ```@docs
@@ -51,6 +66,7 @@ is_commutative_semiring
 ```@docs
 optimize_code
 timespace_complexity
+timespacereadwrite_complexity
 @ein_str
 GreedyMethod
 TreeSA

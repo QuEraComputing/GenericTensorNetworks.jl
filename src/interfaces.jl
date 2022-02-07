@@ -149,13 +149,13 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
     if property isa SizeMax
         syms = symbols(gp)
         vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
-        return contractf(x->Tropical(T(get_weight(gp, vertex_index[x]))), gp; usecuda=usecuda)
+        return contractf(x->Tropical{T}.(get_weights(gp, vertex_index[x])), gp; usecuda=usecuda)
     elseif property isa CountingAll
         return contractx(gp, one(T); usecuda=usecuda)
     elseif property isa CountingMax{1}
         syms = symbols(gp)
         vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
-        return contractf(x->CountingTropical(T(get_weight(gp, vertex_index[x])), one(T)), gp; usecuda=usecuda)
+        return contractf(x->CountingTropical{T,T}.(get_weights(gp, vertex_index[x])), gp; usecuda=usecuda)
     elseif property isa CountingMax
         return contractx(gp, TruncatedPoly(ntuple(i->i == max_k(property) ? one(T) : zero(T), max_k(property)), one(T)); usecuda=usecuda)
     elseif property isa GraphPolynomial

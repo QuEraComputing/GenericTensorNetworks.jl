@@ -180,6 +180,20 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
 end
 _has_weight(gp::GraphProblem) = hasfield(typeof(gp), :weights) && gp.weights isa Vector # ugly but makes life easier
 
+"""
+    max_size(problem; usecuda=false)
+
+Returns the maximum size of the graph problem. 
+A shorthand of `solve(problem, SizeMax(); usecuda=false)`.
+"""
+function max_size end
+"""
+    max_size_count(problem; usecuda=false)
+
+Returns the maximum size and the counting of the graph problem.
+It is a shorthand of `solve(problem, CountingMax(); usecuda=false)`.
+"""
+function max_size_count end
 for TP in [:MaximalIndependence, :Independence, :Matching, :MaxCut, :PaintShop]
     @eval max_size(m::$TP; usecuda=false) = Int(sum(solve(m, SizeMax(); usecuda=usecuda)).n)  # floating point number is faster (BLAS)
     @eval max_size_count(m::$TP; usecuda=false) = (r = sum(solve(m, CountingMax(); usecuda=usecuda)); (Int(r.n), Int(r.c)))

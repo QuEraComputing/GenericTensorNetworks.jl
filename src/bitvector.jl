@@ -54,6 +54,12 @@ Base.:(&)(x::StaticElementVector{N,S,C}, y::StaticElementVector{N,S,C}) where {N
 # difference of two element sets
 Base.:(⊻)(x::StaticElementVector{N,S,C}, y::StaticElementVector{N,S,C}) where {N,S,C} = StaticElementVector{N,S,C}(x.data .⊻ y.data)
 
+"""
+    onehotv(::Type{<:StaticElementVector}, i, v)
+    onehotv(::Type{<:StaticBitVector, i)
+
+Returns a static element vector, with the value at location `i` being `v` (1 if not specified).
+"""
 function onehotv(::Type{StaticElementVector{N,S,C}}, i, v) where {N,S,C}
     x = zeros(Int,N)
     x[i] = v
@@ -61,6 +67,9 @@ function onehotv(::Type{StaticElementVector{N,S,C}}, i, v) where {N,S,C}
 end
 
 ##### BitVectors
+"""
+    StaticBitVector{N,C} = StaticElementVector{N,1,C}
+"""
 const StaticBitVector{N,C} = StaticElementVector{N,1,C}
 @inline function Base.getindex(x::StaticBitVector{N,C}, i::Integer) where {N,C}
     @boundscheck (i <= N || throw(BoundsError(x, i)))  # NOTE: still checks bounds in global scope, why?
@@ -86,6 +95,7 @@ staticfalses(::Type{StaticBitVector{N,C}}) where {N,C} = zero(StaticBitVector{N,
 @generated function statictrues(::Type{StaticBitVector{N,C}}) where {N,C}
     Expr(:call, :(StaticBitVector{$N,$C}), Expr(:tuple, fill(typemax(UInt64), C)...))
 end
+
 onehotv(::Type{StaticBitVector{N,C}}, i, v) where {N,C} = v > 0 ? onehotv(StaticBitVector{N,C}, i) : zero(StaticBitVector{N,C})
 function onehotv(::Type{StaticBitVector{N,C}}, i) where {N,C}
     x = falses(N)

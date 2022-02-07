@@ -1,11 +1,12 @@
 # # Independent set problem
 
-# ## Problem definition
+# ## Introduction
+using GraphTensorNetworks, Graphs
 
 # Please check the docstring of [`Independence`](@ref) for the definition of independence problem.
-# In the following, we are going to defined an independent set problem for the Petersen graph.
+@doc Independence
 
-using GraphTensorNetworks, Graphs
+# In the following, we are going to defined an independent set problem for the Petersen graph.
 
 graph = Graphs.smallgraph(:petersen)
 
@@ -18,13 +19,13 @@ show_graph(graph; locs=locations)
 
 # Let us contruct the problem instance with optimized tensor network contraction order as bellow.
 problem = Independence(graph; optimizer=TreeSA(sc_weight=1.0, ntrials=10,
-                         βs=0.01:0.1:15.0, niters=20, rw_weight=0.2));
+                         βs=0.01:0.1:15.0, niters=20, rw_weight=0.2),
+                         simplifier=MergeGreedy());
 
 
 # ## Solving properties
 
-# ### The decision problem
-# ##### maximum independent set size ``\alpha(G)``
+# ### Maximum independent set size ``\alpha(G)``
 maximum_independent_set_size = solve(problem, SizeMax())
 
 # ### Counting properties
@@ -34,12 +35,18 @@ count_all_independent_sets = solve(problem, CountingAll())
 # ##### counting independent sets with sizes ``\alpha(G)`` and ``\alpha(G)-1``
 count_max2_independent_sets = solve(problem, CountingMax(2))
 
-# ##### computing the independence polynomial
+# ##### independence polynomial
 # For the definition of independence polynomial, please check the docstring of [`Independence`](@ref) or this [wiki page](https://mathworld.wolfram.com/IndependencePolynomial.html).
+# There are 3 methods to compute a graph polynomial, `:finitefield`, `:fft` and `:polynomial`.
+# These methods are introduced in the docstring of [`GraphPolynomial`](@ref).
 independence_polynomial = solve(problem, GraphPolynomial(; method=:finitefield))
 
 # ### Configuration properties
 # ##### finding one maximum independent set (MIS)
+# There are two approaches to find one of the best solution.
+# The unbounded (default) version uses [`ConfigSampler`](@ref) to sample one of the best solutions directly.
+# The bounded version uses the binary gradient back-propagation (see our paper) to compute the gradients.
+# It requires caching intermediate states, but is often faster on CPU because it can use [`TropicalGEMM`](https://github.com/TensorBFS/TropicalGEMM.jl).
 max_config = solve(problem, SingleConfigMax(; bounded=false))[]
 
 # The return value contains a bit string, and one should read this bit string from left to right.
@@ -49,7 +56,9 @@ show_graph(graph; locs=locations, colors=[iszero(max_config.c.data[i]) ? "white"
                                  for i=1:nv(graph)])
 
 # ##### enumeration of all MISs
-all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]
+# There are two approaches to enumerate all best-K solutions.
+# The bounded (default) version is always prefered because it can significantly use the memory usage.
+all_max_configs = solve(problem, ConfigsMax(1; bounded=true))[]
 
 using Compose
 

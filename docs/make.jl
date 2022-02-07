@@ -1,6 +1,6 @@
 using Pkg
 using GraphTensorNetworks
-using GraphTensorNetworks: TropicalNumbers, Polynomials, Mods
+using GraphTensorNetworks: TropicalNumbers, Polynomials, Mods, OMEinsum, OMEinsumContractionOrders
 using Documenter
 using DocThemeIndigo
 using Literate
@@ -19,7 +19,7 @@ indigo = DocThemeIndigo.install(GraphTensorNetworks)
 DocMeta.setdocmeta!(GraphTensorNetworks, :DocTestSetup, :(using GraphTensorNetworks); recursive=true)
 
 makedocs(;
-    modules=[GraphTensorNetworks, TropicalNumbers, Polynomials, Mods],
+    modules=[GraphTensorNetworks, TropicalNumbers, Polynomials, Mods, OMEinsum, OMEinsumContractionOrders],
     authors="Jinguo Liu",
     repo="https://github.com/Happy-Diode/GraphTensorNetworks.jl/blob/{commit}{path}#{line}",
     sitename="GraphTensorNetworks.jl",

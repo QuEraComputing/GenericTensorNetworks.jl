@@ -18,11 +18,13 @@ Polynomials = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
 Primes = "27ebfcd6-29c5-5fa9-bf4b-fb8fc14df3ae"
 Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 SIMDTypes = "94e857df-77ce-4151-89e5-788b33177be4"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 TropicalNumbers = "b3a74e9c-7526-4576-a4eb-79c0d4c32334"
 Viznet = "52a3aca4-6234-47fd-b74a-806bdf78ede9"
 
 [compat]
 CUDA = "3.5"
+Cairo = "1.0"
 Compose = "0.9"
 FFTW = "1.4"
 Graphs = "1.4"
@@ -35,7 +37,7 @@ Requires = "1"
 SIMDTypes = "0.1"
 TropicalNumbers = "0.4, 0.5"
 Viznet = "0.3"
-Cairo = "1.0"
+StatsBase = "0.33"
 julia = "1"
 
 [extras]

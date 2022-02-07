@@ -14,26 +14,46 @@ In the constructor, `weights` are the weights of vertices.
 `openvertices` specifies labels for the output tensor.
 `optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
 
+Problem definition
+---------------------------
 An independent set is defined in the [monadic second order logic](https://digitalcommons.oberlin.edu/cgi/viewcontent.cgi?article=1678&context=honors) as
 ```math
 \\exists x_i,\\ldots,x_M\\left[\\bigwedge_{i\\neq j} (x_i\\neq x_j \\wedge \\neg \\textbf{adj}(x_i, x_j))\\right]
 ```
 
-In tensor network representation, we define a vertex tensors on vertex `i` (labeled by ``s_i``) as
+Graph polynomial
+---------------------------
+The graph polynomial defined for the independence problem is known as the independence polynomial.
+```math
+I(G, x) = \\sum_{k=0}^{\\alpha(G)} a_k x^k,
+```
+where ``\\alpha(G)`` is the maximum independent set size, 
+``a_k`` is the number of independent sets of size ``k`` in graph ``G=(V,E)``.
+The total number of independent sets is thus equal to ``I(G, 1)``.
+
+Tensor network
+---------------------------
+In tensor network representation of the independent set problem,
+we map a vertex ``i\\in V`` to a label ``s_i \\in \\{0, 1\\}`` of dimension 2,
+where we use 0 (1) to denote a vertex is absent (present) in the set.
+For each label ``s_i``, we defined a parametrized rank-one vertex tensor ``W(x_i)`` as
 ```math
 W(x_i)_{s_i} = \\left(\\begin{matrix}
     1 \\\\
     x_i
 \\end{matrix}\\right)_{s_i}
 ```
-
-and a bond tensor on edge `(i, j)` as
+We use subscripts to index tensor elements, e.g.``W(x_i)_0=1`` is the first element associated
+with ``s_i=0`` and ``W(x_i)_1=x_i`` is the second element associated with ``s_i=1``.
+Similarly, on each edge ``(u, v)``, we define a matrix ``B`` indexed by ``s_u`` and ``s_v`` as
 ```math
 B_{s_i s_j} = \\left(\\begin{matrix}
     1  & 1\\\\
     1 & 0
 \\end{matrix}\\right)_{s_is_j}
 ```
+
+Its contraction time space complexity is ``2^{{\\rm tw}(G)}``, where ``{\\rm tw}`` is the [tree-width](https://en.wikipedia.org/wiki/Treewidth) of ``G``.
 """
 struct Independence{CT<:EinTypes,WT<:Union{UnWeighted, Vector}} <: GraphProblem
     code::CT
@@ -53,8 +73,40 @@ end
     MaxCut(graph; weights=UnWeighted(), openvertices=(),
                 optimizer=GreedyMethod(), simplifier=nothing)
 
-Max cut problem (or spin glass problem). In the constructor, `weights` are the weights of edges.
+[Cut](https://en.wikipedia.org/wiki/Maximum_cut) problem (or spin glass problem).
+In the constructor, `weights` are the weights of edges.
 `optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
+
+Problem definition
+---------------------------
+In graph theory, a cut is a partition of the vertices of a graph into two disjoint subsets.
+A maximum cut is a cut whose size is at least the size of any other cut,
+where the size of a cut is the number of edges (or the sum of weights on edges) crossing the cut.
+
+Graph polynomial
+---------------------------
+The graph polynomial defined for the cut problem is
+```math
+C(G, x) = \\sum_{k=0}^{\\gamma(G)} c_k x^k,
+```
+where ``\\alpha(G)`` is the maximum independent set size, 
+``c_k/2`` is the number of cuts of size ``k`` in graph ``G=(V,E)``.
+
+Tensor network
+---------------------------
+For a vertex ``v\\in V``, we define a boolean degree of freedom ``s_v\\in\\{0, 1\\}``.
+Then the maximum cut problem can be encoded to tensor networks by mapping an edge ``(i,j)\\in E`` to an edge matrix labelled by ``s_is_j``
+```math
+B(x_{\\langle i, j\\rangle}) = \\left(\\begin{matrix}
+    1 & x_{\\langle i, j\\rangle}\\\\
+    x_{\\langle i, j\\rangle} & 1
+\\end{matrix}\\right),
+```
+where variable ``x_{\\langle i, j\\rangle}`` represents a cut on edge ``(i, j)`` or a domain wall of an Ising spin glass.
+Similar to other problems, we can define a polynomial about edges variables by setting ``x_{\\langle i, j\\rangle} = x``,
+where its k-th coefficient is two times the number of configurations of cut size k.
+
+Its contraction time space complexity is ``2^{{\\rm tw}(G)}``, where ``{\\rm tw}`` is the [tree-width](https://en.wikipedia.org/wiki/Treewidth) of ``G``.
 """
 struct MaxCut{CT<:EinTypes,WT<:Union{UnWeighted, Vector}} <: GraphProblem
     code::CT
@@ -71,8 +123,37 @@ end
     MaximalIndependence(graph; weights=UnWeighted(), openvertices=(),
                  optimizer=GreedyMethod(), simplifier=nothing)
 
-Maximal independent set problem. In the constructor, `weights` are the weights of vertices.
+[Maximal independent set](https://en.wikipedia.org/wiki/Maximal_independent_set) problem. In the constructor, `weights` are the weights of vertices.
 `optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
+
+Problem definition
+---------------------------
+In graph theory, a maximal independent set is an independent set that is not a subset of any other independent set.
+It is different from maximum independent set because it does not require the set to have the max size.
+
+Graph polynomial
+---------------------------
+The graph polynomial defined for the maximal independent set problem is
+```math
+I_{\\rm max}(G, x) = \\sum_{k=0}^{\\alpha(G)} b_k x^k,
+```
+where ``b_k`` is the number of maximal independent sets of size ``k`` in graph ``G=(V, E)``.
+
+Tensor network
+---------------------------
+For a vertex ``v\\in V``, we define a boolean degree of freedom ``s_v\\in\\{0, 1\\}``.
+We defined the restriction on its neighbourhood ``N[v]``:
+```math
+T(x_v)_{s_1,s_2,\\ldots,s_{|N(v)|},s_v} = \\begin{cases}
+    s_vx_v & s_1=s_2=\\ldots=s_{|N(v)|}=0,\\\\
+    1-s_v& \\text{otherwise}.\\
+\\end{cases}
+```
+Intuitively, it means if all the neighbourhood vertices are not in ``I_{m}``, i.e., ``s_1=s_2=\\ldots=s_{|N(v)|}=0``, then ``v`` should be in ``I_{m}`` and contribute a factor ``x_{v}``,
+otherwise, if any of the neighbourhood vertices is in ``I_{m}``, then ``v`` cannot be in ``I_{m}``.
+
+Its contraction time space complexity is no longer determined by the tree-width of the original graph ``G``.
+It is often harder to contract this tensor network than to contract the one for regular independent set problem.
 """
 struct MaximalIndependence{CT<:EinTypes,WT<:Union{UnWeighted, Vector}} <: GraphProblem
     code::CT

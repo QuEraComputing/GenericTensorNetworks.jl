@@ -1,26 +1,86 @@
-```@meta
-DocTestSetup = quote
-    import TropicalNumbers, Mods, Polynomials
-end
-```
 # References
-
-```@autodocs
-Modules = [GraphTensorNetworks]
+## Graph problems
+```@docs
+solve
+Independence
+MaximalIndependence
+Matching
+Coloring
+MaxCut
+PaintShop
 ```
 
+```@docs
+set_packing
+```
+
+## Properties
+```@docs
+SizeMax
+CountingAll
+CountingMax
+GraphPolynomial
+SingleConfigMax
+ConfigsAll
+ConfigsMax
+```
+
+## Element Algebras
 ```@docs
 TropicalNumbers.Tropical
-```
-
-```@docs
 TropicalNumbers.CountingTropical
-```
-
-```@docs
 Mods.Mod
+Polynomials.Polynomial
+TruncatedPoly
+Max2Poly
+ConfigEnumerator
+ConfigSampler
 ```
 
 ```@docs
-Polynomials.Polynomial
+StaticBitVector
+StaticElementVector
+save_configs
+load_configs
+@bv_str
+onehotv
+is_commutative_semiring
+```
+
+## Tensor Network
+```@docs
+optimize_code
+timespace_complexity
+@ein_str
+GreedyMethod
+TreeSA
+SABipartite
+KaHyParBipartite
+MergeVectors
+MergeGreedy
+```
+
+## Others
+#### Graph
+```@docs
+is_independent_set
+mis_compactify!
+show_graph
+
+diagonal_coupled_graph
+square_lattice_graph
+unitdisk_graph
+```
+
+One can also use `random_regular_graph` and `smallgraph` in [Graphs](https://github.com/JuliaGraphs/Graphs.jl) to build special graphs.
+
+#### Lower level APIs
+```@docs
+best_solutions
+best2_solutions
+solutions
+all_solutions
+graph_polynomial
+max_size
+max_size_count
 ```

@@ -58,7 +58,7 @@ time/space complexity is (7.965784284662086, 4.0)
 
 Here, the `problem` is a `Independence` instance, it contains the tensor network contraction tree for the target graph.
 Here, we choose the `TreeSA` optimizer to optimize the tensor network contraciton tree, it is a local search based algorithm, check [arXiv: 2108.05665](https://arxiv.org/abs/2108.05665). You will see some warnings, do not panic, this is because we set `sc_target` (target space complex) to 1 for agressive optimization of space complexity. Type `?TreeSA` in a Julia REPL for more information about the key word arguments.
-Similarly, one can select tensor network structures for solving other problems like `MaximalIndependence`, `MaxCut`, `Matching`, `Coloring{K}` and `set_packing`.
+Similarly, one can select tensor network structures for solving other problems like `MaximalIndependence`, `MaxCut`, `Matching`, `Coloring{K}`, `PaintShop` and `set_packing`.
 
 #### 1. find MIS size, count MISs and count ISs
 ```julia

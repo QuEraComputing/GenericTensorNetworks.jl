@@ -23,7 +23,7 @@ export bestk_solutions
 export contractx, contractf, graph_polynomial, max_size, max_size_count
 
 # Graphs
-export random_regular_graph, diagonal_coupled_graph, isindependentset
+export random_regular_graph, diagonal_coupled_graph, is_independent_set
 export square_lattice_graph, unitdisk_graph
 
 # Tensor Networks (Graph problems)
@@ -33,7 +33,6 @@ export Independence, MaximalIndependence, Matching, Coloring, optimize_code, set
 export solve, SizeMax, CountingAll, CountingMax, GraphPolynomial, SingleConfigMax, ConfigsAll, ConfigsMax
 
 # Utilities
-export is_independent_set
 export mis_compactify!
 export save_configs, load_configs
 

@@ -25,6 +25,10 @@ end
     include("interfaces.jl")
 end
 
+@testset "graphs" begin
+    include("graphs.jl")
+end
+
 @testset "visualize" begin
     include("visualize.jl")
 end

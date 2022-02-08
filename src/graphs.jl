@@ -9,13 +9,23 @@ Return true if `vertices` is an independent set of graph `g`.
 is_independent_set(g::SimpleGraph, v) = !any(e->v[e.src] == 1 && v[e.dst] == 1, edges(g))
 
 """
+    random_square_lattice_graph(m::Int, n::Int, ρ::Real)
+
+Create a random masked square lattice graph, with number of vertices fixed to ``\\lfloor mn\\rho \\rceil``.
+"""
+function random_square_lattice_graph(m::Int, n::Int, ρ::Real)
+    @assert ρ >=0 && ρ <= 1
+    square_lattice_graph(generate_mask(m, n, round(Int,m*n*ρ)))
+end
+
+"""
     square_lattice_graph(mask::AbstractMatrix{Bool})
 
 Create a masked square lattice graph.
 """
 function square_lattice_graph(mask::AbstractMatrix{Bool})
     locs = [(i, j) for i=1:size(mask, 1), j=1:size(mask, 2) if mask[i,j]]
-    unitdisk_graph(locs, 1.1)
+    unit_disk_graph(locs, 1.1)
 end
 
 """
@@ -40,15 +50,15 @@ Create a masked diagonal coupled square lattice graph from a specified `mask`.
 """
 function diagonal_coupled_graph(mask::AbstractMatrix{Bool})
     locs = [(i, j) for i=1:size(mask, 1), j=1:size(mask, 2) if mask[i,j]]
-    unitdisk_graph(locs, 1.5)
+    unit_disk_graph(locs, 1.5)
 end
 
 """
-    unitdisk_graph(locs::AbstractVector, unit::Real)
+    unit_disk_graph(locs::AbstractVector, unit::Real)
 
 Create a unit disk graph with locations specified by `locs` and unit distance `unit`.
 """
-function unitdisk_graph(locs::AbstractVector, unit::Real)
+function unit_disk_graph(locs::AbstractVector, unit::Real)
     n = length(locs)
     g = SimpleGraph(n)
     for i=1:n, j=i+1:n

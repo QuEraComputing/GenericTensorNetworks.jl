@@ -150,10 +150,6 @@ function Base.show(io::IO, ::MIME"text/plain", x::TruncatedPoly{K}) where K
     end
 end
 
-# patch for CUDA matmul
-Base.:*(a::Bool, y::TruncatedPoly{K,T,TO}) where {K,T,TO} = a ? y : zero(y)
-Base.:*(y::TruncatedPoly{K,T,TO}, a::Bool) where {K,T,TO} = a ? y : zero(y)
-
 """
     ConfigEnumerator{N,S,C}
 
@@ -276,3 +272,9 @@ onehotv(::Type{ConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigEn
 onehotv(::Type{ConfigSampler{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigSampler(onehotv(StaticElementVector{N,S,C}, i, v))
 Base.transpose(c::ConfigEnumerator) = c
 Base.copy(c::ConfigEnumerator) = ConfigEnumerator(copy(c.data))
+
+# Handle boolean, this is a patch for CUDA matmul
+for TYPE in [:ConfigEnumerator, :ConfigSampler, :TruncatedPoly]
+    @eval Base.:*(a::Bool, y::$TYPE) = a ? y : zero(y)
+    @eval Base.:*(y::$TYPE, a::Bool) = a ? y : zero(y)
+end

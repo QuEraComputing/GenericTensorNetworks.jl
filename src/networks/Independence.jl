@@ -10,10 +10,7 @@ In the constructor, `weights` are the weights of vertices.
 
 Problem definition
 ---------------------------
-An independent set is defined in the [monadic second order logic](https://digitalcommons.oberlin.edu/cgi/viewcontent.cgi?article=1678&context=honors) as
-```math
-\\exists x_i,\\ldots,x_M\\left[\\bigwedge_{i\\neq j} (x_i\\neq x_j \\wedge \\neg \\textbf{adj}(x_i, x_j))\\right]
-```
+In graph theory, an independent set is a set of vertices in a graph, no two of which are adjacent.
 
 Graph polynomial
 ---------------------------

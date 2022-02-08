@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Max-Cut Problem · GraphTensorNetworks.jl</title><script data-outdated-warner src="../../assets/warner.js"></script><link rel="canonical" href="https://Happy-Diode.github.io/GraphTensorNetworks.jl/tutorials/MaxCut/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><script src="../../../copy.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GraphTensorNetworks.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../IndependentSet/">Independent Set Problem</a></li><li class="is-active"><a class="tocitem" href>Max-Cut Problem</a><ul class="internal"><li><a class="tocitem" href="#Introduction"><span>Introduction</span></a></li><li><a class="tocitem" href="#Solving-properties"><span>Solving properties</span></a></li></ul></li><li><a class="tocitem" href="../Others/">Other Problems</a></li></ul></li><li><a class="tocitem" href="../../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Max-Cut Problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Max-Cut Problem</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Happy-Diode/GraphTensorNetworks.jl/blob/master/examples/MaxCut/main.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Cutting-problem-(Spin-glass-problem)"><a class="docs-heading-anchor" href="#Cutting-problem-(Spin-glass-problem)">Cutting problem (Spin-glass problem)</a><a id="Cutting-problem-(Spin-glass-problem)-1"></a><a class="docs-heading-anchor-permalink" href="#Cutting-problem-(Spin-glass-problem)" title="Permalink"></a></h1><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>This tutorial only covers the cutting problem specific features, It is recommended to read the <a href="../IndependentSet/#Independent-set-problem">Independent set problem</a> tutorial too to know more about</p><ul><li>how to optimize the tensor network contraction order,</li><li>what are the other graph properties computable,</li><li>how to select correct method to compute graph properties,</li><li>how to compute weighted graphs and handle open vertices.</li></ul></div></div><h2 id="Introduction"><a class="docs-heading-anchor" href="#Introduction">Introduction</a><a id="Introduction-1"></a><a class="docs-heading-anchor-permalink" href="#Introduction" title="Permalink"></a></h2><pre><code class="language-julia hljs">using GraphTensorNetworks, Graphs</code></pre><p>Please check the docstring of <a href="../../ref/#GraphTensorNetworks.MaxCut"><code>MaxCut</code></a> for the definition of the vertex cutting problem.</p><pre><code class="language-julia hljs">@doc MaxCut</code></pre><div class="markdown"><pre><code class="language-julia">MaxCut&#123;CT&lt;:AbstractEinsum,WT&lt;:Union&#123;UnWeighted, Vector&#125;&#125; &lt;: GraphProblem
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Cutting problem · GraphTensorNetworks.jl</title><script data-outdated-warner src="../../assets/warner.js"></script><link rel="canonical" href="https://Happy-Diode.github.io/GraphTensorNetworks.jl/tutorials/MaxCut/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><script src="../../../copy.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GraphTensorNetworks.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../Independence/">Independent set problem</a></li><li><a class="tocitem" href="../MaximalIndependence/">Maximal independent set problem</a></li><li class="is-active"><a class="tocitem" href>Cutting problem</a><ul class="internal"><li><a class="tocitem" href="#Introduction"><span>Introduction</span></a></li><li><a class="tocitem" href="#Solving-properties"><span>Solving properties</span></a></li></ul></li><li><a class="tocitem" href="../Coloring/">Matching problem</a></li><li><a class="tocitem" href="../PaintShop/">Binary paint shop problem</a></li><li><a class="tocitem" href="../Coloring/">Coloring problem</a></li><li><a class="tocitem" href="../Others/">Other problems</a></li></ul></li><li><a class="tocitem" href="../../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Cutting problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Cutting problem</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Happy-Diode/GraphTensorNetworks.jl/blob/master/examples/MaxCut/main.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Cutting-problem-(Spin-glass-problem)"><a class="docs-heading-anchor" href="#Cutting-problem-(Spin-glass-problem)">Cutting problem (Spin-glass problem)</a><a id="Cutting-problem-(Spin-glass-problem)-1"></a><a class="docs-heading-anchor-permalink" href="#Cutting-problem-(Spin-glass-problem)" title="Permalink"></a></h1><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>This tutorial only covers the cutting problem specific features, It is recommended to read the <a href="../Independence/#Independent-set-problem">Independent set problem</a> tutorial too to know more about</p><ul><li>how to optimize the tensor network contraction order,</li><li>what are the other graph properties computable,</li><li>how to select correct method to compute graph properties,</li><li>how to compute weighted graphs and handle open vertices.</li></ul></div></div><h2 id="Introduction"><a class="docs-heading-anchor" href="#Introduction">Introduction</a><a id="Introduction-1"></a><a class="docs-heading-anchor-permalink" href="#Introduction" title="Permalink"></a></h2><pre><code class="language-julia hljs">using GraphTensorNetworks, Graphs</code></pre><p>Please check the docstring of <a href="../../ref/#GraphTensorNetworks.MaxCut"><code>MaxCut</code></a> for the definition of the vertex cutting problem.</p><pre><code class="language-julia hljs">@doc MaxCut</code></pre><div class="markdown"><pre><code class="language-julia">MaxCut&#123;CT&lt;:AbstractEinsum,WT&lt;:Union&#123;UnWeighted, Vector&#125;&#125; &lt;: GraphProblem
 MaxCut&#40;graph; weights&#61;UnWeighted&#40;&#41;, openvertices&#61;&#40;&#41;,
             optimizer&#61;GreedyMethod&#40;&#41;, simplifier&#61;nothing&#41;</code></pre>
 <p><a href="https://en.wikipedia.org/wiki/Maximum_cut">Cut</a> problem &#40;or spin glass problem&#41;. In the constructor, <code>weights</code> are the weights of edges. <code>optimizer</code> and <code>simplifier</code> are for tensor network optimization, check <code>optimize_code</code> for details.</p>
@@ -33,13 +33,13 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-2a008e94">
+     id="img-87ac3467">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-2a008e94-1">
+<g stroke-width="0.67" stroke="#000000" id="img-87ac3467-1">
   <g transform="translate(76.48,39.02)">
     <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
   </g>
@@ -86,7 +86,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-2a008e94-2">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-87ac3467-2">
   <g transform="translate(60,27.04)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
@@ -118,7 +118,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-2a008e94-3">
+<g fill="#000000" font-size="3.13" id="img-87ac3467-3">
   <g transform="translate(60,27.04)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -330,13 +330,13 @@ max_cut_size_verify = cut_size(graph, max_vertex_config)</code></pre><pre class=
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-2ad00a83">
+     id="img-7b41390f">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-2ad00a83-1">
+<g stroke-width="0.67" stroke="#000000" id="img-7b41390f-1">
   <g transform="translate(76.48,39.02)">
     <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
   </g>
@@ -383,57 +383,57 @@ max_cut_size_verify = cut_size(graph, max_vertex_config)</code></pre><pre class=
     <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-2ad00a83-2">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-7b41390f-2">
   <g transform="translate(40.23,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-2ad00a83-3">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-7b41390f-3">
   <g transform="translate(47.78,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-2ad00a83-4">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-7b41390f-4">
   <g transform="translate(72.22,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-2ad00a83-5">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-7b41390f-5">
   <g transform="translate(79.77,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-2ad00a83-6">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-7b41390f-6">
   <g transform="translate(60,40.9)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-2ad00a83-7">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-7b41390f-7">
   <g transform="translate(27.04,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-2ad00a83-8">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-7b41390f-8">
   <g transform="translate(39.63,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-2ad00a83-9">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-7b41390f-9">
   <g transform="translate(80.37,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-2ad00a83-10">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-7b41390f-10">
   <g transform="translate(92.96,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-2ad00a83-11">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-7b41390f-11">
   <g transform="translate(60,27.04)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-2ad00a83-12">
+<g fill="#000000" font-size="3.13" id="img-7b41390f-12">
   <g transform="translate(60,27.04)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -632,4 +632,4 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 
 ]]> </script>
 </svg>
-<hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../IndependentSet/">« Independent Set Problem</a><a class="docs-footer-nextpage" href="../Others/">Other Problems »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.12 on <span class="colophon-date" title="Tuesday 8 February 2022 09:26">Tuesday 8 February 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../MaximalIndependence/">« Maximal independent set problem</a><a class="docs-footer-nextpage" href="../Coloring/">Matching problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.12 on <span class="colophon-date" title="Tuesday 8 February 2022 09:49">Tuesday 8 February 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

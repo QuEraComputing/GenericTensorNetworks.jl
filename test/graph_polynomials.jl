@@ -77,7 +77,6 @@ end
 end
 
 @testset "paint shop" begin
-    Random.seed!(5)
     labels = collect("abaccb")
     pb = PaintShop(labels)
     @test solve(pb, SizeMax())[] == Tropical(3.0)

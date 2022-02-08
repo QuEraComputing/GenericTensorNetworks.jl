@@ -143,9 +143,9 @@ Keyword arguments
 * `T` is the "base" element type, sometimes can be used to reduce the memory cost.
 """
 function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=false)
-    if !_support_weight(property) && _has_weight(gp)
-        throw(ArgumentError("weighted instance of type $(typeof(gp)) is not supported in computing $(property)"))
-    end
+    #if !_support_weight(property) && _has_weight(gp)
+        #throw(ArgumentError("weighted instance of type $(typeof(gp)) is not supported in computing $(property)"))
+    #end
     if property isa SizeMax
         syms = symbols(gp)
         vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])

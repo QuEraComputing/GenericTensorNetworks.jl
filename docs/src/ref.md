@@ -25,8 +25,8 @@ nflavor
 ```
 
 To subtype [`GraphProblem`](@ref), the new type must contain a `code` field to represent the (optimized) tensor network.
-Interfaces [`generate_tensors`](@ref), [`symbols`](@ref) and [`flavors`](@ref) are required.
-[`get_weights`] and [`nflavor`] are optimal.
+Interfaces [`generate_tensors`](@ref), [`symbols`](@ref), [`flavors`](@ref) and [`get_weights`] are required.
+[`nflavor`] is optimal.
 
 
 ## Properties

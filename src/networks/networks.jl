@@ -11,10 +11,10 @@ struct UnWeighted end
 """
     get_weights(problem::GraphProblem, sym)
 
-The weight for `sym` of the graph problem, where `sym` is a symbol.
-This interface is optional, the default weights are same as the flavors.
+The weights for the degree of freedom specified by `sym` of the graph problem, where `sym` is a symbol.
+In graph polynomial, integer weights are the orders of `x`.
 """
-get_weights(problem::GraphProblem, sym) = flavors(problem)
+function get_weights end
 
 """
     symbols(problem::GraphProblem)
@@ -69,12 +69,7 @@ julia> getixsv(gp.code)
  [8]
  [9]
  [10]
- [1, 2]
- [1, 5]
- [1, 6]
- [2, 3]
- [2, 7]
- [3, 4]
+ ⋮
  [3, 8]
  [4, 5]
  [4, 9]
@@ -86,8 +81,7 @@ julia> getixsv(gp.code)
  [8, 10]
 
 julia> gp.code(GraphTensorNetworks.generate_tensors(f, gp)...)
-
-0-dimensional Array{TropicalF64, 0}:
+0-dimensional Array{TropicalNumbers.TropicalF64, 0}:
 4.0ₜ
 ```
 """

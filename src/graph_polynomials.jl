@@ -97,5 +97,5 @@ end
 improved_counting(ys::Mod...) = Mods.CRT(ys...)
 
 for GP in [:Independence, :Matching, :MaxCut, :MaximalIndependence, :PaintShop]
-    @eval contractx(gp::$GP, x::T; usecuda=false) where T = contractf(_->[one(T), x], gp; usecuda=usecuda)
+    @eval contractx(gp::$GP, x::T; usecuda=false) where T = contractf(l->Ref(x) .^ get_weights(gp, l), gp; usecuda=usecuda)
 end

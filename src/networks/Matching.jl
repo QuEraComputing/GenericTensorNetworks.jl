@@ -51,6 +51,7 @@ function Matching(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), sim
 end
 
 flavors(::Type{<:Matching}) = [0, 1]
+get_weights(::Matching, sym) = [0, 1]
 symbols(m::Matching) = m.symbols
 
 function generate_tensors(fx, m::Matching)

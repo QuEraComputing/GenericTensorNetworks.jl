@@ -40,6 +40,7 @@ Coloring{K}(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifie
 
 flavors(::Type{<:Coloring{K}}) where K = collect(0:K-1)
 symbols(c::Coloring{K}) where K = [i for i=1:c.nv]
+get_weights(::Coloring{K}, sym) where K = ones(Int, K)
 
 # `fx` is a function defined on symbols, it returns a vector of elements, the size of vector is same as the number of flavors (or the bond dimension).
 function generate_tensors(fx, c::Coloring{K}) where K

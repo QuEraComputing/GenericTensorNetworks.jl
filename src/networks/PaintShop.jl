@@ -53,6 +53,7 @@ function PaintShop(labels::AbstractVector{T}; openvertices=(), optimizer=GreedyM
 end
 
 flavors(::Type{<:PaintShop}) = [0, 1]
+get_weights(::PaintShop, sym) = [0, 1]
 symbols(gp::PaintShop) = getixsv(gp.code)
 
 function generate_tensors(fx, c::PaintShop)

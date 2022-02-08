@@ -50,10 +50,45 @@ Example
 --------------------------
 The following code gives your the maximum independent set size
 ```jldoctest
-using Graph, GraphTensorNetworks
-problem = Independence(smallgraph(:petersen))
-f(x) = Tropical.([0, 1.0])
-gp.code(generate_tensors(f, gp)...)
+julia> using Graphs, GraphTensorNetworks
+
+julia> gp = Independence(smallgraph(:petersen));
+
+julia> f(x) = Tropical.([0, 1.0])
+f (generic function with 1 method)
+
+julia> getixsv(gp.code)
+25-element Vector{Vector{Int64}}:
+ [1]
+ [2]
+ [3]
+ [4]
+ [5]
+ [6]
+ [7]
+ [8]
+ [9]
+ [10]
+ [1, 2]
+ [1, 5]
+ [1, 6]
+ [2, 3]
+ [2, 7]
+ [3, 4]
+ [3, 8]
+ [4, 5]
+ [4, 9]
+ [5, 10]
+ [6, 8]
+ [6, 9]
+ [7, 9]
+ [7, 10]
+ [8, 10]
+
+julia> gp.code(GraphTensorNetworks.generate_tensors(f, gp)...)
+
+0-dimensional Array{TropicalF64, 0}:
+4.0ₜ
 ```
 """
 generate_tensors(::Type{GT}) where GT = length(flavors(GT))

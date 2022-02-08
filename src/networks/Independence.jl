@@ -115,6 +115,6 @@ julia> res = best_solutions(gp; all=true)[]
 function set_packing(sets; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
     n = length(sets)
     code = EinCode(vcat([[i] for i=1:n], [[i,j] for i=1:n,j=1:n if j>i && !isempty(sets[i] ∩ sets[j])]), collect(Int,openvertices))
-    Independence(_optimize_code(code, uniformsize(code, 2), optimizer, simplifier), weights)
+    Independence(_optimize_code(code, uniformsize(code, 2), optimizer, simplifier), n, weights)
 end
 

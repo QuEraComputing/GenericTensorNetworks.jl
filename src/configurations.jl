@@ -69,7 +69,7 @@ end
 """
     all_solutions(problem)
 
-Finding all solutions.
+Finding all solutions grouped by size.
 e.g. when the problem is `MaximalIndependence`, it computes all maximal independent sets, or the maximal cliques of it complement.
 """
 all_solutions(gp::GraphProblem) = solutions(gp, Polynomial{Float64,:x}, all=true, usecuda=false)
@@ -80,16 +80,14 @@ function fx_solutions(gp::GraphProblem, ::Type{BT}, all::Bool) where {K,BT}
     T = (all ? set_type : sampler_type)(BT, length(syms), nflavor(gp))
     vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
     return function (l)
-        @show _onehotv.(Ref(T), vertex_index[l], flavors(gp), get_weights(gp, l))
+        _onehotv.(Ref(T), vertex_index[l], flavors(gp), get_weights(gp, l))
     end
 end
 function _onehotv(::Type{Polynomial{BS,X}}, x, v, w) where {BS,X}
-    @assert isone(w) || iszero(w)
-    Polynomial{BS,X}([zero(BS), onehotv(BS, x, v)])
+    Polynomial{BS,X}([zero(BS), onehotv(BS, x, v)])^w
 end
 function _onehotv(::Type{TruncatedPoly{K,BS,OS}}, x, v, w) where {K,BS,OS}
-    @assert isone(w) || iszero(w)
-    TruncatedPoly{K,BS,OS}(ntuple(i->i<K ? zero(BS) : onehotv(BS, x, v), K),one(OS))
+    TruncatedPoly{K,BS,OS}(ntuple(i->i<K ? zero(BS) : onehotv(BS, x, v), K),one(OS))^w
 end
 function _onehotv(::Type{CountingTropical{TV,BS}}, x, v, w) where {TV,BS}
     CountingTropical{TV,BS}(TV(w), onehotv(BS, x, v))

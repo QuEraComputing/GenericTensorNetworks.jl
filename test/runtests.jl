@@ -25,6 +25,10 @@ end
     include("interfaces.jl")
 end
 
+@testset "visualize" begin
+    include("visualize.jl")
+end
+
 # --------------
 # doctests
 # --------------

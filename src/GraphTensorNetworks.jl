@@ -8,7 +8,7 @@ using OMEinsum: timespace_complexity, getixsv
 using Graphs
 
 # OMEinsum
-export timespace_complexity, timespacereadwrite_complexity, @ein_str
+export timespace_complexity, timespacereadwrite_complexity, @ein_str, getixsv, getiyv
 export GreedyMethod, TreeSA, SABipartite, KaHyParBipartite, MergeVectors, MergeGreedy
 
 # Algebras

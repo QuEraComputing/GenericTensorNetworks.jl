@@ -65,6 +65,8 @@ is_commutative_semiring
 ## Tensor Network
 ```@docs
 optimize_code
+getixsv
+getiyv
 timespace_complexity
 timespacereadwrite_complexity
 @ein_str

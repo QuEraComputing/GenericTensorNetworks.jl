@@ -45,8 +45,8 @@ symbols(c::Coloring{K}) where K = [i for i=1:c.nv]
 function generate_tensors(fx, c::Coloring{K}) where K
     ixs = getixsv(c.code)
     T = eltype(fx(ixs[1][1]))
-    return map(1:c.nv) do i
-        i <= nv ? coloringv(fx(ixs[i][1])) : coloringb(T, K)
+    return map(1:length(ixs)) do i
+        i <= c.nv ? coloringv(fx(ixs[i][1])) : coloringb(T, K)
     end
 end
 

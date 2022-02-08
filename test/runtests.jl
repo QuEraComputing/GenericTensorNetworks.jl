@@ -25,9 +25,11 @@ end
     include("interfaces.jl")
 end
 
+@testset "visualize" begin
+    include("visualize.jl")
+end
+
 # --------------
 # doctests
 # --------------
-@static if VERSION >= v"1.1.0"
-    doctest(GraphTensorNetworks)
-end
+doctest(GraphTensorNetworks)

@@ -8,7 +8,7 @@ using OMEinsum: timespace_complexity, getixsv
 using Graphs
 
 # OMEinsum
-export timespace_complexity, @ein_str
+export timespace_complexity, timespacereadwrite_complexity, @ein_str, getixsv, getiyv
 export GreedyMethod, TreeSA, SABipartite, KaHyParBipartite, MergeVectors, MergeGreedy
 
 # Algebras
@@ -27,7 +27,8 @@ export random_regular_graph, diagonal_coupled_graph, is_independent_set
 export square_lattice_graph, unitdisk_graph
 
 # Tensor Networks (Graph problems)
-export Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing, MaxCut, PaintShop, paintshop_from_pairs, UnWeighted
+export GraphProblem, Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing, MaxCut, PaintShop, paintshop_from_pairs, UnWeighted
+export flavors, symbols, nflavor, get_weights
 
 # Interfaces
 export solve, SizeMax, CountingAll, CountingMax, GraphPolynomial, SingleConfigMax, ConfigsAll, ConfigsMax
@@ -44,7 +45,7 @@ project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODUL
 include("utils.jl")
 include("bitvector.jl")
 include("arithematics.jl")
-include("networks.jl")
+include("networks/networks.jl")
 include("graph_polynomials.jl")
 include("configurations.jl")
 include("graphs.jl")

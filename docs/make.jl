@@ -35,7 +35,6 @@ makedocs(;
             "Max-Cut Problem" => "tutorials/MaxCut.md",
             "Other Problems" => "tutorials/Others.md",
         ],
-        "Method Selection Guide" => "methodselection.md",
         "References" => "ref.md",
     ],
     doctest=false,

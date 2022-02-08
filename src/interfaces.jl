@@ -1,5 +1,4 @@
 abstract type AbstractProperty end
-_support_weight(::AbstractProperty) = false
 
 """
     SizeMax <: AbstractProperty
@@ -12,7 +11,6 @@ The maximum independent set size.
 * BLAS (on CPU) and GPU are supported,
 """
 struct SizeMax <: AbstractProperty end
-_support_weight(::SizeMax) = true
 
 """
     CountingAll <: AbstractProperty
@@ -25,7 +23,6 @@ Counting the total number of sets. e.g. for [`Independence`](@ref) problem, it c
 * BLAS (GPU and CPU) and GPU are supported,
 """
 struct CountingAll <: AbstractProperty end
-_support_weight(::CountingAll) = true
 
 """
     CountingMax{K} <: AbstractProperty
@@ -41,7 +38,6 @@ it counts independent sets of size ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(
 struct CountingMax{K} <: AbstractProperty end
 CountingMax(K::Int=1) = CountingMax{K}()
 max_k(::CountingMax{K}) where K = K
-_support_weight(::CountingMax{1}) = true
 
 """
     GraphPolynomial{METHOD} <: AbstractProperty
@@ -87,7 +83,6 @@ Finding single best solution, e.g. for [`Independence`](@ref) problem, it is one
 """
 struct SingleConfigMax{BOUNDED} <:AbstractProperty end
 SingleConfigMax(; bounded::Bool=false) = SingleConfigMax{bounded}()
-_support_weight(::SingleConfigMax) = true
 
 """
     ConfigsAll <:AbstractProperty
@@ -99,7 +94,6 @@ Find all valid configurations, e.g. for [`Independence`](@ref) problem, it is fi
 * Weights do not take effect.
 """
 struct ConfigsAll <:AbstractProperty end
-_support_weight(::ConfigsAll) = true
 
 """
     ConfigsMax{K, BOUNDED} <:AbstractProperty
@@ -114,7 +108,6 @@ it is finding all independent sets of sizes ``\\alpha(G), \\alpha(G)-1, \\ldots,
 struct ConfigsMax{K, BOUNDED} <:AbstractProperty end
 ConfigsMax(K::Int=1; bounded::Bool=true) = ConfigsMax{K,bounded}()
 max_k(::ConfigsMax{K}) where K = K
-_support_weight(::ConfigsMax{1}) = true
 
 """
     solve(problem, property; usecuda=false, T=Float64)
@@ -143,19 +136,16 @@ Keyword arguments
 * `T` is the "base" element type, sometimes can be used to reduce the memory cost.
 """
 function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=false)
-    if !_support_weight(property) && _has_weight(gp)
-        throw(ArgumentError("weighted instance of type $(typeof(gp)) is not supported in computing $(property)"))
-    end
     if property isa SizeMax
         syms = symbols(gp)
         vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
-        return contractf(x->Tropical(T(get_weight(gp, vertex_index[x]))), gp; usecuda=usecuda)
+        return contractf(x->Tropical{T}.(get_weights(gp, vertex_index[x])), gp; usecuda=usecuda)
     elseif property isa CountingAll
         return contractx(gp, one(T); usecuda=usecuda)
     elseif property isa CountingMax{1}
         syms = symbols(gp)
         vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
-        return contractf(x->CountingTropical(T(get_weight(gp, vertex_index[x])), one(T)), gp; usecuda=usecuda)
+        return contractf(x->CountingTropical{T,T}.(get_weights(gp, vertex_index[x])), gp; usecuda=usecuda)
     elseif property isa CountingMax
         return contractx(gp, TruncatedPoly(ntuple(i->i == max_k(property) ? one(T) : zero(T), max_k(property)), one(T)); usecuda=usecuda)
     elseif property isa GraphPolynomial
@@ -178,7 +168,6 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
         error("unknown property $property.")
     end
 end
-_has_weight(gp::GraphProblem) = hasfield(typeof(gp), :weights) && gp.weights isa Vector # ugly but makes life easier
 
 """
     max_size(problem; usecuda=false)

@@ -48,7 +48,7 @@ end
 
 flavors(::Type{<:MaximalIndependence}) = [0, 1]
 symbols(gp::MaximalIndependence) = [i for i in 1:length(getixsv(gp.code))]
-get_weights(gp::MaximalIndependence, label) = [0, gp.weights isa UnWeighted ? 1 : gp.weights[findfirst(==(label), symbols(gp))]]
+get_weights(gp::MaximalIndependence, label) = [0, gp.weights[findfirst(==(label), symbols(gp))]]
 
 function generate_tensors(fx, mi::MaximalIndependence)
     ixs = getixsv(mi.code)

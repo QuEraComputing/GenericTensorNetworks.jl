@@ -67,15 +67,6 @@ end
     @test graph_polynomial(Matching(g), Val(:polynomial))[].coeffs == [6, 90, 145, 75, 15, 1][end:-1:1]
 end
 
-@testset "spinglass" begin
-    g = SimpleGraph(5)
-    for (i,j) in [(1,2),(2,3),(3,4),(4,1),(1,5),(2,4)]
-        add_edge!(g, i, j)
-    end
-    @test graph_polynomial(MaxCut(g), Val(:polynomial))[] == Polynomial([2,2,4,12,10,2])
-    @test graph_polynomial(MaxCut(g), Val(:finitefield))[] == Polynomial([2,2,4,12,10,2])
-end
-
 @testset "paint shop" begin
     labels = collect("abaccb")
     pb = PaintShop(labels)

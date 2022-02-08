@@ -8,6 +8,3 @@
 
 # ### Maximal clique problem
 # The maximal clique of graph ``G`` is a maximal clique of ``G``'s complement graph.
-
-# ### Spin-glass problem
-# It is another way of saying the Max-Cut problem.

@@ -44,7 +44,7 @@ locs = let
 end
 
 # ╔═╡ 9d0ba8b7-5a34-418d-97cf-863f376f8453
-graph = unitdisk_graph(locs, 0.23) # SimpleGraph
+graph = unit_disk_graph(locs, 0.23) # SimpleGraph
 
 # ╔═╡ 78ee8772-83e4-40fb-8151-0123370481d9
 vizconfig(graph; locs=locs, config=rand(Bool, 12), graphsize=8cm)

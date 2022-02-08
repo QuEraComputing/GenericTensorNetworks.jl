@@ -18,7 +18,7 @@ md"## High level interfaces"
 locs = [rand(2) for i=1:70];
 
 # ╔═╡ 1522938d-d60b-4133-8625-5a09615a7b26
-g = unitdisk_graph(locs, 0.2)
+g = unit_disk_graph(locs, 0.2)
 
 # ╔═╡ 05ac5610-4a1d-4433-ba0d-1d13fd8a6733
 vizconfig(g; locs=locs, unit=0.5)

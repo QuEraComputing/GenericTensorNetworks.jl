@@ -36,7 +36,25 @@ end
                     (CountingTropicalF64(5, 3), CountingTropicalF64(3, 9), CountingTropicalF64(-3, 2)),
                     (CountingTropical(5.0, ConfigSampler(StaticBitVector(rand(Bool, 10)))), CountingTropical(3.0, ConfigSampler(StaticBitVector(rand(Bool, 10)))), CountingTropical(-3.0, ConfigSampler(StaticBitVector(rand(Bool, 10))))),
                     (CountingTropical(5.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:3])), CountingTropical(3.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:4])), CountingTropical(-3.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:5]))),
+                    (ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:3]), ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:4]), ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:5])),
                     ]
         @test is_commutative_semiring(a, b, c)
+        @test false * a == zero(a)
+        @test true * a == a
+        @test a * false == zero(a)
+        @test a * true == a
     end
+    # the following tests are for Polynomial + ConfigEnumerator
+    a = ConfigEnumerator([StaticBitVector(trues(10)) for j=1:3])
+    @test 1 * a == a
+    @test 0 * a == zero(a)
+    @test a[1] == StaticBitVector(trues(10))
+    @test copy(a) == a
+    a = ConfigSampler(StaticBitVector(rand(Bool, 10)))
+    @test 1 * a == a
+    @test 0 * a == zero(a)
+
+    println(Max2Poly{Float64,Float64}(1, 1, 1))
+    @test abs(Mod{5}(2)) == Mod{5}(2)
+    @test Mod{5}(12) < Mod{5}(8)
 end

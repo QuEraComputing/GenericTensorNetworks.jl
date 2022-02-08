@@ -17,7 +17,7 @@ set_packing
 
 #### Graph Problem Interfaces
 ```@docs
-generate_tensors
+GraphTensorNetworks.generate_tensors
 symbols
 flavors
 get_weights
@@ -25,9 +25,17 @@ nflavor
 ```
 
 To subtype [`GraphProblem`](@ref), the new type must contain a `code` field to represent the (optimized) tensor network.
-Interfaces [`generate_tensors`](@ref), [`symbols`](@ref), [`flavors`](@ref) and [`get_weights`] are required.
+Interfaces [`GraphTensorNetworks.generate_tensors`](@ref), [`symbols`](@ref), [`flavors`](@ref) and [`get_weights`] are required.
 [`nflavor`] is optimal.
 
+#### Graph Problem Utilities
+```@docs
+is_independent_set
+mis_compactify!
+
+cut_size
+cut_assign
+```
 
 ## Properties
 ```@docs
@@ -81,13 +89,14 @@ MergeGreedy
 ## Others
 #### Graph
 ```@docs
-is_independent_set
-mis_compactify!
 show_graph
 
 diagonal_coupled_graph
 square_lattice_graph
-unitdisk_graph
+unit_disk_graph
+
+random_diagonal_coupled_graph
+random_square_lattice_graph
 ```
 
 One can also use `random_regular_graph` and `smallgraph` in [Graphs](https://github.com/JuliaGraphs/Graphs.jl) to build special graphs.

@@ -131,7 +131,8 @@ end
     @test res1 == Tropical(24.0)
     res2 = solve(gp, CountingMax(1))[]
     @test res2 == CountingTropical(24.0, 1.0)
-    @test_throws ArgumentError solve(gp, CountingMax(2))[]
+    res2b = solve(gp, CountingMax(2))[]
+    @test res2b == Max2Poly(1.0, 1.0, 24.0)
     res3 = solve(gp, SingleConfigMax(; bounded=false))[]
     res3b = solve(gp, SingleConfigMax(; bounded=true))[]
     @test res3 == res3b

@@ -4,7 +4,7 @@ using Graphs, Test
 @testset "independence problem" begin
     g = Graphs.smallgraph("petersen")
     for optimizer in (GreedyMethod(), TreeSA(ntrials=1))
-        gp = Independence(g; optimizer=optimizer)
+        gp = IndependentSet(g; optimizer=optimizer)
         res1 = solve(gp, SizeMax())[]
         res2 = solve(gp, CountingAll())[]
         res3 = solve(gp, CountingMax(1))[]
@@ -85,7 +85,7 @@ end
 
 @testset "slicing" begin
     g = Graphs.smallgraph("petersen")
-    gp = Independence(g; optimizer=TreeSA(nslices=5, ntrials=1))
+    gp = IndependentSet(g; optimizer=TreeSA(nslices=5, ntrials=1))
     res1 = solve(gp, SizeMax())[]
     res2 = solve(gp, CountingAll())[]
     res3 = solve(gp, CountingMax(1))[]
@@ -126,7 +126,7 @@ end
 
 @testset "Weighted" begin
     g = Graphs.smallgraph("petersen")
-    gp = Independence(g; weights=collect(1:10))
+    gp = IndependentSet(g; weights=collect(1:10))
     res1 = solve(gp, SizeMax())[]
     @test res1 == Tropical(24.0)
     res2 = solve(gp, CountingMax(1))[]

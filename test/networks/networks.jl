@@ -1,2 +1,2 @@
-include("Independence.jl")
+include("IndependentSet.jl")
 include("MaxCut.jl")

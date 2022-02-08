@@ -22,8 +22,8 @@ end
         y2 = bounding_contract(AllConfigs{1}(), code, xs, BitArray(ones(Bool,2,2,2)), xs)
         @test y1 ≈ y2
     end
-    rawcode = Independence(random_regular_graph(10, 3); optimizer=nothing).code
-    optcode = Independence(random_regular_graph(10, 3); optimizer=GreedyMethod()).code
+    rawcode = IndependentSet(random_regular_graph(10, 3); optimizer=nothing).code
+    optcode = IndependentSet(random_regular_graph(10, 3); optimizer=GreedyMethod()).code
     xs = map(OMEinsum.getixs(rawcode)) do ix
         length(ix)==1 ? GraphTensorNetworks.misv([one(TropicalF64), TropicalF64(1.0)]) : GraphTensorNetworks.misb(TropicalF64)
     end

@@ -31,9 +31,9 @@ makedocs(;
     pages=[
         "Home" => "index.md",
         "Tutorials" => [
-            "Independent set problem" => "tutorials/Independence.md",
-            "Maximal independent set problem" => "tutorials/MaximalIndependence.md",
-            "Cutting problem" => "tutorials/MaxCut.md",
+            "Independent set problem" => "tutorials/IndependentSet.md",
+            "Maximal independent set problem" => "tutorials/MaximalIndependentSet.md",
+            "Cut problem" => "tutorials/MaxCut.md",
             "Matching problem" => "tutorials/Coloring.md",
             "Binary paint shop problem" => "tutorials/PaintShop.md",
             "Coloring problem" => "tutorials/Coloring.md",

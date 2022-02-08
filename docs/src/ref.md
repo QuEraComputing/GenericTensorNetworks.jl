@@ -3,8 +3,8 @@
 ```@docs
 solve
 GraphProblem
-Independence
-MaximalIndependence
+IndependentSet
+MaximalIndependentSet
 Matching
 Coloring
 MaxCut

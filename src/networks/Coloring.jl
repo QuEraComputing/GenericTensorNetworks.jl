@@ -36,7 +36,12 @@ struct Coloring{K,CT<:AbstractEinsum} <: GraphProblem
 end
 Coloring{K}(code::ET, nv::Int) where {K,ET<:AbstractEinsum} = Coloring{K,ET}(code, nv)
 # same network layout as independent set.
-Coloring{K}(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing) where K = Coloring{K}(Independence(g; openvertices=openvertices, optimizer=optimizer, simplifier=simplifier).code, nv(g))
+function Coloring{K}(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing) where K
+    rawcode = EinCode(([[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
+                       [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...), collect(Int, openvertices))  # labels for edge tensors
+    code = _optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier)
+    Coloring{K}(code, nv(g))
+end
 
 flavors(::Type{<:Coloring{K}}) where K = collect(0:K-1)
 symbols(c::Coloring{K}) where K = [i for i=1:c.nv]

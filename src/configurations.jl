@@ -70,7 +70,7 @@ end
     all_solutions(problem)
 
 Finding all solutions grouped by size.
-e.g. when the problem is `MaximalIndependence`, it computes all maximal independent sets, or the maximal cliques of it complement.
+e.g. when the problem is `MaximalIndependentSet`, it computes all maximal independent sets, or the maximal cliques of it complement.
 """
 all_solutions(gp::GraphProblem) = solutions(gp, Polynomial{Float64,:x}, all=true, usecuda=false)
 

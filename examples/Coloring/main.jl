@@ -11,7 +11,7 @@
 # ## Introduction
 using GraphTensorNetworks, Graphs
 
-# Please check the docstring of [`Coloring`](@ref) for the definition of the vertex cutting problem.
+# Please check the docstring of [`Coloring`](@ref) for the definition of the coloring problem.
 @doc Coloring
 
 # In the following, we are going to defined a 3-coloring problem for the Petersen graph.

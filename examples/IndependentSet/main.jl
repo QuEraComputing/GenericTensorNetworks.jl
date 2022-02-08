@@ -86,6 +86,17 @@ Compose.set_default_graphic_size(18cm, 4cm); Compose.compose(context(), imgs...)
 # ##### enumeration of all IS configurations
 all_independent_sets = solve(problem, ConfigsAll())[]
 
+# To save/read a set of configuration to disk, one can type the following
+filename = tempname()
+
+save_configs(filename, all_independent_sets; format=:binary)
+
+loaded_sets = load_configs(filename; format=:binary, bitlength=10)
+
+# !!! note
+#     When loading data, one needs to provide the `bitlength` if the data is saved in binary format.
+#     Because the bitstring length is not stored.
+
 # ## Weights and open vertices
 # [`Independence`] accepts weights as a key word argument.
 # The following code computes the weighted MIS problem.

@@ -4,7 +4,7 @@
 #     This tutorial only covers the cutting problem specific features,
 #     It is recommended to read the [Independent set problem](@ref) tutorial too to know more about
 #     * how to optimize the tensor network contraction order,
-#     * how to compute other graph properties,
+#     * what are the other graph properties computable,
 #     * how to select correct method to compute graph properties,
 #     * how to compute weighted graphs and handle open vertices.
 
@@ -40,13 +40,15 @@ max_cut_size = solve(problem, SizeMax())[]
 max_config = solve(problem, GraphPolynomial())[]
 
 # ### Configuration properties
-# ##### finding one maximum independent set (MIS)
+# ##### finding one max cut solution
 max_edge_config = solve(problem, SingleConfigMax())[]
 
 # These configurations are defined on edges, we need to find a valid assignment on vertices
-max_vertex_config = maxcut_assign(graph, max_edge_config.c.data)
+max_vertex_config = cut_assign(graph, max_edge_config.c.data)
 
-max_cut_size_verify = cutsize(graph, max_vertex_config)
+max_cut_size_verify = cut_size(graph, max_vertex_config)
+
+# You should see a consistent result as above `max_cut_size`.
 
 show_graph(graph; locs=locations, colors=[
         iszero(max_vertex_config[i]) ? "white" : "red" for i=1:nv(graph)])

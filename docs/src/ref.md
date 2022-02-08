@@ -28,6 +28,14 @@ To subtype [`GraphProblem`](@ref), the new type must contain a `code` field to r
 Interfaces [`GraphTensorNetworks.generate_tensors`](@ref), [`symbols`](@ref), [`flavors`](@ref) and [`get_weights`] are required.
 [`nflavor`] is optimal.
 
+#### Graph Problem Utilities
+```@docs
+is_independent_set
+mis_compactify!
+
+cut_size
+cut_assign
+```
 
 ## Properties
 ```@docs
@@ -81,8 +89,6 @@ MergeGreedy
 ## Others
 #### Graph
 ```@docs
-is_independent_set
-mis_compactify!
 show_graph
 
 diagonal_coupled_graph

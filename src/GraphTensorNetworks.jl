@@ -29,12 +29,12 @@ export square_lattice_graph, unit_disk_graph, random_diagonal_coupled_graph, ran
 # Tensor Networks (Graph problems)
 export GraphProblem, Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing, MaxCut, PaintShop, paintshop_from_pairs, UnWeighted
 export flavors, symbols, nflavor, get_weights
+export mis_compactify!, cut_assign, cut_size
 
 # Interfaces
 export solve, SizeMax, CountingAll, CountingMax, GraphPolynomial, SingleConfigMax, ConfigsAll, ConfigsMax
 
 # Utilities
-export mis_compactify!
 export save_configs, load_configs
 
 # Visualization

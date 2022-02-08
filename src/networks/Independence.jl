@@ -62,7 +62,7 @@ end
 
 flavors(::Type{<:Independence}) = [0, 1]
 symbols(gp::Independence) = [i for i in 1:gp.nv]
-get_weights(gp::Independence, label) = [0, gp.weights isa UnWeighted ? 1 : gp.weights[findfirst(==(label), symbols(gp))]]
+get_weights(gp::Independence, label) = [0, gp.weights[findfirst(==(label), symbols(gp))]]
 
 # generate tensors
 function generate_tensors(fx, gp::Independence)
@@ -115,3 +115,28 @@ function set_packing(sets; weights=UnWeighted(), openvertices=(), optimizer=Gree
     Independence(_optimize_code(code, uniformsize(code, 2), optimizer, simplifier), n, weights)
 end
 
+"""
+    mis_compactify!(tropicaltensor)
+
+Compactify tropical tensor for maximum independent set problem. It will eliminate
+some entries by setting them to zero, by the criteria that even these entries are removed, the MIS size is not changed.
+"""
+function mis_compactify!(a::AbstractArray{T}) where T <: TropicalTypes
+	for (ind_a, val_a) in enumerate(a)
+		for (ind_b, val_b) in enumerate(a)
+			bs_a = ind_a - 1
+			bs_b = ind_b - 1
+			@inbounds if bs_a != bs_b && val_a <= val_b && (bs_b & bs_a) == bs_b
+				a[ind_a] = zero(T)
+			end
+		end
+	end
+	return a
+end
+
+"""
+    is_independent_set(g::SimpleGraph, vertices)
+
+Return true if `vertices` is an independent set of graph `g`.
+"""
+is_independent_set(g::SimpleGraph, v) = !any(e->v[e.src] == 1 && v[e.dst] == 1, edges(g))

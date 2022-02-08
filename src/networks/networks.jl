@@ -6,6 +6,8 @@ The abstract base type of graph problems.
 abstract type GraphProblem end
 
 struct UnWeighted end
+Base.getindex(::UnWeighted, i) = 1
+Base.eltype(::UnWeighted) = Int
 
 ######## Interfaces for graph problems ##########
 """

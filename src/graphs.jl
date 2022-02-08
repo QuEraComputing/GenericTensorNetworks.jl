@@ -2,13 +2,6 @@ using Graphs, OMEinsumContractionOrders
 import StatsBase
 
 """
-    is_independent_set(g::SimpleGraph, vertices)
-
-Return true if `vertices` is an independent set of graph `g`.
-"""
-is_independent_set(g::SimpleGraph, v) = !any(e->v[e.src] == 1 && v[e.dst] == 1, edges(g))
-
-"""
     random_square_lattice_graph(m::Int, n::Int, ρ::Real)
 
 Create a random masked square lattice graph, with number of vertices fixed to ``\\lfloor mn\\rho \\rceil``.

@@ -9,7 +9,7 @@
 #     * how to compute weighted graphs and handle open vertices.
 
 # ## Problem definition
-using GraphTensorNetworks, Graphs
+using GraphTensorNetworks, Graphs, Compose
 
 # In graph theory, a [maximal independent set](https://en.wikipedia.org/wiki/Maximal_independent_set) is an independent set that is not a subset of any other independent set.
 # It is different from maximum independent set because it does not require the set to have the max size.

@@ -87,14 +87,14 @@ paint_polynomial = solve(problem, GraphPolynomial())[]
 # ##### finding best solutions
 best_configs = solve(problem, ConfigsMax())[]
 
-painting1 = paint_shop_coloring_from_config(best_config.c.data[1]; initial=false)
+painting1 = paint_shop_coloring_from_config(best_configs.c.data[1]; initial=false)
 
 show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=[sequence[e.src] == sequence[e.dst] ? "blue" : "black" for e in edges(graph)],
                 vertex_colors=[isone(c) ? "red" : "black" for c in painting1], vertex_text_color="white")
 
 #
 
-painting2 = paint_shop_coloring_from_config(best_config.c.data[2]; initial=false)
+painting2 = paint_shop_coloring_from_config(best_configs.c.data[2]; initial=false)
 
 show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=[sequence[e.src] == sequence[e.dst] ? "blue" : "black" for e in edges(graph)],
                 vertex_colors=[isone(c) ? "red" : "black" for c in painting2], vertex_text_color="white")

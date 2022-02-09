@@ -129,7 +129,7 @@ problem = IndependentSet(graph; weights=collect(1:10))
 
 max_config_weighted = solve(problem, SingleConfigMax())[]
 
-show_graph(graph; locs=locations, colors=
+show_graph(graph; locs=locations, vertex_colors=
           [iszero(max_config_weighted.c.data[i]) ? "white" : "red" for i=1:nv(graph)])
 
 # The following code computes the MIS tropical tensor (reference to be added) with open vertices 1 and 2.

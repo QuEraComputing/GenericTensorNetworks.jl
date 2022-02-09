@@ -83,7 +83,7 @@ julia> getixsv(gp.code)
  [8, 10]
 
 julia> gp.code(GraphTensorNetworks.generate_tensors(f, gp)...)
-0-dimensional Array{TropicalNumbers.TropicalF64, 0}:
+0-dimensional Array{TropicalF64, 0}:
 4.0ₜ
 ```
 """

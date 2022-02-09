@@ -54,7 +54,7 @@ end
 
 flavors(::Type{<:PaintShop}) = [0, 1]
 get_weights(::PaintShop, sym) = [0, 1]
-symbols(gp::PaintShop) = getixsv(gp.code)
+symbols(gp::PaintShop) = getixsv(gp.code)  # !!! may not be unique
 
 function generate_tensors(fx, c::PaintShop)
     ixs = getixsv(c.code)
@@ -83,7 +83,7 @@ function num_paint_shop_color_switch(labels::AbstractVector, coloring::AbstractV
         @assert length(locs) == 2
         c1, c2 = coloring[locs]
         @show c1, c2
-        @assert c1 != c2
+        #@assert c1 != c2
     end
     # counting color switch
     return count(i->coloring[i] != coloring[i+1], 1:length(coloring)-1)
@@ -101,4 +101,13 @@ function paint_shop_coloring_from_config(config)
         res[i] = res[i-1] ⊻ (1-config[i-1])
     end
     return res
+end
+
+function fx_solutions(gp::PaintShop, ::Type{BT}, all::Bool) where {BT}
+    syms = symbols(gp)
+    T = (all ? set_type : sampler_type)(BT, length(syms), nflavor(gp))
+    counter = Ref(0)
+    return function (l)
+        _onehotv.(Ref(T), (counter[]+=1; counter[]), flavors(gp), get_weights(gp, l))
+    end
 end

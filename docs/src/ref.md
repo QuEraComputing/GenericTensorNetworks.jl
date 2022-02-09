@@ -100,7 +100,6 @@ spring_layout
 diagonal_coupled_graph
 square_lattice_graph
 unit_disk_graph
-path_graph
 line_graph
 
 random_diagonal_coupled_graph

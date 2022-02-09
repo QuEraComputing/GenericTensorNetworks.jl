@@ -71,5 +71,5 @@ max_cut_size_verify = cut_size(graph, max_vertex_config)
 
 # You should see a consistent result as above `max_cut_size`.
 
-show_graph(graph; locs=locations, colors=[
+show_graph(graph; locs=locations, vertex_colors=[
         iszero(max_vertex_config[i]) ? "white" : "red" for i=1:nv(graph)])

@@ -63,19 +63,6 @@ function unit_disk_graph(locs::AbstractVector, unit::Real)
 end
 
 """
-    path_graph(n::Int)
-
-Returns a path graph with `n` vertices.
-"""
-function path_graph(n::Int)
-    g = SimpleGraph(n)
-    for i=1:n-1
-        add_edge!(g, i, i+1)
-    end
-    return g
-end
-
-"""
     line_graph(g::SimpleGraph)
 
 Returns the line graph of `g`.

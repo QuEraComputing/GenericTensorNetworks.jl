@@ -24,7 +24,7 @@ g = unit_disk_graph(locs, 0.2)
 vizconfig(g; locs=locs, unit=0.5)
 
 # ╔═╡ b6e916e2-7d43-4085-a3c8-5c57069e8384
-gp = Independence(g, optimizer=TreeSA());
+gp = IndependentSet(g, optimizer=TreeSA());
 
 # ╔═╡ 1a58dea3-14fa-4be7-b087-45ed9bad2407
 gp

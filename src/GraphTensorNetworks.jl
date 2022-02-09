@@ -27,7 +27,7 @@ export random_regular_graph, diagonal_coupled_graph, is_independent_set
 export square_lattice_graph, unit_disk_graph, random_diagonal_coupled_graph, random_square_lattice_graph
 
 # Tensor Networks (Graph problems)
-export GraphProblem, Independence, MaximalIndependence, Matching, Coloring, optimize_code, set_packing, MaxCut, PaintShop, paintshop_from_pairs, UnWeighted
+export GraphProblem, IndependentSet, MaximalIS, Matching, Coloring, optimize_code, set_packing, MaxCut, PaintShop, paintshop_from_pairs, UnWeighted
 export flavors, symbols, nflavor, get_weights
 export mis_compactify!, cut_assign, cut_size
 
@@ -52,6 +52,7 @@ include("graphs.jl")
 include("bounding.jl")
 include("visualize.jl")
 include("interfaces.jl")
+include("deprecate.jl")
 
 using Requires
 function __init__()

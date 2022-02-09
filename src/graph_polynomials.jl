@@ -9,8 +9,8 @@ using Graphs
 Computing the graph polynomial for specific problem.
 
 * `problem` can be one of the following instances,
-    * `Independence` for the independence polynomial,
-    * `MaximalIndependence` for the maximal independence polynomial,
+    * `IndependentSet` for the independence polynomial,
+    * `MaximalIS` for the maximal independence polynomial,
     * `Matching` for the matching polynomial,
 
 * `method` can be one of the following inputs,
@@ -96,6 +96,6 @@ function improved_counting(ys::AbstractArray...)
 end
 improved_counting(ys::Mod...) = Mods.CRT(ys...)
 
-for GP in [:Independence, :Matching, :MaxCut, :MaximalIndependence, :PaintShop]
+for GP in [:IndependentSet, :Matching, :MaxCut, :MaximalIS, :PaintShop]
     @eval contractx(gp::$GP, x::T; usecuda=false) where T = contractf(l->Ref(x) .^ get_weights(gp, l), gp; usecuda=usecuda)
 end

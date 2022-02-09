@@ -31,8 +31,8 @@ using GraphTensorNetworks: _onehotv, sampler_type, set_type
 end
 
 @testset "enumerating" begin
-    rawcode = Independence(random_regular_graph(10, 3); optimizer=nothing)
-    optcode = Independence(optimize_code(rawcode.code, uniformsize(rawcode.code, 2), GreedyMethod()), 10, UnWeighted())
+    rawcode = IndependentSet(random_regular_graph(10, 3); optimizer=nothing)
+    optcode = IndependentSet(optimize_code(rawcode.code, uniformsize(rawcode.code, 2), GreedyMethod()), 10, UnWeighted())
     for code in [rawcode, optcode]
         res0 = max_size(code)
         _, res1 = max_size_count(code)

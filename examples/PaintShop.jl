@@ -8,12 +8,11 @@
 #     * how to select correct method to compute graph properties,
 #     * how to compute weighted graphs and handle open vertices.
 
-# ## Introduction
-using GraphTensorNetworks, Graphs
-
-# Please check the docstring of [`PaintShop`](@ref) for the definition of the binary paint shop problem.
-@doc PaintShop
+# ## Problme Definition
+# The [binary paint shop problem](http://m-hikari.com/ams/ams-2012/ams-93-96-2012/popovAMS93-96-2012-2.pdf).
 
 # In the following, we are going to defined a binary paint shop problem for the following string
+
+using GraphTensorNetworks, Graphs
 
 sequence = "abaccb"

@@ -1,12 +1,10 @@
 # # Independent set problem
 
-# ## Introduction
-using GraphTensorNetworks, Graphs
-
-# Please check the docstring of [`Independence`](@ref) for the definition of independence problem.
-@doc Independence
-
+# ## Problem definition
+# In graph theory, an [independent set](https://en.wikipedia.org/wiki/Independent_set_(graph_theory)) is a set of vertices in a graph, no two of which are adjacent.
 # In the following, we are going to defined an independent set problem for the Petersen graph.
+
+using GraphTensorNetworks, Graphs
 
 graph = Graphs.smallgraph(:petersen)
 
@@ -17,17 +15,38 @@ locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.6, i) for i=0:4]..
 
 show_graph(graph; locs=locations)
 
+# ## Tensor network representation
+# Type [`IndependentSet`](@ref) can be used for constructing the tensor network with optimized contraction order for solving an independent set problem.
+# we map a vertex ``i\in V`` to a label ``s_i \in \{0, 1\}`` of dimension 2,
+# where we use 0 (1) to denote a vertex is absent (present) in the set.
+# For each label ``s_i``, we defined a parametrized rank-one vertex tensor ``W(x_i)`` as
+# ```math
+# W(x_i)_{s_i} = \left(\begin{matrix}
+#     1 \\
+#     x_i
+# \end{matrix}\right)_{s_i}
+# ```
+# We use subscripts to index tensor elements, e.g.``W(x_i)_0=1`` is the first element associated
+# with ``s_i=0`` and ``W(x_i)_1=x_i`` is the second element associated with ``s_i=1``.
+# Similarly, on each edge ``(u, v)``, we define a matrix ``B`` indexed by ``s_u`` and ``s_v`` as
+# ```math
+# B_{s_i s_j} = \left(\begin{matrix}
+#     1  & 1\\
+#     1 & 0
+# \end{matrix}\right)_{s_is_j}
+# ```
 # Let us contruct the problem instance with optimized tensor network contraction order as bellow.
-problem = Independence(graph; optimizer=TreeSA(sc_weight=1.0, ntrials=10,
+problem = IndependentSet(graph; optimizer=TreeSA(sc_weight=1.0, ntrials=10,
                          βs=0.01:0.1:15.0, niters=20, rw_weight=0.2),
                          simplifier=MergeGreedy());
 
-# The `optimizer` is for optimizing the contraction orders.
+# In the input arguments of [`IndependentSet`](@ref), the `optimizer` is for optimizing the contraction orders.
 # Here we use the local search based optimizer in [arXiv:2108.05665](https://arxiv.org/abs/2108.05665).
 # If no optimizer is specified, the default fast (in terms of the speed of searching contraction order)
 # but worst (in term of contraction complexity) [`GreedyMethod`](@ref) will be used.
 # `simplifier` is a preprocessing routine to speed up the `optimizer`.
-# Please check section [Tensor Network](@ref) for more details.
+# The returned instance `problem` contains a field `code` that specifies the tensor network contraction order.
+# Its contraction time space complexity is ``2^{{\rm tw}(G)}``, where ``{\rm tw(G)}`` is the [tree-width](https://en.wikipedia.org/wiki/Treewidth) of ``G``.
 # One can check the time, space and read-write complexity with the following function.
 
 timespacereadwrite_complexity(problem)
@@ -48,7 +67,13 @@ count_all_independent_sets = solve(problem, CountingAll())[]
 count_max2_independent_sets = solve(problem, CountingMax(2))[]
 
 # ##### independence polynomial
-# For the definition of independence polynomial, please check the docstring of [`Independence`](@ref) or this [wiki page](https://mathworld.wolfram.com/IndependencePolynomial.html).
+# The graph polynomial defined for the independence problem is known as the independence polynomial.
+# ```math
+# I(G, x) = \sum_{k=0}^{\alpha(G)} a_k x^k,
+# ```
+# where ``\alpha(G)`` is the maximum independent set size, 
+# ``a_k`` is the number of independent sets of size ``k`` in graph ``G=(V,E)``.
+# The total number of independent sets is thus equal to ``I(G, 1)``.
 # There are 3 methods to compute a graph polynomial, `:finitefield`, `:fft` and `:polynomial`.
 # These methods are introduced in the docstring of [`GraphPolynomial`](@ref).
 independence_polynomial = solve(problem, GraphPolynomial(; method=:finitefield))[]
@@ -98,9 +123,9 @@ loaded_sets = load_configs(filename; format=:binary, bitlength=10)
 #     Because the bitstring length is not stored.
 
 # ## Weights and open vertices
-# [`Independence`] accepts weights as a key word argument.
+# [`IndependentSet`] accepts weights as a key word argument.
 # The following code computes the weighted MIS problem.
-problem = Independence(graph; weights=collect(1:10))
+problem = IndependentSet(graph; weights=collect(1:10))
 
 max_config_weighted = solve(problem, SingleConfigMax())[]
 
@@ -108,7 +133,7 @@ show_graph(graph; locs=locations, colors=
           [iszero(max_config_weighted.c.data[i]) ? "white" : "red" for i=1:nv(graph)])
 
 # The following code computes the MIS tropical tensor (reference to be added) with open vertices 1 and 2.
-problem = Independence(graph; openvertices=[1,2,3])
+problem = IndependentSet(graph; openvertices=[1,2,3])
 
 mis_tropical_tensor = solve(problem, SizeMax())
 

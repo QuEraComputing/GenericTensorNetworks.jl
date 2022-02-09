@@ -50,15 +50,15 @@ julia> using GraphTensorNetworks, Random, Graphs
 julia> graph = (Random.seed!(2); Graphs.smallgraph(:petersen))
 {10, 15} undirected simple Int64 graph
 
-julia> problem = Independence(graph; optimizer=TreeSA(sc_target=0, sc_weight=1.0, ntrials=10, βs=0.01:0.1:15.0, niters=20, rw_weight=0.2));
+julia> problem = IndependentSet(graph; optimizer=TreeSA(sc_target=0, sc_weight=1.0, ntrials=10, βs=0.01:0.1:15.0, niters=20, rw_weight=0.2));
 ┌ Warning: target space complexity not found, got: 4.0, with time complexity 7.965784284662087, read-right complexity 8.661778097771988.
 └ @ OMEinsumContractionOrders ~/.julia/dev/OMEinsumContractionOrders/src/treesa.jl:71
 time/space complexity is (7.965784284662086, 4.0)
 ```
 
-Here, the `problem` is a `Independence` instance, it contains the tensor network contraction tree for the target graph.
+Here, the `problem` is a `IndependentSet` instance, it contains the tensor network contraction tree for the target graph.
 Here, we choose the `TreeSA` optimizer to optimize the tensor network contraciton tree, it is a local search based algorithm, check [arXiv: 2108.05665](https://arxiv.org/abs/2108.05665). You will see some warnings, do not panic, this is because we set `sc_target` (target space complex) to 1 for agressive optimization of space complexity. Type `?TreeSA` in a Julia REPL for more information about the key word arguments.
-Similarly, one can select tensor network structures for solving other problems like `MaximalIndependence`, `MaxCut`, `Matching`, `Coloring{K}`, `PaintShop` and `set_packing`.
+Similarly, one can select tensor network structures for solving other problems like `MaximalIS`, `MaxCut`, `Matching`, `Coloring{K}`, `PaintShop` and `set_packing`.
 
 #### 1. find MIS size, count MISs and count ISs
 ```julia

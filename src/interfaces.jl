@@ -16,7 +16,7 @@ struct SizeMax <: AbstractProperty end
     CountingAll <: AbstractProperty
     CountingAll()
 
-Counting the total number of sets. e.g. for [`Independence`](@ref) problem, it counts the independent sets.
+Counting the total number of sets. e.g. for [`IndependentSet`](@ref) problem, it counts the independent sets.
 
 * The corresponding tensor element type is `Base.Real`.
 * The weights on graph does not have effect.
@@ -28,7 +28,7 @@ struct CountingAll <: AbstractProperty end
     CountingMax{K} <: AbstractProperty
     CountingMax(K=1)
 
-Counting the number of sets with `K` largest size. e.g. for [`Independence`](@ref) problem,
+Counting the number of sets with `K` largest size. e.g. for [`IndependentSet`](@ref) problem,
 it counts independent sets of size ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
 
 * The corresponding tensor element type is [`CountingTropical`](@ref) for `K == 1`, and [`TruncatedPoly`](@ref)`{K}` for `K > 1`.
@@ -43,14 +43,14 @@ max_k(::CountingMax{K}) where K = K
     GraphPolynomial{METHOD} <: AbstractProperty
     GraphPolynomial(; method=:finitefield, kwargs...)
 
-Compute the graph polynomial, e.g. for [`Independence`](@ref) problem, it is the independence polynomial.
+Compute the graph polynomial, e.g. for [`IndependentSet`](@ref) problem, it is the independence polynomial.
 The `METHOD` type parameter can be one of the following symbols
 
 * `:finitefield`, it uses finite field algebra to fit the polynomial.
     * The corresponding tensor element type is [`Mods.Mod`](@ref),
     * It does not have round-off error,
     * GPU is supported,
-    * It accepts keyword arguments `maxorder` (optional, e.g. the MIS size in the [`Independence`](@ref) problem).
+    * It accepts keyword arguments `maxorder` (optional, e.g. the MIS size in the [`IndependentSet`](@ref) problem).
 * `:polynomial`, the program uses polynomial numbers to solve the polynomial directly.
     * The corresponding tensor element type is [`Polynomials.Polynomial`](@ref).
     * It might have small round-off error depending on the data type for storing the counting.
@@ -75,7 +75,7 @@ graph_polynomial_method(::GraphPolynomial{METHOD}) where METHOD = METHOD
     SingleConfigMax{BOUNDED} <: AbstractProperty
     SingleConfigMax(; bounded=false)
 
-Finding single best solution, e.g. for [`Independence`](@ref) problem, it is one of the maximum independent sets.
+Finding single best solution, e.g. for [`IndependentSet`](@ref) problem, it is one of the maximum independent sets.
 
 * The corresponding data type is [`CountingTropical{Float64,<:ConfigSampler}`](@ref) if `BOUNDED` is `true`, [`Tropical`](@ref) otherwise.
 * Weighted graph problems is supported.
@@ -88,7 +88,7 @@ SingleConfigMax(; bounded::Bool=false) = SingleConfigMax{bounded}()
     ConfigsAll <:AbstractProperty
     ConfigsAll()
 
-Find all valid configurations, e.g. for [`Independence`](@ref) problem, it is finding all independent sets.
+Find all valid configurations, e.g. for [`IndependentSet`](@ref) problem, it is finding all independent sets.
 
 * The corresponding data type is [`ConfigEnumerator`](@ref).
 * Weights do not take effect.
@@ -99,7 +99,7 @@ struct ConfigsAll <:AbstractProperty end
     ConfigsMax{K, BOUNDED} <:AbstractProperty
     ConfigsMax(K=1; bounded=true)
 
-Find configurations with largest sizes, e.g. for [`Independence`](@ref) problem,
+Find configurations with largest sizes, e.g. for [`IndependentSet`](@ref) problem,
 it is finding all independent sets of sizes ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
 
 * The corresponding data type is [`CountingTropical`](@ref)`{Float64,<:ConfigEnumerator}` for `K == 1` and [`TruncatedPoly`](@ref)`{K,<:ConfigEnumerator}` for `K > 1`.
@@ -181,7 +181,7 @@ Returns the maximum size and the counting of the graph problem.
 It is a shorthand of `solve(problem, CountingMax(); usecuda=false)`.
 """
 function max_size_count end
-for TP in [:MaximalIndependence, :Independence, :Matching, :MaxCut, :PaintShop]
+for TP in [:MaximalIS, :IndependentSet, :Matching, :MaxCut, :PaintShop]
     @eval max_size(m::$TP; usecuda=false) = Int(sum(solve(m, SizeMax(); usecuda=usecuda)).n)  # floating point number is faster (BLAS)
     @eval max_size_count(m::$TP; usecuda=false) = (r = sum(solve(m, CountingMax(); usecuda=usecuda)); (Int(r.n), Int(r.c)))
 end

@@ -54,7 +54,7 @@ The following code gives your the maximum independent set size
 ```jldoctest
 julia> using Graphs, GraphTensorNetworks
 
-julia> gp = Independence(smallgraph(:petersen));
+julia> gp = IndependentSet(smallgraph(:petersen));
 
 julia> f(x) = Tropical.([0, 1.0])
 f (generic function with 1 method)
@@ -91,8 +91,8 @@ generate_tensors(::Type{GT}) where GT = length(flavors(GT))
 
 # requires field `code`
 
-include("Independence.jl")
-include("MaximalIndependence.jl")
+include("IndependentSet.jl")
+include("MaximalIS.jl")
 include("MaxCut.jl")
 include("Matching.jl")
 include("Coloring.jl")

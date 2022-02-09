@@ -6,13 +6,12 @@ using DocThemeIndigo
 using Literate
 
 for each in readdir(pkgdir(GraphTensorNetworks, "examples"))
-    project_dir = pkgdir(GraphTensorNetworks, "examples", each)
-    isdir(project_dir) || continue
-    @info "building" project_dir
-    input_file = pkgdir(GraphTensorNetworks, "examples", each, "main.jl")
+    input_file = pkgdir(GraphTensorNetworks, "examples", each)
+    endswith(input_file, ".jl") || continue
+    @info "building" input_file
     output_dir = pkgdir(GraphTensorNetworks, "docs", "src", "tutorials")
     @info "executing" input_file
-    Literate.markdown(input_file, output_dir; name=each, execute=false)
+    Literate.markdown(input_file, output_dir; name=each[1:end-3], execute=false)
 end
 
 indigo = DocThemeIndigo.install(GraphTensorNetworks)
@@ -24,7 +23,7 @@ makedocs(;
     repo="https://github.com/Happy-Diode/GraphTensorNetworks.jl/blob/{commit}{path}#{line}",
     sitename="GraphTensorNetworks.jl",
     format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
+        prettyurls=false,
         canonical="https://Happy-Diode.github.io/GraphTensorNetworks.jl",
         assets=String[indigo],
     ),
@@ -32,9 +31,9 @@ makedocs(;
         "Home" => "index.md",
         "Tutorials" => [
             "Independent set problem" => "tutorials/IndependentSet.md",
-            "Maximal independent set problem" => "tutorials/MaximalIndependentSet.md",
-            "Cut problem" => "tutorials/MaxCut.md",
-            "Matching problem" => "tutorials/Coloring.md",
+            "Maximal independent set problem" => "tutorials/MaximalIS.md",
+            "Cutting problem" => "tutorials/MaxCut.md",
+            "Matching problem" => "tutorials/Matching.md",
             "Binary paint shop problem" => "tutorials/PaintShop.md",
             "Coloring problem" => "tutorials/Coloring.md",
             "Other problems" => "tutorials/Others.md",

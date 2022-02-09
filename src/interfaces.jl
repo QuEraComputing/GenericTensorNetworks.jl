@@ -181,7 +181,7 @@ Returns the maximum size and the counting of the graph problem.
 It is a shorthand of `solve(problem, CountingMax(); usecuda=false)`.
 """
 function max_size_count end
-for TP in [:MaximalIndependentSet, :IndependentSet, :Matching, :MaxCut, :PaintShop]
+for TP in [:MaximalIS, :IndependentSet, :Matching, :MaxCut, :PaintShop]
     @eval max_size(m::$TP; usecuda=false) = Int(sum(solve(m, SizeMax(); usecuda=usecuda)).n)  # floating point number is faster (BLAS)
     @eval max_size_count(m::$TP; usecuda=false) = (r = sum(solve(m, CountingMax(); usecuda=usecuda)); (Int(r.n), Int(r.c)))
 end

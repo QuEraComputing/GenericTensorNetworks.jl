@@ -1,7 +1,7 @@
-# # Cut problem (Spin-glass problem)
+# # Cutting problem (Spin-glass problem)
 
 # !!! note
-#     This tutorial only covers the cut problem specific features,
+#     This tutorial only covers the cutting problem specific features,
 #     It is recommended to read the [Independent set problem](@ref) tutorial too to know more about
 #     * how to optimize the tensor network contraction order,
 #     * what are the other graph properties computable,
@@ -16,7 +16,7 @@
 
 using GraphTensorNetworks, Graphs
 
-# In the following, we are going to defined an cut problem for the Petersen graph.
+# In the following, we are going to defined an cutting problem for the Petersen graph.
 
 graph = Graphs.smallgraph(:petersen)
 
@@ -27,9 +27,9 @@ locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.6, i) for i=0:4]..
 
 show_graph(graph; locs=locations)
 
-# ## Tensor network
+# ## Tensor network representation
 # For a vertex ``v\in V``, we define a boolean degree of freedom ``s_v\in\{0, 1\}``.
-# Then the maximum cut problem can be encoded to tensor networks by mapping an edge ``(i,j)\in E`` to an edge matrix labelled by ``s_is_j``
+# Then the maximum cutting problem can be encoded to tensor networks by mapping an edge ``(i,j)\in E`` to an edge matrix labelled by ``s_is_j``
 # ```math
 # B(x_{\langle i, j\rangle}) = \left(\begin{matrix}
 #     1 & x_{\langle i, j\rangle}\\
@@ -39,7 +39,7 @@ show_graph(graph; locs=locations)
 # where variable ``x_{\langle i, j\rangle}`` represents a cut on edge ``(i, j)`` or a domain wall of an Ising spin glass.
 # Similar to other problems, we can define a polynomial about edges variables by setting ``x_{\langle i, j\rangle} = x``,
 # where its k-th coefficient is two times the number of configurations of cut size k.
-# We define the cut problem as
+# We define the cutting problem as
 problem = MaxCut(graph);
 
 # Its contraction time space complexity is ``2^{{\rm tw}(G)}``, where ``{\rm tw(G)}`` is the [tree-width](https://en.wikipedia.org/wiki/Treewidth) of ``G``.
@@ -50,7 +50,7 @@ max_cut_size = solve(problem, SizeMax())[]
 
 # ### Counting properties
 # ##### graph polynomial
-# The graph polynomial defined for the cut problem is
+# The graph polynomial defined for the cutting problem is
 # ```math
 # C(G, x) = \sum_{k=0}^{\gamma(G)} c_k x^k,
 # ```

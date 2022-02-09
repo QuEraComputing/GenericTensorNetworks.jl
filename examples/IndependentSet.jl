@@ -16,7 +16,7 @@ locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.6, i) for i=0:4]..
 show_graph(graph; locs=locations)
 
 # ## Tensor network representation
-# In tensor network representation of the independent set problem,
+# Type [`IndependentSet`](@ref) can be used for constructing the tensor network with optimized contraction order for solving an independent set problem.
 # we map a vertex ``i\in V`` to a label ``s_i \in \{0, 1\}`` of dimension 2,
 # where we use 0 (1) to denote a vertex is absent (present) in the set.
 # For each label ``s_i``, we defined a parametrized rank-one vertex tensor ``W(x_i)`` as

@@ -92,7 +92,7 @@ generate_tensors(::Type{GT}) where GT = length(flavors(GT))
 # requires field `code`
 
 include("IndependentSet.jl")
-include("MaximalIndependentSet.jl")
+include("MaximalIS.jl")
 include("MaxCut.jl")
 include("Matching.jl")
 include("Coloring.jl")

@@ -37,9 +37,9 @@ show_graph(graph; locs=locations)
 # Intuitively, it means if all the neighbourhood vertices are not in ``I_{m}``, i.e., ``s_1=s_2=\ldots=s_{|N(v)|}=0``, then ``v`` should be in ``I_{m}`` and contribute a factor ``x_{v}``,
 # otherwise, if any of the neighbourhood vertices is in ``I_{m}``, then ``v`` cannot be in ``I_{m}``.
 # We construct the tensor network for the maximal independent set problem as
-problem = MaximalIndependentSet(graph);
+problem = MaximalIS(graph);
 
-# Its contraction time space complexity of a [`MaximalIndependentSet`](@ref) instance is no longer determined by the tree-width of the original graph ``G``.
+# Its contraction time space complexity of a [`MaximalIS`](@ref) instance is no longer determined by the tree-width of the original graph ``G``.
 # It is often harder to contract this tensor network than to contract the one for regular independent set problem.
 
 # ## Solving properties

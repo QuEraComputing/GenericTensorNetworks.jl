@@ -1,2 +1,2 @@
 @deprecate Independence(args...; kwargs...) IndependentSet(args...; kwargs...)
-@deprecate MaximalIndependence(args...; kwargs...) MaximalIndependentSet(args...; kwargs...)
+@deprecate MaximalIndependence(args...; kwargs...) MaximalIS(args...; kwargs...)

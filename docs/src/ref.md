@@ -4,7 +4,7 @@
 solve
 GraphProblem
 IndependentSet
-MaximalIndependentSet
+MaximalIS
 Matching
 Coloring
 MaxCut

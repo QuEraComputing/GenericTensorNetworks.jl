@@ -25,6 +25,7 @@ export contractx, contractf, graph_polynomial, max_size, max_size_count
 # Graphs
 export random_regular_graph, diagonal_coupled_graph, is_independent_set
 export square_lattice_graph, unit_disk_graph, random_diagonal_coupled_graph, random_square_lattice_graph
+export line_graph
 
 # Tensor Networks (Graph problems)
 export GraphProblem, IndependentSet, MaximalIS, Matching, Coloring, optimize_code, set_packing, MaxCut, PaintShop, paintshop_from_pairs, UnWeighted

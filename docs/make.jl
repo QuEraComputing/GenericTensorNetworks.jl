@@ -23,7 +23,7 @@ makedocs(;
     repo="https://github.com/Happy-Diode/GraphTensorNetworks.jl/blob/{commit}{path}#{line}",
     sitename="GraphTensorNetworks.jl",
     format=Documenter.HTML(;
-        prettyurls=false,
+        prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://Happy-Diode.github.io/GraphTensorNetworks.jl",
         assets=String[indigo],
     ),

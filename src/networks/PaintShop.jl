@@ -3,7 +3,7 @@
     PaintShop(labels::AbstractVector; openvertices=(),
              optimizer=GreedyMethod(), simplifier=nothing)
 
-The [binary paint shop problem](http://m-hikari.com/ams/ams-2012/ams-93-96-2012/popovAMS93-96-2012-2.pdf).
+The [binary paint shop problem](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/PaintShop.html).
 
 Example
 -----------------------------------------

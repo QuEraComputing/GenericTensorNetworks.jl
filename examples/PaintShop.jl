@@ -15,4 +15,22 @@
 
 using GraphTensorNetworks, Graphs
 
-sequence = "abaccb"
+sequence = collect("iadgbeadfcchghebfi")
+
+# We can visualize this graph using the following function
+rot(a, b, θ) = cos(θ*π)*a + sin(θ*π)*b, cos(θ*π)*b - sin(θ*π)*a
+
+locations = [rot(0.0, 1.0, 2π*i/length(sequence)) for i=1:length(sequence)]
+
+graph = let
+    g = line_graph(length(sequence))
+    for i=1:length(sequence) 
+        j = findlast(==(sequence[i]), sequence)
+        i != j && add_edge!(g, i, j)
+    end
+    g
+end
+
+show_graph(graph; locs=locations)
+
+gp = PaintShop(sequence)

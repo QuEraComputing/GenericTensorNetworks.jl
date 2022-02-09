@@ -61,3 +61,16 @@ function unit_disk_graph(locs::AbstractVector, unit::Real)
     end
     return g
 end
+
+"""
+    line_graph(n::Int)
+
+Returns a line graph with `n` vertices.
+"""
+function line_graph(n::Int)
+    g = SimpleGraph(n)
+    for i=1:n-1
+        add_edge!(g, i, i+1)
+    end
+    return g
+end

@@ -46,10 +46,3 @@ end
     g = smallgraph(:petersen)
     @test graph_polynomial(Matching(g), Val(:polynomial))[].coeffs == [6, 90, 145, 75, 15, 1][end:-1:1]
 end
-
-@testset "paint shop" begin
-    labels = collect("abaccb")
-    pb = PaintShop(labels)
-    @test solve(pb, SizeMax())[] == Tropical(3.0)
-    @test StaticBitVector(Bool[0,1,1,0,1]) ∈ solve(pb, ConfigsMax())[].c.data
-end

@@ -34,34 +34,59 @@ end
 
 show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=[sequence[e.src] == sequence[e.dst] ? "blue" : "black" for e in edges(graph)])
 
-# ## Tensor network representation
-# Its tensor network representation is obtained by mapping a pair of cars into a boolean variable,
-# where we use 0 to denote the first car is in red and 1 to denote the second car is in red.
-# The paint shop problem is converted to finding the minimum energy of a spin glass problem.
-
-chars = unique(sequence)
-
-mapped_graph = SimpleGraph(length(chars))
-weights = Dict{Tuple{Int,Int},Int}()
-for i=2:length(sequence)
-    a, b = sequence[i-1], sequence[i]
-    l, m = findfirst(==(a), chars), findfirst(==(b), chars)
-    add_edge!(mapped_graph, l, m)
-    edge = minmax(l, m)
-    # both are the first appearence of a car, or both are the second appearence of a car
-    # prefer to have the same boolean value: s_a * s_b
-    if (i-1 == findfirst(==(a), sequence)) == (i == findfirst(==(b), sequence))
-        weights[edge] = get(weights, edge, 0) + 1
-    else
-        weights[edge] = get(weights, edge, 0) - 1
-    end
-end
-
-weight_vector = [weights[minmax(e.src, e.dst)] for e in edges(mapped_graph)]
-weight_color_map = Dict(1=>"red", -1=>"cyan", 2=>"green", 0=>"purple")
-show_graph(mapped_graph; locs=GraphTensorNetworks.spring_layout(mapped_graph), texts=string.(chars), edge_colors=[weight_color_map[w] for w in weight_vector])
-
 # Vertices connected by blue edges must have different colors,
 # and the goal becomes a min-cut problem defined on black edges.
 
-gp = PaintShop(sequence)
+# ## Tensor network representation
+# Type [`PaintShop`](@ref) can be used for constructing the tensor network with optimized contraction order for solving a binary paint shop problem.
+# To obtain its tensor network representation, we associating car ``c_i`` (the ``i``-th character in our example) with a degree of freedom ``s_{c_i} \in \{0, 1\}``,
+# where we use ``0`` to denote the first appearance of a car is colored red and ``1`` to denote the first appearance of a car is colored blue.
+# For each black edges ``(i, i+1)``, we define an edge tensor labeld by ``(s_{c_i}, s_{c_{i+1}})`` as follows:
+# If both cars on this edge are their first or second appearance
+# ```math
+# B^{\rm parallel} = \begin{matrix}
+# x & 1 \\
+# 1 & x \\
+# \end{matrix},
+#
+# otherwise,
+# B^{\rm anti-parallel} = B^{\rm 10} = \begin{matrix}
+# 1 & x \\
+# x & 1 \\
+# \end{matrix}.
+# ```
+# It can be understood as, when both cars are their first appearance,
+# they tend to have the same configuration so that the color is not changed.
+# Otherwise, they tend to have different configuration to keep the color unchanged.
+
+# Let us contruct the problem instance as bellow.
+problem = PaintShop(sequence);
+
+# ### Counting properties
+# ##### maximal independence polynomial
+# The graph polynomial defined for the maximal independent set problem is
+# ```math
+# I_{\rm max}(G, x) = \sum_{k=0}^{\alpha(G)} b_k x^k,
+# ```
+# where ``b_k`` is the number of maximal independent sets of size ``k`` in graph ``G=(V, E)``.
+
+max_config = solve(problem, GraphPolynomial())[]
+
+# Since it only counts the maximal independent sets, the first several coefficients are 0.
+
+# ### Counting properties
+# ##### graph polynomial
+# The graph polynomial of the binary paint shop problem in our convension is defined as
+# ```math
+# D(G, x) = \sum_{k=0}^{\delta(G)} d_k x^k 
+# ```
+# where ``2d_k`` is the number of possible coloring with number of color changes ``2m-1-k``.
+
+# ### Configuration properties
+# ##### finding one best solution
+best_config = solve(problem, SingleConfigMax())[]
+
+coloring = paint_shop_coloring_from_config(best_config.c.data)
+
+# The following function will check the solution and return you the number of coloring switchs
+num_paint_shop_color_switch(sequence, coloring)

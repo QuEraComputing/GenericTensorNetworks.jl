@@ -26,6 +26,7 @@ locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.6, i) for i=0:4]..
 show_graph(graph; locs=locations)
 
 # ## Tensor network representation
+# Type [`MaximalIS`](@ref) can be used for constructing the tensor network with optimized contraction order for solving a maximal independent set problem.
 # For a vertex ``v\in V``, we define a boolean degree of freedom ``s_v\in\{0, 1\}``.
 # We defined the restriction on its neighbourhood ``N[v]``:
 # ```math

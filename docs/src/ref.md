@@ -35,6 +35,9 @@ mis_compactify!
 
 cut_size
 cut_assign
+
+num_paint_shop_color_switch
+paint_shop_coloring_from_config
 ```
 
 ## Properties

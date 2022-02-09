@@ -90,6 +90,7 @@ MergeGreedy
 #### Graph
 ```@docs
 show_graph
+spring_layout
 
 diagonal_coupled_graph
 square_lattice_graph

@@ -39,7 +39,7 @@ export solve, SizeMax, CountingAll, CountingMax, GraphPolynomial, SingleConfigMa
 export save_configs, load_configs
 
 # Visualization
-export show_graph
+export show_graph, spring_layout
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 

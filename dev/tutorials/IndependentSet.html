@@ -1,29 +1,7 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Independent set problem · GraphTensorNetworks.jl</title><script data-outdated-warner src="../../assets/warner.js"></script><link rel="canonical" href="https://Happy-Diode.github.io/GraphTensorNetworks.jl/tutorials/Independence/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><script src="../../../copy.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GraphTensorNetworks.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Tutorials</span><ul><li class="is-active"><a class="tocitem" href>Independent set problem</a><ul class="internal"><li><a class="tocitem" href="#Introduction"><span>Introduction</span></a></li><li><a class="tocitem" href="#Solving-properties"><span>Solving properties</span></a></li><li><a class="tocitem" href="#Weights-and-open-vertices"><span>Weights and open vertices</span></a></li></ul></li><li><a class="tocitem" href="../MaximalIndependence/">Maximal independent set problem</a></li><li><a class="tocitem" href="../MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../Coloring/">Matching problem</a></li><li><a class="tocitem" href="../PaintShop/">Binary paint shop problem</a></li><li><a class="tocitem" href="../Coloring/">Coloring problem</a></li><li><a class="tocitem" href="../Others/">Other problems</a></li></ul></li><li><a class="tocitem" href="../../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Independent set problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Independent set problem</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Happy-Diode/GraphTensorNetworks.jl/blob/master/examples/Independence/main.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Independent-set-problem"><a class="docs-heading-anchor" href="#Independent-set-problem">Independent set problem</a><a id="Independent-set-problem-1"></a><a class="docs-heading-anchor-permalink" href="#Independent-set-problem" title="Permalink"></a></h1><h2 id="Introduction"><a class="docs-heading-anchor" href="#Introduction">Introduction</a><a id="Introduction-1"></a><a class="docs-heading-anchor-permalink" href="#Introduction" title="Permalink"></a></h2><pre><code class="language-julia hljs">using GraphTensorNetworks, Graphs</code></pre><p>Please check the docstring of <a href="../../ref/#GraphTensorNetworks.Independence"><code>Independence</code></a> for the definition of independence problem.</p><pre><code class="language-julia hljs">@doc Independence</code></pre><div class="markdown"><pre><code class="language-julia">Independence&#123;CT&lt;:AbstractEinsum,WT&lt;:Union&#123;UnWeighted, Vector&#125;&#125; &lt;: GraphProblem
-Independence&#40;graph; weights&#61;UnWeighted&#40;&#41;, openvertices&#61;&#40;&#41;,
-             optimizer&#61;GreedyMethod&#40;&#41;, simplifier&#61;nothing&#41;</code></pre>
-<p>The <a href="https://en.wikipedia.org/wiki/Independent_set_&#40;graph_theory&#41;">Independent set problem</a>. In the constructor, <code>weights</code> are the weights of vertices. <code>openvertices</code> specifies labels for the output tensor. <code>optimizer</code> and <code>simplifier</code> are for tensor network optimization, check <code>optimize_code</code> for details.</p>
-<h2>Problem definition</h2>
-<p>In graph theory, an independent set is a set of vertices in a graph, no two of which are adjacent.</p>
-<h2>Graph polynomial</h2>
-<p>The graph polynomial defined for the independence problem is known as the independence polynomial.</p>
-&#36;I&#40;G, x&#41; &#61; \sum_&#123;k&#61;0&#125;^&#123;\alpha&#40;G&#41;&#125; a_k x^k,&#36;
-<p>where &#36;\alpha&#40;G&#41;&#36; is the maximum independent set size,  &#36;a_k&#36; is the number of independent sets of size &#36;k&#36; in graph &#36;G&#61;&#40;V,E&#41;&#36;. The total number of independent sets is thus equal to &#36;I&#40;G, 1&#41;&#36;.</p>
-<h2>Tensor network</h2>
-<p>In tensor network representation of the independent set problem, we map a vertex &#36;i\in V&#36; to a label &#36;s_i \in \&#123;0, 1\&#125;&#36; of dimension 2, where we use 0 &#40;1&#41; to denote a vertex is absent &#40;present&#41; in the set. For each label &#36;s_i&#36;, we defined a parametrized rank-one vertex tensor &#36;W&#40;x_i&#41;&#36; as</p>
-&#36;W&#40;x_i&#41;_&#123;s_i&#125; &#61; \left&#40;\begin&#123;matrix&#125;
-    1 \\
-    x_i
-\end&#123;matrix&#125;\right&#41;_&#123;s_i&#125;&#36;
-<p>We use subscripts to index tensor elements, e.g.&#36;W&#40;x_i&#41;_0&#61;1&#36; is the first element associated with &#36;s_i&#61;0&#36; and &#36;W&#40;x_i&#41;_1&#61;x_i&#36; is the second element associated with &#36;s_i&#61;1&#36;. Similarly, on each edge &#36;&#40;u, v&#41;&#36;, we define a matrix &#36;B&#36; indexed by &#36;s_u&#36; and &#36;s_v&#36; as</p>
-&#36;B_&#123;s_i s_j&#125; &#61; \left&#40;\begin&#123;matrix&#125;
-    1  &amp; 1\\
-    1 &amp; 0
-\end&#123;matrix&#125;\right&#41;_&#123;s_is_j&#125;&#36;
-<p>Its contraction time space complexity is &#36;2^&#123;&#123;\rm tw&#125;&#40;G&#41;&#125;&#36;, where &#36;&#123;\rm tw&#40;G&#41;&#125;&#36; is the <a href="https://en.wikipedia.org/wiki/Treewidth">tree-width</a> of &#36;G&#36;.</p>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Independent set problem · GraphTensorNetworks.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link rel="canonical" href="https://Happy-Diode.github.io/GraphTensorNetworks.jl/tutorials/IndependentSet.html"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><script src="../../copy.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../index.html">GraphTensorNetworks.jl</a></span></div><form class="docs-search" action="../search.html"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../index.html">Home</a></li><li><span class="tocitem">Tutorials</span><ul><li class="is-active"><a class="tocitem" href="IndependentSet.html">Independent set problem</a><ul class="internal"><li><a class="tocitem" href="#Problem-definition"><span>Problem definition</span></a></li><li><a class="tocitem" href="#Tensor-network-representation"><span>Tensor network representation</span></a></li><li><a class="tocitem" href="#Solving-properties"><span>Solving properties</span></a></li><li><a class="tocitem" href="#Weights-and-open-vertices"><span>Weights and open vertices</span></a></li></ul></li><li><a class="tocitem" href="MaximalIS.html">Maximal independent set problem</a></li><li><a class="tocitem" href="MaxCut.html">Cutting problem</a></li><li><a class="tocitem" href="Matching.html">Matching problem</a></li><li><a class="tocitem" href="PaintShop.html">Binary paint shop problem</a></li><li><a class="tocitem" href="Coloring.html">Coloring problem</a></li><li><a class="tocitem" href="Others.html">Other problems</a></li></ul></li><li><a class="tocitem" href="../ref.html">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href="IndependentSet.html">Independent set problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="IndependentSet.html">Independent set problem</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Happy-Diode/GraphTensorNetworks.jl/blob/master/examples/IndependentSet.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Independent-set-problem"><a class="docs-heading-anchor" href="#Independent-set-problem">Independent set problem</a><a id="Independent-set-problem-1"></a><a class="docs-heading-anchor-permalink" href="#Independent-set-problem" title="Permalink"></a></h1><h2 id="Problem-definition"><a class="docs-heading-anchor" href="#Problem-definition">Problem definition</a><a id="Problem-definition-1"></a><a class="docs-heading-anchor-permalink" href="#Problem-definition" title="Permalink"></a></h2><p>In graph theory, an <a href="https://en.wikipedia.org/wiki/Independent_set_(graph_theory)">independent set</a> is a set of vertices in a graph, no two of which are adjacent. In the following, we are going to defined an independent set problem for the Petersen graph.</p><pre><code class="language-julia hljs">using GraphTensorNetworks, Graphs
 
-
-</div><p>In the following, we are going to defined an independent set problem for the Petersen graph.</p><pre><code class="language-julia hljs">graph = Graphs.smallgraph(:petersen)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{10, 15} undirected simple Int64 graph</code></pre><p>We can visualize this graph using the following function</p><pre><code class="language-julia hljs">rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
+graph = Graphs.smallgraph(:petersen)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{10, 15} undirected simple Int64 graph</code></pre><p>We can visualize this graph using the following function</p><pre><code class="language-julia hljs">rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
 
 locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.6, i) for i=0:4]...]
 
@@ -37,13 +15,13 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-411e3c8f">
+     id="img-8524c92a">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-411e3c8f-1">
+<g stroke-width="0.67" stroke="#000000" id="img-8524c92a-1">
   <g transform="translate(76.48,39.02)">
     <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
   </g>
@@ -90,7 +68,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-411e3c8f-2">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-8524c92a-2">
   <g transform="translate(60,27.04)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
@@ -122,7 +100,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-411e3c8f-3">
+<g fill="#000000" font-size="3.13" id="img-8524c92a-3">
   <g transform="translate(60,27.04)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -321,9 +299,15 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 
 ]]> </script>
 </svg>
-<p>Let us contruct the problem instance with optimized tensor network contraction order as bellow.</p><pre><code class="language-julia hljs">problem = Independence(graph; optimizer=TreeSA(sc_weight=1.0, ntrials=10,
+<h2 id="Tensor-network-representation"><a class="docs-heading-anchor" href="#Tensor-network-representation">Tensor network representation</a><a id="Tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Tensor-network-representation" title="Permalink"></a></h2><p>Type <a href="../ref.html#GraphTensorNetworks.IndependentSet"><code>IndependentSet</code></a> can be used for constructing the tensor network with optimized contraction order for solving an independent set problem. we map a vertex <span>$i\in V$</span> to a label <span>$s_i \in \{0, 1\}$</span> of dimension 2, where we use 0 (1) to denote a vertex is absent (present) in the set. For each label <span>$s_i$</span>, we defined a parametrized rank-one vertex tensor <span>$W(x_i)$</span> as</p><p class="math-container">\[W(x_i)_{s_i} = \left(\begin{matrix}
+    1 \\
+    x_i
+\end{matrix}\right)_{s_i}\]</p><p>We use subscripts to index tensor elements, e.g.<span>$W(x_i)_0=1$</span> is the first element associated with <span>$s_i=0$</span> and <span>$W(x_i)_1=x_i$</span> is the second element associated with <span>$s_i=1$</span>. Similarly, on each edge <span>$(u, v)$</span>, we define a matrix <span>$B$</span> indexed by <span>$s_u$</span> and <span>$s_v$</span> as</p><p class="math-container">\[B_{s_i s_j} = \left(\begin{matrix}
+    1  &amp; 1\\
+    1 &amp; 0
+\end{matrix}\right)_{s_is_j}\]</p><p>Let us contruct the problem instance with optimized tensor network contraction order as bellow.</p><pre><code class="language-julia hljs">problem = IndependentSet(graph; optimizer=TreeSA(sc_weight=1.0, ntrials=10,
                          βs=0.01:0.1:15.0, niters=20, rw_weight=0.2),
-                         simplifier=MergeGreedy());</code></pre><p>The <code>optimizer</code> is for optimizing the contraction orders. Here we use the local search based optimizer in <a href="https://arxiv.org/abs/2108.05665">arXiv:2108.05665</a>. If no optimizer is specified, the default fast (in terms of the speed of searching contraction order) but worst (in term of contraction complexity) <a href="../../ref/#OMEinsumContractionOrders.GreedyMethod"><code>GreedyMethod</code></a> will be used. <code>simplifier</code> is a preprocessing routine to speed up the <code>optimizer</code>. Please check section <a href="../../ref/#Tensor-Network">Tensor Network</a> for more details. One can check the time, space and read-write complexity with the following function.</p><pre><code class="language- hljs">timespacereadwrite_complexity(problem)</code></pre><p>The return values are <code>log2</code> of the the number of iterations, the number elements in the max tensor and the number of read-write operations to tensor elements.</p><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><h3 id="Maximum-independent-set-size-\\alpha(G)"><a class="docs-heading-anchor" href="#Maximum-independent-set-size-\\alpha(G)">Maximum independent set size <span>$\alpha(G)$</span></a><a id="Maximum-independent-set-size-\\alpha(G)-1"></a><a class="docs-heading-anchor-permalink" href="#Maximum-independent-set-size-\\alpha(G)" title="Permalink"></a></h3><pre><code class="language-julia hljs">maximum_independent_set_size = solve(problem, SizeMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4.0ₜ</code></pre><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="counting-all-independent-sets"><a class="docs-heading-anchor" href="#counting-all-independent-sets">counting all independent sets</a><a id="counting-all-independent-sets-1"></a><a class="docs-heading-anchor-permalink" href="#counting-all-independent-sets" title="Permalink"></a></h5><pre><code class="language-julia hljs">count_all_independent_sets = solve(problem, CountingAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">76.0</code></pre><h5 id="counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1"><a class="docs-heading-anchor" href="#counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1">counting independent sets with sizes <span>$\alpha(G)$</span> and <span>$\alpha(G)-1$</span></a><a id="counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1-1"></a><a class="docs-heading-anchor-permalink" href="#counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1" title="Permalink"></a></h5><pre><code class="language-julia hljs">count_max2_independent_sets = solve(problem, CountingMax(2))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">30.0*x^3 + 5.0*x^4</code></pre><h5 id="independence-polynomial"><a class="docs-heading-anchor" href="#independence-polynomial">independence polynomial</a><a id="independence-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#independence-polynomial" title="Permalink"></a></h5><p>For the definition of independence polynomial, please check the docstring of <a href="../../ref/#GraphTensorNetworks.Independence"><code>Independence</code></a> or this <a href="https://mathworld.wolfram.com/IndependencePolynomial.html">wiki page</a>. There are 3 methods to compute a graph polynomial, <code>:finitefield</code>, <code>:fft</code> and <code>:polynomial</code>. These methods are introduced in the docstring of <a href="../../ref/#GraphTensorNetworks.GraphPolynomial"><code>GraphPolynomial</code></a>.</p><pre><code class="language-julia hljs">independence_polynomial = solve(problem, GraphPolynomial(; method=:finitefield))[]</code></pre>1 &#43; 10&#8729;x &#43; 30&#8729;x<sup>2</sup> &#43; 30&#8729;x<sup>3</sup> &#43; 5&#8729;x<sup>4</sup><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="finding-one-maximum-independent-set-(MIS)"><a class="docs-heading-anchor" href="#finding-one-maximum-independent-set-(MIS)">finding one maximum independent set (MIS)</a><a id="finding-one-maximum-independent-set-(MIS)-1"></a><a class="docs-heading-anchor-permalink" href="#finding-one-maximum-independent-set-(MIS)" title="Permalink"></a></h5><p>There are two approaches to find one of the best solution. The unbounded (default) version uses <a href="../../ref/#GraphTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> to sample one of the best solutions directly. The bounded version uses the binary gradient back-propagation (see our paper) to compute the gradients. It requires caching intermediate states, but is often faster on CPU because it can use <a href="https://github.com/TensorBFS/TropicalGEMM.jl"><code>TropicalGEMM</code></a>.</p><pre><code class="language-julia hljs">max_config = solve(problem, SingleConfigMax(; bounded=false))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, ConfigSampler{10, 1, 1}(1001001100))ₜ</code></pre><p>The return value contains a bit string, and one should read this bit string from left to right. Having value 1 at i-th bit means vertex <span>$i$</span> is in the maximum independent set. One can visualize this MIS with the following function.</p><pre><code class="language-julia hljs">show_graph(graph; locs=locations, colors=[iszero(max_config.c.data[i]) ? &quot;white&quot; : &quot;red&quot;
+                         simplifier=MergeGreedy());</code></pre><p>In the input arguments of <a href="../ref.html#GraphTensorNetworks.IndependentSet"><code>IndependentSet</code></a>, the <code>optimizer</code> is for optimizing the contraction orders. Here we use the local search based optimizer in <a href="https://arxiv.org/abs/2108.05665">arXiv:2108.05665</a>. If no optimizer is specified, the default fast (in terms of the speed of searching contraction order) but worst (in term of contraction complexity) <a href="../ref.html#OMEinsumContractionOrders.GreedyMethod"><code>GreedyMethod</code></a> will be used. <code>simplifier</code> is a preprocessing routine to speed up the <code>optimizer</code>. The returned instance <code>problem</code> contains a field <code>code</code> that specifies the tensor network contraction order. Its contraction time space complexity is <span>$2^{{\rm tw}(G)}$</span>, where <span>${\rm tw(G)}$</span> is the <a href="https://en.wikipedia.org/wiki/Treewidth">tree-width</a> of <span>$G$</span>. One can check the time, space and read-write complexity with the following function.</p><pre><code class="language- hljs">timespacereadwrite_complexity(problem)</code></pre><p>The return values are <code>log2</code> of the the number of iterations, the number elements in the max tensor and the number of read-write operations to tensor elements.</p><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><h3 id="Maximum-independent-set-size-\\alpha(G)"><a class="docs-heading-anchor" href="#Maximum-independent-set-size-\\alpha(G)">Maximum independent set size <span>$\alpha(G)$</span></a><a id="Maximum-independent-set-size-\\alpha(G)-1"></a><a class="docs-heading-anchor-permalink" href="#Maximum-independent-set-size-\\alpha(G)" title="Permalink"></a></h3><pre><code class="language-julia hljs">maximum_independent_set_size = solve(problem, SizeMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4.0ₜ</code></pre><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="counting-all-independent-sets"><a class="docs-heading-anchor" href="#counting-all-independent-sets">counting all independent sets</a><a id="counting-all-independent-sets-1"></a><a class="docs-heading-anchor-permalink" href="#counting-all-independent-sets" title="Permalink"></a></h5><pre><code class="language-julia hljs">count_all_independent_sets = solve(problem, CountingAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">76.0</code></pre><h5 id="counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1"><a class="docs-heading-anchor" href="#counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1">counting independent sets with sizes <span>$\alpha(G)$</span> and <span>$\alpha(G)-1$</span></a><a id="counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1-1"></a><a class="docs-heading-anchor-permalink" href="#counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1" title="Permalink"></a></h5><pre><code class="language-julia hljs">count_max2_independent_sets = solve(problem, CountingMax(2))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">30.0*x^3 + 5.0*x^4</code></pre><h5 id="independence-polynomial"><a class="docs-heading-anchor" href="#independence-polynomial">independence polynomial</a><a id="independence-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#independence-polynomial" title="Permalink"></a></h5><p>The graph polynomial defined for the independence problem is known as the independence polynomial.</p><p class="math-container">\[I(G, x) = \sum_{k=0}^{\alpha(G)} a_k x^k,\]</p><p>where <span>$\alpha(G)$</span> is the maximum independent set size, <span>$a_k$</span> is the number of independent sets of size <span>$k$</span> in graph <span>$G=(V,E)$</span>. The total number of independent sets is thus equal to <span>$I(G, 1)$</span>. There are 3 methods to compute a graph polynomial, <code>:finitefield</code>, <code>:fft</code> and <code>:polynomial</code>. These methods are introduced in the docstring of <a href="../ref.html#GraphTensorNetworks.GraphPolynomial"><code>GraphPolynomial</code></a>.</p><pre><code class="language-julia hljs">independence_polynomial = solve(problem, GraphPolynomial(; method=:finitefield))[]</code></pre>1 &#43; 10&#8729;x &#43; 30&#8729;x<sup>2</sup> &#43; 30&#8729;x<sup>3</sup> &#43; 5&#8729;x<sup>4</sup><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="finding-one-maximum-independent-set-(MIS)"><a class="docs-heading-anchor" href="#finding-one-maximum-independent-set-(MIS)">finding one maximum independent set (MIS)</a><a id="finding-one-maximum-independent-set-(MIS)-1"></a><a class="docs-heading-anchor-permalink" href="#finding-one-maximum-independent-set-(MIS)" title="Permalink"></a></h5><p>There are two approaches to find one of the best solution. The unbounded (default) version uses <a href="../ref.html#GraphTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> to sample one of the best solutions directly. The bounded version uses the binary gradient back-propagation (see our paper) to compute the gradients. It requires caching intermediate states, but is often faster on CPU because it can use <a href="https://github.com/TensorBFS/TropicalGEMM.jl"><code>TropicalGEMM</code></a>.</p><pre><code class="language-julia hljs">max_config = solve(problem, SingleConfigMax(; bounded=false))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, ConfigSampler{10, 1, 1}(0101010001))ₜ</code></pre><p>The return value contains a bit string, and one should read this bit string from left to right. Having value 1 at i-th bit means vertex <span>$i$</span> is in the maximum independent set. One can visualize this MIS with the following function.</p><pre><code class="language-julia hljs">show_graph(graph; locs=locations, colors=[iszero(max_config.c.data[i]) ? &quot;white&quot; : &quot;red&quot;
                                  for i=1:nv(graph)])</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -334,13 +318,13 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-4353e3f8">
+     id="img-478a772b">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-4353e3f8-1">
+<g stroke-width="0.67" stroke="#000000" id="img-478a772b-1">
   <g transform="translate(76.48,39.02)">
     <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
   </g>
@@ -387,57 +371,57 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
     <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-4353e3f8-2">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-478a772b-2">
   <g transform="translate(40.23,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-4353e3f8-3">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-478a772b-3">
   <g transform="translate(47.78,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-4353e3f8-4">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-478a772b-4">
   <g transform="translate(72.22,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-4353e3f8-5">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-478a772b-5">
   <g transform="translate(79.77,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-4353e3f8-6">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-478a772b-6">
   <g transform="translate(60,40.9)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-4353e3f8-7">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-478a772b-7">
   <g transform="translate(27.04,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-4353e3f8-8">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-478a772b-8">
   <g transform="translate(39.63,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-4353e3f8-9">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-478a772b-9">
   <g transform="translate(80.37,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-4353e3f8-10">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-478a772b-10">
   <g transform="translate(92.96,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-4353e3f8-11">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-478a772b-11">
   <g transform="translate(60,27.04)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-4353e3f8-12">
+<g fill="#000000" font-size="3.13" id="img-478a772b-12">
   <g transform="translate(60,27.04)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -647,11 +631,11 @@ imgs = ntuple(k-&gt;(context((k-1)/m, 0.0, 1.2/m, 1.0), show_graph(graph;
                             colors=[iszero(all_max_configs.c[k][i]) ? &quot;white&quot; : &quot;red&quot;
                                  for i=1:nv(graph)])), m)
 
-Compose.set_default_graphic_size(18cm, 4cm); Compose.compose(context(), imgs...)</code></pre><h5 id="enumeration-of-all-IS-configurations"><a class="docs-heading-anchor" href="#enumeration-of-all-IS-configurations">enumeration of all IS configurations</a><a id="enumeration-of-all-IS-configurations-1"></a><a class="docs-heading-anchor-permalink" href="#enumeration-of-all-IS-configurations" title="Permalink"></a></h5><pre><code class="language-julia hljs">all_independent_sets = solve(problem, ConfigsAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0000000100, 0000100000, 0000100100, 1000000000, 1000000100, 0000000010, 0000000110, 0000100010, 0000100110, 1000000010, 1000000110, 0000001000, 0000001100, 0000101000, 0000101100, 1000001000, 1000001100, 0000010000, 0000110000, 0000011000, 0000111000, 0000000001, 1000000001, 0000000011, 1000000011, 0000010001, 0001000000, 0001000100, 1001000000, 1001000100, 0001001000, 0001001100, 1001001000, 1001001100, 0001010000, 0001011000, 0001000001, 1001000001, 0001010001, 0100000000, 0100000100, 0100100000, 0100100100, 0100000010, 0100000110, 0100100010, 0100100110, 0100010000, 0100110000, 0100000001, 0100000011, 0100010001, 0101000000, 0101000100, 0101010000, 0101000001, 0101010001, 0010000000, 0010100000, 1010000000, 0010000010, 0010100010, 1010000010, 0010001000, 0010101000, 1010001000, 0010010000, 0010110000, 0010011000, 0010111000, 0010000001, 1010000001, 0010000011, 1010000011, 0010010001}</code></pre><p>To save/read a set of configuration to disk, one can type the following</p><pre><code class="language-julia hljs">filename = tempname()
+Compose.set_default_graphic_size(18cm, 4cm); Compose.compose(context(), imgs...)</code></pre><h5 id="enumeration-of-all-IS-configurations"><a class="docs-heading-anchor" href="#enumeration-of-all-IS-configurations">enumeration of all IS configurations</a><a id="enumeration-of-all-IS-configurations-1"></a><a class="docs-heading-anchor-permalink" href="#enumeration-of-all-IS-configurations" title="Permalink"></a></h5><pre><code class="language-julia hljs">all_independent_sets = solve(problem, ConfigsAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0000010000, 0100000000, 0100010000, 0000001000, 0000011000, 0001000000, 0001010000, 0101000000, 0101010000, 0001001000, 0001011000, 0000100000, 0000110000, 0100100000, 0100110000, 0000101000, 0000111000, 0000000010, 0100000010, 0000100010, 0100100010, 1000000000, 1000001000, 1001000000, 1001001000, 1000000010, 0000000001, 0000010001, 0100000001, 0100010001, 0001000001, 0001010001, 0101000001, 0101010001, 0000000011, 0100000011, 1000000001, 1001000001, 1000000011, 0010000000, 0010010000, 0010001000, 0010011000, 0010100000, 0010110000, 0010101000, 0010111000, 0010000010, 0010100010, 1010000000, 1010001000, 1010000010, 0010000001, 0010010001, 0010000011, 1010000001, 1010000011, 0000000100, 0100000100, 0000001100, 0001000100, 0101000100, 0001001100, 0000100100, 0100100100, 0000101100, 0000000110, 0100000110, 0000100110, 0100100110, 1000000100, 1000001100, 1001000100, 1001001100, 1000000110}</code></pre><p>To save/read a set of configuration to disk, one can type the following</p><pre><code class="language-julia hljs">filename = tempname()
 
 save_configs(filename, all_independent_sets; format=:binary)
 
-loaded_sets = load_configs(filename; format=:binary, bitlength=10)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0000000100, 0000100000, 0000100100, 1000000000, 1000000100, 0000000010, 0000000110, 0000100010, 0000100110, 1000000010, 1000000110, 0000001000, 0000001100, 0000101000, 0000101100, 1000001000, 1000001100, 0000010000, 0000110000, 0000011000, 0000111000, 0000000001, 1000000001, 0000000011, 1000000011, 0000010001, 0001000000, 0001000100, 1001000000, 1001000100, 0001001000, 0001001100, 1001001000, 1001001100, 0001010000, 0001011000, 0001000001, 1001000001, 0001010001, 0100000000, 0100000100, 0100100000, 0100100100, 0100000010, 0100000110, 0100100010, 0100100110, 0100010000, 0100110000, 0100000001, 0100000011, 0100010001, 0101000000, 0101000100, 0101010000, 0101000001, 0101010001, 0010000000, 0010100000, 1010000000, 0010000010, 0010100010, 1010000010, 0010001000, 0010101000, 1010001000, 0010010000, 0010110000, 0010011000, 0010111000, 0010000001, 1010000001, 0010000011, 1010000011, 0010010001}</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>When loading data, one needs to provide the <code>bitlength</code> if the data is saved in binary format. Because the bitstring length is not stored.</p></div></div><h2 id="Weights-and-open-vertices"><a class="docs-heading-anchor" href="#Weights-and-open-vertices">Weights and open vertices</a><a id="Weights-and-open-vertices-1"></a><a class="docs-heading-anchor-permalink" href="#Weights-and-open-vertices" title="Permalink"></a></h2><p>[<code>Independence</code>] accepts weights as a key word argument. The following code computes the weighted MIS problem.</p><pre><code class="language-julia hljs">problem = Independence(graph; weights=collect(1:10))
+loaded_sets = load_configs(filename; format=:binary, bitlength=10)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0000010000, 0100000000, 0100010000, 0000001000, 0000011000, 0001000000, 0001010000, 0101000000, 0101010000, 0001001000, 0001011000, 0000100000, 0000110000, 0100100000, 0100110000, 0000101000, 0000111000, 0000000010, 0100000010, 0000100010, 0100100010, 1000000000, 1000001000, 1001000000, 1001001000, 1000000010, 0000000001, 0000010001, 0100000001, 0100010001, 0001000001, 0001010001, 0101000001, 0101010001, 0000000011, 0100000011, 1000000001, 1001000001, 1000000011, 0010000000, 0010010000, 0010001000, 0010011000, 0010100000, 0010110000, 0010101000, 0010111000, 0010000010, 0010100010, 1010000000, 1010001000, 1010000010, 0010000001, 0010010001, 0010000011, 1010000001, 1010000011, 0000000100, 0100000100, 0000001100, 0001000100, 0101000100, 0001001100, 0000100100, 0100100100, 0000101100, 0000000110, 0100000110, 0000100110, 0100100110, 1000000100, 1000001100, 1001000100, 1001001100, 1000000110}</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>When loading data, one needs to provide the <code>bitlength</code> if the data is saved in binary format. Because the bitstring length is not stored.</p></div></div><h2 id="Weights-and-open-vertices"><a class="docs-heading-anchor" href="#Weights-and-open-vertices">Weights and open vertices</a><a id="Weights-and-open-vertices-1"></a><a class="docs-heading-anchor-permalink" href="#Weights-and-open-vertices" title="Permalink"></a></h2><p>[<code>IndependentSet</code>] accepts weights as a key word argument. The following code computes the weighted MIS problem.</p><pre><code class="language-julia hljs">problem = IndependentSet(graph; weights=collect(1:10))
 
 max_config_weighted = solve(problem, SingleConfigMax())[]
 
@@ -666,13 +650,13 @@ show_graph(graph; locs=locations, colors=
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-6764ab84">
+     id="img-9132b94c">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-6764ab84-1">
+<g stroke-width="0.67" stroke="#000000" id="img-9132b94c-1">
   <g transform="translate(76.48,39.02)">
     <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
   </g>
@@ -719,57 +703,57 @@ show_graph(graph; locs=locations, colors=
     <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6764ab84-2">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9132b94c-2">
   <g transform="translate(40.23,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-6764ab84-3">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-9132b94c-3">
   <g transform="translate(47.78,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-6764ab84-4">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-9132b94c-4">
   <g transform="translate(72.22,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6764ab84-5">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9132b94c-5">
   <g transform="translate(79.77,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6764ab84-6">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9132b94c-6">
   <g transform="translate(60,40.9)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-6764ab84-7">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-9132b94c-7">
   <g transform="translate(27.04,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6764ab84-8">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9132b94c-8">
   <g transform="translate(39.63,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6764ab84-9">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9132b94c-9">
   <g transform="translate(80.37,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-6764ab84-10">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-9132b94c-10">
   <g transform="translate(92.96,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6764ab84-11">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9132b94c-11">
   <g transform="translate(60,27.04)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-6764ab84-12">
+<g fill="#000000" font-size="3.13" id="img-9132b94c-12">
   <g transform="translate(60,27.04)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -968,7 +952,7 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 
 ]]> </script>
 </svg>
-<p>The following code computes the MIS tropical tensor (reference to be added) with open vertices 1 and 2.</p><pre><code class="language-julia hljs">problem = Independence(graph; openvertices=[1,2,3])
+<p>The following code computes the MIS tropical tensor (reference to be added) with open vertices 1 and 2.</p><pre><code class="language-julia hljs">problem = IndependentSet(graph; openvertices=[1,2,3])
 
 mis_tropical_tensor = solve(problem, SizeMax())</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2×2×2 Array{TropicalNumbers.TropicalF64, 3}:
 [:, :, 1] =
@@ -984,4 +968,4 @@ mis_tropical_tensor = solve(problem, SizeMax())</code></pre><pre class="document
 
 [:, :, 2] =
   4.0ₜ  -Infₜ
- -Infₜ  -Infₜ</code></pre><p>It will eliminate some entries having no contribution to the MIS size when embeding this local graph into a larger one.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../MaximalIndependence/">Maximal independent set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.12 on <span class="colophon-date" title="Tuesday 8 February 2022 09:49">Tuesday 8 February 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ -Infₜ  -Infₜ</code></pre><p>It will eliminate some entries having no contribution to the MIS size when embeding this local graph into a larger one.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../index.html">« Home</a><a class="docs-footer-nextpage" href="MaximalIS.html">Maximal independent set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.12 on <span class="colophon-date" title="Wednesday 9 February 2022 02:48">Wednesday 9 February 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

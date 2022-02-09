@@ -42,3 +42,10 @@ end
 # coloring vertex tensor
 coloringv(vals::Vector{T}) where T = vals
 
+# utilities
+function is_good_vertex_coloring(graph::SimpleGraph, config)
+    for e in edges(graph)
+        config[e.src] == config[e.dst] && return false
+    end
+    return true
+end

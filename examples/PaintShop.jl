@@ -26,7 +26,7 @@ rot(a, b, θ) = cos(θ)*a + sin(θ)*b, cos(θ)*b - sin(θ)*a
 
 locations = [rot(0.0, 1.0, -0.25π - 1.5*π*(i-0.5)/length(sequence)) for i=1:length(sequence)]
 
-graph = line_graph(length(sequence))
+graph = path_graph(length(sequence))
 for i=1:length(sequence) 
     j = findlast(==(sequence[i]), sequence)
     i != j && add_edge!(graph, i, j)
@@ -81,12 +81,24 @@ max_config = solve(problem, GraphPolynomial())[]
 # D(G, x) = \sum_{k=0}^{\delta(G)} d_k x^k 
 # ```
 # where ``2d_k`` is the number of possible coloring with number of color changes ``2m-1-k``.
+paint_polynomial = solve(problem, GraphPolynomial())[]
 
 # ### Configuration properties
-# ##### finding one best solution
-best_config = solve(problem, SingleConfigMax())[]
+# ##### finding best solutions
+best_configs = solve(problem, ConfigsMax())[]
 
-coloring = paint_shop_coloring_from_config(best_config.c.data)
+painting1 = paint_shop_coloring_from_config(best_config.c.data[1]; initial=false)
 
-# The following function will check the solution and return you the number of coloring switchs
+show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=[sequence[e.src] == sequence[e.dst] ? "blue" : "black" for e in edges(graph)],
+                vertex_colors=[isone(c) ? "red" : "black" for c in painting1], vertex_text_color="white")
+
+#
+
+painting2 = paint_shop_coloring_from_config(best_config.c.data[2]; initial=false)
+
+show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=[sequence[e.src] == sequence[e.dst] ? "blue" : "black" for e in edges(graph)],
+                vertex_colors=[isone(c) ? "red" : "black" for c in painting2], vertex_text_color="white")
+
+# Since we have different choices of initial color, the number of best solution is 4.
+# The following function will check the solution and return you the number of color switchs
 num_paint_shop_color_switch(sequence, coloring)

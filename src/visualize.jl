@@ -63,7 +63,9 @@ default_edge_style(scale, color) = Viznet.bondstyle(:default, Compose.stroke(col
         texts=["1", "2", ...],
         format=SVG,
         edge_color="black",
+        kwargs...
         )
+    show_graph(graph::SimpleGraph; locs=spring_layout(graph), kwargs...)
 
 Plots vertices at `locations` with vertex colors specified by `vertex_colors` and texts specified by `texts`.
 You will need a `VSCode`, `Pluto` notebook or `Jupyter` notebook to show the image.
@@ -75,7 +77,21 @@ julia> open("test.png", "w") do f
        end
 ```
 
-The `format` keyword argument can also be `Compose.SVG` or `Compose.PDF`.
+The `format` keyword argument can be `Compose.SVG` or `Compose.PDF`.
+
+Other keyword arguments
+-------------------------------
+* line, vertex and text
+    * scale::Float64 = 1.0
+    * pad::Float64 = 1.5
+* vertex
+    * vertex_text_color::String = "black"
+    * vertex_stroke_color = "black"
+    * vertex_fill_color = "white"
+* edge
+    * edge_color::String = "black"
+* image size in `cm`
+    * image_size::Float64 = 12
 """
 function show_graph(locations, edges;
         vertex_colors=nothing,
@@ -127,7 +143,7 @@ Base.@kwdef struct GraphDisplayConfig
     vertex_text_color::String = "black"
     vertex_stroke_color = "black"
     vertex_fill_color = "white"
-    # bond
+    # edge
     edge_color::String = "black"
     # image size in cm
     image_size::Float64 = 12

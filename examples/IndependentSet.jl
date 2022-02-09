@@ -89,7 +89,7 @@ max_config = solve(problem, SingleConfigMax(; bounded=false))[]
 # The return value contains a bit string, and one should read this bit string from left to right.
 # Having value 1 at i-th bit means vertex ``i`` is in the maximum independent set.
 # One can visualize this MIS with the following function.
-show_graph(graph; locs=locations, colors=[iszero(max_config.c.data[i]) ? "white" : "red"
+show_graph(graph; locs=locations, vertex_colors=[iszero(max_config.c.data[i]) ? "white" : "red"
                                  for i=1:nv(graph)])
 
 # ##### enumeration of all MISs
@@ -101,12 +101,12 @@ using Compose
 
 m = length(all_max_configs.c)
 
-imgs = ntuple(k->(context((k-1)/m, 0.0, 1.2/m, 1.0), show_graph(graph;
+imgs = ntuple(k->show_graph(graph;
                             locs=locations, scale=0.25,
-                            colors=[iszero(all_max_configs.c[k][i]) ? "white" : "red"
-                                 for i=1:nv(graph)])), m)
+                            vertex_colors=[iszero(all_max_configs.c[k][i]) ? "white" : "red"
+                            for i=1:nv(graph)]), m);
 
-Compose.set_default_graphic_size(18cm, 4cm); Compose.compose(context(), imgs...)
+Compose.set_default_graphic_size(18cm, 4cm); Compose.compose(context(), ntuple(k->(context((k-1)/m, 0.0, 1.2/m, 1.0), imgs[k]), m)...)
 
 # ##### enumeration of all IS configurations
 all_independent_sets = solve(problem, ConfigsAll())[]

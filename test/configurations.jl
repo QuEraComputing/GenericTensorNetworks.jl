@@ -60,35 +60,3 @@ end
         end
     end
 end
-
-@testset "set packing" begin
-    sets = [[1, 2, 5], [1, 3], [2, 4], [3, 6], [2, 3, 6]]  # each set is a vertex
-    gp = set_packing(sets; optimizer=GreedyMethod())
-    res = best_solutions(gp; all=true)[]
-    @test res.n == 2
-    @test BitVector(Bool[0,0,1,1,0]) ∈ res.c.data
-    @test BitVector(Bool[1,0,0,1,0]) ∈ res.c.data
-    @test BitVector(Bool[0,1,1,0,0]) ∈ res.c.data
-end
-
-@testset "enumerating - coloring" begin
-    g = SimpleGraph(5)
-    for (i,j) in [(1,2),(2,3),(3,4),(4,1),(1,5),(2,4)]
-        add_edge!(g, i, j)
-    end
-    code = Coloring{3}(g; optimizer=GreedyMethod())
-    res = solutions(code, CountingTropicalF64; all=true)[]
-    @test length(res.c.data) == 12
-    g = smallgraph(:petersen)
-    code = Coloring{3}(g; optimizer=GreedyMethod())
-    res = solutions(code, CountingTropicalF64; all=true)[]
-    @test length(res.c.data) == 120
-end
-
-@testset "enumerating - matching" begin
-    g = smallgraph(:petersen)
-    code = Matching(g; optimizer=GreedyMethod())
-    res = solutions(code, CountingTropicalF64; all=true)[]
-    @test res.n == 5
-    @test length(res.c.data) == 6
-end

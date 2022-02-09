@@ -227,8 +227,11 @@ function Base.:*(x::ConfigSampler{L,S,C}, y::ConfigSampler{L,S,C}) where {L,S,C}
     ConfigSampler(x.data | y.data)
 end
 
-Base.zero(::Type{ConfigSampler{N,S,C}}) where {N,S,C} = ConfigSampler{N,S,C}(statictrues(StaticElementVector{N,S,C}))
-Base.one(::Type{ConfigSampler{N,S,C}}) where {N,S,C} = ConfigSampler{N,S,C}(staticfalses(StaticElementVector{N,S,C}))
+@generated function Base.zero(::Type{ConfigSampler{N,S,C}}) where {N,S,C}
+    ex = Expr(:call, :(StaticElementVector{$N,$S,$C}), Expr(:tuple, fill(typemax(UInt64), C)...))
+    :(ConfigSampler{N,S,C}($ex))
+end
+Base.one(::Type{ConfigSampler{N,S,C}}) where {N,S,C} = ConfigSampler{N,S,C}(zero(StaticElementVector{N,S,C}))
 Base.zero(::ConfigSampler{N,S,C}) where {N,S,C} = zero(ConfigSampler{N,S,C})
 Base.one(::ConfigSampler{N,S,C}) where {N,S,C} = one(ConfigSampler{N,S,C})
 

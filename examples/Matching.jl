@@ -48,9 +48,25 @@ show_graph(graph; locs=locations)
 problem = Matching(graph);
 
 # ## Solving properties
+# ### Maximum matching
+# ### Configuration properties
+max_matching = solve(problem, SizeMax())[]
+# The largest number of matching is 5, which means we have a perfect matching (vertices are all paired).
+
+# ##### matching polynomial
 # The graph polynomial defined for the independence problem is known as the matching polynomial.
 # Here, we adopt the first definition in the [wiki page](https://en.wikipedia.org/wiki/Matching_polynomial).
 # ```math
 # M(G, x) = \sum\limits_{k=1}^{|V|/2} c_k x^k,
 # ```
 # where ``k`` is the number of matches, and coefficients ``c_k`` are the corresponding counting.
+
+matching_poly = solve(problem, GraphPolynomial())[]
+
+# ## Configuration properties
+
+# ##### one of the perfect matches
+match_config = solve(problem, SingleConfigMax())[]
+
+# Let us show the result by coloring the matched edges to red
+show_graph(graph; locs=locations, edge_colors=[isone(match_config.c.data[i]) ? "red" : "black" for i=1:ne(graph)])

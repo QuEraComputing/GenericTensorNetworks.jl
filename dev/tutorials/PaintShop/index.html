@@ -1,154 +1,320 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Independent set problem · GraphTensorNetworks.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link rel="canonical" href="https://Happy-Diode.github.io/GraphTensorNetworks.jl/tutorials/IndependentSet.html"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><script src="../../copy.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../index.html">GraphTensorNetworks.jl</a></span></div><form class="docs-search" action="../search.html"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../index.html">Home</a></li><li><span class="tocitem">Tutorials</span><ul><li class="is-active"><a class="tocitem" href="IndependentSet.html">Independent set problem</a><ul class="internal"><li><a class="tocitem" href="#Problem-definition"><span>Problem definition</span></a></li><li><a class="tocitem" href="#Tensor-network-representation"><span>Tensor network representation</span></a></li><li><a class="tocitem" href="#Solving-properties"><span>Solving properties</span></a></li><li><a class="tocitem" href="#Weights-and-open-vertices"><span>Weights and open vertices</span></a></li></ul></li><li><a class="tocitem" href="MaximalIS.html">Maximal independent set problem</a></li><li><a class="tocitem" href="MaxCut.html">Cutting problem</a></li><li><a class="tocitem" href="Matching.html">Matching problem</a></li><li><a class="tocitem" href="PaintShop.html">Binary paint shop problem</a></li><li><a class="tocitem" href="Coloring.html">Coloring problem</a></li><li><a class="tocitem" href="Others.html">Other problems</a></li></ul></li><li><a class="tocitem" href="../ref.html">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href="IndependentSet.html">Independent set problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href="IndependentSet.html">Independent set problem</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Happy-Diode/GraphTensorNetworks.jl/blob/master/examples/IndependentSet.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Independent-set-problem"><a class="docs-heading-anchor" href="#Independent-set-problem">Independent set problem</a><a id="Independent-set-problem-1"></a><a class="docs-heading-anchor-permalink" href="#Independent-set-problem" title="Permalink"></a></h1><h2 id="Problem-definition"><a class="docs-heading-anchor" href="#Problem-definition">Problem definition</a><a id="Problem-definition-1"></a><a class="docs-heading-anchor-permalink" href="#Problem-definition" title="Permalink"></a></h2><p>In graph theory, an <a href="https://en.wikipedia.org/wiki/Independent_set_(graph_theory)">independent set</a> is a set of vertices in a graph, no two of which are adjacent. In the following, we are going to defined an independent set problem for the Petersen graph.</p><pre><code class="language-julia hljs">using GraphTensorNetworks, Graphs
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Binary paint shop problem · GraphTensorNetworks.jl</title><script data-outdated-warner src="../../assets/warner.js"></script><link rel="canonical" href="https://Happy-Diode.github.io/GraphTensorNetworks.jl/tutorials/PaintShop/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><script src="../../../copy.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GraphTensorNetworks.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../IndependentSet/">Independent set problem</a></li><li><a class="tocitem" href="../MaximalIS/">Maximal independent set problem</a></li><li><a class="tocitem" href="../MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../Matching/">Matching problem</a></li><li class="is-active"><a class="tocitem" href>Binary paint shop problem</a><ul class="internal"><li><a class="tocitem" href="#Problme-Definition"><span>Problme Definition</span></a></li><li><a class="tocitem" href="#Tensor-network-representation"><span>Tensor network representation</span></a></li></ul></li><li><a class="tocitem" href="../Coloring/">Coloring problem</a></li><li><a class="tocitem" href="../Others/">Other problems</a></li></ul></li><li><a class="tocitem" href="../../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Binary paint shop problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Binary paint shop problem</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Happy-Diode/GraphTensorNetworks.jl/blob/master/examples/PaintShop.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Binary-paint-shop-problem"><a class="docs-heading-anchor" href="#Binary-paint-shop-problem">Binary paint shop problem</a><a id="Binary-paint-shop-problem-1"></a><a class="docs-heading-anchor-permalink" href="#Binary-paint-shop-problem" title="Permalink"></a></h1><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>This tutorial only covers the binary paint shop problem specific features, It is recommended to read the <a href="../IndependentSet/#Independent-set-problem">Independent set problem</a> tutorial too to know more about</p><ul><li>how to optimize the tensor network contraction order,</li><li>what are the other graph properties computable,</li><li>how to select correct method to compute graph properties,</li><li>how to compute weighted graphs and handle open vertices.</li></ul></div></div><h2 id="Problme-Definition"><a class="docs-heading-anchor" href="#Problme-Definition">Problme Definition</a><a id="Problme-Definition-1"></a><a class="docs-heading-anchor-permalink" href="#Problme-Definition" title="Permalink"></a></h2><p>The <a href="http://m-hikari.com/ams/ams-2012/ams-93-96-2012/popovAMS93-96-2012-2.pdf">binary paint shop problem</a> is defined as follows: we are given a <span>$2m$</span> length sequence containing <span>$m$</span> cars, where each car appears twice. Each car need to be colored red in one occurrence, and blue in the other. We need to choose which occurrence for each car to color with which color — the goal is to minimize the number of times we need to change the current color.</p><p>In the following, we use a character to represent a car, and defined a binary paint shop problem as a string that each character appear exactly twice.</p><pre><code class="language-julia hljs">using GraphTensorNetworks, Graphs
 
-graph = Graphs.smallgraph(:petersen)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{10, 15} undirected simple Int64 graph</code></pre><p>We can visualize this graph using the following function</p><pre><code class="language-julia hljs">rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
+sequence = collect(&quot;iadgbeadfcchghebif&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">18-element Vector{Char}:
+ &#39;i&#39;: ASCII/Unicode U+0069 (category Ll: Letter, lowercase)
+ &#39;a&#39;: ASCII/Unicode U+0061 (category Ll: Letter, lowercase)
+ &#39;d&#39;: ASCII/Unicode U+0064 (category Ll: Letter, lowercase)
+ &#39;g&#39;: ASCII/Unicode U+0067 (category Ll: Letter, lowercase)
+ &#39;b&#39;: ASCII/Unicode U+0062 (category Ll: Letter, lowercase)
+ &#39;e&#39;: ASCII/Unicode U+0065 (category Ll: Letter, lowercase)
+ &#39;a&#39;: ASCII/Unicode U+0061 (category Ll: Letter, lowercase)
+ &#39;d&#39;: ASCII/Unicode U+0064 (category Ll: Letter, lowercase)
+ &#39;f&#39;: ASCII/Unicode U+0066 (category Ll: Letter, lowercase)
+ &#39;c&#39;: ASCII/Unicode U+0063 (category Ll: Letter, lowercase)
+ &#39;c&#39;: ASCII/Unicode U+0063 (category Ll: Letter, lowercase)
+ &#39;h&#39;: ASCII/Unicode U+0068 (category Ll: Letter, lowercase)
+ &#39;g&#39;: ASCII/Unicode U+0067 (category Ll: Letter, lowercase)
+ &#39;h&#39;: ASCII/Unicode U+0068 (category Ll: Letter, lowercase)
+ &#39;e&#39;: ASCII/Unicode U+0065 (category Ll: Letter, lowercase)
+ &#39;b&#39;: ASCII/Unicode U+0062 (category Ll: Letter, lowercase)
+ &#39;i&#39;: ASCII/Unicode U+0069 (category Ll: Letter, lowercase)
+ &#39;f&#39;: ASCII/Unicode U+0066 (category Ll: Letter, lowercase)</code></pre><p>We can visualize this paint shop problem as a graph</p><pre><code class="language-julia hljs">rot(a, b, θ) = cos(θ)*a + sin(θ)*b, cos(θ)*b - sin(θ)*a
 
-locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.6, i) for i=0:4]...]
+locations = [rot(0.0, 1.0, -0.25π - 1.5*π*(i-0.5)/length(sequence)) for i=1:length(sequence)]
 
-show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-8"?>
+graph = path_graph(length(sequence))
+for i=1:length(sequence)
+    j = findlast(==(sequence[i]), sequence)
+    i != j &amp;&amp; add_edge!(graph, i, j)
+end
+
+show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=[sequence[e.src] == sequence[e.dst] ? &quot;blue&quot; : &quot;black&quot; for e in edges(graph)])</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink"
      version="1.2"
-     width="120mm" height="116.77mm" viewBox="0 0 120 116.77"
+     width="120mm" height="106.08mm" viewBox="0 0 120 106.08"
      stroke="none"
      fill="#000000"
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-8524c92a">
+     id="img-735e2846">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-8524c92a-1">
-  <g transform="translate(76.48,39.02)">
-    <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
-  </g>
-  <g transform="translate(43.52,39.02)">
-    <path fill="none" d="M16.48,-11.97 L-16.48,11.97 " class="primitive"/>
-  </g>
-  <g transform="translate(60,33.97)">
-    <path fill="none" d="M0,-6.93 L0,6.93 " class="primitive"/>
-  </g>
-  <g transform="translate(86.66,70.36)">
-    <path fill="none" d="M6.29,-19.37 L-6.29,19.37 " class="primitive"/>
-  </g>
-  <g transform="translate(86.37,53.13)">
-    <path fill="none" d="M6.59,-2.14 L-6.59,2.14 " class="primitive"/>
-  </g>
-  <g transform="translate(60,89.73)">
-    <path fill="none" d="M20.37,0 L-20.37,0 " class="primitive"/>
-  </g>
-  <g transform="translate(76.29,84.12)">
-    <path fill="none" d="M4.07,5.61 L-4.07,-5.61 " class="primitive"/>
-  </g>
-  <g transform="translate(33.34,70.36)">
-    <path fill="none" d="M6.29,19.37 L-6.29,-19.37 " class="primitive"/>
-  </g>
-  <g transform="translate(43.71,84.12)">
-    <path fill="none" d="M-4.07,5.61 L4.07,-5.61 " class="primitive"/>
-  </g>
-  <g transform="translate(33.63,53.13)">
-    <path fill="none" d="M-6.59,-2.14 L6.59,2.14 " class="primitive"/>
-  </g>
-  <g transform="translate(66.11,59.71)">
-    <path fill="none" d="M-6.11,-18.81 L6.11,18.81 " class="primitive"/>
-  </g>
-  <g transform="translate(53.89,59.71)">
-    <path fill="none" d="M6.11,-18.81 L-6.11,18.81 " class="primitive"/>
-  </g>
-  <g transform="translate(63.78,66.89)">
-    <path fill="none" d="M16,-11.62 L-16,11.62 " class="primitive"/>
-  </g>
-  <g transform="translate(60,55.27)">
-    <path fill="none" d="M19.77,0 L-19.77,0 " class="primitive"/>
-  </g>
-  <g transform="translate(56.22,66.89)">
-    <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-1">
+  <g transform="translate(91.24,28.04)">
+    <path fill="none" d="M2.37,4.11 L-2.37,-4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-8524c92a-2">
-  <g transform="translate(60,27.04)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
-  </g>
-  <g transform="translate(92.96,50.99)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
-  </g>
-  <g transform="translate(80.37,89.73)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
-  </g>
-  <g transform="translate(39.63,89.73)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
-  </g>
-  <g transform="translate(27.04,50.99)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
-  </g>
-  <g transform="translate(60,40.9)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
-  </g>
-  <g transform="translate(79.77,55.27)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
-  </g>
-  <g transform="translate(72.22,78.52)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
-  </g>
-  <g transform="translate(47.78,78.52)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
-  </g>
-  <g transform="translate(40.23,55.27)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-2">
+  <g transform="translate(94.84,36.74)">
+    <path fill="none" d="M1.23,4.59 L-1.23,-4.59 " class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-8524c92a-3">
-  <g transform="translate(60,27.04)">
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-3">
+  <g transform="translate(96.07,46.08)">
+    <path fill="none" d="M0,4.75 L0,-4.75 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-4">
+  <g transform="translate(94.84,55.41)">
+    <path fill="none" d="M-1.23,4.59 L1.23,-4.59 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-5">
+  <g transform="translate(91.24,64.11)">
+    <path fill="none" d="M-2.37,4.11 L2.37,-4.11 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-735e2846-6">
+  <g transform="translate(87.88,67.47)">
+    <path fill="none" d="M-5.73,7.47 L5.73,-7.47 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-7">
+  <g transform="translate(85.51,71.58)">
+    <path fill="none" d="M-3.36,3.36 L3.36,-3.36 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-8">
+  <g transform="translate(78.04,77.32)">
+    <path fill="none" d="M-4.11,2.37 L4.11,-2.37 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-735e2846-9">
+  <g transform="translate(69.34,80.92)">
+    <path fill="none" d="M-4.59,1.23 L4.59,-1.23 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-735e2846-10">
+  <g transform="translate(72.06,53.04)">
+    <path fill="none" d="M-16.81,29.11 L16.81,-29.11 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-11">
+  <g transform="translate(60,82.15)">
+    <path fill="none" d="M-4.75,0 L4.75,0 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-12">
+  <g transform="translate(50.66,80.92)">
+    <path fill="none" d="M-4.59,-1.23 L4.59,1.23 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-13">
+  <g transform="translate(41.96,77.32)">
+    <path fill="none" d="M-4.11,-2.37 L4.11,2.37 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-735e2846-14">
+  <g transform="translate(63.6,59.53)">
+    <path fill="none" d="M-32.47,8.7 L32.47,-8.7 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-15">
+  <g transform="translate(34.49,71.58)">
+    <path fill="none" d="M-3.36,-3.36 L3.36,3.36 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-735e2846-16">
+  <g transform="translate(61.23,50.66)">
+    <path fill="none" d="M-34.84,9.34 L34.84,-9.34 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-17">
+  <g transform="translate(28.76,64.11)">
+    <path fill="none" d="M-2.37,-4.11 L2.37,4.11 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-735e2846-18">
+  <g transform="translate(56.4,59.53)">
+    <path fill="none" d="M-32.47,-8.7 L32.47,8.7 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-19">
+  <g transform="translate(25.16,55.41)">
+    <path fill="none" d="M-1.23,-4.59 L1.23,4.59 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-735e2846-20">
+  <g transform="translate(35,60.51)">
+    <path fill="none" d="M-11.07,-19.18 L11.07,19.18 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-21">
+  <g transform="translate(23.93,46.08)">
+    <path fill="none" d="M0,-4.75 L0,4.75 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-735e2846-22">
+  <g transform="translate(32.12,53.55)">
+    <path fill="none" d="M-5.73,-21.39 L5.73,21.39 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-23">
+  <g transform="translate(25.16,36.74)">
+    <path fill="none" d="M1.23,-4.59 L-1.23,4.59 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-735e2846-24">
+  <g transform="translate(62.37,28.04)">
+    <path fill="none" d="M-31.24,-4.11 L31.24,4.11 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-735e2846-25">
+  <g transform="translate(28.76,28.04)">
+    <path fill="none" d="M2.37,-4.11 L-2.37,4.11 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#FFFFFF" stroke="#000000" id="img-735e2846-26">
+  <g transform="translate(31.13,23.93)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(26.39,32.15)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(23.93,41.33)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(23.93,50.83)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(26.39,60)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(31.13,68.23)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(37.85,74.94)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(46.08,79.69)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(55.25,82.15)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(64.75,82.15)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(73.92,79.69)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(82.15,74.94)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(88.87,68.23)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(93.61,60)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(96.07,50.83)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(96.07,41.33)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(93.61,32.15)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+  <g transform="translate(88.87,23.93)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g fill="#000000" font-size="2.14" id="img-735e2846-27">
+  <g transform="translate(31.13,23.93)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">1</text>
+      <text text-anchor="middle" dy="0.35em">i</text>
     </g>
   </g>
-  <g transform="translate(92.96,50.99)">
+  <g transform="translate(26.39,32.15)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">2</text>
+      <text text-anchor="middle" dy="0.35em">a</text>
     </g>
   </g>
-  <g transform="translate(80.37,89.73)">
+  <g transform="translate(23.93,41.33)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">3</text>
+      <text text-anchor="middle" dy="0.35em">d</text>
     </g>
   </g>
-  <g transform="translate(39.63,89.73)">
+  <g transform="translate(23.93,50.83)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">4</text>
+      <text text-anchor="middle" dy="0.35em">g</text>
     </g>
   </g>
-  <g transform="translate(27.04,50.99)">
+  <g transform="translate(26.39,60)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">5</text>
+      <text text-anchor="middle" dy="0.35em">b</text>
     </g>
   </g>
-  <g transform="translate(60,40.9)">
+  <g transform="translate(31.13,68.23)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">6</text>
+      <text text-anchor="middle" dy="0.35em">e</text>
     </g>
   </g>
-  <g transform="translate(79.77,55.27)">
+  <g transform="translate(37.85,74.94)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">7</text>
+      <text text-anchor="middle" dy="0.35em">a</text>
     </g>
   </g>
-  <g transform="translate(72.22,78.52)">
+  <g transform="translate(46.08,79.69)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">8</text>
+      <text text-anchor="middle" dy="0.35em">d</text>
     </g>
   </g>
-  <g transform="translate(47.78,78.52)">
+  <g transform="translate(55.25,82.15)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">9</text>
+      <text text-anchor="middle" dy="0.35em">f</text>
     </g>
   </g>
-  <g transform="translate(40.23,55.27)">
+  <g transform="translate(64.75,82.15)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">10</text>
+      <text text-anchor="middle" dy="0.35em">c</text>
+    </g>
+  </g>
+  <g transform="translate(73.92,79.69)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">c</text>
+    </g>
+  </g>
+  <g transform="translate(82.15,74.94)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">h</text>
+    </g>
+  </g>
+  <g transform="translate(88.87,68.23)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">g</text>
+    </g>
+  </g>
+  <g transform="translate(93.61,60)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">h</text>
+    </g>
+  </g>
+  <g transform="translate(96.07,50.83)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">e</text>
+    </g>
+  </g>
+  <g transform="translate(96.07,41.33)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">b</text>
+    </g>
+  </g>
+  <g transform="translate(93.61,32.15)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">i</text>
+    </g>
+  </g>
+  <g transform="translate(88.87,23.93)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">f</text>
     </g>
   </g>
 </g>
@@ -299,177 +465,340 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 
 ]]> </script>
 </svg>
-<h2 id="Tensor-network-representation"><a class="docs-heading-anchor" href="#Tensor-network-representation">Tensor network representation</a><a id="Tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Tensor-network-representation" title="Permalink"></a></h2><p>Type <a href="../ref.html#GraphTensorNetworks.IndependentSet"><code>IndependentSet</code></a> can be used for constructing the tensor network with optimized contraction order for solving an independent set problem. we map a vertex <span>$i\in V$</span> to a label <span>$s_i \in \{0, 1\}$</span> of dimension 2, where we use 0 (1) to denote a vertex is absent (present) in the set. For each label <span>$s_i$</span>, we defined a parametrized rank-one vertex tensor <span>$W(x_i)$</span> as</p><p class="math-container">\[W(x_i)_{s_i} = \left(\begin{matrix}
-    1 \\
-    x_i
-\end{matrix}\right)_{s_i}\]</p><p>We use subscripts to index tensor elements, e.g.<span>$W(x_i)_0=1$</span> is the first element associated with <span>$s_i=0$</span> and <span>$W(x_i)_1=x_i$</span> is the second element associated with <span>$s_i=1$</span>. Similarly, on each edge <span>$(u, v)$</span>, we define a matrix <span>$B$</span> indexed by <span>$s_u$</span> and <span>$s_v$</span> as</p><p class="math-container">\[B_{s_i s_j} = \left(\begin{matrix}
-    1  &amp; 1\\
-    1 &amp; 0
-\end{matrix}\right)_{s_is_j}\]</p><p>Let us contruct the problem instance with optimized tensor network contraction order as bellow.</p><pre><code class="language-julia hljs">problem = IndependentSet(graph; optimizer=TreeSA(sc_weight=1.0, ntrials=10,
-                         βs=0.01:0.1:15.0, niters=20, rw_weight=0.2),
-                         simplifier=MergeGreedy());</code></pre><p>In the input arguments of <a href="../ref.html#GraphTensorNetworks.IndependentSet"><code>IndependentSet</code></a>, the <code>optimizer</code> is for optimizing the contraction orders. Here we use the local search based optimizer in <a href="https://arxiv.org/abs/2108.05665">arXiv:2108.05665</a>. If no optimizer is specified, the default fast (in terms of the speed of searching contraction order) but worst (in term of contraction complexity) <a href="../ref.html#OMEinsumContractionOrders.GreedyMethod"><code>GreedyMethod</code></a> will be used. <code>simplifier</code> is a preprocessing routine to speed up the <code>optimizer</code>. The returned instance <code>problem</code> contains a field <code>code</code> that specifies the tensor network contraction order. Its contraction time space complexity is <span>$2^{{\rm tw}(G)}$</span>, where <span>${\rm tw(G)}$</span> is the <a href="https://en.wikipedia.org/wiki/Treewidth">tree-width</a> of <span>$G$</span>. One can check the time, space and read-write complexity with the following function.</p><pre><code class="language- hljs">timespacereadwrite_complexity(problem)</code></pre><p>The return values are <code>log2</code> of the the number of iterations, the number elements in the max tensor and the number of read-write operations to tensor elements.</p><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><h3 id="Maximum-independent-set-size-\\alpha(G)"><a class="docs-heading-anchor" href="#Maximum-independent-set-size-\\alpha(G)">Maximum independent set size <span>$\alpha(G)$</span></a><a id="Maximum-independent-set-size-\\alpha(G)-1"></a><a class="docs-heading-anchor-permalink" href="#Maximum-independent-set-size-\\alpha(G)" title="Permalink"></a></h3><pre><code class="language-julia hljs">maximum_independent_set_size = solve(problem, SizeMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4.0ₜ</code></pre><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="counting-all-independent-sets"><a class="docs-heading-anchor" href="#counting-all-independent-sets">counting all independent sets</a><a id="counting-all-independent-sets-1"></a><a class="docs-heading-anchor-permalink" href="#counting-all-independent-sets" title="Permalink"></a></h5><pre><code class="language-julia hljs">count_all_independent_sets = solve(problem, CountingAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">76.0</code></pre><h5 id="counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1"><a class="docs-heading-anchor" href="#counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1">counting independent sets with sizes <span>$\alpha(G)$</span> and <span>$\alpha(G)-1$</span></a><a id="counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1-1"></a><a class="docs-heading-anchor-permalink" href="#counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1" title="Permalink"></a></h5><pre><code class="language-julia hljs">count_max2_independent_sets = solve(problem, CountingMax(2))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">30.0*x^3 + 5.0*x^4</code></pre><h5 id="independence-polynomial"><a class="docs-heading-anchor" href="#independence-polynomial">independence polynomial</a><a id="independence-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#independence-polynomial" title="Permalink"></a></h5><p>The graph polynomial defined for the independence problem is known as the independence polynomial.</p><p class="math-container">\[I(G, x) = \sum_{k=0}^{\alpha(G)} a_k x^k,\]</p><p>where <span>$\alpha(G)$</span> is the maximum independent set size, <span>$a_k$</span> is the number of independent sets of size <span>$k$</span> in graph <span>$G=(V,E)$</span>. The total number of independent sets is thus equal to <span>$I(G, 1)$</span>. There are 3 methods to compute a graph polynomial, <code>:finitefield</code>, <code>:fft</code> and <code>:polynomial</code>. These methods are introduced in the docstring of <a href="../ref.html#GraphTensorNetworks.GraphPolynomial"><code>GraphPolynomial</code></a>.</p><pre><code class="language-julia hljs">independence_polynomial = solve(problem, GraphPolynomial(; method=:finitefield))[]</code></pre>1 &#43; 10&#8729;x &#43; 30&#8729;x<sup>2</sup> &#43; 30&#8729;x<sup>3</sup> &#43; 5&#8729;x<sup>4</sup><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="finding-one-maximum-independent-set-(MIS)"><a class="docs-heading-anchor" href="#finding-one-maximum-independent-set-(MIS)">finding one maximum independent set (MIS)</a><a id="finding-one-maximum-independent-set-(MIS)-1"></a><a class="docs-heading-anchor-permalink" href="#finding-one-maximum-independent-set-(MIS)" title="Permalink"></a></h5><p>There are two approaches to find one of the best solution. The unbounded (default) version uses <a href="../ref.html#GraphTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> to sample one of the best solutions directly. The bounded version uses the binary gradient back-propagation (see our paper) to compute the gradients. It requires caching intermediate states, but is often faster on CPU because it can use <a href="https://github.com/TensorBFS/TropicalGEMM.jl"><code>TropicalGEMM</code></a>.</p><pre><code class="language-julia hljs">max_config = solve(problem, SingleConfigMax(; bounded=false))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, ConfigSampler{10, 1, 1}(0101010001))ₜ</code></pre><p>The return value contains a bit string, and one should read this bit string from left to right. Having value 1 at i-th bit means vertex <span>$i$</span> is in the maximum independent set. One can visualize this MIS with the following function.</p><pre><code class="language-julia hljs">show_graph(graph; locs=locations, colors=[iszero(max_config.c.data[i]) ? &quot;white&quot; : &quot;red&quot;
-                                 for i=1:nv(graph)])</code></pre><?xml version="1.0" encoding="UTF-8"?>
+<p>Vertices connected by blue edges must have different colors, and the goal becomes a min-cut problem defined on black edges.</p><h2 id="Tensor-network-representation"><a class="docs-heading-anchor" href="#Tensor-network-representation">Tensor network representation</a><a id="Tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Tensor-network-representation" title="Permalink"></a></h2><p>Type <a href="../../ref/#GraphTensorNetworks.PaintShop"><code>PaintShop</code></a> can be used for constructing the tensor network with optimized contraction order for solving a binary paint shop problem. To obtain its tensor network representation, we associating car <span>$c_i$</span> (the <span>$i$</span>-th character in our example) with a degree of freedom <span>$s_{c_i} \in \{0, 1\}$</span>, where we use <span>$0$</span> to denote the first appearance of a car is colored red and <span>$1$</span> to denote the first appearance of a car is colored blue. For each black edges <span>$(i, i+1)$</span>, we define an edge tensor labeld by <span>$(s_{c_i}, s_{c_{i+1}})$</span> as follows: If both cars on this edge are their first or second appearance</p><p class="math-container">\[B^{\rm parallel} = \begin{matrix}
+x &amp; 1 \\
+1 &amp; x \\
+\end{matrix},
+
+otherwise,
+B^{\rm anti-parallel} = B^{\rm 10} = \begin{matrix}
+1 &amp; x \\
+x &amp; 1 \\
+\end{matrix}.\]</p><p>It can be understood as, when both cars are their first appearance, they tend to have the same configuration so that the color is not changed. Otherwise, they tend to have different configuration to keep the color unchanged.</p><p>Let us contruct the problem instance as bellow.</p><pre><code class="language-julia hljs">problem = PaintShop(sequence);</code></pre><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="maximal-independence-polynomial"><a class="docs-heading-anchor" href="#maximal-independence-polynomial">maximal independence polynomial</a><a id="maximal-independence-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#maximal-independence-polynomial" title="Permalink"></a></h5><p>The graph polynomial defined for the maximal independent set problem is</p><p class="math-container">\[I_{\rm max}(G, x) = \sum_{k=0}^{\alpha(G)} b_k x^k,\]</p><p>where <span>$b_k$</span> is the number of maximal independent sets of size <span>$k$</span> in graph <span>$G=(V, E)$</span>.</p><pre><code class="language-julia hljs">max_config = solve(problem, GraphPolynomial())[]</code></pre>8&#8729;x<sup>3</sup> &#43; 12&#8729;x<sup>4</sup> &#43; 50&#8729;x<sup>5</sup> &#43; 48&#8729;x<sup>6</sup> &#43; 104&#8729;x<sup>7</sup> &#43; 88&#8729;x<sup>8</sup> &#43; 60&#8729;x<sup>9</sup> &#43; 80&#8729;x<sup>10</sup> &#43; 32&#8729;x<sup>11</sup> &#43; 28&#8729;x<sup>12</sup> &#43; 2&#8729;x<sup>13</sup><p>Since it only counts the maximal independent sets, the first several coefficients are 0.</p><h3 id="Counting-properties-2"><a class="docs-heading-anchor" href="#Counting-properties-2">Counting properties</a><a class="docs-heading-anchor-permalink" href="#Counting-properties-2" title="Permalink"></a></h3><h5 id="graph-polynomial"><a class="docs-heading-anchor" href="#graph-polynomial">graph polynomial</a><a id="graph-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#graph-polynomial" title="Permalink"></a></h5><p>The graph polynomial of the binary paint shop problem in our convension is defined as</p><p class="math-container">\[D(G, x) = \sum_{k=0}^{\delta(G)} d_k x^k\]</p><p>where <span>$2d_k$</span> is the number of possible coloring with number of color changes <span>$2m-1-k$</span>.</p><pre><code class="language-julia hljs">paint_polynomial = solve(problem, GraphPolynomial())[]</code></pre>8&#8729;x<sup>3</sup> &#43; 12&#8729;x<sup>4</sup> &#43; 50&#8729;x<sup>5</sup> &#43; 48&#8729;x<sup>6</sup> &#43; 104&#8729;x<sup>7</sup> &#43; 88&#8729;x<sup>8</sup> &#43; 60&#8729;x<sup>9</sup> &#43; 80&#8729;x<sup>10</sup> &#43; 32&#8729;x<sup>11</sup> &#43; 28&#8729;x<sup>12</sup> &#43; 2&#8729;x<sup>13</sup><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="finding-best-solutions"><a class="docs-heading-anchor" href="#finding-best-solutions">finding best solutions</a><a id="finding-best-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#finding-best-solutions" title="Permalink"></a></h5><pre><code class="language-julia hljs">best_configs = solve(problem, ConfigsMax())[]
+
+painting1 = paint_shop_coloring_from_config(best_configs.c.data[1]; initial=false)
+
+show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=[sequence[e.src] == sequence[e.dst] ? &quot;blue&quot; : &quot;black&quot; for e in edges(graph)],
+                vertex_colors=[isone(c) ? &quot;red&quot; : &quot;black&quot; for c in painting1], vertex_text_color=&quot;white&quot;)</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink"
      version="1.2"
-     width="120mm" height="116.77mm" viewBox="0 0 120 116.77"
+     width="120mm" height="106.08mm" viewBox="0 0 120 106.08"
      stroke="none"
      fill="#000000"
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-478a772b">
+     id="img-fd1d278b">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-478a772b-1">
-  <g transform="translate(76.48,39.02)">
-    <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
-  </g>
-  <g transform="translate(43.52,39.02)">
-    <path fill="none" d="M16.48,-11.97 L-16.48,11.97 " class="primitive"/>
-  </g>
-  <g transform="translate(60,33.97)">
-    <path fill="none" d="M0,-6.93 L0,6.93 " class="primitive"/>
-  </g>
-  <g transform="translate(86.66,70.36)">
-    <path fill="none" d="M6.29,-19.37 L-6.29,19.37 " class="primitive"/>
-  </g>
-  <g transform="translate(86.37,53.13)">
-    <path fill="none" d="M6.59,-2.14 L-6.59,2.14 " class="primitive"/>
-  </g>
-  <g transform="translate(60,89.73)">
-    <path fill="none" d="M20.37,0 L-20.37,0 " class="primitive"/>
-  </g>
-  <g transform="translate(76.29,84.12)">
-    <path fill="none" d="M4.07,5.61 L-4.07,-5.61 " class="primitive"/>
-  </g>
-  <g transform="translate(33.34,70.36)">
-    <path fill="none" d="M6.29,19.37 L-6.29,-19.37 " class="primitive"/>
-  </g>
-  <g transform="translate(43.71,84.12)">
-    <path fill="none" d="M-4.07,5.61 L4.07,-5.61 " class="primitive"/>
-  </g>
-  <g transform="translate(33.63,53.13)">
-    <path fill="none" d="M-6.59,-2.14 L6.59,2.14 " class="primitive"/>
-  </g>
-  <g transform="translate(66.11,59.71)">
-    <path fill="none" d="M-6.11,-18.81 L6.11,18.81 " class="primitive"/>
-  </g>
-  <g transform="translate(53.89,59.71)">
-    <path fill="none" d="M6.11,-18.81 L-6.11,18.81 " class="primitive"/>
-  </g>
-  <g transform="translate(63.78,66.89)">
-    <path fill="none" d="M16,-11.62 L-16,11.62 " class="primitive"/>
-  </g>
-  <g transform="translate(60,55.27)">
-    <path fill="none" d="M19.77,0 L-19.77,0 " class="primitive"/>
-  </g>
-  <g transform="translate(56.22,66.89)">
-    <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-1">
+  <g transform="translate(91.24,28.04)">
+    <path fill="none" d="M2.37,4.11 L-2.37,-4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-478a772b-2">
-  <g transform="translate(40.23,55.27)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-2">
+  <g transform="translate(94.84,36.74)">
+    <path fill="none" d="M1.23,4.59 L-1.23,-4.59 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-478a772b-3">
-  <g transform="translate(47.78,78.52)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-3">
+  <g transform="translate(96.07,46.08)">
+    <path fill="none" d="M0,4.75 L0,-4.75 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-478a772b-4">
-  <g transform="translate(72.22,78.52)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-4">
+  <g transform="translate(94.84,55.41)">
+    <path fill="none" d="M-1.23,4.59 L1.23,-4.59 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-478a772b-5">
-  <g transform="translate(79.77,55.27)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-5">
+  <g transform="translate(91.24,64.11)">
+    <path fill="none" d="M-2.37,4.11 L2.37,-4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-478a772b-6">
-  <g transform="translate(60,40.9)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#0000FF" id="img-fd1d278b-6">
+  <g transform="translate(87.88,67.47)">
+    <path fill="none" d="M-5.73,7.47 L5.73,-7.47 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-478a772b-7">
-  <g transform="translate(27.04,50.99)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-7">
+  <g transform="translate(85.51,71.58)">
+    <path fill="none" d="M-3.36,3.36 L3.36,-3.36 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-478a772b-8">
-  <g transform="translate(39.63,89.73)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-8">
+  <g transform="translate(78.04,77.32)">
+    <path fill="none" d="M-4.11,2.37 L4.11,-2.37 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-478a772b-9">
-  <g transform="translate(80.37,89.73)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#0000FF" id="img-fd1d278b-9">
+  <g transform="translate(69.34,80.92)">
+    <path fill="none" d="M-4.59,1.23 L4.59,-1.23 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-478a772b-10">
-  <g transform="translate(92.96,50.99)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#0000FF" id="img-fd1d278b-10">
+  <g transform="translate(72.06,53.04)">
+    <path fill="none" d="M-16.81,29.11 L16.81,-29.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-478a772b-11">
-  <g transform="translate(60,27.04)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-11">
+  <g transform="translate(60,82.15)">
+    <path fill="none" d="M-4.75,0 L4.75,0 " class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-478a772b-12">
-  <g transform="translate(60,27.04)">
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-12">
+  <g transform="translate(50.66,80.92)">
+    <path fill="none" d="M-4.59,-1.23 L4.59,1.23 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-13">
+  <g transform="translate(41.96,77.32)">
+    <path fill="none" d="M-4.11,-2.37 L4.11,2.37 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-fd1d278b-14">
+  <g transform="translate(63.6,59.53)">
+    <path fill="none" d="M-32.47,8.7 L32.47,-8.7 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-15">
+  <g transform="translate(34.49,71.58)">
+    <path fill="none" d="M-3.36,-3.36 L3.36,3.36 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-fd1d278b-16">
+  <g transform="translate(61.23,50.66)">
+    <path fill="none" d="M-34.84,9.34 L34.84,-9.34 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-17">
+  <g transform="translate(28.76,64.11)">
+    <path fill="none" d="M-2.37,-4.11 L2.37,4.11 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-fd1d278b-18">
+  <g transform="translate(56.4,59.53)">
+    <path fill="none" d="M-32.47,-8.7 L32.47,8.7 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-19">
+  <g transform="translate(25.16,55.41)">
+    <path fill="none" d="M-1.23,-4.59 L1.23,4.59 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-fd1d278b-20">
+  <g transform="translate(35,60.51)">
+    <path fill="none" d="M-11.07,-19.18 L11.07,19.18 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-21">
+  <g transform="translate(23.93,46.08)">
+    <path fill="none" d="M0,-4.75 L0,4.75 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-fd1d278b-22">
+  <g transform="translate(32.12,53.55)">
+    <path fill="none" d="M-5.73,-21.39 L5.73,21.39 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-23">
+  <g transform="translate(25.16,36.74)">
+    <path fill="none" d="M1.23,-4.59 L-1.23,4.59 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-fd1d278b-24">
+  <g transform="translate(62.37,28.04)">
+    <path fill="none" d="M-31.24,-4.11 L31.24,4.11 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-fd1d278b-25">
+  <g transform="translate(28.76,28.04)">
+    <path fill="none" d="M2.37,-4.11 L-2.37,4.11 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-fd1d278b-26">
+  <g transform="translate(88.87,23.93)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-fd1d278b-27">
+  <g transform="translate(93.61,32.15)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-fd1d278b-28">
+  <g transform="translate(96.07,41.33)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-fd1d278b-29">
+  <g transform="translate(96.07,50.83)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-fd1d278b-30">
+  <g transform="translate(93.61,60)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-fd1d278b-31">
+  <g transform="translate(88.87,68.23)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-fd1d278b-32">
+  <g transform="translate(82.15,74.94)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-fd1d278b-33">
+  <g transform="translate(73.92,79.69)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-fd1d278b-34">
+  <g transform="translate(64.75,82.15)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-fd1d278b-35">
+  <g transform="translate(55.25,82.15)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-fd1d278b-36">
+  <g transform="translate(46.08,79.69)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-fd1d278b-37">
+  <g transform="translate(37.85,74.94)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-fd1d278b-38">
+  <g transform="translate(31.13,68.23)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-fd1d278b-39">
+  <g transform="translate(26.39,60)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-fd1d278b-40">
+  <g transform="translate(23.93,50.83)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-fd1d278b-41">
+  <g transform="translate(23.93,41.33)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-fd1d278b-42">
+  <g transform="translate(26.39,32.15)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-fd1d278b-43">
+  <g transform="translate(31.13,23.93)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g fill="#FFFFFF" font-size="2.14" id="img-fd1d278b-44">
+  <g transform="translate(31.13,23.93)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">1</text>
+      <text text-anchor="middle" dy="0.35em">i</text>
     </g>
   </g>
-  <g transform="translate(92.96,50.99)">
+  <g transform="translate(26.39,32.15)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">2</text>
+      <text text-anchor="middle" dy="0.35em">a</text>
     </g>
   </g>
-  <g transform="translate(80.37,89.73)">
+  <g transform="translate(23.93,41.33)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">3</text>
+      <text text-anchor="middle" dy="0.35em">d</text>
     </g>
   </g>
-  <g transform="translate(39.63,89.73)">
+  <g transform="translate(23.93,50.83)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">4</text>
+      <text text-anchor="middle" dy="0.35em">g</text>
     </g>
   </g>
-  <g transform="translate(27.04,50.99)">
+  <g transform="translate(26.39,60)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">5</text>
+      <text text-anchor="middle" dy="0.35em">b</text>
     </g>
   </g>
-  <g transform="translate(60,40.9)">
+  <g transform="translate(31.13,68.23)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">6</text>
+      <text text-anchor="middle" dy="0.35em">e</text>
     </g>
   </g>
-  <g transform="translate(79.77,55.27)">
+  <g transform="translate(37.85,74.94)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">7</text>
+      <text text-anchor="middle" dy="0.35em">a</text>
     </g>
   </g>
-  <g transform="translate(72.22,78.52)">
+  <g transform="translate(46.08,79.69)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">8</text>
+      <text text-anchor="middle" dy="0.35em">d</text>
     </g>
   </g>
-  <g transform="translate(47.78,78.52)">
+  <g transform="translate(55.25,82.15)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">9</text>
+      <text text-anchor="middle" dy="0.35em">f</text>
     </g>
   </g>
-  <g transform="translate(40.23,55.27)">
+  <g transform="translate(64.75,82.15)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">10</text>
+      <text text-anchor="middle" dy="0.35em">c</text>
+    </g>
+  </g>
+  <g transform="translate(73.92,79.69)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">c</text>
+    </g>
+  </g>
+  <g transform="translate(82.15,74.94)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">h</text>
+    </g>
+  </g>
+  <g transform="translate(88.87,68.23)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">g</text>
+    </g>
+  </g>
+  <g transform="translate(93.61,60)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">h</text>
+    </g>
+  </g>
+  <g transform="translate(96.07,50.83)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">e</text>
+    </g>
+  </g>
+  <g transform="translate(96.07,41.33)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">b</text>
+    </g>
+  </g>
+  <g transform="translate(93.61,32.15)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">i</text>
+    </g>
+  </g>
+  <g transform="translate(88.87,23.93)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">f</text>
     </g>
   </g>
 </g>
@@ -620,188 +949,329 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 
 ]]> </script>
 </svg>
-<h5 id="enumeration-of-all-MISs"><a class="docs-heading-anchor" href="#enumeration-of-all-MISs">enumeration of all MISs</a><a id="enumeration-of-all-MISs-1"></a><a class="docs-heading-anchor-permalink" href="#enumeration-of-all-MISs" title="Permalink"></a></h5><p>There are two approaches to enumerate all best-K solutions. The bounded (default) version is always prefered because it can significantly use the memory usage.</p><pre><code class="language- hljs">all_max_configs = solve(problem, ConfigsMax(1; bounded=true))[]
+<pre><code class="language-julia hljs">painting2 = paint_shop_coloring_from_config(best_configs.c.data[2]; initial=false)
 
-using Compose
-
-m = length(all_max_configs.c)
-
-imgs = ntuple(k-&gt;(context((k-1)/m, 0.0, 1.2/m, 1.0), show_graph(graph;
-                            locs=locations, scale=0.25,
-                            colors=[iszero(all_max_configs.c[k][i]) ? &quot;white&quot; : &quot;red&quot;
-                                 for i=1:nv(graph)])), m)
-
-Compose.set_default_graphic_size(18cm, 4cm); Compose.compose(context(), imgs...)</code></pre><h5 id="enumeration-of-all-IS-configurations"><a class="docs-heading-anchor" href="#enumeration-of-all-IS-configurations">enumeration of all IS configurations</a><a id="enumeration-of-all-IS-configurations-1"></a><a class="docs-heading-anchor-permalink" href="#enumeration-of-all-IS-configurations" title="Permalink"></a></h5><pre><code class="language-julia hljs">all_independent_sets = solve(problem, ConfigsAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0000010000, 0100000000, 0100010000, 0000001000, 0000011000, 0001000000, 0001010000, 0101000000, 0101010000, 0001001000, 0001011000, 0000100000, 0000110000, 0100100000, 0100110000, 0000101000, 0000111000, 0000000010, 0100000010, 0000100010, 0100100010, 1000000000, 1000001000, 1001000000, 1001001000, 1000000010, 0000000001, 0000010001, 0100000001, 0100010001, 0001000001, 0001010001, 0101000001, 0101010001, 0000000011, 0100000011, 1000000001, 1001000001, 1000000011, 0010000000, 0010010000, 0010001000, 0010011000, 0010100000, 0010110000, 0010101000, 0010111000, 0010000010, 0010100010, 1010000000, 1010001000, 1010000010, 0010000001, 0010010001, 0010000011, 1010000001, 1010000011, 0000000100, 0100000100, 0000001100, 0001000100, 0101000100, 0001001100, 0000100100, 0100100100, 0000101100, 0000000110, 0100000110, 0000100110, 0100100110, 1000000100, 1000001100, 1001000100, 1001001100, 1000000110}</code></pre><p>To save/read a set of configuration to disk, one can type the following</p><pre><code class="language-julia hljs">filename = tempname()
-
-save_configs(filename, all_independent_sets; format=:binary)
-
-loaded_sets = load_configs(filename; format=:binary, bitlength=10)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0000010000, 0100000000, 0100010000, 0000001000, 0000011000, 0001000000, 0001010000, 0101000000, 0101010000, 0001001000, 0001011000, 0000100000, 0000110000, 0100100000, 0100110000, 0000101000, 0000111000, 0000000010, 0100000010, 0000100010, 0100100010, 1000000000, 1000001000, 1001000000, 1001001000, 1000000010, 0000000001, 0000010001, 0100000001, 0100010001, 0001000001, 0001010001, 0101000001, 0101010001, 0000000011, 0100000011, 1000000001, 1001000001, 1000000011, 0010000000, 0010010000, 0010001000, 0010011000, 0010100000, 0010110000, 0010101000, 0010111000, 0010000010, 0010100010, 1010000000, 1010001000, 1010000010, 0010000001, 0010010001, 0010000011, 1010000001, 1010000011, 0000000100, 0100000100, 0000001100, 0001000100, 0101000100, 0001001100, 0000100100, 0100100100, 0000101100, 0000000110, 0100000110, 0000100110, 0100100110, 1000000100, 1000001100, 1001000100, 1001001100, 1000000110}</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>When loading data, one needs to provide the <code>bitlength</code> if the data is saved in binary format. Because the bitstring length is not stored.</p></div></div><h2 id="Weights-and-open-vertices"><a class="docs-heading-anchor" href="#Weights-and-open-vertices">Weights and open vertices</a><a id="Weights-and-open-vertices-1"></a><a class="docs-heading-anchor-permalink" href="#Weights-and-open-vertices" title="Permalink"></a></h2><p>[<code>IndependentSet</code>] accepts weights as a key word argument. The following code computes the weighted MIS problem.</p><pre><code class="language-julia hljs">problem = IndependentSet(graph; weights=collect(1:10))
-
-max_config_weighted = solve(problem, SingleConfigMax())[]
-
-show_graph(graph; locs=locations, colors=
-          [iszero(max_config_weighted.c.data[i]) ? &quot;white&quot; : &quot;red&quot; for i=1:nv(graph)])</code></pre><?xml version="1.0" encoding="UTF-8"?>
+show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=[sequence[e.src] == sequence[e.dst] ? &quot;blue&quot; : &quot;black&quot; for e in edges(graph)],
+                vertex_colors=[isone(c) ? &quot;red&quot; : &quot;black&quot; for c in painting2], vertex_text_color=&quot;white&quot;)</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink"
      version="1.2"
-     width="120mm" height="116.77mm" viewBox="0 0 120 116.77"
+     width="120mm" height="106.08mm" viewBox="0 0 120 106.08"
      stroke="none"
      fill="#000000"
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-9132b94c">
+     id="img-2db6be8c">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-9132b94c-1">
-  <g transform="translate(76.48,39.02)">
-    <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
-  </g>
-  <g transform="translate(43.52,39.02)">
-    <path fill="none" d="M16.48,-11.97 L-16.48,11.97 " class="primitive"/>
-  </g>
-  <g transform="translate(60,33.97)">
-    <path fill="none" d="M0,-6.93 L0,6.93 " class="primitive"/>
-  </g>
-  <g transform="translate(86.66,70.36)">
-    <path fill="none" d="M6.29,-19.37 L-6.29,19.37 " class="primitive"/>
-  </g>
-  <g transform="translate(86.37,53.13)">
-    <path fill="none" d="M6.59,-2.14 L-6.59,2.14 " class="primitive"/>
-  </g>
-  <g transform="translate(60,89.73)">
-    <path fill="none" d="M20.37,0 L-20.37,0 " class="primitive"/>
-  </g>
-  <g transform="translate(76.29,84.12)">
-    <path fill="none" d="M4.07,5.61 L-4.07,-5.61 " class="primitive"/>
-  </g>
-  <g transform="translate(33.34,70.36)">
-    <path fill="none" d="M6.29,19.37 L-6.29,-19.37 " class="primitive"/>
-  </g>
-  <g transform="translate(43.71,84.12)">
-    <path fill="none" d="M-4.07,5.61 L4.07,-5.61 " class="primitive"/>
-  </g>
-  <g transform="translate(33.63,53.13)">
-    <path fill="none" d="M-6.59,-2.14 L6.59,2.14 " class="primitive"/>
-  </g>
-  <g transform="translate(66.11,59.71)">
-    <path fill="none" d="M-6.11,-18.81 L6.11,18.81 " class="primitive"/>
-  </g>
-  <g transform="translate(53.89,59.71)">
-    <path fill="none" d="M6.11,-18.81 L-6.11,18.81 " class="primitive"/>
-  </g>
-  <g transform="translate(63.78,66.89)">
-    <path fill="none" d="M16,-11.62 L-16,11.62 " class="primitive"/>
-  </g>
-  <g transform="translate(60,55.27)">
-    <path fill="none" d="M19.77,0 L-19.77,0 " class="primitive"/>
-  </g>
-  <g transform="translate(56.22,66.89)">
-    <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-1">
+  <g transform="translate(91.24,28.04)">
+    <path fill="none" d="M2.37,4.11 L-2.37,-4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9132b94c-2">
-  <g transform="translate(40.23,55.27)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-2">
+  <g transform="translate(94.84,36.74)">
+    <path fill="none" d="M1.23,4.59 L-1.23,-4.59 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-9132b94c-3">
-  <g transform="translate(47.78,78.52)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-3">
+  <g transform="translate(96.07,46.08)">
+    <path fill="none" d="M0,4.75 L0,-4.75 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-9132b94c-4">
-  <g transform="translate(72.22,78.52)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-4">
+  <g transform="translate(94.84,55.41)">
+    <path fill="none" d="M-1.23,4.59 L1.23,-4.59 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9132b94c-5">
-  <g transform="translate(79.77,55.27)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-5">
+  <g transform="translate(91.24,64.11)">
+    <path fill="none" d="M-2.37,4.11 L2.37,-4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9132b94c-6">
-  <g transform="translate(60,40.9)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#0000FF" id="img-2db6be8c-6">
+  <g transform="translate(87.88,67.47)">
+    <path fill="none" d="M-5.73,7.47 L5.73,-7.47 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-9132b94c-7">
-  <g transform="translate(27.04,50.99)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-7">
+  <g transform="translate(85.51,71.58)">
+    <path fill="none" d="M-3.36,3.36 L3.36,-3.36 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9132b94c-8">
-  <g transform="translate(39.63,89.73)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-8">
+  <g transform="translate(78.04,77.32)">
+    <path fill="none" d="M-4.11,2.37 L4.11,-2.37 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9132b94c-9">
-  <g transform="translate(80.37,89.73)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#0000FF" id="img-2db6be8c-9">
+  <g transform="translate(69.34,80.92)">
+    <path fill="none" d="M-4.59,1.23 L4.59,-1.23 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-9132b94c-10">
-  <g transform="translate(92.96,50.99)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#0000FF" id="img-2db6be8c-10">
+  <g transform="translate(72.06,53.04)">
+    <path fill="none" d="M-16.81,29.11 L16.81,-29.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9132b94c-11">
-  <g transform="translate(60,27.04)">
-    <circle cx="0" cy="0" r="3.33" class="primitive"/>
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-11">
+  <g transform="translate(60,82.15)">
+    <path fill="none" d="M-4.75,0 L4.75,0 " class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-9132b94c-12">
-  <g transform="translate(60,27.04)">
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-12">
+  <g transform="translate(50.66,80.92)">
+    <path fill="none" d="M-4.59,-1.23 L4.59,1.23 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-13">
+  <g transform="translate(41.96,77.32)">
+    <path fill="none" d="M-4.11,-2.37 L4.11,2.37 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-2db6be8c-14">
+  <g transform="translate(63.6,59.53)">
+    <path fill="none" d="M-32.47,8.7 L32.47,-8.7 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-15">
+  <g transform="translate(34.49,71.58)">
+    <path fill="none" d="M-3.36,-3.36 L3.36,3.36 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-2db6be8c-16">
+  <g transform="translate(61.23,50.66)">
+    <path fill="none" d="M-34.84,9.34 L34.84,-9.34 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-17">
+  <g transform="translate(28.76,64.11)">
+    <path fill="none" d="M-2.37,-4.11 L2.37,4.11 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-2db6be8c-18">
+  <g transform="translate(56.4,59.53)">
+    <path fill="none" d="M-32.47,-8.7 L32.47,8.7 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-19">
+  <g transform="translate(25.16,55.41)">
+    <path fill="none" d="M-1.23,-4.59 L1.23,4.59 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-2db6be8c-20">
+  <g transform="translate(35,60.51)">
+    <path fill="none" d="M-11.07,-19.18 L11.07,19.18 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-21">
+  <g transform="translate(23.93,46.08)">
+    <path fill="none" d="M0,-4.75 L0,4.75 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-2db6be8c-22">
+  <g transform="translate(32.12,53.55)">
+    <path fill="none" d="M-5.73,-21.39 L5.73,21.39 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-23">
+  <g transform="translate(25.16,36.74)">
+    <path fill="none" d="M1.23,-4.59 L-1.23,4.59 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#0000FF" id="img-2db6be8c-24">
+  <g transform="translate(62.37,28.04)">
+    <path fill="none" d="M-31.24,-4.11 L31.24,4.11 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" stroke="#000000" id="img-2db6be8c-25">
+  <g transform="translate(28.76,28.04)">
+    <path fill="none" d="M2.37,-4.11 L-2.37,4.11 " class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-2db6be8c-26">
+  <g transform="translate(88.87,23.93)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-2db6be8c-27">
+  <g transform="translate(93.61,32.15)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-2db6be8c-28">
+  <g transform="translate(96.07,41.33)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-2db6be8c-29">
+  <g transform="translate(96.07,50.83)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-2db6be8c-30">
+  <g transform="translate(93.61,60)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-2db6be8c-31">
+  <g transform="translate(88.87,68.23)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-2db6be8c-32">
+  <g transform="translate(82.15,74.94)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-2db6be8c-33">
+  <g transform="translate(73.92,79.69)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-2db6be8c-34">
+  <g transform="translate(64.75,82.15)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-2db6be8c-35">
+  <g transform="translate(55.25,82.15)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-2db6be8c-36">
+  <g transform="translate(46.08,79.69)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-2db6be8c-37">
+  <g transform="translate(37.85,74.94)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-2db6be8c-38">
+  <g transform="translate(31.13,68.23)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-2db6be8c-39">
+  <g transform="translate(26.39,60)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-2db6be8c-40">
+  <g transform="translate(23.93,50.83)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-2db6be8c-41">
+  <g transform="translate(23.93,41.33)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-2db6be8c-42">
+  <g transform="translate(26.39,32.15)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-2db6be8c-43">
+  <g transform="translate(31.13,23.93)">
+    <circle cx="0" cy="0" r="2.28" class="primitive"/>
+  </g>
+</g>
+<g fill="#FFFFFF" font-size="2.14" id="img-2db6be8c-44">
+  <g transform="translate(31.13,23.93)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">1</text>
+      <text text-anchor="middle" dy="0.35em">i</text>
     </g>
   </g>
-  <g transform="translate(92.96,50.99)">
+  <g transform="translate(26.39,32.15)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">2</text>
+      <text text-anchor="middle" dy="0.35em">a</text>
     </g>
   </g>
-  <g transform="translate(80.37,89.73)">
+  <g transform="translate(23.93,41.33)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">3</text>
+      <text text-anchor="middle" dy="0.35em">d</text>
     </g>
   </g>
-  <g transform="translate(39.63,89.73)">
+  <g transform="translate(23.93,50.83)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">4</text>
+      <text text-anchor="middle" dy="0.35em">g</text>
     </g>
   </g>
-  <g transform="translate(27.04,50.99)">
+  <g transform="translate(26.39,60)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">5</text>
+      <text text-anchor="middle" dy="0.35em">b</text>
     </g>
   </g>
-  <g transform="translate(60,40.9)">
+  <g transform="translate(31.13,68.23)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">6</text>
+      <text text-anchor="middle" dy="0.35em">e</text>
     </g>
   </g>
-  <g transform="translate(79.77,55.27)">
+  <g transform="translate(37.85,74.94)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">7</text>
+      <text text-anchor="middle" dy="0.35em">a</text>
     </g>
   </g>
-  <g transform="translate(72.22,78.52)">
+  <g transform="translate(46.08,79.69)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">8</text>
+      <text text-anchor="middle" dy="0.35em">d</text>
     </g>
   </g>
-  <g transform="translate(47.78,78.52)">
+  <g transform="translate(55.25,82.15)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">9</text>
+      <text text-anchor="middle" dy="0.35em">f</text>
     </g>
   </g>
-  <g transform="translate(40.23,55.27)">
+  <g transform="translate(64.75,82.15)">
     <g class="primitive">
-      <text text-anchor="middle" dy="0.35em">10</text>
+      <text text-anchor="middle" dy="0.35em">c</text>
+    </g>
+  </g>
+  <g transform="translate(73.92,79.69)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">c</text>
+    </g>
+  </g>
+  <g transform="translate(82.15,74.94)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">h</text>
+    </g>
+  </g>
+  <g transform="translate(88.87,68.23)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">g</text>
+    </g>
+  </g>
+  <g transform="translate(93.61,60)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">h</text>
+    </g>
+  </g>
+  <g transform="translate(96.07,50.83)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">e</text>
+    </g>
+  </g>
+  <g transform="translate(96.07,41.33)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">b</text>
+    </g>
+  </g>
+  <g transform="translate(93.61,32.15)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">i</text>
+    </g>
+  </g>
+  <g transform="translate(88.87,23.93)">
+    <g class="primitive">
+      <text text-anchor="middle" dy="0.35em">f</text>
     </g>
   </g>
 </g>
@@ -952,20 +1422,4 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 
 ]]> </script>
 </svg>
-<p>The following code computes the MIS tropical tensor (reference to be added) with open vertices 1 and 2.</p><pre><code class="language-julia hljs">problem = IndependentSet(graph; openvertices=[1,2,3])
-
-mis_tropical_tensor = solve(problem, SizeMax())</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2×2×2 Array{TropicalNumbers.TropicalF64, 3}:
-[:, :, 1] =
- 3.0ₜ   4.0ₜ
- 4.0ₜ  -Infₜ
-
-[:, :, 2] =
- 4.0ₜ  -Infₜ
- 4.0ₜ  -Infₜ</code></pre><p>The MIS tropical tensor shows the MIS size under different configuration of open vertices. It is useful in MIS tropical tensor analysis. One can compatify this MIS-Tropical tensor by typing</p><pre><code class="language-julia hljs">mis_compactify!(mis_tropical_tensor)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2×2×2 Array{TropicalNumbers.TropicalF64, 3}:
-[:, :, 1] =
- 3.0ₜ   4.0ₜ
- 4.0ₜ  -Infₜ
-
-[:, :, 2] =
-  4.0ₜ  -Infₜ
- -Infₜ  -Infₜ</code></pre><p>It will eliminate some entries having no contribution to the MIS size when embeding this local graph into a larger one.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../index.html">« Home</a><a class="docs-footer-nextpage" href="MaximalIS.html">Maximal independent set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.12 on <span class="colophon-date" title="Wednesday 9 February 2022 02:48">Wednesday 9 February 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<p>Since we have different choices of initial color, the number of best solution is 4. The following function will check the solution and return you the number of color switchs</p><pre><code class="language- hljs">num_paint_shop_color_switch(sequence, painting2)</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Matching/">« Matching problem</a><a class="docs-footer-nextpage" href="../Coloring/">Coloring problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.12 on <span class="colophon-date" title="Thursday 10 February 2022 00:32">Thursday 10 February 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

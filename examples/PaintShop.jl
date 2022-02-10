@@ -64,7 +64,7 @@ show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=
 problem = PaintShop(sequence);
 
 # ### Counting properties
-# ##### maximal independence polynomial
+# ##### graph polynomial
 # The graph polynomial defined for the maximal independent set problem is
 # ```math
 # I_{\rm max}(G, x) = \sum_{k=0}^{\alpha(G)} b_k x^k,

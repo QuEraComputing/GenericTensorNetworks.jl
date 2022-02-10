@@ -54,7 +54,7 @@ max_matching = solve(problem, SizeMax())[]
 # The largest number of matching is 5, which means we have a perfect matching (vertices are all paired).
 
 # ##### matching polynomial
-# The graph polynomial defined for the independence problem is known as the matching polynomial.
+# The graph polynomial defined for the matching problem is known as the matching polynomial.
 # Here, we adopt the first definition in the [wiki page](https://en.wikipedia.org/wiki/Matching_polynomial).
 # ```math
 # M(G, x) = \sum\limits_{k=1}^{|V|/2} c_k x^k,

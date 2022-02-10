@@ -1,7 +1,7 @@
 using GraphTensorNetworks
 using Graphs, Test
 
-@testset "independence problem" begin
+@testset "independent set problem" begin
     g = Graphs.smallgraph("petersen")
     for optimizer in (GreedyMethod(), TreeSA(ntrials=1))
         gp = IndependentSet(g; optimizer=optimizer)

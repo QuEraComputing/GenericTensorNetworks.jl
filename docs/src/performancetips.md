@@ -23,7 +23,7 @@ Other optimizers include
 One can type `?TreeSA` in a Julia REPL for more information about how to configure the hyper-parameters of `TreeSA` method.
 `simplifier` keyword argument is not so important, it is a preprocessing routine to improve the searching speed of the `optimizer`.
 
-The returned instance `problem` contains a field `code` that specifies the tensor network contraction order. For an independence problem, its contraction time space complexity is ``2^{{\rm tw}(G)}``, where ``{\rm tw(G)}`` is the [tree-width](https://en.wikipedia.org/wiki/Treewidth) of ``G``.
+The returned instance `problem` contains a field `code` that specifies the tensor network contraction order. For an independent set problem, its contraction time space complexity is ``2^{{\rm tw}(G)}``, where ``{\rm tw(G)}`` is the [tree-width](https://en.wikipedia.org/wiki/Treewidth) of ``G``.
 One can check the time, space and read-write complexity with the following function.
 
 ```julia

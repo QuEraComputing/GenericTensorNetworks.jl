@@ -70,3 +70,5 @@ match_config = solve(problem, SingleConfigMax())[]
 
 # Let us show the result by coloring the matched edges to red
 show_graph(graph; locs=locations, edge_colors=[isone(match_config.c.data[i]) ? "red" : "black" for i=1:ne(graph)])
+
+# where we use edges with red color to related pairs of matched vertices.

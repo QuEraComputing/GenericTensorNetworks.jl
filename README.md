@@ -92,9 +92,8 @@ julia> solve(problem, CountingMax(2))[]
 30.0*x^3 + 5.0*x^4
 ```
 
-#### 2. compute the independence polynomial
-
 The following code computes independence polynomial using the finite field algebra (default) approach.
+It is equivalent to counting independent sets of an arbituary size.
 
 ```julia
 julia> solve(problem, GraphPolynomial())[]

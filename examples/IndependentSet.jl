@@ -54,7 +54,7 @@ problem = IndependentSet(graph; optimizer=TreeSA());
 
 timespacereadwrite_complexity(problem)
 
-# The return values are `log2` of the the number of iterations, the number elements in the tensor with maximum size during contraction and the number of tensor element read-write operations.
+# The return values are `log2` of the the number of iterations, the number elements in the largest tensor during contraction and the number of tensor element read-write operations.
 # For more information about how to improve the contraction order, please check the [Performance Tips](@ref).
 
 # ## Solving properties

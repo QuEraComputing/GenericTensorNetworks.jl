@@ -16,12 +16,12 @@ GraphTensorNetworks is a &nbsp;
     Julia's interactive session (known as REPL)</a> and press <kbd>]</kbd> key in the REPL to use the package mode, then
 </p>
 
-1. if you have access to our registry
+1. if you want to use this package, just type
 ```julia
 pkg> add GraphTensorNetworks
 ```
 
-otherwise (e.g. you are an external collaborator), just install the master branch by typing
+If you do not have access to our registry, e.g. you are an external collaborator, you can install the master branch by typing
 ```julia
 pkg> add https://github.com/Happy-Diode/GraphTensorNetworks.jl.git#master
 ```
@@ -35,7 +35,7 @@ pkg> dev https://github.com/Happy-Diode/GraphTensorNetworks.jl.git
 
 Packages installed in developer mode will not be updated by the `up` command, you should go to the develop folder and use `git` to manage your versions. For more [details](https://docs.julialang.org/en/v1/stdlib/Pkg/).
 
-Please use **Julia-1.7**, otherwise you will suffer from huge overheads when contracting large tensor networks. If you have to use a lower version,
+Please use **Julia version >= 1.7**, otherwise you will suffer from huge overheads when contracting large tensor networks. If you have to use an old version Julia,
 you can avoid the overhead by overriding the `permutedims!` is `LinearAlgebra`, i.e. add the following code to your own project.
 
 ```julia

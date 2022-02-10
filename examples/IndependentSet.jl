@@ -19,21 +19,20 @@ show_graph(graph; locs=locations)
 # Let ``G=(V,E)`` be the target graph that we want to solve.
 # The tensor network representation map a vertex ``i\in V`` to a label ``s_i \in \{0, 1\}`` of dimension ``2`` in a tensor network, where we use ``0`` (``1``) to denote a vertex is absent (present) in the set.
 # For each label ``s_i``, we defined a parametrized rank-one vertex tensor ``W(x_i)`` as
-# \begin{equation}
-#     W(x_i) = \left(\begin{matrix}
-#         1 \\
-#         x_i
-#     \end{matrix}\right).
-# \end{equation}
+# ```math
+# W(x_i) = \left(\begin{matrix}
+#     1 \\
+#     x_i
+# \end{matrix}\right).
+# ```
 # We use subscripts to index tensor elements, e.g. ``W(x_i)_0=1`` is the first element associated with ``s_i=0`` and ``W(x_i)_1=x_i`` is the second element associated with ``s_i=1``.
 # Similarly, on each edge ``(u, v)``, we define a matrix ``B`` indexed by ``s_u`` and ``s_v`` as
-# \begin{equation}
-#     \qquad \quad 
-#        B = \left(\begin{matrix}
-#         1  & 1\\
-#         1 & 0
-#     \end{matrix}\right). \label{eq:edgetensor}
-# \end{equation}
+# ```math
+# B = \left(\begin{matrix}
+#     1  & 1\\
+#     1 & 0
+# \end{matrix}\right).
+# ```
 
 # We can use [`IndependentSet`](@ref) to construct a tensor network
 # corresponding to the independent set problem on our target graph.

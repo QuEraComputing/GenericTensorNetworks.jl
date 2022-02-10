@@ -9,7 +9,7 @@
 #     * how to compute weighted graphs and handle open vertices.
 
 # ## Problem definition
-using GraphTensorNetworks, Graphs
+using GraphTensorNetworks, Graphs, Compose
 
 # In graph theory, a [maximal independent set](https://en.wikipedia.org/wiki/Maximal_independent_set) is an independent set that is not a subset of any other independent set.
 # It is different from maximum independent set because it does not require the set to have the max size.
@@ -26,6 +26,7 @@ locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.6, i) for i=0:4]..
 show_graph(graph; locs=locations)
 
 # ## Tensor network representation
+# Type [`MaximalIS`](@ref) can be used for constructing the tensor network with optimized contraction order for solving a maximal independent set problem.
 # For a vertex ``v\in V``, we define a boolean degree of freedom ``s_v\in\{0, 1\}``.
 # We defined the restriction on its neighbourhood ``N[v]``:
 # ```math
@@ -58,9 +59,16 @@ max_config = solve(problem, GraphPolynomial())[]
 
 # ### Configuration properties
 # ##### finding all maximal independent set
-max_edge_config = solve(problem, ConfigsAll())[]
+maximal_configs = solve(problem, ConfigsAll())[]
+
+imgs = ntuple(k->show_graph(graph;
+                            locs=locations, scale=0.25,
+                            vertex_colors=[iszero(maximal_configs[k][i]) ? "white" : "red"
+                            for i=1:nv(graph)]), length(maximal_configs));
+
+Compose.set_default_graphic_size(18cm, 12cm); Compose.compose(context(), ntuple(k->(context((mod1(k,5)-1)/5, ((k-1)÷5)/3, 1.2/5, 1.0/3), imgs[k]), 15)...)
 
 # This result should be consistent with that given by the [Bron Kerbosch algorithm](https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm) on the complement of Petersen graph.
-maximal_cliques = maximal_cliques(complement(graph))
+cliques = maximal_cliques(complement(graph))
 
 # For sparse graphs, the generic tensor network approach is usually much faster and memory efficient.

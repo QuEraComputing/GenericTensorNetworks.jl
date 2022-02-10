@@ -15,6 +15,7 @@ export GreedyMethod, TreeSA, SABipartite, KaHyParBipartite, MergeVectors, MergeG
 export StaticBitVector, StaticElementVector, @bv_str
 export is_commutative_semiring
 export Max2Poly, TruncatedPoly, Polynomial, Tropical, CountingTropical, StaticElementVector, Mod, ConfigEnumerator, onehotv, ConfigSampler
+export CountingTropicalF64, CountingTropicalF32, TropicalF64, TropicalF32
 
 # Lower level APIs
 export AllConfigs, SingleConfig
@@ -25,11 +26,13 @@ export contractx, contractf, graph_polynomial, max_size, max_size_count
 # Graphs
 export random_regular_graph, diagonal_coupled_graph, is_independent_set
 export square_lattice_graph, unit_disk_graph, random_diagonal_coupled_graph, random_square_lattice_graph
+export line_graph
 
 # Tensor Networks (Graph problems)
 export GraphProblem, IndependentSet, MaximalIS, Matching, Coloring, optimize_code, set_packing, MaxCut, PaintShop, paintshop_from_pairs, UnWeighted
 export flavors, symbols, nflavor, get_weights
-export mis_compactify!, cut_assign, cut_size
+export mis_compactify!, cut_assign, cut_size, num_paint_shop_color_switch, paint_shop_coloring_from_config
+export is_good_vertex_coloring
 
 # Interfaces
 export solve, SizeMax, CountingAll, CountingMax, GraphPolynomial, SingleConfigMax, ConfigsAll, ConfigsMax
@@ -38,7 +41,7 @@ export solve, SizeMax, CountingAll, CountingMax, GraphPolynomial, SingleConfigMa
 export save_configs, load_configs
 
 # Visualization
-export show_graph
+export show_graph, spring_layout
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 

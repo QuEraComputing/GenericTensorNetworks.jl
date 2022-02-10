@@ -25,6 +25,7 @@ using GraphTensorNetworks: StaticBitVector
 end
 
 @testset "arithematics" begin
+    Random.seed!(2)
     for (a, b, c) in [
                     (TropicalF64(2), TropicalF64(8), TropicalF64(9)),
                     (CountingTropicalF64(2, 8), CountingTropicalF64(8, 9), CountingTropicalF64(9, 2)),

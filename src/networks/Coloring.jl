@@ -2,7 +2,7 @@
     Coloring{K,CT<:AbstractEinsum} <: GraphProblem
     Coloring{K}(graph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
 
-[Vertex Coloring](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/Coloring/) problem.
+[Vertex Coloring](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/Coloring.html) problem.
 `optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
 """
 struct Coloring{K,CT<:AbstractEinsum} <: GraphProblem
@@ -42,3 +42,15 @@ end
 # coloring vertex tensor
 coloringv(vals::Vector{T}) where T = vals
 
+# utilities
+"""
+    is_good_vertex_coloring(graph::SimpleGraph, config)
+
+Returns true if the coloring specified by config is a valid one, i.e. does not violate the contraints of vertices of an edges having different colors.
+"""
+function is_good_vertex_coloring(graph::SimpleGraph, config)
+    for e in edges(graph)
+        config[e.src] == config[e.dst] && return false
+    end
+    return true
+end

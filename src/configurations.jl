@@ -75,7 +75,7 @@ e.g. when the problem is [`MaximalIS`](@ref), it computes all maximal independen
 all_solutions(gp::GraphProblem) = solutions(gp, Polynomial{Float64,:x}, all=true, usecuda=false)
 
 # return a mapping from label to onehot bitstrings (degree of freedoms).
-function fx_solutions(gp::GraphProblem, ::Type{BT}, all::Bool) where {K,BT}
+function fx_solutions(gp::GraphProblem, ::Type{BT}, all::Bool) where {BT}
     syms = symbols(gp)
     T = (all ? set_type : sampler_type)(BT, length(syms), nflavor(gp))
     vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])

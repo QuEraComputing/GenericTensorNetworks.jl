@@ -3,7 +3,7 @@
     IndependentSet(graph; weights=UnWeighted(), openvertices=(),
                  optimizer=GreedyMethod(), simplifier=nothing)
 
-The [independent set problem](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/IndependentSet/) in graph theory.
+The [independent set problem](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/IndependentSet.html) in graph theory.
 In the constructor, `weights` are the weights of vertices.
 `openvertices` specifies labels for the output tensor.
 `optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.

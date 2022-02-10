@@ -3,7 +3,7 @@
     PaintShop(labels::AbstractVector; openvertices=(),
              optimizer=GreedyMethod(), simplifier=nothing)
 
-The [binary paint shop problem](http://m-hikari.com/ams/ams-2012/ams-93-96-2012/popovAMS93-96-2012-2.pdf).
+The [binary paint shop problem](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/PaintShop.html).
 
 Example
 -----------------------------------------
@@ -54,7 +54,7 @@ end
 
 flavors(::Type{<:PaintShop}) = [0, 1]
 get_weights(::PaintShop, sym) = [0, 1]
-symbols(gp::PaintShop) = getixsv(gp.code)
+symbols(gp::PaintShop) = getixsv(gp.code)  # !!! may not be unique
 
 function generate_tensors(fx, c::PaintShop)
     ixs = getixsv(c.code)
@@ -68,3 +68,45 @@ function paintshop_bond_tensor(a::T, b::T, if1::Bool, if2::Bool) where T
     return m
 end
 
+"""
+    num_paint_shop_color_switch(labels::AbstractVector, coloring::AbstractVector)
+
+Check the validity of the `coloring` and returns the number of color switches.
+"""
+function num_paint_shop_color_switch(labels::AbstractVector, coloring::AbstractVector)
+    # check validity of solution
+    @assert length(unique(coloring)) == 2 && length(labels) == length(coloring)
+    unique_labels = unique(labels)
+    for l in unique_labels
+        locs = findall(==(l), labels)
+        @assert length(locs) == 2
+        c1, c2 = coloring[locs]
+        @assert c1 != c2
+    end
+    # counting color switch
+    return count(i->coloring[i] != coloring[i+1], 1:length(coloring)-1)
+end
+
+"""
+    paint_shop_coloring_from_config(config; initial=false)
+
+Return a valid painting from the paint shop configuration (given by the configuration solvers).
+The `config` is a sequence of 0 and 1, where 0 means the color changed, 1 mean color unchanged.
+"""
+function paint_shop_coloring_from_config(config; initial::Bool=false)
+    res = falses(length(config)+1)
+    res[1] = initial
+    @inbounds for i=2:length(res)
+        res[i] = res[i-1] ⊻ (1-config[i-1])
+    end
+    return res
+end
+
+function fx_solutions(gp::PaintShop, ::Type{BT}, all::Bool) where {BT}
+    syms = symbols(gp)
+    T = (all ? set_type : sampler_type)(BT, length(syms), nflavor(gp))
+    counter = Ref(0)
+    return function (l)
+        _onehotv.(Ref(T), (counter[]+=1; counter[]), flavors(gp), get_weights(gp, l))
+    end
+end

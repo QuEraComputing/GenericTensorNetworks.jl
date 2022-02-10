@@ -101,4 +101,4 @@ show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=[sequence
 
 # Since we have different choices of initial color, the number of best solution is 4.
 # The following function will check the solution and return you the number of color switchs
-num_paint_shop_color_switch(sequence, coloring)
+num_paint_shop_color_switch(sequence, painting2)

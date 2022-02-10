@@ -38,6 +38,7 @@ makedocs(;
             "Coloring problem" => "tutorials/Coloring.md",
             "Other problems" => "tutorials/Others.md",
         ],
+        "Performance Tips" => "performancetips.md",
         "References" => "ref.md",
     ],
     doctest=false,

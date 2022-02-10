@@ -10,9 +10,6 @@ function best_solutions(gp::GraphProblem; all=false, usecuda=false)
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
-    syms = symbols(gp)
-    T = (all ? set_type : sampler_type)(CountingTropical{Int64}, length(syms), nflavor(gp))
-    vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
     xst = generate_tensors(l->TropicalF64.(get_weights(gp, l)), gp)
     ymask = trues(fill(2, length(getiyv(gp.code)))...)
     if usecuda
@@ -20,13 +17,12 @@ function best_solutions(gp::GraphProblem; all=false, usecuda=false)
         ymask = CuArray(ymask)
     end
     if all
-        xs = generate_tensors(l->_onehotv.(Ref(T), vertex_index[l], flavors(gp), get_weights(gp, l)), gp)
+        xs = generate_tensors(fx_solutions(gp, CountingTropical{Int64}, all), gp)
         return bounding_contract(AllConfigs{1}(), gp.code, xst, ymask, xs)
     else
         @assert ndims(ymask) == 0
         t, res = solution_ad(gp.code, xst, ymask)
-        N = length(vertex_index)
-        return fill(CountingTropical(asscalar(t).n, ConfigSampler(StaticBitVector(map(l->res[l], 1:N)))))
+        return fill(CountingTropical(asscalar(t).n, ConfigSampler(StaticBitVector(map(l->res[l], 1:length(res))))))
     end
 end
 
@@ -57,12 +53,9 @@ Finding optimal and suboptimal solutions.
 best2_solutions(gp::GraphProblem; all=true, usecuda=false) = solutions(gp, Max2Poly{Float64,Float64}; all=all, usecuda=usecuda)
 
 function bestk_solutions(gp::GraphProblem, k::Int)
-    syms = symbols(gp)
-    vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
     xst = generate_tensors(l->TropicalF64.(get_weights(gp, l)), gp)
     ymask = trues(fill(2, length(getiyv(gp.code)))...)
-    T = set_type(TruncatedPoly{k,Float64,Float64}, length(syms), nflavor(gp))
-    xs = generate_tensors(l->_onehotv.(Ref(T), vertex_index[l], flavors(gp), get_weights(gp, l)), gp)
+    xs = generate_tensors(fx_solutions(gp, TruncatedPoly{k,Float64,Float64}, true), gp)
     return bounding_contract(AllConfigs{k}(), gp.code, xst, ymask, xs)
 end
 

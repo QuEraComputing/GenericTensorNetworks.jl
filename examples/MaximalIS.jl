@@ -62,11 +62,12 @@ max_config = solve(problem, GraphPolynomial())[]
 maximal_configs = solve(problem, ConfigsAll())[]
 
 imgs = ntuple(k->show_graph(graph;
-                            locs=locations, scale=0.25,
-                            vertex_colors=[iszero(maximal_configs[k][i]) ? "white" : "red"
-                            for i=1:nv(graph)]), length(maximal_configs));
+                locs=locations, scale=0.25,
+                vertex_colors=[iszero(maximal_configs[k][i]) ? "white" : "red"
+                for i=1:nv(graph)]), length(maximal_configs));
 
-Compose.set_default_graphic_size(18cm, 12cm); Compose.compose(context(), ntuple(k->(context((mod1(k,5)-1)/5, ((k-1)÷5)/3, 1.2/5, 1.0/3), imgs[k]), 15)...)
+Compose.set_default_graphic_size(18cm, 12cm); Compose.compose(context(),
+     ntuple(k->(context((mod1(k,5)-1)/5, ((k-1)÷5)/3, 1.2/5, 1.0/3), imgs[k]), 15)...)
 
 # This result should be consistent with that given by the [Bron Kerbosch algorithm](https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm) on the complement of Petersen graph.
 cliques = maximal_cliques(complement(graph))

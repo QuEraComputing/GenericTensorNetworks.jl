@@ -3,9 +3,9 @@
     MaxCut(graph; weights=UnWeighted(), openvertices=(),
                 optimizer=GreedyMethod(), simplifier=nothing)
 
-[Cut](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/MaxCut.html) problem (or spin glass problem).
+The [cutting](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/MaxCut.html) problem (or spin glass problem).
 In the constructor, `weights` are the weights of edges.
-`optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
+`optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
 """
 struct MaxCut{CT<:AbstractEinsum,WT<:Union{UnWeighted, Vector}} <: GraphProblem
     code::CT

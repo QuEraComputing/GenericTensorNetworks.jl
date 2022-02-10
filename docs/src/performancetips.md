@@ -7,7 +7,8 @@ julia> using GraphTensorNetworks, Graphs, Random
 julia> graph = random_regular_graph(120, 3)
 {120, 180} undirected simple Int64 graph
 
-julia> problem = IndependentSet(graph; optimizer=TreeSA(sc_target=20, sc_weight=1.0, rw_weight=3.0, ntrials=10, βs=0.01:0.1:15.0, niters=20), simplifier=MergeGreedy());
+julia> problem = IndependentSet(graph; optimizer=TreeSA(
+    sc_target=20, sc_weight=1.0, rw_weight=3.0, ntrials=10, βs=0.01:0.1:15.0, niters=20), simplifier=MergeGreedy());
 ```
 
 Key word argument `optimizer` decides the contraction order optimizer of the tensor network.

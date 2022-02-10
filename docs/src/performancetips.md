@@ -68,7 +68,7 @@ julia> solve(problem, SizeMax(), usecuda=true)
 
 CUDA backended properties are
 * [`SizeMax`](@ref)
-* [`CoutingAll`](@ref)
+* [`CountingAll`](@ref)
 * [`CountingMax`](@ref)
 * [`GraphPolynomial`](@ref)
 * [`SingleConfigMax`](@ref)

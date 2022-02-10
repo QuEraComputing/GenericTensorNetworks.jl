@@ -9,12 +9,12 @@
 #     * how to compute weighted graphs and handle open vertices.
 
 # ## Problem definition
-using GraphTensorNetworks, Graphs, Compose
 
 # In graph theory, a [maximal independent set](https://en.wikipedia.org/wiki/Maximal_independent_set) is an independent set that is not a subset of any other independent set.
 # It is different from maximum independent set because it does not require the set to have the max size.
+# In the following, we are going to solve the maximal independent set problem on the Petersen graph.
 
-# In the following, we are going to solve the maximal independent set problem for the Petersen graph.
+using GraphTensorNetworks, Graphs, Compose
 
 graph = Graphs.smallgraph(:petersen)
 
@@ -26,8 +26,8 @@ locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.6, i) for i=0:4]..
 show_graph(graph; locs=locations)
 
 # ## Tensor network representation
-# Type [`MaximalIS`](@ref) can be used for constructing the tensor network with optimized contraction order for solving a maximal independent set problem.
-# For a vertex ``v\in V``, we define a boolean degree of freedom ``s_v\in\{0, 1\}``.
+# Let ``G=(V,E)`` be the target graph that we want to solve.
+# The tensor network representation map a vertex ``v\in V`` to a boolean degree of freedom ``s_v\in\{0, 1\}``.
 # We defined the restriction on its neighbourhood ``N[v]``:
 # ```math
 # T(x_v)_{s_1,s_2,\ldots,s_{|N(v)|},s_v} = \begin{cases}
@@ -37,11 +37,15 @@ show_graph(graph; locs=locations)
 # ```
 # Intuitively, it means if all the neighbourhood vertices are not in ``I_{m}``, i.e., ``s_1=s_2=\ldots=s_{|N(v)|}=0``, then ``v`` should be in ``I_{m}`` and contribute a factor ``x_{v}``,
 # otherwise, if any of the neighbourhood vertices is in ``I_{m}``, then ``v`` cannot be in ``I_{m}``.
-# We construct the tensor network for the maximal independent set problem as
-problem = MaximalIS(graph);
+# We can use [`MaximalIS`](@ref) to construct the tensor network for solving the maximal independent set problem as
+problem = MaximalIS(graph; optimizer=TreeSA());
 
 # Its contraction time space complexity of a [`MaximalIS`](@ref) instance is no longer determined by the tree-width of the original graph ``G``.
 # It is often harder to contract this tensor network than to contract the one for regular independent set problem.
+
+timespacereadwrite_complexity(problem)
+
+# Results are `log2` values.
 
 # ## Solving properties
 
@@ -55,7 +59,7 @@ problem = MaximalIS(graph);
 
 max_config = solve(problem, GraphPolynomial())[]
 
-# Since it only counts the maximal independent sets, the first several coefficients are 0.
+# One can see the first several coefficients are 0, because it only counts the maximal independent sets, 
 
 # ### Configuration properties
 # ##### finding all maximal independent set
@@ -72,4 +76,4 @@ Compose.set_default_graphic_size(18cm, 12cm); Compose.compose(context(),
 # This result should be consistent with that given by the [Bron Kerbosch algorithm](https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm) on the complement of Petersen graph.
 cliques = maximal_cliques(complement(graph))
 
-# For sparse graphs, the generic tensor network approach is usually much faster and memory efficient.
+# For sparse graphs, the generic tensor network approach is usually much faster and memory efficient than the Bron Kerbosch algorithm.

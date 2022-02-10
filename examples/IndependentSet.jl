@@ -103,7 +103,9 @@ imgs = ntuple(k->show_graph(graph;
                     vertex_colors=[iszero(all_max_configs.c[k][i]) ? "white" : "red"
                     for i=1:nv(graph)]), m);
 
-Compose.set_default_graphic_size(18cm, 4cm); Compose.compose(context(),
+Compose.set_default_graphic_size(18cm, 4cm)
+
+Compose.compose(context(),
      ntuple(k->(context((k-1)/m, 0.0, 1.2/m, 1.0), imgs[k]), m)...)
 
 # ##### enumeration of all IS configurations

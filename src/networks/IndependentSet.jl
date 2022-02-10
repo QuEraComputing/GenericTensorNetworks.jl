@@ -81,7 +81,8 @@ end
     mis_compactify!(tropicaltensor)
 
 Compactify tropical tensor for maximum independent set problem. It will eliminate
-some entries by setting them to zero, by the criteria that even these entries are removed, the MIS size is not changed.
+some entries by setting them to zero, by the criteria that removing these entry
+does not change the MIS size of its parent graph (reference to be added).
 """
 function mis_compactify!(a::AbstractArray{T}) where T <: TropicalTypes
 	for (ind_a, val_a) in enumerate(a)

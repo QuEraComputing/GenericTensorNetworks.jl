@@ -34,7 +34,7 @@ end
 """
     cut_assign(g::SimpleGraph, config)
 
-Returns a valid vertex configurations (a vector of size `nv(g)`) from `config` (an iterator) defined on edges:
+Returns a valid vertex cut configurations (a vector of size `nv(g)`) from `config` (an iterator) defined on edges:
 
 * assign two vertices with the same values if they are connected by an edge with configuration `0`.
 * assign two vertices with the different values if they are connected by an edge with configuration `1`.

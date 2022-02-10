@@ -85,9 +85,9 @@ Other keyword arguments
     * scale::Float64 = 1.0
     * pad::Float64 = 1.5
 * vertex
-    * vertex_text_color::String = "black"
-    * vertex_stroke_color = "black"
-    * vertex_fill_color = "white"
+    * vertex\\_text\\_color::String = "black"
+    * vertex\\_stroke\\_color = "black"
+    * vertex\\_fill\\_color = "white"
 * edge
     * edge_color::String = "black"
 * image size in `cm`

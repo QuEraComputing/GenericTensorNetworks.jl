@@ -71,7 +71,7 @@ end
 """
     num_paint_shop_color_switch(labels::AbstractVector, coloring::AbstractVector)
 
-Check the validity of the `coloring` and returns the number of color switches.
+Checks the validity of the painting and returns the number of color switches.
 """
 function num_paint_shop_color_switch(labels::AbstractVector, coloring::AbstractVector)
     # check validity of solution
@@ -90,7 +90,7 @@ end
 """
     paint_shop_coloring_from_config(config; initial=false)
 
-Return a valid painting from the paint shop configuration (given by the configuration solvers).
+Returns a valid painting from the paint shop configuration (given by the configuration solvers).
 The `config` is a sequence of 0 and 1, where 0 means the color changed, 1 mean color unchanged.
 """
 function paint_shop_coloring_from_config(config; initial::Bool=false)

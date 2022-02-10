@@ -59,6 +59,8 @@ maximum_independent_set_size = solve(problem, SizeMax())[]
 # ##### counting all independent sets
 count_all_independent_sets = solve(problem, CountingAll())[]
 
+# Function [`solve`](@ref) takes two positional arguments, the problem instance and the wanted property.
+
 # ##### counting independent sets with sizes ``\alpha(G)`` and ``\alpha(G)-1``
 count_max2_independent_sets = solve(problem, CountingMax(2))[]
 

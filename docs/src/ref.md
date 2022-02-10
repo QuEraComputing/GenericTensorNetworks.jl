@@ -16,6 +16,11 @@ set_packing
 ```
 
 #### Graph Problem Interfaces
+
+To subtype [`GraphProblem`](@ref), a new type must contain a `code` field to represent the (optimized) tensor network.
+Interfaces [`GraphTensorNetworks.generate_tensors`](@ref), [`symbols`](@ref), [`flavors`](@ref) and [`get_weights`](@ref) are required.
+[`nflavor`](@ref) is optional.
+
 ```@docs
 GraphTensorNetworks.generate_tensors
 symbols
@@ -23,10 +28,6 @@ flavors
 get_weights
 nflavor
 ```
-
-To subtype [`GraphProblem`](@ref), the new type must contain a `code` field to represent the (optimized) tensor network.
-Interfaces [`GraphTensorNetworks.generate_tensors`](@ref), [`symbols`](@ref), [`flavors`](@ref) and [`get_weights`] are required.
-[`nflavor`] is optimal.
 
 #### Graph Problem Utilities
 ```@docs

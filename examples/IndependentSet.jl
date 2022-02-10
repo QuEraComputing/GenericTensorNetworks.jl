@@ -2,7 +2,7 @@
 
 # ## Problem definition
 # In graph theory, an [independent set](https://en.wikipedia.org/wiki/Independent_set_(graph_theory)) is a set of vertices in a graph, no two of which are adjacent.
-# In the following, we are going to defined an independent set problem for the Petersen graph.
+# In the following, we are going to defined the independent set problem on the Petersen graph.
 
 using GraphTensorNetworks, Graphs
 
@@ -123,7 +123,7 @@ loaded_sets = load_configs(filename; format=:binary, bitlength=10)
 #     Because the bitstring length is not stored.
 
 # ## Weights and open vertices
-# [`IndependentSet`] accepts weights as a key word argument.
+# [`IndependentSet`](@ref) accepts weights as a key word argument.
 # The following code computes the weighted MIS problem.
 problem = IndependentSet(graph; weights=collect(1:10))
 

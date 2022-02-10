@@ -21,10 +21,19 @@ GraphTensorNetworks is a &nbsp;
 pkg> add GraphTensorNetworks
 ```
 
-2. otherwise (e.g. if you are an external collaborator), you can install in develop mode
+otherwise (e.g. you are an external collaborator), just install the master branch by typing
+```julia
+pkg> add https://github.com/Happy-Diode/GraphTensorNetworks.jl.git#master
+```
+
+To update, just type `up` in the package mode.
+
+2. If you are a developer, you can install it in develop mode
 ```julia
 pkg> dev https://github.com/Happy-Diode/GraphTensorNetworks.jl.git
 ```
+
+Packages installed in developer mode will not be updated by the `up` command, you should go to the develop folder and use `git` to manage your versions. For more [details](https://docs.julialang.org/en/v1/stdlib/Pkg/).
 
 Please use **Julia-1.7**, otherwise you will suffer from huge overheads when contracting large tensor networks. If you have to use a lower version,
 you can avoid the overhead by overriding the `permutedims!` is `LinearAlgebra`, i.e. add the following code to your own project.

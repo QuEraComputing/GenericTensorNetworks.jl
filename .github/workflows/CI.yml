@@ -62,8 +62,9 @@ jobs:
           path-to-lcov: lcov.info
 
   finish:
+      needs: [pre_job, test]
+      if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
       name: Coveralls Finished
-      needs: test
       runs-on: ubuntu-latest
       steps:
         - uses: coverallsapp/github-action@master

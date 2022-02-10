@@ -52,7 +52,7 @@ end
 
 ## Examples
 
-Let us use the Petersen graph as an example, we first generate its tensor network contraction tree.
+In this example, we will show how to compute the independent set properties of the Petersen graph, we first generate its tensor network contraction tree.
 ```julia
 julia> using GraphTensorNetworks, Random, Graphs
 

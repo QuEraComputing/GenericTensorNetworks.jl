@@ -133,7 +133,7 @@ Much of the software in this ecosystem was developed as part of academic researc
 would like to help support it, please star the repository as such metrics may help us secure
 funding in the future. If you use our software as part of your research, teaching, or other
 activities, we would be grateful if you could cite our work. The
-[CITATION.bib](https://github.com/HappyDiode/GraphTensorNetworks.jl/blob/master/CITATION.bib) file in the root of this repository lists the relevant papers.
+[CITATION.bib](https://github.com/Happy-Diode/GraphTensorNetworks.jl/blob/master/CITATION.bib) file in the root of this repository lists the relevant papers.
 
 ## Questions and Contributions
 

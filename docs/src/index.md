@@ -10,11 +10,7 @@ The properties includes the size of the maximum set size, the number of sets of 
 ## Background knowledge
 
 Please check our paper ["Computing properties of independent sets by generic programming tensor networks"]().
-If you find our paper or software useful in your work, please cite us:
-
-```bibtex
-(bibtex to be added)
-```
+If you find our paper or software useful in your work, we would be grateful if you could cite our work. The [CITATION.bib](https://github.com/HappyDiode/GraphTensorNetworks.jl/blob/master/CITATION.bib) file in the root of this repository lists the relevant papers.
 
 ## Quick start
 

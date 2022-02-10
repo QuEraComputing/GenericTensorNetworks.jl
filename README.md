@@ -23,7 +23,7 @@ pkg> add GraphTensorNetworks
 
 2. otherwise (e.g. if you are an external collaborator), you can install in develop mode
 ```julia
-pkg> dev https://github.com/Happy-Diode/GraphTensorNetworks.jl.git  # if you have access to the registry
+pkg> dev https://github.com/Happy-Diode/GraphTensorNetworks.jl.git
 ```
 
 Please use **Julia-1.7**, otherwise you will suffer from huge overheads when contracting large tensor networks. If you have to use a lower version,
@@ -126,3 +126,18 @@ julia> solve(problem, ConfigsMax(2))[]
 julia> solve(problem, ConfigsAll())[]
 {0000000000, 0000010000, 1000000000, 0001000000, 0001010000, 1001000000, 0010000000, 0010010000, 1010000000, 0000001000, 0000011000, 1000001000, 0001001000, 0001011000, 1001001000, 0010001000, 0010011000, 1010001000, 0000000010, 1000000010, 0010000010, 1010000010, 0100000000, 0100010000, 0101000000, 0101010000, 0100000010, 0000000100, 1000000100, 0001000100, 1001000100, 0000001100, 1000001100, 0001001100, 1001001100, 0000000110, 1000000110, 0100000100, 0101000100, 0100000110, 0000100000, 0000110000, 0010100000, 0010110000, 0000101000, 0000111000, 0010101000, 0010111000, 0000100010, 0010100010, 0100100000, 0100110000, 0100100010, 0000100100, 0000101100, 0000100110, 0100100100, 0100100110, 0000000001, 0000010001, 1000000001, 0001000001, 0001010001, 1001000001, 0010000001, 0010010001, 1010000001, 0000000011, 1000000011, 0010000011, 1010000011, 0100000001, 0100010001, 0101000001, 0101010001, 0100000011}
 ```
+
+## Supporting and Citing
+
+Much of the software in this ecosystem was developed as part of academic research. If you
+would like to help support it, please star the repository as such metrics may help us secure
+funding in the future. If you use our software as part of your research, teaching, or other
+activities, we would be grateful if you could cite our work. The
+[CITATION.bib](https://github.com/HappyDiode/GraphTensorNetworks.jl/blob/master/CITATION.bib) file in the root of this repository lists the relevant papers.
+
+## Questions and Contributions
+
+You can
+* Post a question on [Julia Discourse forum](https://discourse.julialang.org/), pin the package maintainer wih `@1115`.
+* Discuss in the `#graphs` channel of the [Julia Slack](https://julialang.org/community/), ping the package maintainer with `@JinGuo Liu`.
+* Open an [issue](https://github.com/Happy-Diode/GraphTensorNetworks.jl/issues) if you encounter any problems, or have any feature request.

@@ -52,7 +52,7 @@ julia> sizeof(TruncatedPoly{5,Float64,Float64})
 !!! note
     * The actual run time memory can be several times larger than the size of the maximum tensor.
     There is no constant bound for the factor, an empirical value for it is 3x.
-    * For mutable types like [`Polynomial`](@ref) and [`ConfigEnumerater`](@ref), the `sizeof` function does not measure the actual element size.
+    * For mutable types like [`Polynomial`](@ref) and [`ConfigEnumerator`](@ref), the `sizeof` function does not measure the actual element size.
 
 ## GEMM for Tropical numbers
 You can speed up the Tropical number matrix multiplication when computing `SizeMax()` by using the Tropical GEMM routines implemented in package [`TropicalGEMM.jl`](https://github.com/TensorBFS/TropicalGEMM.jl/).

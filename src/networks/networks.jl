@@ -21,7 +21,7 @@ function get_weights end
 """
     symbols(problem::GraphProblem)
 
-The symbols of a graph problem, they are the degrees of freedoms in the graph.
+The symbols of a graph problem, they are the degrees of freedoms in the graph problem.
 """
 function symbols end
 

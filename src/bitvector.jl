@@ -1,9 +1,20 @@
 """
     StaticElementVector{N,S,C}
+    StaticElementVector(nflavor::Int, x::AbstractVector)
 
 `N` is the length of vector, `C` is the size of storage in unit of `UInt64`,
 `S` is the stride defined as the `log2(# of flavors)`.
 When the number of flavors is 2, it is a `StaticBitVector`.
+
+Example
+-------------------------------
+```jldoctest; setup=:(using GraphTensorNetworks)
+julia> ev = StaticElementVector(3, [1,2,0,1,2])
+12012
+
+julia> ev[2]
+0x0000000000000002
+```
 """
 struct StaticElementVector{N,S,C}
     data::NTuple{C,UInt64}
@@ -26,6 +37,9 @@ Base.:(==)(x::StaticElementVector{N,S,C}, y::StaticElementVector{N,S,C}) where {
     end
 end
 function StaticElementVector(nflavor::Int, x::AbstractVector)
+    if any(x->x<0 || x>=nflavor, x)
+        throw(ArgumentError("Vector elements must be in range `[0, $(nflavor-1)]`, got $x."))
+    end
     N = length(x)
     S = ceil(Int,log2(nflavor)) # sometimes can not devide 64.
     convert(StaticElementVector{N,S,_nints(N,S)}, x)
@@ -69,6 +83,17 @@ end
 ##### BitVectors
 """
     StaticBitVector{N,C} = StaticElementVector{N,1,C}
+    StaticBitVector(x::AbstractVector)
+
+Example
+-------------------------------
+```jldoctest; setup=:(using GraphTensorNetworks)
+julia> sb = StaticBitVector([1,0,0,1,1])
+10011
+
+julia> sb[3]
+0x0000000000000000
+```
 """
 const StaticBitVector{N,C} = StaticElementVector{N,1,C}
 @inline function Base.getindex(x::StaticBitVector{N,C}, i::Integer) where {N,C}

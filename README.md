@@ -8,7 +8,7 @@
 <p>
 GraphTensorNetworks is a &nbsp;
     <a href="https://julialang.org">
-        <img src="https://julialang.org/favicon.ico" width="16em">
+        <img src="https://raw.githubusercontent.com/JuliaLang/julia-logo-graphics/master/images/julia.ico" width="16em">
         Julia Language
     </a>
     &nbsp; package. To install GraphTensorNetworks,
@@ -16,17 +16,26 @@ GraphTensorNetworks is a &nbsp;
     Julia's interactive session (known as REPL)</a> and press <kbd>]</kbd> key in the REPL to use the package mode, then
 </p>
 
-1. if you have access to our registry
+1. if you are a user, just type
 ```julia
 pkg> add GraphTensorNetworks
 ```
 
-2. otherwise (e.g. if you are an external collaborator), you can install in develop mode
+If you do not have access to our registry, e.g. you are an external collaborator, you can install the master branch by typing
+```julia
+pkg> add https://github.com/Happy-Diode/GraphTensorNetworks.jl.git#master
+```
+
+To update, just type `up` in the package mode.
+
+2. If you are a developer, you can install it in develop mode
 ```julia
 pkg> dev https://github.com/Happy-Diode/GraphTensorNetworks.jl.git
 ```
 
-Please use **Julia-1.7**, otherwise you will suffer from huge overheads when contracting large tensor networks. If you have to use a lower version,
+Packages installed in developer mode will not be updated by the `up` command, you should go to the develop folder and use `git` to manage your versions. For more [details](https://docs.julialang.org/en/v1/stdlib/Pkg/).
+
+Please use **Julia version >= 1.7**, otherwise you will suffer from huge overheads when contracting large tensor networks. If you have to use an old version Julia,
 you can avoid the overhead by overriding the `permutedims!` is `LinearAlgebra`, i.e. add the following code to your own project.
 
 ```julia
@@ -43,7 +52,7 @@ end
 
 ## Examples
 
-Let us use the Petersen graph as an example, we first generate its tensor network contraction tree.
+In this example, we will show how to compute the independent set properties of the Petersen graph, we first generate its tensor network contraction tree.
 ```julia
 julia> using GraphTensorNetworks, Random, Graphs
 
@@ -83,9 +92,8 @@ julia> solve(problem, CountingMax(2))[]
 30.0*x^3 + 5.0*x^4
 ```
 
-#### 2. compute the independence polynomial
-
 The following code computes independence polynomial using the finite field algebra (default) approach.
+It is equivalent to counting independent sets of an arbituary size.
 
 ```julia
 julia> solve(problem, GraphPolynomial())[]

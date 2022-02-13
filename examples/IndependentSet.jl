@@ -15,6 +15,13 @@ locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.6, i) for i=0:4]..
 
 show_graph(graph; locs=locations)
 
+# In order to display your plot with [`show_graph`](@ref), you need to call this function in
+# * a [VSCode](https://github.com/julia-vscode/julia-vscode) editor,
+# * a [Jupyter](https://github.com/JunoLab/Juno.jl) notebook,
+# * or a [Pluto](https://github.com/fonsp/Pluto.jl) notebook,
+#
+# rather than a Julia REPL that does not have a graphical display.
+
 # ## Tensor network representation
 # Let ``G=(V,E)`` be the target graph that we want to solve.
 # The tensor network representation map a vertex ``i\in V`` to a label ``s_i \in \{0, 1\}`` of dimension ``2`` in a tensor network, where we use ``0`` (``1``) to denote a vertex is absent (present) in the set.
@@ -47,7 +54,7 @@ problem = IndependentSet(graph; optimizer=TreeSA());
 
 timespacereadwrite_complexity(problem)
 
-# The return values are `log2` of the the number of iterations, the number elements in the tensor with maximum size during contraction and the number of tensor element read-write operations.
+# The return values are `log2` of the the number of iterations, the number elements in the largest tensor during contraction and the number of tensor element read-write operations.
 # For more information about how to improve the contraction order, please check the [Performance Tips](@ref).
 
 # ## Solving properties

@@ -45,16 +45,18 @@ show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=
 # For each black edges ``(i, i+1)``, we define an edge tensor labeld by ``(s_{c_i}, s_{c_{i+1}})`` as follows:
 # If both cars on this edge are their first or second appearance
 # ```math
-# B^{\rm parallel} = \begin{matrix}
+# B^{\rm parallel} = \left(\begin{matrix}
 # x & 1 \\
 # 1 & x \\
-# \end{matrix},
+# \end{matrix}\right),
+# ```
 #
 # otherwise,
-# B^{\rm anti-parallel} = B^{\rm 10} = \begin{matrix}
+# ```math
+# B^{\rm anti-parallel} = \left(\begin{matrix}
 # 1 & x \\
 # x & 1 \\
-# \end{matrix}.
+# \end{matrix}\right).
 # ```
 # It can be understood as, when both cars are their first appearance,
 # they tend to have the same configuration so that the color is not changed.

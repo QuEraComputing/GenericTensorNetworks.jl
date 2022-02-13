@@ -63,7 +63,7 @@ end
     @test mb == m
 
     M = 10
-    m = ConfigEnumerator([StaticElementVector(3, rand(1:3, 300)) for i=1:M])
+    m = ConfigEnumerator([StaticElementVector(3, rand(0:2, 300)) for i=1:M])
     bm = GraphTensorNetworks.plain_matrix(m)
     rm = GraphTensorNetworks.raw_matrix(m)
     m1 = GraphTensorNetworks.from_raw_matrix(rm; bitlength=300, nflavors=3)

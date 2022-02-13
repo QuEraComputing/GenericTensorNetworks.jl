@@ -28,9 +28,31 @@ One can check the time, space and read-write complexity with the following funct
 
 ```julia
 julia> timespacereadwrite_complexity(problem)
+(21.90683335864693, 17.0, 20.03588509836998)
 ```
 
-The return values are `log2` of the the number of iterations, the number elements in the max tensor and the number of read-write operations to tensor elements.
+The return values are `log2` of the the number of iterations, the number elements in the largest tensor during contraction and the number of read-write operations to tensor elements.
+In this example, the number of `+` and `*` operations are both `\sim 2^{21.9}`
+and the number of read-write operations are `\sim 2^{20}`.
+The largest tensor size is ``2^17``, one can check the element size by typing
+```julia
+julia> sizeof(TropicalF64)
+8
+
+julia> sizeof(TropicalF32)
+4
+
+julia> sizeof(StaticBitVector{200,4})
+32
+
+julia> sizeof(TruncatedPoly{5,Float64,Float64})
+48
+```
+
+!!! note
+    * The actual run time memory can be several times larger than the size of the maximum tensor.
+    There is no constant bound for the factor, an empirical value for it is 3x.
+    * For mutable types like [`Polynomial`](@ref) and [`ConfigEnumerater`](@ref), the `sizeof` function does not measure the actual element size.
 
 ## GEMM for Tropical numbers
 You can speed up the Tropical number matrix multiplication when computing `SizeMax()` by using the Tropical GEMM routines implemented in package [`TropicalGEMM.jl`](https://github.com/TensorBFS/TropicalGEMM.jl/).

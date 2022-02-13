@@ -78,11 +78,20 @@ end
 
 """
     TruncatedPoly{K,T,TO} <: Number
+    TruncatedPoly(coeffs::Tuple, maxorder)
 
 Polynomial truncated to largest `K` orders. `T` is the coefficients type and `TO` is the orders type.
 
+Example
+------------------------
 ```jldoctest; setup=(using GraphTensorNetworks)
 julia> TruncatedPoly((1,2,3), 6)
+x^4 + 2*x^5 + 3*x^6
+
+julia> TruncatedPoly((1,2,3), 6) * TruncatedPoly((5,2,1), 3)
+20*x^7 + 8*x^8 + 3*x^9
+
+julia> TruncatedPoly((1,2,3), 6) + TruncatedPoly((5,2,1), 3)
 x^4 + 2*x^5 + 3*x^6
 ```
 """
@@ -93,6 +102,9 @@ end
 
 """
     Max2Poly{T,TO} = TruncatedPoly{2,T,TO}
+    Max2Poly(a, b, maxorder)
+
+A shorthand of [`TruncatedPoly`](@ref){2}.
 """
 const Max2Poly{T,TO} = TruncatedPoly{2,T,TO}
 Max2Poly(a, b, maxorder) = TruncatedPoly((a, b), maxorder)
@@ -157,6 +169,8 @@ Set algebra for enumerating configurations, where `N` is the length of configura
 `C` is the size of storage in unit of `UInt64`,
 `S` is the bit width to store a single element in a configuration, i.e. `log2(# of flavors)`, for bitstrings, it is `1``.
 
+Example
+----------------------
 ```jldoctest; setup=:(using GraphTensorNetworks)
 julia> a = ConfigEnumerator([StaticBitVector([1,1,1,0,0]), StaticBitVector([1,0,0,0,1])])
 {11100, 10001}
@@ -166,6 +180,12 @@ julia> b = ConfigEnumerator([StaticBitVector([0,0,0,0,0]), StaticBitVector([1,0,
 
 julia> a + b
 {11100, 10001, 00000, 10101}
+
+julia> one(a)
+{00000}
+
+julia> zero(a)
+{}
 ```
 """
 struct ConfigEnumerator{N,S,C}
@@ -203,14 +223,32 @@ Base.show(io::IO, ::MIME"text/plain", x::ConfigEnumerator) = Base.show(io, x)
 # the algebra sampling one of the configurations
 """
     ConfigSampler{N,S,C}
+    ConfigSampler(elements::StaticElementVector)
 
 The algebra for sampling one configuration, where `N` is the length of configurations,
 `C` is the size of storage in unit of `UInt64`,
 `S` is the bit width to store a single element in a configuration, i.e. `log2(# of flavors)`, for bitstrings, it is `1``.
 
-```jldoctest; setup=:(using GraphTensorNetworks)
+!!! note
+    `ConfigSampler` is a **probabilistic** commutative semiring, adding two config samplers do not give you deterministic results.
+
+Example
+----------------------
+```jldoctest; setup=:(using GraphTensorNetworks, Random; Random.seed!(2))
 julia> ConfigSampler(StaticBitVector([1,1,1,0,0]))
 ConfigSampler{5, 1, 1}(11100)
+
+julia> ConfigSampler(StaticBitVector([1,1,1,0,0])) + ConfigSampler(StaticBitVector([1,0,1,0,0]))
+ConfigSampler{5, 1, 1}(10100)
+
+julia> ConfigSampler(StaticBitVector([1,1,1,0,0])) * ConfigSampler(StaticBitVector([0,0,0,0,1]))
+ConfigSampler{5, 1, 1}(11101)
+
+julia> one(ConfigSampler{5, 1, 1})
+ConfigSampler{5, 1, 1}(00000)
+
+julia> zero(ConfigSampler{5, 1, 1})
+ConfigSampler{5, 1, 1}(11111)
 ```
 """
 struct ConfigSampler{N,S,C}

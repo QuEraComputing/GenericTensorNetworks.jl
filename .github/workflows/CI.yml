@@ -5,7 +5,25 @@ on:
       - master
   pull_request:
 jobs:
+  pre_job:
+    # continue-on-error: true # Uncomment once integration is finished
+    runs-on: ubuntu-latest
+    # Map a step output to a job output
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@master
+        with:
+          # All of these options are optional, so you can remove them if you are happy with the defaults
+          concurrent_skipping: 'never'
+          skip_after_successful_duplicate: 'true'
+          paths_ignore: '["**/README.md", "**/docs/**", "**/examples/**"]'
+          do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
+
   test:
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -44,8 +62,9 @@ jobs:
           path-to-lcov: lcov.info
 
   finish:
+      needs: [pre_job, test]
+      if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
       name: Coveralls Finished
-      needs: test
       runs-on: ubuntu-latest
       steps:
         - uses: coverallsapp/github-action@master

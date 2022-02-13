@@ -2,8 +2,8 @@
     Matching{CT<:AbstractEinsum} <: GraphProblem
     Matching(graph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
 
-[Vertex matching](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/Matching.html) problem.
-`optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
+The [Vertex matching](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/Matching.html) problem.
+`optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
 """
 struct Matching{CT<:AbstractEinsum} <: GraphProblem
     symbols::Vector{Tuple{Int,Int}}

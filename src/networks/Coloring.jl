@@ -2,8 +2,8 @@
     Coloring{K,CT<:AbstractEinsum} <: GraphProblem
     Coloring{K}(graph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
 
-[Vertex Coloring](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/Coloring.html) problem.
-`optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
+The [Vertex Coloring](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/Coloring.html) problem.
+`optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
 """
 struct Coloring{K,CT<:AbstractEinsum} <: GraphProblem
     code::CT

@@ -17,7 +17,8 @@ function best_solutions(gp::GraphProblem; all=false, usecuda=false)
         ymask = CuArray(ymask)
     end
     if all
-        xs = generate_tensors(fx_solutions(gp, CountingTropical{Int64}, all), gp)
+        # we use `Float64` types because we want to support weighted graphs.
+        xs = generate_tensors(fx_solutions(gp, CountingTropical{Float64,Float64}, all), gp)
         return bounding_contract(AllConfigs{1}(), gp.code, xst, ymask, xs)
     else
         @assert ndims(ymask) == 0

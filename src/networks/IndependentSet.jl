@@ -16,8 +16,8 @@ end
 
 function IndependentSet(g::SimpleGraph; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
     @assert weights isa UnWeighted || length(weights) == nv(g)
-    rawcode = EinCode(([[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
-                       [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...), collect(Int, openvertices))  # labels for edge tensors
+    rawcode = EinCode([[[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
+                       [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...], collect(Int, openvertices))  # labels for edge tensors
     code = _optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier)
     IndependentSet(code, nv(g), weights)
 end

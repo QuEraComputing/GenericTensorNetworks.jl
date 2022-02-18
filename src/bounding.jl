@@ -24,8 +24,8 @@ function backward_tropical(mode, ixs, @nospecialize(xs::Tuple), iy, @nospecializ
         niy = ixs[i]
         if mode isa AllConfigs
             mask = zeros(Bool, size(xs[i]))
-            # here, we set a threshold `1e-15` to avoid round off errors.
-            mask .= inv.(einsum(EinCode(nixs, niy), nxs, size_dict)) .<= xs[i] .* Tropical(largest_k(mode)-1+1e-15)
+            # here, we set a threshold `1e-12` to avoid round off errors.
+            mask .= inv.(einsum(EinCode(nixs, niy), nxs, size_dict)) .<= xs[i] .* Tropical(largest_k(mode)-1+1e-12)
             push!(masks, mask)
         elseif mode isa SingleConfig
             A = zeros(eltype(xs[i]), size(xs[i]))

@@ -363,15 +363,10 @@ for T in [:ConfigEnumerator, :ConfigSampler, :TreeConfigEnumerator]
         a == 1 && return y
         error("multiplication between int and `$(typeof(y))` is not defined.")
     end
-    @eval function Base.:*(a::Int, y::$T)
-        a == 0 && return zero(y)
-        a == 1 && return y
-        error("multiplication between int and `$(typeof(y))` is not defined.")
-    end
 end
 
 # convert from counting type to bitstring type
-for (F,TP) in [(:set_type, :ConfigEnumerator), (:sampler_type, :ConfigSampler), (:treesampler_type, :TreeConfigEnumerator)]
+for (F,TP) in [(:set_type, :ConfigEnumerator), (:sampler_type, :ConfigSampler), (:treeset_type, :TreeConfigEnumerator)]
     @eval begin
         function $F(::Type{T}, n::Int, nflavor::Int) where {OT, K, T<:TruncatedPoly{K,C,OT} where C}
             TruncatedPoly{K, $F(n,nflavor),OT}

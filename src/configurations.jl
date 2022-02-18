@@ -1,13 +1,14 @@
 """
-    best_solutions(problem; all=false, usecuda=false, invert=false)
+    best_solutions(problem; all=false, usecuda=false, invert=false, tree_storage::Bool=false)
     
 Find optimal solutions with bounding.
 
 * When `all` is true, the program will use set for enumerate all possible solutions, otherwise, it will return one solution for each size.
 * `usecuda` can not be true if you want to use set to enumerate all possible solutions.
 * If `invert` is true, find the minimum.
+* If `tree_storage` is true, use [`TreeConfigEnumerator`](@ref) as the storage of solutions.
 """
-function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false)
+function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false, tree_storage::Bool)
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
@@ -19,7 +20,7 @@ function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false
     end
     if all
         # we use `Float64` types because we want to support weighted graphs.
-        xs = generate_tensors(fx_solutions(gp, CountingTropical{Float64,Float64}, all, invert), gp)
+        xs = generate_tensors(fx_solutions(gp, CountingTropical{Float64,Float64}, all, invert, tree_storage), gp)
         ret = bounding_contract(AllConfigs{1}(), gp.code, xst, ymask, xs)
         return invert ? post_invert_exponent.(ret) : ret
     else
@@ -31,7 +32,7 @@ function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false
 end
 
 """
-    solutions(problem, basetype; all, usecuda=false, invert=false)
+    solutions(problem, basetype; all, usecuda=false, invert=false, tree_storage::Bool=false)
     
 General routine to find solutions without bounding,
 
@@ -41,26 +42,27 @@ General routine to find solutions without bounding,
     * `Max2Poly{Float64,Float64}` for optimal and suboptimal solutions.
 * When `all` is true, the program will use set for enumerate all possible solutions, otherwise, it will return one solution for each size.
 * `usecuda` can not be true if you want to use set to enumerate all possible solutions.
+* If `tree_storage` is true, use [`TreeConfigEnumerator`](@ref) as the storage of solutions.
 """
-function solutions(gp::GraphProblem, ::Type{BT}; all::Bool, usecuda::Bool=false, invert::Bool=false) where BT
+function solutions(gp::GraphProblem, ::Type{BT}; all::Bool, usecuda::Bool=false, invert::Bool=false, tree_storage::Bool=false) where BT
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
-    ret = contractf(fx_solutions(gp, BT, all, invert), gp; usecuda=usecuda)
+    ret = contractf(fx_solutions(gp, BT, all, invert, tree_storage), gp; usecuda=usecuda)
     return invert ? post_invert_exponent.(ret) : ret
 end
 
 """
-    best2_solutions(problem; all=true, usecuda=false, invert=false)
+    best2_solutions(problem; all=true, usecuda=false, invert=false, tree_storage::Bool=false)
 
 Finding optimal and suboptimal solutions.
 """
 best2_solutions(gp::GraphProblem; all=true, usecuda=false, invert::Bool=false) = solutions(gp, Max2Poly{Float64,Float64}; all, usecuda, invert)
 
-function bestk_solutions(gp::GraphProblem, k::Int; invert::Bool=false)
+function bestk_solutions(gp::GraphProblem, k::Int; invert::Bool=false, tree_storage::Bool=false)
     xst = generate_tensors(l->TropicalF64.(get_weights(gp, l)), gp)
     ymask = trues(fill(2, length(getiyv(gp.code)))...)
-    xs = generate_tensors(fx_solutions(gp, TruncatedPoly{k,Float64,Float64}, true, invert), gp)
+    xs = generate_tensors(fx_solutions(gp, TruncatedPoly{k,Float64,Float64}, true, invert, tree_storage), gp)
     ret = bounding_contract(AllConfigs{k}(), gp.code, xst, ymask, xs)
     return invert ? post_invert_exponent.(ret) : ret
 end
@@ -74,9 +76,9 @@ e.g. when the problem is [`MaximalIS`](@ref), it computes all maximal independen
 all_solutions(gp::GraphProblem) = solutions(gp, Polynomial{Float64,:x}, all=true, usecuda=false)
 
 # return a mapping from label to onehot bitstrings (degree of freedoms).
-function fx_solutions(gp::GraphProblem, ::Type{BT}, all::Bool, invert::Bool) where {BT}
+function fx_solutions(gp::GraphProblem, ::Type{BT}, all::Bool, invert::Bool, tree_storage::Bool) where {BT}
     syms = symbols(gp)
-    T = (all ? set_type : sampler_type)(BT, length(syms), nflavor(gp))
+    T = (all ? (tree_storage ? treeset_type : set_type) : sampler_type)(BT, length(syms), nflavor(gp))
     vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
     return function (l)
         ret = _onehotv.(Ref(T), vertex_index[l], flavors(gp), get_weights(gp, l))
@@ -92,6 +94,6 @@ end
 function _onehotv(::Type{CountingTropical{TV,BS}}, x, v, w) where {TV,BS}
     CountingTropical{TV,BS}(TV(w), onehotv(BS, x, v))
 end
-function _onehotv(::Type{BS}, x, v, w) where {BS<:ConfigEnumerator}
+function _onehotv(::Type{BS}, x, v, w) where {BS<:Union{ConfigEnumerator, TreeConfigEnumerator}}
     onehotv(BS, x, v)
 end

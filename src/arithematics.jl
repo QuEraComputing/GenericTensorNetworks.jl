@@ -2,7 +2,7 @@ using Polynomials: Polynomial
 using TropicalNumbers: Tropical, CountingTropical
 using Mods, Primes
 using Base.Cartesian
-import AbstractTrees: children, printnode
+import AbstractTrees: children, printnode, print_tree
 
 @enum TreeTag LEAF SUM PROD
 
@@ -290,24 +290,30 @@ end
 
 children(t::TreeConfigEnumerator) = t.siblings
 function printnode(io::IO, t::TreeConfigEnumerator)
-    if t.tag == LEAF
+    if t.tag === LEAF
         print(io, t.data)
-    elseif t.tag == SUM
+    elseif t.tag === SUM
         print(io, "+")
     else  # PROD
         print(io, "*")
     end
 end
 
-function Base.length(x::TreeConfigEnumerator)
-    if x.tag == LEAF
-        1
-    elseif x.tag == SUM
-        isempty(children(x)) && return 0
-        sum(length, children(x))
+@inline function Base.length(x::TreeConfigEnumerator)
+    if x.tag === LEAF
+        return 1
+    elseif x.tag === SUM
+        res = 0
+        for sib in x.siblings
+            res += length(sib)
+        end
+        return res
     else
-        isempty(children(x)) && return 1
-        prod(length, children(x))
+        res = 1
+        for sib in x.siblings
+            res *= length(sib)
+        end
+        return res
     end
 end
 
@@ -320,6 +326,8 @@ function Base.:(==)(x::TreeConfigEnumerator{N,S,C}, y::TreeConfigEnumerator{N,S,
         #return Set(children(x)) == Set(children(y))
     #end
 end
+
+Base.show(io::IO, t::TreeConfigEnumerator) = print_tree(io, t)
 
 function Base.collect(x::TreeConfigEnumerator{N,S,C}) where {N,S,C}
     if x.tag == LEAF

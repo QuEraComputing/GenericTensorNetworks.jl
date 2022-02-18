@@ -39,3 +39,10 @@ function neighbortensor(a::T, b::T, d::Int) where T
     return t
 end
 
+
+"""
+    is_maximal_independent_set(g::SimpleGraph, config)
+
+Return true if `config` (a vector of boolean numbers as the mask of vertices) is a maximal independent set of graph `g`.
+"""
+is_maximal_independent_set(g::SimpleGraph, config) = !any(e->config[e.src] == 1 && config[e.dst] == 1, edges(g)) && all(w->config[w] == 1 || any(v->!iszero(config[v]), neighbors(g, w)), Graphs.vertices(g))

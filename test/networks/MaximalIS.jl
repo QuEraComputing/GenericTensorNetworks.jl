@@ -20,3 +20,28 @@ using GraphTensorNetworks, Test, Graphs
     end
 end
 
+@testset "counting minimum maximal IS" begin
+    g = smallgraph(:tutte)
+    res = solve(MaximalIS(g), SizeMin())[]
+    poly = solve(MaximalIS(g), GraphPolynomial())[]
+    @test poly == Polynomial([fill(0.0, 13)..., 2, 150, 7510, 71669, 66252, 14925, 571])
+    @test res.n == 13
+    @test solve(MaximalIS(g), CountingMin())[].c == 2
+    min2 = solve(MaximalIS(g), CountingMin(3))[]
+    @test min2.maxorder == 15
+    @test min2.coeffs == (2, 150, 7510)
+
+    for bounded in [false, true]
+        println("bounded = ", bounded, ", configs max1")
+        @test length(solve(MaximalIS(g), ConfigsMin(; bounded=bounded))[].c) == 2
+        println("bounded = ", bounded, ", configs max3")
+        cmin2 = solve(MaximalIS(g), ConfigsMin(3; bounded=bounded))[]
+        @test cmin2.maxorder == 15
+        @test length.(cmin2.coeffs) == (2, 150, 7510)
+
+        println("bounded = ", bounded, ", single config min")
+        c = solve(MaximalIS(g), SingleConfigMin(; bounded=bounded), T=Int64)[].c.data
+        @test c ∈ cmin2.coeffs[1].data
+        @test is_maximal_independent_set(g, c) && count(!iszero, c) == 13
+    end
+end

@@ -103,11 +103,12 @@ function paint_shop_coloring_from_config(config; initial::Bool=false)
     return res
 end
 
-function fx_solutions(gp::PaintShop, ::Type{BT}, all::Bool) where {BT}
+function fx_solutions(gp::PaintShop, ::Type{BT}, all::Bool, invert::Bool) where {BT}
     syms = symbols(gp)
     T = (all ? set_type : sampler_type)(BT, length(syms), nflavor(gp))
     counter = Ref(0)
     return function (l)
-        _onehotv.(Ref(T), (counter[]+=1; counter[]), flavors(gp), get_weights(gp, l))
+        ret = _onehotv.(Ref(T), (counter[]+=1; counter[]), flavors(gp), get_weights(gp, l))
+        invert ? pre_invert_exponent.(ret) : ret
     end
 end

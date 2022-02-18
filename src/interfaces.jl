@@ -4,19 +4,31 @@ abstract type AbstractProperty end
     SizeMax <: AbstractProperty
     SizeMax()
 
-The maximum independent set size.
+The maximum set size. e.g. the largest size of the [`IndependentSet`](@ref)  problem is also know as the independence number.
 
-* The corresponding tensor element type is [`Tropical`](@ref).
+* The corresponding tensor element type is max-plus tropical number [`Tropical`](@ref).
 * It is compatible with weighted graph problems.
 * BLAS (on CPU) and GPU are supported,
 """
 struct SizeMax <: AbstractProperty end
 
 """
+    SizeMin <: AbstractProperty
+    SizeMin()
+
+The maximum set size. e.g. the smallest size ofthe [`MaximalIS`](@ref) problem is also known as the independent domination number.
+
+* The corresponding tensor element type inverted max-plus tropical number [`Tropical`](@ref), which is equivalent to the min-plus tropical number.
+* It is compatible with weighted graph problems.
+* BLAS (on CPU) and GPU are supported,
+"""
+struct SizeMin <: AbstractProperty end
+
+"""
     CountingAll <: AbstractProperty
     CountingAll()
 
-Counting the total number of sets. e.g. for [`IndependentSet`](@ref) problem, it counts the independent sets.
+Counting the total number of sets. e.g. for the [`IndependentSet`](@ref) problem, it counts the independent sets.
 
 * The corresponding tensor element type is `Base.Real`.
 * The weights on graph does not have effect.
@@ -28,7 +40,7 @@ struct CountingAll <: AbstractProperty end
     CountingMax{K} <: AbstractProperty
     CountingMax(K=1)
 
-Counting the number of sets with `K` largest size. e.g. for [`IndependentSet`](@ref) problem,
+Counting the number of sets with `K`-largest size. e.g. for [`IndependentSet`](@ref) problem,
 it counts independent sets of size ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
 
 * The corresponding tensor element type is [`CountingTropical`](@ref) for `K == 1`, and [`TruncatedPoly`](@ref)`{K}` for `K > 1`.
@@ -38,6 +50,20 @@ it counts independent sets of size ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(
 struct CountingMax{K} <: AbstractProperty end
 CountingMax(K::Int=1) = CountingMax{K}()
 max_k(::CountingMax{K}) where K = K
+
+"""
+    CountingMin{K} <: AbstractProperty
+    CountingMin(K=1)
+
+Counting the number of sets with `K`-smallest size.
+
+* The corresponding tensor element type is inverted [`CountingTropical`](@ref) for `K == 1`, and [`TruncatedPoly`](@ref)`{K}` for `K > 1`.
+* Weighted graph problems is only supported for `K == 1`.
+* GPU is supported,
+"""
+struct CountingMin{K} <: AbstractProperty end
+CountingMin(K::Int=1) = CountingMin{K}()
+min_k(::CountingMin{K}) where K = K
 
 """
     GraphPolynomial{METHOD} <: AbstractProperty
@@ -77,12 +103,25 @@ graph_polynomial_method(::GraphPolynomial{METHOD}) where METHOD = METHOD
 
 Finding single best solution, e.g. for [`IndependentSet`](@ref) problem, it is one of the maximum independent sets.
 
-* The corresponding data type is [`CountingTropical{Float64,<:ConfigSampler}`](@ref) if `BOUNDED` is `true`, [`Tropical`](@ref) otherwise.
+* The corresponding data type is [`CountingTropical{Float64,<:ConfigSampler}`](@ref) if `BOUNDED` is `false`, [`Tropical`](@ref) otherwise.
 * Weighted graph problems is supported.
 * GPU is supported,
 """
 struct SingleConfigMax{BOUNDED} <:AbstractProperty end
 SingleConfigMax(; bounded::Bool=false) = SingleConfigMax{bounded}()
+
+"""
+    SingleConfigMin{BOUNDED} <: AbstractProperty
+    SingleConfigMin(; bounded=false)
+
+Finding single "worst" solution.
+
+* The corresponding data type is inverted [`CountingTropical{Float64,<:ConfigSampler}`](@ref) if `BOUNDED` is `false`, inverted [`Tropical`](@ref) otherwise.
+* Weighted graph problems is supported.
+* GPU is supported,
+"""
+struct SingleConfigMin{BOUNDED} <:AbstractProperty end
+SingleConfigMin(; bounded::Bool=false) = SingleConfigMin{bounded}()
 
 """
     ConfigsAll <:AbstractProperty
@@ -99,7 +138,7 @@ struct ConfigsAll <:AbstractProperty end
     ConfigsMax{K, BOUNDED} <:AbstractProperty
     ConfigsMax(K=1; bounded=true)
 
-Find configurations with largest sizes, e.g. for [`IndependentSet`](@ref) problem,
+Find configurations with largest-K sizes, e.g. for [`IndependentSet`](@ref) problem,
 it is finding all independent sets of sizes ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
 
 * The corresponding data type is [`CountingTropical`](@ref)`{Float64,<:ConfigEnumerator}` for `K == 1` and [`TruncatedPoly`](@ref)`{K,<:ConfigEnumerator}` for `K > 1`.
@@ -108,6 +147,19 @@ it is finding all independent sets of sizes ``\\alpha(G), \\alpha(G)-1, \\ldots,
 struct ConfigsMax{K, BOUNDED} <:AbstractProperty end
 ConfigsMax(K::Int=1; bounded::Bool=true) = ConfigsMax{K,bounded}()
 max_k(::ConfigsMax{K}) where K = K
+
+"""
+    ConfigsMin{K, BOUNDED} <:AbstractProperty
+    ConfigsMin(K=1; bounded=true)
+
+Find configurations with smallest-K sizes.
+
+* The corresponding data type is inverted [`CountingTropical`](@ref)`{Float64,<:ConfigEnumerator}` for `K == 1` and inverted [`TruncatedPoly`](@ref)`{K,<:ConfigEnumerator}` for `K > 1`.
+* Weighted graph problems is only supported for `K == 1`.
+"""
+struct ConfigsMin{K, BOUNDED} <:AbstractProperty end
+ConfigsMin(K::Int=1; bounded::Bool=true) = ConfigsMin{K,bounded}()
+min_k(::ConfigsMin{K}) where K = K
 
 """
     solve(problem, property; usecuda=false, T=Float64)
@@ -119,7 +171,8 @@ Positional Arguments
 * `problem` is the graph problem with tensor network information,
 * `property` is string specifying the task. Using the maximum independent set problem as an example, it can be one of
 
-    * [`SizeMax`](@ref) for finding maximum configuration size,
+    * [`SizeMax`](@ref) for finding maximum set size,
+    * [`SizeMin`](@ref) for finding minimum set size,
 
     * [`CountingMax`](@ref) for counting configurations with top `K` sizes,
     * [`CountingAll`](@ref) for counting all configurations,
@@ -136,36 +189,69 @@ Keyword arguments
 * `T` is the "base" element type, sometimes can be used to reduce the memory cost.
 """
 function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=false)
+    if !_solvable(gp, property)
+        throw(ArgumentError("Graph property `$(typeof(property))` is not computable for graph problem of type `$(typeof(gp))`."))
+    end
     if property isa SizeMax
         syms = symbols(gp)
         return contractf(x->Tropical{T}.(get_weights(gp, x)), gp; usecuda=usecuda)
+    elseif property isa SizeMin
+        syms = symbols(gp)
+        return post_invert_exponent.(contractf(x->pre_invert_exponent.(Tropical{T}.(get_weights(gp, x))), gp; usecuda=usecuda))
     elseif property isa CountingAll
         return contractx(gp, one(T); usecuda=usecuda)
     elseif property isa CountingMax{1}
         syms = symbols(gp)
         return contractf(x->CountingTropical{T,T}.(get_weights(gp, x)), gp; usecuda=usecuda)
+    elseif property isa CountingMin{1}
+        return post_invert_exponent.(contractf(x->pre_invert_exponent.(CountingTropical{T,T}.(get_weights(gp, x))), gp; usecuda=usecuda))
     elseif property isa CountingMax
         return contractx(gp, TruncatedPoly(ntuple(i->i == max_k(property) ? one(T) : zero(T), max_k(property)), one(T)); usecuda=usecuda)
+    elseif property isa CountingMin
+        return post_invert_exponent.(contractx(gp, pre_invert_exponent(TruncatedPoly(ntuple(i->i == min_k(property) ? one(T) : zero(T), min_k(property)), one(T))); usecuda=usecuda))
     elseif property isa GraphPolynomial
         return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, property.kwargs...)
     elseif property isa SingleConfigMax{false}
         return solutions(gp, CountingTropical{T,T}; all=false, usecuda=usecuda)
+    elseif property isa SingleConfigMin{false}
+        return solutions(gp, CountingTropical{T,T}; all=false, usecuda=usecuda, invert=true)
     elseif property isa ConfigsMax{1,false}
         return solutions(gp, CountingTropical{T,T}; all=true, usecuda=usecuda)
+    elseif property isa ConfigsMin{1,false}
+        return solutions(gp, CountingTropical{T,T}; all=true, usecuda=usecuda, invert=true)
     elseif property isa (ConfigsMax{K, false} where K)
         return solutions(gp, TruncatedPoly{max_k(property),T,T}; all=true, usecuda=usecuda)
+    elseif property isa (ConfigsMin{K, false} where K)
+        return solutions(gp, TruncatedPoly{min_k(property),T,T}; all=true, usecuda=usecuda, invert=true)
     elseif property isa ConfigsAll
         return solutions(gp, Real; all=true, usecuda=usecuda)
     elseif property isa SingleConfigMax{true}
         return best_solutions(gp; all=false, usecuda=usecuda)
+    elseif property isa SingleConfigMin{true}
+        return best_solutions(gp; all=false, usecuda=usecuda, invert=true)
     elseif property isa ConfigsMax{1,true}
         return best_solutions(gp; all=true, usecuda=usecuda)
+    elseif property isa ConfigsMin{1,true}
+        return best_solutions(gp; all=true, usecuda=usecuda, invert=true)
     elseif property isa (ConfigsMax{K,true} where K)
         return bestk_solutions(gp, max_k(property))
+    elseif property isa (ConfigsMin{K,true} where K)
+        return bestk_solutions(gp, min_k(property), invert=true)
     else
         error("unknown property $property.")
     end
 end
+
+# raise an error if the property for problem can not be computed
+_solvable(::Any, ::Any) = true
+_solvable(::Coloring, ::GraphPolynomial) = false
+
+# negate the exponents before entering the solver
+pre_invert_exponent(t::TruncatedPoly{K}) where K = TruncatedPoly(t.coeffs, -t.maxorder)
+pre_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
+# negate the exponents after entering the solver
+post_invert_exponent(t::TruncatedPoly{K}) where K = TruncatedPoly(ntuple(i->t.coeffs[K-i+1], K), -t.maxorder+(K-1))
+post_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
 
 """
     max_size(problem; usecuda=false)

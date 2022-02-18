@@ -34,6 +34,8 @@ nflavor
 is_independent_set
 mis_compactify!
 
+is_maximal_independent_set
+
 cut_size
 cut_assign
 
@@ -48,10 +50,13 @@ is_good_vertex_coloring
 SizeMax
 CountingAll
 CountingMax
+CountingMin
 GraphPolynomial
 SingleConfigMax
+SingleConfigMin
 ConfigsAll
 ConfigsMax
+ConfigsMin
 ```
 
 ## Element Algebras

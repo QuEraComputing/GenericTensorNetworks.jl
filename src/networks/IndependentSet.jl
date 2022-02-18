@@ -98,8 +98,8 @@ function mis_compactify!(a::AbstractArray{T}) where T <: TropicalTypes
 end
 
 """
-    is_independent_set(g::SimpleGraph, vertices)
+    is_independent_set(g::SimpleGraph, config)
 
-Return true if `vertices` is an independent set of graph `g`.
+Return true if `config` (a vector of boolean numbers as the mask of vertices) is an independent set of graph `g`.
 """
-is_independent_set(g::SimpleGraph, v) = !any(e->v[e.src] == 1 && v[e.dst] == 1, edges(g))
+is_independent_set(g::SimpleGraph, config) = !any(e->config[e.src] == 1 && config[e.dst] == 1, edges(g))

@@ -20,7 +20,8 @@ function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false
     if all
         # we use `Float64` types because we want to support weighted graphs.
         xs = generate_tensors(fx_solutions(gp, CountingTropical{Float64,Float64}, all, invert), gp)
-        return post_invert_exponent.(bounding_contract(AllConfigs{1}(), gp.code, xst, ymask, xs))
+        ret = bounding_contract(AllConfigs{1}(), gp.code, xst, ymask, xs)
+        return invert ? post_invert_exponent.(ret) : ret
     else
         @assert ndims(ymask) == 0
         t, res = solution_ad(gp.code, xst, ymask)

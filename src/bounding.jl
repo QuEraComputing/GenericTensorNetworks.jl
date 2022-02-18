@@ -156,7 +156,7 @@ function solution_ad(code::Union{NestedEinsum,SlicedEinsum}, @nospecialize(xsa),
     @debug "generating masked tree..."
     mt = generate_masktree(SingleConfig(), code, c, ymask, size_dict)
     config = read_config!(code, mt, Dict())
-    if length(config) !== length(xsa)
+    if length(config) !== length(labels(code))  # equal to the # of degree of freedoms
         error("configuration `$(config)` is not fully determined!")
     end
     n, config

@@ -299,22 +299,30 @@ function printnode(io::IO, t::TreeConfigEnumerator)
     end
 end
 
-@inline function Base.length(x::TreeConfigEnumerator)
-    if x.tag === LEAF
-        return 1
-    elseif x.tag === SUM
-        res = 0
-        for sib in x.siblings
-            res += length(sib)
+function Base.length(x::TreeConfigEnumerator)
+    if x.tag === SUM
+        isempty(x.siblings) && return 0
+        res = length(first(x.siblings))
+        for i = 2:length(x.siblings)
+            res += length(x.siblings[i])
+        end
+        return res
+    elseif x.tag === PROD
+        isempty(x.siblings) && return 1
+        res = length(first(x.siblings))
+        for i = 2:length(x.siblings)
+            res *= length(x.siblings[i])
         end
         return res
     else
-        res = 1
-        for sib in x.siblings
-            res *= length(sib)
-        end
-        return res
+        return 1
     end
+end
+
+function num_nodes(x::TreeConfigEnumerator)
+    x.tag == LEAF && return 1
+    isempty(x.siblings) && return 0
+    return sum(num_nodes, x.siblings)
 end
 
 function Base.:(==)(x::TreeConfigEnumerator{N,S,C}, y::TreeConfigEnumerator{N,S,C}) where {N,S,C}
@@ -327,7 +335,7 @@ function Base.:(==)(x::TreeConfigEnumerator{N,S,C}, y::TreeConfigEnumerator{N,S,
     #end
 end
 
-Base.show(io::IO, t::TreeConfigEnumerator) = print_tree(io, t)
+#Base.show(io::IO, t::TreeConfigEnumerator) = print_tree(io, t)
 
 function Base.collect(x::TreeConfigEnumerator{N,S,C}) where {N,S,C}
     if x.tag == LEAF
@@ -342,11 +350,27 @@ function Base.collect(x::TreeConfigEnumerator{N,S,C}) where {N,S,C}
 end
 
 function Base.:+(x::TreeConfigEnumerator{N,S,C}, y::TreeConfigEnumerator{N,S,C}) where {N,S,C}
-    return TreeConfigEnumerator(SUM, [x, y])
+    if x.tag === y.tag === SUM
+        return TreeConfigEnumerator(SUM, [x.siblings..., y.siblings...])
+    elseif x.tag === SUM
+        return TreeConfigEnumerator(SUM, [x.siblings..., y])
+    elseif y.tag === SUM
+        return TreeConfigEnumerator(SUM, [x, y.siblings...])
+    else
+        return TreeConfigEnumerator(SUM, [x, y])
+    end
 end
 
 function Base.:*(x::TreeConfigEnumerator{L,S,C}, y::TreeConfigEnumerator{L,S,C}) where {L,S,C}
-    return TreeConfigEnumerator(PROD, [x, y])
+    if x.tag === y.tag === PROD
+        return TreeConfigEnumerator(PROD, [x.siblings..., y.siblings...])
+    elseif x.tag === PROD
+        return TreeConfigEnumerator(PROD, [x.siblings..., y])
+    elseif y.tag === PROD
+        return TreeConfigEnumerator(PROD, [x, y.siblings...])
+    else
+        return TreeConfigEnumerator(PROD, [x, y])
+    end
 end
 
 Base.zero(::Type{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = TreeConfigEnumerator(SUM, TreeConfigEnumerator{N,S,C}[])

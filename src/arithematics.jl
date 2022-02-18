@@ -2,7 +2,9 @@ using Polynomials: Polynomial
 using TropicalNumbers: Tropical, CountingTropical
 using Mods, Primes
 using Base.Cartesian
-import AbstractTrees
+import AbstractTrees: children, printnode
+
+@enum TreeTag LEAF SUM PROD
 
 # pirate
 Base.abs(x::Mod) = x
@@ -279,64 +281,97 @@ Base.one(::ConfigSampler{N,S,C}) where {N,S,C} = one(ConfigSampler{N,S,C})
 # tree config enumerator
 export TreeConfigEnumerator
 struct TreeConfigEnumerator{N,S,C}
+    tag::TreeTag
     siblings::Vector{TreeConfigEnumerator{N,S,C}}
-    isleaf::Bool
     data::StaticElementVector{N,S,C}
-    TreeConfigEnumerator(v::Vector{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = new{N,S,C}(v, false)
-    TreeConfigEnumerator(data::StaticElementVector{N,S,C}) where {N,S,C} = new{N,S,C}(StaticElementVector{N,S,C}[], true, data)
+    TreeConfigEnumerator(tag::TreeTag, v::Vector{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = new{N,S,C}(tag, v)
+    TreeConfigEnumerator(data::StaticElementVector{N,S,C}) where {N,S,C} = new{N,S,C}(LEAF, StaticElementVector{N,S,C}[], data)
 end
 
-isleaf(t::TreeConfigEnumerator) = t.isleaf
-AbstractTrees.children(t::TreeConfigEnumerator) = t.siblings
-AbstractTrees.printnode(io::IO, t::TreeConfigEnumerator) = isleaf(t) ? print(io, t.data) : print(io, "○")
+children(t::TreeConfigEnumerator) = t.siblings
+function printnode(io::IO, t::TreeConfigEnumerator)
+    if t.tag == LEAF
+        print(io, t.data)
+    elseif t.tag == SUM
+        print(io, "+")
+    else  # PROD
+        print(io, "*")
+    end
+end
 
-Base.length(x::TreeConfigEnumerator{N}) where N = isleaf(x) ? 1 : prod(length, x.siblings)
-Base.eltype(::Type{<:AbstractTrees.TreeIterator{TreeConfigEnumerator{N,S,C}}}) where {N,S,C} = StaticElementVector{N,S,C}
-Base.IteratorEltype(::Type{<:AbstractTrees.TreeIterator{TreeConfigEnumerator{N, S, C}}}) where {N,S,C} = Base.HasEltype()a
-function Base.:(==)(x::TreeConfigEnumerator{N,S,C}, y::TreeConfigEnumerator{N,S,C}) where {N,S,C}
-    if isleaf(x) && isleaf(y)
-        return x.data == y.data
-    elseif !isleaf(x) && !isleaf(y) && length(x.siblings) == length(y.siblings)
-        return all(i->x.siblings[i] == y.siblings[i], lengh(x.siblings))
+function Base.length(x::TreeConfigEnumerator)
+    if x.tag == LEAF
+        1
+    elseif x.tag == SUM
+        isempty(children(x)) && return 0
+        sum(length, children(x))
     else
-        return false
+        isempty(children(x)) && return 1
+        prod(length, children(x))
+    end
+end
+
+function Base.:(==)(x::TreeConfigEnumerator{N,S,C}, y::TreeConfigEnumerator{N,S,C}) where {N,S,C}
+    return Set(collect(x)) == Set(collect(y))
+    #(x.tag != y.tag || length(children(x)) == length(children(y))) && return false
+    #if x.tag == LEAF
+        #return x.data == y.data
+    #else
+        #return Set(children(x)) == Set(children(y))
+    #end
+end
+
+function Base.collect(x::TreeConfigEnumerator{N,S,C}) where {N,S,C}
+    if x.tag == LEAF
+        return StaticElementVector{N,S,C}[x.data]
+    elseif x.tag == SUM
+        sets = collect.(x.siblings)
+        return vcat(sets...)
+    else   # PROD
+        sets = collect.(x.siblings)
+        return vec([reduce((x,y)->x|y, si) for si in Iterators.product(sets...)])
     end
 end
 
 function Base.:+(x::TreeConfigEnumerator{N,S,C}, y::TreeConfigEnumerator{N,S,C}) where {N,S,C}
-    iszero(x) && return y
-    iszero(y) && return x
-    return TreeConfigEnumerator(vcat(x.siblings, y.siblings))
+    return TreeConfigEnumerator(SUM, [x, y])
 end
 
 function Base.:*(x::TreeConfigEnumerator{L,S,C}, y::TreeConfigEnumerator{L,S,C}) where {L,S,C}
-    iszero(x) && return x
-    iszero(y) && return y
-    return TreeConfigEnumerator([x, y])
+    return TreeConfigEnumerator(PROD, [x, y])
 end
 
-Base.zero(::Type{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = TreeConfigEnumerator(TreeConfigEnumerator{N,S,C}[])
-Base.one(::Type{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = TreeConfigEnumerator([TreeConfigEnumerator(zero(StaticElementVector{N,S,C}))])
+Base.zero(::Type{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = TreeConfigEnumerator(SUM, TreeConfigEnumerator{N,S,C}[])
+Base.one(::Type{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = TreeConfigEnumerator(SUM, [TreeConfigEnumerator(zero(StaticElementVector{N,S,C}))])
 Base.zero(::TreeConfigEnumerator{N,S,C}) where {N,S,C} = zero(TreeConfigEnumerator{N,S,C})
 Base.one(::TreeConfigEnumerator{N,S,C}) where {N,S,C} = one(TreeConfigEnumerator{N,S,C})
 # todo, check siblings too?
-Base.iszero(t::TreeConfigEnumerator) = isempty(t.siblings)
-Base.iterate(t::TreeConfigEnumerator) = iterate(AbstractTrees.PreOrderDFS(t))
+function Base.iszero(t::TreeConfigEnumerator)
+    if t.TAG == SUM
+        all(isempty, t.siblings)
+    elseif t.TAG == LEAF
+        false
+    else
+        any(isempty, t.siblings)
+    end
+end
 
 # A patch to make `Polynomial{ConfigEnumerator}` work
-function Base.:*(a::Int, y::ConfigEnumerator)
-    a == 0 && return zero(y)
-    a == 1 && return y
-    error("multiplication between int and config enumerator is not defined.")
-end
-function Base.:*(a::Int, y::ConfigSampler)
-    a == 0 && return zero(y)
-    a == 1 && return y
-    error("multiplication between int and config sampler is not defined.")
+for T in [:ConfigEnumerator, :ConfigSampler, :TreeConfigEnumerator]
+    @eval function Base.:*(a::Int, y::$T)
+        a == 0 && return zero(y)
+        a == 1 && return y
+        error("multiplication between int and `$(typeof(y))` is not defined.")
+    end
+    @eval function Base.:*(a::Int, y::$T)
+        a == 0 && return zero(y)
+        a == 1 && return y
+        error("multiplication between int and `$(typeof(y))` is not defined.")
+    end
 end
 
 # convert from counting type to bitstring type
-for (F,TP) in [(:set_type, :ConfigEnumerator), (:sampler_type, :ConfigSampler)]
+for (F,TP) in [(:set_type, :ConfigEnumerator), (:sampler_type, :ConfigSampler), (:treesampler_type, :TreeConfigEnumerator)]
     @eval begin
         function $F(::Type{T}, n::Int, nflavor::Int) where {OT, K, T<:TruncatedPoly{K,C,OT} where C}
             TruncatedPoly{K, $F(n,nflavor),OT}
@@ -360,12 +395,13 @@ end
 
 # utilities for creating onehot vectors
 onehotv(::Type{ConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigEnumerator([onehotv(StaticElementVector{N,S,C}, i, v)])
-onehotv(::Type{TreeConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = TreeConfigEnumerator([TreeConfigEnumerator(onehotv(StaticElementVector{N,S,C}, i, v))])
+onehotv(::Type{TreeConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = TreeConfigEnumerator(SUM, [TreeConfigEnumerator(onehotv(StaticElementVector{N,S,C}, i, v))])
 onehotv(::Type{ConfigSampler{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigSampler(onehotv(StaticElementVector{N,S,C}, i, v))
+# just to make matrix transpose work
 Base.transpose(c::ConfigEnumerator) = c
 Base.copy(c::ConfigEnumerator) = ConfigEnumerator(copy(c.data))
 Base.transpose(c::TreeConfigEnumerator) = c
-Base.copy(c::TreeConfigEnumerator) = isleaf(c) ? TreeConfigEnumerator(c.data) : TreeConfigEnumerator(c.siblings)
+Base.copy(c::TreeConfigEnumerator) = c.tag == LEAF ? TreeConfigEnumerator(c.data) : TreeConfigEnumerator(c.tag, c.siblings)
 
 # Handle boolean, this is a patch for CUDA matmul
 for TYPE in [:ConfigEnumerator, :ConfigSampler, :TruncatedPoly, :TreeConfigEnumerator]

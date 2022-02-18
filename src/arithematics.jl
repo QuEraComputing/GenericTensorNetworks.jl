@@ -2,6 +2,7 @@ using Polynomials: Polynomial
 using TropicalNumbers: Tropical, CountingTropical
 using Mods, Primes
 using Base.Cartesian
+import AbstractTrees
 
 # pirate
 Base.abs(x::Mod) = x
@@ -275,6 +276,53 @@ Base.one(::Type{ConfigSampler{N,S,C}}) where {N,S,C} = ConfigSampler{N,S,C}(zero
 Base.zero(::ConfigSampler{N,S,C}) where {N,S,C} = zero(ConfigSampler{N,S,C})
 Base.one(::ConfigSampler{N,S,C}) where {N,S,C} = one(ConfigSampler{N,S,C})
 
+# tree config enumerator
+export TreeConfigEnumerator
+struct TreeConfigEnumerator{N,S,C}
+    siblings::Vector{TreeConfigEnumerator{N,S,C}}
+    isleaf::Bool
+    data::StaticElementVector{N,S,C}
+    TreeConfigEnumerator(v::Vector{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = new{N,S,C}(v, false)
+    TreeConfigEnumerator(data::StaticElementVector{N,S,C}) where {N,S,C} = new{N,S,C}(StaticElementVector{N,S,C}[], true, data)
+end
+
+isleaf(t::TreeConfigEnumerator) = t.isleaf
+AbstractTrees.children(t::TreeConfigEnumerator) = t.siblings
+AbstractTrees.printnode(io::IO, t::TreeConfigEnumerator) = isleaf(t) ? print(io, t.data) : print(io, "○")
+
+Base.length(x::TreeConfigEnumerator{N}) where N = isleaf(x) ? 1 : prod(length, x.siblings)
+Base.eltype(::Type{<:AbstractTrees.TreeIterator{TreeConfigEnumerator{N,S,C}}}) where {N,S,C} = StaticElementVector{N,S,C}
+Base.IteratorEltype(::Type{<:AbstractTrees.TreeIterator{TreeConfigEnumerator{N, S, C}}}) where {N,S,C} = Base.HasEltype()a
+function Base.:(==)(x::TreeConfigEnumerator{N,S,C}, y::TreeConfigEnumerator{N,S,C}) where {N,S,C}
+    if isleaf(x) && isleaf(y)
+        return x.data == y.data
+    elseif !isleaf(x) && !isleaf(y) && length(x.siblings) == length(y.siblings)
+        return all(i->x.siblings[i] == y.siblings[i], lengh(x.siblings))
+    else
+        return false
+    end
+end
+
+function Base.:+(x::TreeConfigEnumerator{N,S,C}, y::TreeConfigEnumerator{N,S,C}) where {N,S,C}
+    iszero(x) && return y
+    iszero(y) && return x
+    return TreeConfigEnumerator(vcat(x.siblings, y.siblings))
+end
+
+function Base.:*(x::TreeConfigEnumerator{L,S,C}, y::TreeConfigEnumerator{L,S,C}) where {L,S,C}
+    iszero(x) && return x
+    iszero(y) && return y
+    return TreeConfigEnumerator([x, y])
+end
+
+Base.zero(::Type{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = TreeConfigEnumerator(TreeConfigEnumerator{N,S,C}[])
+Base.one(::Type{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = TreeConfigEnumerator([TreeConfigEnumerator(zero(StaticElementVector{N,S,C}))])
+Base.zero(::TreeConfigEnumerator{N,S,C}) where {N,S,C} = zero(TreeConfigEnumerator{N,S,C})
+Base.one(::TreeConfigEnumerator{N,S,C}) where {N,S,C} = one(TreeConfigEnumerator{N,S,C})
+# todo, check siblings too?
+Base.iszero(t::TreeConfigEnumerator) = isempty(t.siblings)
+Base.iterate(t::TreeConfigEnumerator) = iterate(AbstractTrees.PreOrderDFS(t))
+
 # A patch to make `Polynomial{ConfigEnumerator}` work
 function Base.:*(a::Int, y::ConfigEnumerator)
     a == 0 && return zero(y)
@@ -312,12 +360,15 @@ end
 
 # utilities for creating onehot vectors
 onehotv(::Type{ConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigEnumerator([onehotv(StaticElementVector{N,S,C}, i, v)])
+onehotv(::Type{TreeConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = TreeConfigEnumerator([TreeConfigEnumerator(onehotv(StaticElementVector{N,S,C}, i, v))])
 onehotv(::Type{ConfigSampler{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigSampler(onehotv(StaticElementVector{N,S,C}, i, v))
 Base.transpose(c::ConfigEnumerator) = c
 Base.copy(c::ConfigEnumerator) = ConfigEnumerator(copy(c.data))
+Base.transpose(c::TreeConfigEnumerator) = c
+Base.copy(c::TreeConfigEnumerator) = isleaf(c) ? TreeConfigEnumerator(c.data) : TreeConfigEnumerator(c.siblings)
 
 # Handle boolean, this is a patch for CUDA matmul
-for TYPE in [:ConfigEnumerator, :ConfigSampler, :TruncatedPoly]
+for TYPE in [:ConfigEnumerator, :ConfigSampler, :TruncatedPoly, :TreeConfigEnumerator]
     @eval Base.:*(a::Bool, y::$TYPE) = a ? y : zero(y)
     @eval Base.:*(y::$TYPE, a::Bool) = a ? y : zero(y)
 end

@@ -1,16 +1,17 @@
 """
-    best_solutions(problem; all=false, usecuda=false)
+    best_solutions(problem; all=false, usecuda=false, invert=false)
     
 Find optimal solutions with bounding.
 
 * When `all` is true, the program will use set for enumerate all possible solutions, otherwise, it will return one solution for each size.
 * `usecuda` can not be true if you want to use set to enumerate all possible solutions.
+* If `invert` is true, find the minimum.
 """
-function best_solutions(gp::GraphProblem; all=false, usecuda=false)
+function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false)
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
-    xst = generate_tensors(l->TropicalF64.(get_weights(gp, l)), gp)
+    xst = generate_tensors(l->(vs = TropicalF64.(get_weights(gp, l)); invert ? pre_invert_exponent.(vs) : vs), gp)
     ymask = trues(fill(2, length(getiyv(gp.code)))...)
     if usecuda
         xst = CuArray.(xst)
@@ -18,17 +19,18 @@ function best_solutions(gp::GraphProblem; all=false, usecuda=false)
     end
     if all
         # we use `Float64` types because we want to support weighted graphs.
-        xs = generate_tensors(fx_solutions(gp, CountingTropical{Float64,Float64}, all), gp)
-        return bounding_contract(AllConfigs{1}(), gp.code, xst, ymask, xs)
+        xs = generate_tensors(fx_solutions(gp, CountingTropical{Float64,Float64}, all, invert), gp)
+        return post_invert_exponent.(bounding_contract(AllConfigs{1}(), gp.code, xst, ymask, xs))
     else
         @assert ndims(ymask) == 0
         t, res = solution_ad(gp.code, xst, ymask)
-        return fill(CountingTropical(asscalar(t).n, ConfigSampler(StaticBitVector(map(l->res[l], 1:length(res))))))
+        ret = fill(CountingTropical(asscalar(t).n, ConfigSampler(StaticBitVector(map(l->res[l], 1:length(res))))))
+        return invert ? post_invert_exponent.(ret) : ret
     end
 end
 
 """
-    solutions(problem, basetype; all, usecuda=false)
+    solutions(problem, basetype; all, usecuda=false, invert=false)
     
 General routine to find solutions without bounding,
 
@@ -39,25 +41,27 @@ General routine to find solutions without bounding,
 * When `all` is true, the program will use set for enumerate all possible solutions, otherwise, it will return one solution for each size.
 * `usecuda` can not be true if you want to use set to enumerate all possible solutions.
 """
-function solutions(gp::GraphProblem, ::Type{BT}; all, usecuda=false) where BT
+function solutions(gp::GraphProblem, ::Type{BT}; all::Bool, usecuda::Bool=false, invert::Bool=false) where BT
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
-    return contractf(fx_solutions(gp, BT, all), gp; usecuda=usecuda)
+    ret = contractf(fx_solutions(gp, BT, all, invert), gp; usecuda=usecuda)
+    return invert ? post_invert_exponent.(ret) : ret
 end
 
 """
-    best2_solutions(problem; all=true, usecuda=false)
+    best2_solutions(problem; all=true, usecuda=false, invert=false)
 
 Finding optimal and suboptimal solutions.
 """
-best2_solutions(gp::GraphProblem; all=true, usecuda=false) = solutions(gp, Max2Poly{Float64,Float64}; all=all, usecuda=usecuda)
+best2_solutions(gp::GraphProblem; all=true, usecuda=false, invert::Bool=false) = solutions(gp, Max2Poly{Float64,Float64}; all, usecuda, invert)
 
-function bestk_solutions(gp::GraphProblem, k::Int)
+function bestk_solutions(gp::GraphProblem, k::Int; invert::Bool=false)
     xst = generate_tensors(l->TropicalF64.(get_weights(gp, l)), gp)
     ymask = trues(fill(2, length(getiyv(gp.code)))...)
-    xs = generate_tensors(fx_solutions(gp, TruncatedPoly{k,Float64,Float64}, true), gp)
-    return bounding_contract(AllConfigs{k}(), gp.code, xst, ymask, xs)
+    xs = generate_tensors(fx_solutions(gp, TruncatedPoly{k,Float64,Float64}, true, invert), gp)
+    ret = bounding_contract(AllConfigs{k}(), gp.code, xst, ymask, xs)
+    return invert ? post_invert_exponent.(ret) : ret
 end
 
 """
@@ -69,12 +73,13 @@ e.g. when the problem is [`MaximalIS`](@ref), it computes all maximal independen
 all_solutions(gp::GraphProblem) = solutions(gp, Polynomial{Float64,:x}, all=true, usecuda=false)
 
 # return a mapping from label to onehot bitstrings (degree of freedoms).
-function fx_solutions(gp::GraphProblem, ::Type{BT}, all::Bool) where {BT}
+function fx_solutions(gp::GraphProblem, ::Type{BT}, all::Bool, invert::Bool) where {BT}
     syms = symbols(gp)
     T = (all ? set_type : sampler_type)(BT, length(syms), nflavor(gp))
     vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
     return function (l)
-        _onehotv.(Ref(T), vertex_index[l], flavors(gp), get_weights(gp, l))
+        ret = _onehotv.(Ref(T), vertex_index[l], flavors(gp), get_weights(gp, l))
+        invert ? pre_invert_exponent.(ret) : ret
     end
 end
 function _onehotv(::Type{Polynomial{BS,X}}, x, v, w) where {BS,X}

@@ -155,24 +155,31 @@ function solution_ad(code::Union{NestedEinsum,SlicedEinsum}, @nospecialize(xsa),
     # compute masks from cached tensors
     @debug "generating masked tree..."
     mt = generate_masktree(SingleConfig(), code, c, ymask, size_dict)
-    n, read_config!(code, mt, Dict())
+    config = read_config!(code, mt, Dict())
+    if length(config) !== length(xsa)
+        error("configuration `$(config)` is not fully determined!")
+    end
+    n, config
 end
 
 # get the solution configuration from gradients.
 function read_config!(code::SlicedEinsum, mt, out)
     read_config!(code.eins, mt, out)
 end
+
 function read_config!(code::NestedEinsum, mt, out)
     for (arg, ix, sibling) in zip(code.args, getixs(code.eins), mt.siblings)
         if OMEinsum.isleaf(arg)
-            assign = convert(Array, sibling.content)  # note: the content can be CuArray
-            if length(ix) == 1
-                if !assign[1] && assign[2]
-                    out[ix[1]] = 1
-                elseif !assign[2] && assign[1]
-                    out[ix[1]] = 0
-                else
-                    error("invalid assign $(assign)")
+            mask = convert(Array, sibling.content)  # note: the content can be CuArray
+            for ci in CartesianIndices(mask)
+                if mask[ci]
+                    for k in 1:ndims(mask)
+                        if haskey(out, ix[k])
+                            @assert out[ix[k]] == ci.I[k] - 1
+                        else
+                            out[ix[k]] = ci.I[k] - 1
+                        end
+                    end
                 end
             end
         else  # nested

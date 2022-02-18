@@ -62,14 +62,20 @@ timespacereadwrite_complexity(problem)
 # ### Maximum independent set size ``\alpha(G)``
 maximum_independent_set_size = solve(problem, SizeMax())[]
 
+# Function [`solve`](@ref) takes two positional arguments, the problem instance and the wanted property.
+# Here [`SizeMax`](@ref) means finding the solution with maximum set size.
+
 # ### Counting properties
 # ##### counting all independent sets
 count_all_independent_sets = solve(problem, CountingAll())[]
 
-# Function [`solve`](@ref) takes two positional arguments, the problem instance and the wanted property.
+# Here [`CountingAll`](@ref) means finding all possible solutions.
 
 # ##### counting independent sets with sizes ``\alpha(G)`` and ``\alpha(G)-1``
 count_max2_independent_sets = solve(problem, CountingMax(2))[]
+
+# Here [`CountingMax`](@ref) means finding solutions with largest-2 sizes,
+# the positional argument has default value `1`.
 
 # ##### independence polynomial
 # The graph polynomial for the independent set problem is known as the independence polynomial.
@@ -85,7 +91,7 @@ independence_polynomial = solve(problem, GraphPolynomial(; method=:finitefield))
 
 # ### Configuration properties
 # ##### finding one maximum independent set (MIS)
-# There are two approaches to find one of the best solution.
+# One can use [`SingleConfigMax`](@ref) to find one of the solution with largest set size, and it has two implementations.
 # The unbounded (default) version uses [`ConfigSampler`](@ref) to sample one of the best solutions directly.
 # The bounded version uses the binary gradient back-propagation (see our paper) to compute the gradients.
 # It requires caching intermediate states, but is often faster (on CPU) because it can use [`TropicalGEMM`](https://github.com/TensorBFS/TropicalGEMM.jl) (see [Performance Tips](@ref)).
@@ -98,7 +104,8 @@ show_graph(graph; locs=locations, vertex_colors=
     [iszero(max_config.c.data[i]) ? "white" : "red" for i=1:nv(graph)])
 
 # ##### enumeration of all MISs
-# There are two approaches to enumerate all best-K solutions.
+# One can use [`ConfigsMax`](@ref) to find all solutions with largest-K set sizes.
+# It also has two implementations.
 # The bounded (default) version is always prefered because it can significantly use the memory usage.
 all_max_configs = solve(problem, ConfigsMax(1; bounded=true))[]
 
@@ -117,6 +124,7 @@ Compose.compose(context(),
      ntuple(k->(context((k-1)/m, 0.0, 1.2/m, 1.0), imgs[k]), m)...)
 
 # ##### enumeration of all IS configurations
+# One can use [`ConfigsAll`](@ref) to enumerate all sets satisfying the problem constraint.
 all_independent_sets = solve(problem, ConfigsAll())[]
 
 # To save/read a set of configuration to disk, one can type the following
@@ -129,6 +137,14 @@ loaded_sets = load_configs(filename; format=:binary, bitlength=10)
 # !!! note
 #     When loading data, one needs to provide the `bitlength` if the data is saved in binary format.
 #     Because the bitstring length is not stored.
+
+# !!! note
+#     Check section [Maximal independent set problem](@ref) for examples of finding graph properties related to minimum sizes:
+#     * [`SizeMin`](@ref) for enumerating minimum set size,
+#     * [`CountingMin`](@ref) for enumerating minimum set size,
+#     * [`SingleConfigMin`](@ref) for enumerating minimum set size,
+#     * [`ConfigsMin`](@ref) for enumerating minimum set size,
+
 
 # ## Weights and open vertices
 # [`IndependentSet`](@ref) accepts weights as a key word argument.

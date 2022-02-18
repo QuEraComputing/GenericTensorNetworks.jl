@@ -51,6 +51,8 @@ end
     @test 0 * a == zero(a)
     @test a[1] == StaticBitVector(trues(10))
     @test copy(a) == a
+    @test length.(a) == [10, 10, 10]
+    @test map(x->length(x), a) == [10, 10, 10]
     a = ConfigSampler(StaticBitVector(rand(Bool, 10)))
     @test 1 * a == a
     @test 0 * a == zero(a)

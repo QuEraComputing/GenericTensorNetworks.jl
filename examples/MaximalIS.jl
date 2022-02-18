@@ -57,13 +57,23 @@ timespacereadwrite_complexity(problem)
 # ```
 # where ``b_k`` is the number of maximal independent sets of size ``k`` in graph ``G=(V, E)``.
 
-max_config = solve(problem, GraphPolynomial())[]
+maximal_indenpendence_polynomial = solve(problem, GraphPolynomial())[]
 
 # One can see the first several coefficients are 0, because it only counts the maximal independent sets, 
+# The minimum maximal independent set size is also known as the independent domination number.
+# It can be computed with the [`SizeMin`](@ref) property:
+independent_domination_number = solve(problem, SizeMin())[]
+
+# Similarly, we have its counting [`CountingMin`](@ref):
+counting_min_maximal_independent_set = solve(problem, CountingMin())[]
 
 # ### Configuration properties
 # ##### finding all maximal independent set
 maximal_configs = solve(problem, ConfigsAll())[]
+
+all(c->is_maximal_independent_set(g, i), maximal_configs)
+
+#
 
 imgs = ntuple(k->show_graph(graph;
                 locs=locations, scale=0.25,
@@ -77,3 +87,18 @@ Compose.set_default_graphic_size(18cm, 12cm); Compose.compose(context(),
 cliques = maximal_cliques(complement(graph))
 
 # For sparse graphs, the generic tensor network approach is usually much faster and memory efficient than the Bron Kerbosch algorithm.
+
+# ##### finding minimum maximal independent set
+# It is the [`ConfigsMin`](@ref) property in the program.
+minimum_maximal_configs = solve(problem, ConfigsMin())[]
+
+imgs2 = ntuple(k->show_graph(graph;
+                locs=locations, scale=0.25,
+                vertex_colors=[iszero(minimum_maximal_configs[k][i]) ? "white" : "red"
+                for i=1:nv(graph)]), length(minimum_maximal_configs));
+
+Compose.set_default_graphic_size(15cm, 12cm); Compose.compose(context(),
+     ntuple(k->(context((mod1(k,4)-1)/4, ((k-1)÷5)/3, 1.2/4, 1.0/3), imgs2[k]), 10)...)
+
+# Similarly, if one is only interested in computing one of the minimum sets,
+# one can use the graph property [`SingleConfigMin`](@ref).

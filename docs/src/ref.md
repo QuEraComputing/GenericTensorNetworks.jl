@@ -48,6 +48,7 @@ is_good_vertex_coloring
 ## Properties
 ```@docs
 SizeMax
+SizeMin
 CountingAll
 CountingMax
 CountingMin

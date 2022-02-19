@@ -68,6 +68,7 @@ Polynomials.Polynomial
 TruncatedPoly
 Max2Poly
 ConfigEnumerator
+TreeConfigEnumerator
 ConfigSampler
 ```
 

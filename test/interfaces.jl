@@ -142,3 +142,41 @@ end
     @test res4 == res4b
     @test res4.c.data[] == res3.c.data
 end
+
+@testset "tree storage" begin
+    g = smallgraph(:petersen)
+    gp = IndependentSet(g)
+    res1 = solve(gp, ConfigsAll(; tree_storage=true))[]
+    res2 = solve(gp, ConfigsAll(; tree_storage=false))[]
+    @test res1 isa TreeConfigEnumerator && res2 isa ConfigEnumerator
+    @test length(res1) == length(res2)
+    @test Set(res2 |> collect) == Set(res1 |> collect)
+
+    res1 = solve(gp, ConfigsMax(; tree_storage=true))[].c
+    res2 = solve(gp, ConfigsMax(; tree_storage=false))[].c
+    @test res1 isa TreeConfigEnumerator && res2 isa ConfigEnumerator
+    @test length(res1) == length(res2)
+    @test Set(res2 |> collect) == Set(res1 |> collect)
+
+    res1s = solve(gp, ConfigsMax(2; tree_storage=true))[].coeffs
+    res2s = solve(gp, ConfigsMax(2; tree_storage=false))[].coeffs
+    for (res1, res2) in zip(res1s, res2s)
+        @test res1 isa TreeConfigEnumerator && res2 isa ConfigEnumerator
+        @test length(res1) == length(res2)
+        @test Set(res2 |> collect) == Set(res1 |> collect)
+    end
+
+    res1 = solve(gp, ConfigsMin(; tree_storage=true))[].c
+    res2 = solve(gp, ConfigsMin(; tree_storage=false))[].c
+    @test res1 isa TreeConfigEnumerator && res2 isa ConfigEnumerator
+    @test length(res1) == length(res2)
+    @test Set(res2 |> collect) == Set(res1 |> collect)
+
+    res1s = solve(gp, ConfigsMin(2; tree_storage=true))[].coeffs
+    res2s = solve(gp, ConfigsMin(2; tree_storage=false))[].coeffs
+    for (res1, res2) in zip(res1s, res2s)
+        @test res1 isa TreeConfigEnumerator && res2 isa ConfigEnumerator
+        @test length(res1) == length(res2)
+        @test Set(res2 |> collect) == Set(res1 |> collect)
+    end
+end

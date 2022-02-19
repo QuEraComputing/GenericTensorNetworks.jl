@@ -1,9 +1,10 @@
 name = "GraphTensorNetworks"
 uuid = "0978c8c2-34f6-49c7-9826-ea2cc20dabd2"
 authors = ["GiggleLiu <cacate0129@gmail.com> and contributors"]
-version = "0.2.1"
+version = "0.2.2"
 
 [deps]
+AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 Cairo = "159f3aea-2a34-519c-b102-8c37f9878175"
 Compose = "a81c6b42-2e10-5240-aca2-a61377ecd94b"
@@ -35,9 +36,10 @@ Polynomials = "2.0"
 Primes = "0.5"
 Requires = "1"
 SIMDTypes = "0.1"
+StatsBase = "0.33"
 TropicalNumbers = "0.4, 0.5"
 Viznet = "0.3"
-StatsBase = "0.33"
+AbstractTrees = "0.3"
 julia = "1"
 
 [extras]

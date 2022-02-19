@@ -127,6 +127,17 @@ Compose.compose(context(),
 # One can use [`ConfigsAll`](@ref) to enumerate all sets satisfying the problem constraint.
 all_independent_sets = solve(problem, ConfigsAll())[]
 
+# It is often difficult to store all configurations in a vector.
+# A more clever way to store the data is using the [`TreeConfigEnumerator`](@ref) format.
+all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]
+
+# The results encode the configurations in the sum-product-tree format. One can count and enumerate them explicitly by typing
+length(all_independent_sets_tree)
+
+# 
+
+collect(all_independent_sets_tree)
+
 # To save/read a set of configuration to disk, one can type the following
 filename = tempname()
 

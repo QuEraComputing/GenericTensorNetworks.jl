@@ -71,7 +71,7 @@ counting_min_maximal_independent_set = solve(problem, CountingMin())[]
 # ##### finding all maximal independent set
 maximal_configs = solve(problem, ConfigsAll())[]
 
-all(c->is_maximal_independent_set(g, i), maximal_configs)
+all(c->is_maximal_independent_set(graph, c), maximal_configs)
 
 #
 
@@ -90,7 +90,7 @@ cliques = maximal_cliques(complement(graph))
 
 # ##### finding minimum maximal independent set
 # It is the [`ConfigsMin`](@ref) property in the program.
-minimum_maximal_configs = solve(problem, ConfigsMin())[]
+minimum_maximal_configs = solve(problem, ConfigsMin())[].c
 
 imgs2 = ntuple(k->show_graph(graph;
                 locs=locations, scale=0.25,

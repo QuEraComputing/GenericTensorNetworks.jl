@@ -40,7 +40,7 @@ struct CountingAll <: AbstractProperty end
     CountingMax{K} <: AbstractProperty
     CountingMax(K=1)
 
-Counting the number of sets with `K`-largest size. e.g. for [`IndependentSet`](@ref) problem,
+Counting the number of sets with largest-K size. e.g. for [`IndependentSet`](@ref) problem,
 it counts independent sets of size ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
 
 * The corresponding tensor element type is [`CountingTropical`](@ref) for `K == 1`, and [`TruncatedPoly`](@ref)`{K}` for `K > 1`.
@@ -55,7 +55,7 @@ max_k(::CountingMax{K}) where K = K
     CountingMin{K} <: AbstractProperty
     CountingMin(K=1)
 
-Counting the number of sets with `K`-smallest size.
+Counting the number of sets with smallest-K size.
 
 * The corresponding tensor element type is inverted [`CountingTropical`](@ref) for `K == 1`, and [`TruncatedPoly`](@ref)`{K}` for `K > 1`.
 * Weighted graph problems is only supported for `K == 1`.
@@ -72,16 +72,18 @@ min_k(::CountingMin{K}) where K = K
 Compute the graph polynomial, e.g. for [`IndependentSet`](@ref) problem, it is the independence polynomial.
 The `METHOD` type parameter can be one of the following symbols
 
-* `:finitefield`, it uses finite field algebra to fit the polynomial.
+Method Argument
+---------------------------
+* `:finitefield`, uses finite field algebra to fit the polynomial.
     * The corresponding tensor element type is [`Mods.Mod`](@ref),
     * It does not have round-off error,
     * GPU is supported,
     * It accepts keyword arguments `maxorder` (optional, e.g. the MIS size in the [`IndependentSet`](@ref) problem).
-* `:polynomial`, the program uses polynomial numbers to solve the polynomial directly.
+* `:polynomial`, use polynomial numbers to solve the polynomial directly.
     * The corresponding tensor element type is [`Polynomials.Polynomial`](@ref).
     * It might have small round-off error depending on the data type for storing the counting.
     * It has memory overhead that linear to the graph size.
-* `:fft`, 
+* `:fft`, use fast fourier transformation to fit the polynomial.
     * The corresponding tensor element type is `Base.Complex`.
     * It has (controllable) round-off error.
     * BLAS and GPU are supported.
@@ -106,6 +108,10 @@ Finding single best solution, e.g. for [`IndependentSet`](@ref) problem, it is o
 * The corresponding data type is [`CountingTropical{Float64,<:ConfigSampler}`](@ref) if `BOUNDED` is `false`, [`Tropical`](@ref) otherwise.
 * Weighted graph problems is supported.
 * GPU is supported,
+
+Keyword Arguments
+----------------------------
+* `bounded`, if it is true, use bounding trick (or boolean gradients) to reduce the working memory to store intermediate configurations.
 """
 struct SingleConfigMax{BOUNDED} <:AbstractProperty end
 SingleConfigMax(; bounded::Bool=false) = SingleConfigMax{bounded}()
@@ -119,47 +125,69 @@ Finding single "worst" solution.
 * The corresponding data type is inverted [`CountingTropical{Float64,<:ConfigSampler}`](@ref) if `BOUNDED` is `false`, inverted [`Tropical`](@ref) otherwise.
 * Weighted graph problems is supported.
 * GPU is supported,
+
+Keyword Arguments
+----------------------------
+* `bounded`, if it is true, use bounding trick (or boolean gradients) to reduce the working memory to store intermediate configurations.
 """
 struct SingleConfigMin{BOUNDED} <:AbstractProperty end
 SingleConfigMin(; bounded::Bool=false) = SingleConfigMin{bounded}()
 
 """
-    ConfigsAll <:AbstractProperty
-    ConfigsAll()
+    ConfigsAll{TREESTORAGE} <:AbstractProperty
+    ConfigsAll(; tree_storage=false)
 
 Find all valid configurations, e.g. for [`IndependentSet`](@ref) problem, it is finding all independent sets.
 
 * The corresponding data type is [`ConfigEnumerator`](@ref).
 * Weights do not take effect.
+
+Keyword Arguments
+----------------------------
+* `tree_storage`, if it is true, it uses more memory efficient tree-structure to store the configurations.
 """
-struct ConfigsAll <:AbstractProperty end
+struct ConfigsAll{TREESTORAGE} <:AbstractProperty end
+ConfigsAll(; tree_storage::Bool=false) = ConfigsAll{tree_storage}()
+tree_storage(::ConfigsAll{TREESTORAGE}) where {TREESTORAGE} = TREESTORAGE
 
 """
-    ConfigsMax{K, BOUNDED} <:AbstractProperty
-    ConfigsMax(K=1; bounded=true)
+    ConfigsMax{K, BOUNDED, TREESTORAGE} <:AbstractProperty
+    ConfigsMax(K=1; bounded=true, tree_storage=true)
 
 Find configurations with largest-K sizes, e.g. for [`IndependentSet`](@ref) problem,
 it is finding all independent sets of sizes ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
 
 * The corresponding data type is [`CountingTropical`](@ref)`{Float64,<:ConfigEnumerator}` for `K == 1` and [`TruncatedPoly`](@ref)`{K,<:ConfigEnumerator}` for `K > 1`.
 * Weighted graph problems is only supported for `K == 1`.
+
+Keyword Arguments
+----------------------------
+* `bounded`, if it is true, use bounding trick (or boolean gradients) to reduce the working memory to store intermediate configurations.
+* `tree_storage`, if it is true, it uses more memory efficient tree-structure to store the configurations.
 """
-struct ConfigsMax{K, BOUNDED} <:AbstractProperty end
-ConfigsMax(K::Int=1; bounded::Bool=true) = ConfigsMax{K,bounded}()
+struct ConfigsMax{K, BOUNDED, TREESTORAGE} <:AbstractProperty end
+ConfigsMax(K::Int=1; bounded::Bool=true, tree_storage::Bool=false) = ConfigsMax{K,bounded,tree_storage}()
 max_k(::ConfigsMax{K}) where K = K
+tree_storage(::ConfigsMax{K,BOUNDED,TREESTORAGE}) where {K,BOUNDED,TREESTORAGE} = TREESTORAGE
 
 """
-    ConfigsMin{K, BOUNDED} <:AbstractProperty
-    ConfigsMin(K=1; bounded=true)
+    ConfigsMin{K, BOUNDED, TREESTORAGE} <:AbstractProperty
+    ConfigsMin(K=1; bounded=true, tree_storage=false)
 
 Find configurations with smallest-K sizes.
 
 * The corresponding data type is inverted [`CountingTropical`](@ref)`{Float64,<:ConfigEnumerator}` for `K == 1` and inverted [`TruncatedPoly`](@ref)`{K,<:ConfigEnumerator}` for `K > 1`.
 * Weighted graph problems is only supported for `K == 1`.
+
+Keyword Arguments
+----------------------------
+* `bounded`, if it is true, use bounding trick (or boolean gradients) to reduce the working memory to store intermediate configurations.
+* `tree_storage`, if it is true, it uses more memory efficient tree-structure to store the configurations.
 """
-struct ConfigsMin{K, BOUNDED} <:AbstractProperty end
-ConfigsMin(K::Int=1; bounded::Bool=true) = ConfigsMin{K,bounded}()
+struct ConfigsMin{K, BOUNDED, TREESTORAGE} <:AbstractProperty end
+ConfigsMin(K::Int=1; bounded::Bool=true, tree_storage::Bool=false) = ConfigsMin{K,bounded, tree_storage}()
 min_k(::ConfigsMin{K}) where K = K
+tree_storage(::ConfigsMin{K,BOUNDED,TREESTORAGE}) where {K,BOUNDED,TREESTORAGE} = TREESTORAGE
 
 """
     solve(problem, property; usecuda=false, T=Float64)
@@ -212,31 +240,31 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
     elseif property isa GraphPolynomial
         return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, property.kwargs...)
     elseif property isa SingleConfigMax{false}
-        return solutions(gp, CountingTropical{T,T}; all=false, usecuda=usecuda)
+        return solutions(gp, CountingTropical{T,T}; all=false, usecuda=usecuda, )
     elseif property isa SingleConfigMin{false}
         return solutions(gp, CountingTropical{T,T}; all=false, usecuda=usecuda, invert=true)
     elseif property isa ConfigsMax{1,false}
-        return solutions(gp, CountingTropical{T,T}; all=true, usecuda=usecuda)
+        return solutions(gp, CountingTropical{T,T}; all=true, usecuda=usecuda, tree_storage=tree_storage(property))
     elseif property isa ConfigsMin{1,false}
-        return solutions(gp, CountingTropical{T,T}; all=true, usecuda=usecuda, invert=true)
+        return solutions(gp, CountingTropical{T,T}; all=true, usecuda=usecuda, invert=true, tree_storage=tree_storage(property))
     elseif property isa (ConfigsMax{K, false} where K)
-        return solutions(gp, TruncatedPoly{max_k(property),T,T}; all=true, usecuda=usecuda)
+        return solutions(gp, TruncatedPoly{max_k(property),T,T}; all=true, usecuda=usecuda, tree_storage=tree_storage(property))
     elseif property isa (ConfigsMin{K, false} where K)
         return solutions(gp, TruncatedPoly{min_k(property),T,T}; all=true, usecuda=usecuda, invert=true)
     elseif property isa ConfigsAll
-        return solutions(gp, Real; all=true, usecuda=usecuda)
+        return solutions(gp, Real; all=true, usecuda=usecuda, tree_storage=tree_storage(property))
     elseif property isa SingleConfigMax{true}
         return best_solutions(gp; all=false, usecuda=usecuda)
     elseif property isa SingleConfigMin{true}
         return best_solutions(gp; all=false, usecuda=usecuda, invert=true)
     elseif property isa ConfigsMax{1,true}
-        return best_solutions(gp; all=true, usecuda=usecuda)
+        return best_solutions(gp; all=true, usecuda=usecuda, tree_storage=tree_storage(property))
     elseif property isa ConfigsMin{1,true}
-        return best_solutions(gp; all=true, usecuda=usecuda, invert=true)
+        return best_solutions(gp; all=true, usecuda=usecuda, invert=true, tree_storage=tree_storage(property))
     elseif property isa (ConfigsMax{K,true} where K)
-        return bestk_solutions(gp, max_k(property))
+        return bestk_solutions(gp, max_k(property), tree_storage=tree_storage(property))
     elseif property isa (ConfigsMin{K,true} where K)
-        return bestk_solutions(gp, min_k(property), invert=true)
+        return bestk_solutions(gp, min_k(property), invert=true, tree_storage=tree_storage(property))
     else
         error("unknown property $property.")
     end

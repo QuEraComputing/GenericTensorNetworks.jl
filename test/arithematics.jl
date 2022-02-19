@@ -38,6 +38,18 @@ end
                     (CountingTropical(5.0, ConfigSampler(StaticBitVector(rand(Bool, 10)))), CountingTropical(3.0, ConfigSampler(StaticBitVector(rand(Bool, 10)))), CountingTropical(-3.0, ConfigSampler(StaticBitVector(rand(Bool, 10))))),
                     (CountingTropical(5.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:3])), CountingTropical(3.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:4])), CountingTropical(-3.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:5]))),
                     (ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:3]), ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:4]), ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:5])),
+                    (TreeConfigEnumerator(GraphTensorNetworks.SUM, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        TreeConfigEnumerator(GraphTensorNetworks.SUM, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        TreeConfigEnumerator(GraphTensorNetworks.SUM, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...)
+                        ),
+                    (TreeConfigEnumerator(GraphTensorNetworks.PROD, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        TreeConfigEnumerator(GraphTensorNetworks.PROD, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        TreeConfigEnumerator(GraphTensorNetworks.PROD, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...)
+                        ),
+                    (TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))),
+                        TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))),
+                        TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))),
+                        ),
                     ]
         @test is_commutative_semiring(a, b, c)
         @test false * a == zero(a)
@@ -53,6 +65,17 @@ end
     @test copy(a) == a
     @test length.(a) == [10, 10, 10]
     @test map(x->length(x), a) == [10, 10, 10]
+
+    # the following tests are for Polynomial + ConfigEnumerator
+    a = TreeConfigEnumerator(StaticBitVector(trues(10)))
+    @test 1 * a == a
+    @test 0 * a == zero(a)
+    @test copy(a) == a
+    @test length(a) == 1
+    @test length(a + a) == 2
+    @test length(a * a) == 1
+    print((a+a) * a)
+ 
     a = ConfigSampler(StaticBitVector(rand(Bool, 10)))
     @test 1 * a == a
     @test 0 * a == zero(a)

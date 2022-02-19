@@ -40,7 +40,7 @@ struct CountingAll <: AbstractProperty end
     CountingMax{K} <: AbstractProperty
     CountingMax(K=1)
 
-Counting the number of sets with `K`-largest size. e.g. for [`IndependentSet`](@ref) problem,
+Counting the number of sets with largest-K size. e.g. for [`IndependentSet`](@ref) problem,
 it counts independent sets of size ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
 
 * The corresponding tensor element type is [`CountingTropical`](@ref) for `K == 1`, and [`TruncatedPoly`](@ref)`{K}` for `K > 1`.
@@ -55,7 +55,7 @@ max_k(::CountingMax{K}) where K = K
     CountingMin{K} <: AbstractProperty
     CountingMin(K=1)
 
-Counting the number of sets with `K`-smallest size.
+Counting the number of sets with smallest-K size.
 
 * The corresponding tensor element type is inverted [`CountingTropical`](@ref) for `K == 1`, and [`TruncatedPoly`](@ref)`{K}` for `K > 1`.
 * Weighted graph problems is only supported for `K == 1`.
@@ -72,16 +72,18 @@ min_k(::CountingMin{K}) where K = K
 Compute the graph polynomial, e.g. for [`IndependentSet`](@ref) problem, it is the independence polynomial.
 The `METHOD` type parameter can be one of the following symbols
 
-* `:finitefield`, it uses finite field algebra to fit the polynomial.
+Method Argument
+---------------------------
+* `:finitefield`, uses finite field algebra to fit the polynomial.
     * The corresponding tensor element type is [`Mods.Mod`](@ref),
     * It does not have round-off error,
     * GPU is supported,
     * It accepts keyword arguments `maxorder` (optional, e.g. the MIS size in the [`IndependentSet`](@ref) problem).
-* `:polynomial`, the program uses polynomial numbers to solve the polynomial directly.
+* `:polynomial`, use polynomial numbers to solve the polynomial directly.
     * The corresponding tensor element type is [`Polynomials.Polynomial`](@ref).
     * It might have small round-off error depending on the data type for storing the counting.
     * It has memory overhead that linear to the graph size.
-* `:fft`, 
+* `:fft`, use fast fourier transformation to fit the polynomial.
     * The corresponding tensor element type is `Base.Complex`.
     * It has (controllable) round-off error.
     * BLAS and GPU are supported.
@@ -106,6 +108,10 @@ Finding single best solution, e.g. for [`IndependentSet`](@ref) problem, it is o
 * The corresponding data type is [`CountingTropical{Float64,<:ConfigSampler}`](@ref) if `BOUNDED` is `false`, [`Tropical`](@ref) otherwise.
 * Weighted graph problems is supported.
 * GPU is supported,
+
+Keyword Arguments
+----------------------------
+* `bounded`, if it is true, use bounding trick (or boolean gradients) to reduce the working memory to store intermediate configurations.
 """
 struct SingleConfigMax{BOUNDED} <:AbstractProperty end
 SingleConfigMax(; bounded::Bool=false) = SingleConfigMax{bounded}()
@@ -119,6 +125,10 @@ Finding single "worst" solution.
 * The corresponding data type is inverted [`CountingTropical{Float64,<:ConfigSampler}`](@ref) if `BOUNDED` is `false`, inverted [`Tropical`](@ref) otherwise.
 * Weighted graph problems is supported.
 * GPU is supported,
+
+Keyword Arguments
+----------------------------
+* `bounded`, if it is true, use bounding trick (or boolean gradients) to reduce the working memory to store intermediate configurations.
 """
 struct SingleConfigMin{BOUNDED} <:AbstractProperty end
 SingleConfigMin(; bounded::Bool=false) = SingleConfigMin{bounded}()
@@ -131,6 +141,10 @@ Find all valid configurations, e.g. for [`IndependentSet`](@ref) problem, it is 
 
 * The corresponding data type is [`ConfigEnumerator`](@ref).
 * Weights do not take effect.
+
+Keyword Arguments
+----------------------------
+* `tree_storage`, if it is true, it uses more memory efficient tree-structure to store the configurations.
 """
 struct ConfigsAll{TREESTORAGE} <:AbstractProperty end
 ConfigsAll(; tree_storage::Bool=false) = ConfigsAll{tree_storage}()
@@ -145,6 +159,11 @@ it is finding all independent sets of sizes ``\\alpha(G), \\alpha(G)-1, \\ldots,
 
 * The corresponding data type is [`CountingTropical`](@ref)`{Float64,<:ConfigEnumerator}` for `K == 1` and [`TruncatedPoly`](@ref)`{K,<:ConfigEnumerator}` for `K > 1`.
 * Weighted graph problems is only supported for `K == 1`.
+
+Keyword Arguments
+----------------------------
+* `bounded`, if it is true, use bounding trick (or boolean gradients) to reduce the working memory to store intermediate configurations.
+* `tree_storage`, if it is true, it uses more memory efficient tree-structure to store the configurations.
 """
 struct ConfigsMax{K, BOUNDED, TREESTORAGE} <:AbstractProperty end
 ConfigsMax(K::Int=1; bounded::Bool=true, tree_storage::Bool=false) = ConfigsMax{K,bounded,tree_storage}()
@@ -153,12 +172,17 @@ tree_storage(::ConfigsMax{K,BOUNDED,TREESTORAGE}) where {K,BOUNDED,TREESTORAGE} 
 
 """
     ConfigsMin{K, BOUNDED, TREESTORAGE} <:AbstractProperty
-    ConfigsMin(K=1; bounded=true, tree_storage::Bool=false)
+    ConfigsMin(K=1; bounded=true, tree_storage=false)
 
 Find configurations with smallest-K sizes.
 
 * The corresponding data type is inverted [`CountingTropical`](@ref)`{Float64,<:ConfigEnumerator}` for `K == 1` and inverted [`TruncatedPoly`](@ref)`{K,<:ConfigEnumerator}` for `K > 1`.
 * Weighted graph problems is only supported for `K == 1`.
+
+Keyword Arguments
+----------------------------
+* `bounded`, if it is true, use bounding trick (or boolean gradients) to reduce the working memory to store intermediate configurations.
+* `tree_storage`, if it is true, it uses more memory efficient tree-structure to store the configurations.
 """
 struct ConfigsMin{K, BOUNDED, TREESTORAGE} <:AbstractProperty end
 ConfigsMin(K::Int=1; bounded::Bool=true, tree_storage::Bool=false) = ConfigsMin{K,bounded, tree_storage}()

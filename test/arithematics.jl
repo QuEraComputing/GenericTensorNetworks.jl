@@ -38,13 +38,13 @@ end
                     (CountingTropical(5.0, ConfigSampler(StaticBitVector(rand(Bool, 10)))), CountingTropical(3.0, ConfigSampler(StaticBitVector(rand(Bool, 10)))), CountingTropical(-3.0, ConfigSampler(StaticBitVector(rand(Bool, 10))))),
                     (CountingTropical(5.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:3])), CountingTropical(3.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:4])), CountingTropical(-3.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:5]))),
                     (ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:3]), ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:4]), ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:5])),
-                    (TreeConfigEnumerator(GraphTensorNetworks.SUM, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:3]),
-                        TreeConfigEnumerator(GraphTensorNetworks.SUM, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:4]),
-                        TreeConfigEnumerator(GraphTensorNetworks.SUM, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:5])
+                    (TreeConfigEnumerator(GraphTensorNetworks.SUM, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        TreeConfigEnumerator(GraphTensorNetworks.SUM, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        TreeConfigEnumerator(GraphTensorNetworks.SUM, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...)
                         ),
-                    (TreeConfigEnumerator(GraphTensorNetworks.PROD, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:3]),
-                        TreeConfigEnumerator(GraphTensorNetworks.PROD, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:4]),
-                        TreeConfigEnumerator(GraphTensorNetworks.PROD, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:5])
+                    (TreeConfigEnumerator(GraphTensorNetworks.PROD, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        TreeConfigEnumerator(GraphTensorNetworks.PROD, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        TreeConfigEnumerator(GraphTensorNetworks.PROD, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...)
                         ),
                     (TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))),
                         TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))),
@@ -74,6 +74,7 @@ end
     @test length(a) == 1
     @test length(a + a) == 2
     @test length(a * a) == 1
+    print((a+a) * a)
  
     a = ConfigSampler(StaticBitVector(rand(Bool, 10)))
     @test 1 * a == a

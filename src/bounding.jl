@@ -28,7 +28,6 @@ function backward_tropical(mode, ixs, @nospecialize(xs::Tuple), iy, @nospecializ
             mask .= inv.(einsum(EinCode(nixs, niy), nxs, size_dict)) .<= xs[i] .* Tropical(largest_k(mode)-1+1e-12)
             push!(masks, mask)
         elseif mode isa SingleConfig
-            A = zeros(eltype(xs[i]), size(xs[i]))
             A = einsum(EinCode(nixs, niy), nxs, size_dict)
             push!(masks, onehotmask(A, xs[i]))
         else

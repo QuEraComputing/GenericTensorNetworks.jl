@@ -279,21 +279,94 @@ Base.zero(::ConfigSampler{N,S,C}) where {N,S,C} = zero(ConfigSampler{N,S,C})
 Base.one(::ConfigSampler{N,S,C}) where {N,S,C} = one(ConfigSampler{N,S,C})
 
 # tree config enumerator
-export TreeConfigEnumerator
-mutable struct TreeConfigEnumerator{N,S,C}
+"""
+    TreeConfigEnumerator{N,S,C}
+
+Configuration enumerator encoded in a tree, it is the most natural representation given by a sum-product network
+and is often more memory efficient than putting the configurations in a vector.
+`N`, `S` and `C` are type parameters from the [`StaticElementVector`](@ref){N,S,C}.
+
+Fields
+-----------------------
+* `tag` is one of `ZERO`, `LEAF`, `SUM`, `PROD`.
+* `data` is the element stored in a `LEAF` node.
+* `left` and `right` are two operands of a `SUM` or `PROD` node.
+
+Example
+------------------------
+```jldoctest; setup=:(using GraphTensorNetworks)
+julia> s = TreeConfigEnumerator(bv"00111")
+00111
+
+
+julia> q = TreeConfigEnumerator(bv"10000")
+10000
+
+
+julia> x = s + q
++
+├─ 00111
+└─ 10000
+
+
+julia> y = x * x
+*
+├─ +
+│  ├─ 00111
+│  └─ 10000
+└─ +
+   ├─ 00111
+   └─ 10000
+
+
+julia> collect(y)
+4-element Vector{StaticBitVector{5, 1}}:
+ 00111
+ 10111
+ 10111
+ 10000
+
+julia> zero(s)
+
+
+
+julia> one(s)
+00000
+
+
+```
+"""
+struct TreeConfigEnumerator{N,S,C}
     tag::TreeTag
+    data::StaticElementVector{N,S,C}
     left::TreeConfigEnumerator{N,S,C}
     right::TreeConfigEnumerator{N,S,C}
-    data::StaticElementVector{N,S,C}
-    TreeConfigEnumerator(tag::TreeTag, left::TreeConfigEnumerator{N,S,C}, right::TreeConfigEnumerator{N,S,C}) where {N,S,C} = new{N,S,C}(tag, left, right)
+    TreeConfigEnumerator(tag::TreeTag, left::TreeConfigEnumerator{N,S,C}, right::TreeConfigEnumerator{N,S,C}) where {N,S,C} = new{N,S,C}(tag, zero(StaticElementVector{N,S,C}), left, right)
     function TreeConfigEnumerator(data::StaticElementVector{N,S,C}) where {N,S,C}
-        res = new{N,S,C}(LEAF)
-        res.data = data
-        return res
+        new{N,S,C}(LEAF, data)
+    end
+    function TreeConfigEnumerator{N,S,C}(tag::TreeTag) where {N,S,C}
+        @assert  tag === ZERO
+        return new{N,S,C}(tag)
     end
 end
 
-children(t::TreeConfigEnumerator) = (t.left, t.right)
+# AbstractTree APIs
+function children(t::TreeConfigEnumerator)
+    if isdefined(t, :left)
+        if isdefined(t, :right)
+            return [t.left, t.right]
+        else
+            return [t.left]
+        end
+    else
+        if isdefined(t, :right)
+            return [t.right]
+        else
+            return typeof(t)[]
+        end
+    end
+end
 function printnode(io::IO, t::TreeConfigEnumerator)
     if t.tag === LEAF
         print(io, t.data)
@@ -319,16 +392,16 @@ function Base.length(x::TreeConfigEnumerator)
 end
 
 function num_nodes(x::TreeConfigEnumerator)
-    x.tag == ZERO && return 0
+    x.tag == ZERO && return 1
     x.tag == LEAF && return 1
-    return num_nodes(x.left) + num_nodes(x.right)
+    return num_nodes(x.left) + num_nodes(x.right) + 1
 end
 
 function Base.:(==)(x::TreeConfigEnumerator{N,S,C}, y::TreeConfigEnumerator{N,S,C}) where {N,S,C}
     return Set(collect(x)) == Set(collect(y))
 end
 
-#Base.show(io::IO, t::TreeConfigEnumerator) = print_tree(io, t)
+Base.show(io::IO, t::TreeConfigEnumerator) = print_tree(io, t)
 
 function Base.collect(x::TreeConfigEnumerator{N,S,C}) where {N,S,C}
     if x.tag == ZERO
@@ -350,7 +423,7 @@ function Base.:*(x::TreeConfigEnumerator{L,S,C}, y::TreeConfigEnumerator{L,S,C})
     TreeConfigEnumerator(PROD, x, y)
 end
 
-Base.zero(::Type{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = TreeConfigEnumerator(ZERO)
+Base.zero(::Type{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = TreeConfigEnumerator{N,S,C}(ZERO)
 Base.one(::Type{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = TreeConfigEnumerator(zero(StaticElementVector{N,S,C}))
 Base.zero(::TreeConfigEnumerator{N,S,C}) where {N,S,C} = zero(TreeConfigEnumerator{N,S,C})
 Base.one(::TreeConfigEnumerator{N,S,C}) where {N,S,C} = one(TreeConfigEnumerator{N,S,C})

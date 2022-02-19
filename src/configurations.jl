@@ -8,7 +8,7 @@ Find optimal solutions with bounding.
 * If `invert` is true, find the minimum.
 * If `tree_storage` is true, use [`TreeConfigEnumerator`](@ref) as the storage of solutions.
 """
-function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false, tree_storage::Bool)
+function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false, tree_storage::Bool=false)
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
@@ -73,7 +73,7 @@ end
 Finding all solutions grouped by size.
 e.g. when the problem is [`MaximalIS`](@ref), it computes all maximal independent sets, or the maximal cliques of it complement.
 """
-all_solutions(gp::GraphProblem) = solutions(gp, Polynomial{Float64,:x}, all=true, usecuda=false)
+all_solutions(gp::GraphProblem) = solutions(gp, Polynomial{Float64,:x}, all=true, usecuda=false, tree_storage=false)
 
 # return a mapping from label to onehot bitstrings (degree of freedoms).
 function fx_solutions(gp::GraphProblem, ::Type{BT}, all::Bool, invert::Bool, tree_storage::Bool) where {BT}

@@ -1,7 +1,7 @@
 name = "GraphTensorNetworks"
 uuid = "0978c8c2-34f6-49c7-9826-ea2cc20dabd2"
 authors = ["GiggleLiu <cacate0129@gmail.com> and contributors"]
-version = "0.2.1"
+version = "0.2.2"
 
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
@@ -39,7 +39,7 @@ SIMDTypes = "0.1"
 StatsBase = "0.33"
 TropicalNumbers = "0.4, 0.5"
 Viznet = "0.3"
-AbstractTrees = 0.3
+AbstractTrees = "0.3"
 julia = "1"
 
 [extras]

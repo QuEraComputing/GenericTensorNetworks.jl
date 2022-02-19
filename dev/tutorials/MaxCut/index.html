@@ -13,13 +13,13 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-d8023fb0">
+     id="img-022c7038">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-d8023fb0-1">
+<g stroke-width="0.67" stroke="#000000" id="img-022c7038-1">
   <g transform="translate(76.48,39.02)">
     <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
   </g>
@@ -66,7 +66,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-d8023fb0-2">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-022c7038-2">
   <g transform="translate(60,27.04)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
@@ -98,7 +98,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-d8023fb0-3">
+<g fill="#000000" font-size="3.13" id="img-022c7038-3">
   <g transform="translate(60,27.04)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -300,7 +300,7 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 <h2 id="Tensor-network-representation"><a class="docs-heading-anchor" href="#Tensor-network-representation">Tensor network representation</a><a id="Tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Tensor-network-representation" title="Permalink"></a></h2><p>For a vertex <span>$v\in V$</span>, we define a boolean degree of freedom <span>$s_v\in\{0, 1\}$</span>. Then the maximum cutting problem can be encoded to tensor networks by mapping an edge <span>$(i,j)\in E$</span> to an edge matrix labelled by <span>$s_is_j$</span></p><p class="math-container">\[B(x_{\langle i, j\rangle}) = \left(\begin{matrix}
     1 &amp; x_{\langle i, j\rangle}\\
     x_{\langle i, j\rangle} &amp; 1
-\end{matrix}\right),\]</p><p>where variable <span>$x_{\langle i, j\rangle}$</span> represents a cut on edge <span>$(i, j)$</span> or a domain wall of an Ising spin glass. Similar to other problems, we can define a polynomial about edges variables by setting <span>$x_{\langle i, j\rangle} = x$</span>, where its k-th coefficient is two times the number of configurations of cut size k. We define the cutting problem as</p><pre><code class="language-julia hljs">problem = MaxCut(graph);</code></pre><p>Its contraction time space complexity is <span>$2^{{\rm tw}(G)}$</span>, where <span>${\rm tw(G)}$</span> is the <a href="https://en.wikipedia.org/wiki/Treewidth">tree-width</a> of <span>$G$</span>.</p><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><h3 id="Maximum-cut-size-\\gamma(G)"><a class="docs-heading-anchor" href="#Maximum-cut-size-\\gamma(G)">Maximum cut size <span>$\gamma(G)$</span></a><a id="Maximum-cut-size-\\gamma(G)-1"></a><a class="docs-heading-anchor-permalink" href="#Maximum-cut-size-\\gamma(G)" title="Permalink"></a></h3><pre><code class="language-julia hljs">max_cut_size = solve(problem, SizeMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">12.0ₜ</code></pre><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="graph-polynomial"><a class="docs-heading-anchor" href="#graph-polynomial">graph polynomial</a><a id="graph-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#graph-polynomial" title="Permalink"></a></h5><p>The graph polynomial defined for the cutting problem is</p><p class="math-container">\[C(G, x) = \sum_{k=0}^{\gamma(G)} c_k x^k,\]</p><p>where <span>$\alpha(G)$</span> is the maximum independent set size, <span>$c_k/2$</span> is the number of cuts of size <span>$k$</span> in graph <span>$G=(V,E)$</span>. Since the variable <span>$x$</span> is defined on edges, the coefficients of the polynomial is the number of configurations having different number of anti-parallel edges.</p><pre><code class="language-julia hljs">max_config = solve(problem, GraphPolynomial())[]</code></pre>2 &#43; 20&#8729;x<sup>3</sup> &#43; 30&#8729;x<sup>4</sup> &#43; 72&#8729;x<sup>5</sup> &#43; 200&#8729;x<sup>6</sup> &#43; 240&#8729;x<sup>7</sup> &#43; 150&#8729;x<sup>8</sup> &#43; 120&#8729;x<sup>9</sup> &#43; 120&#8729;x<sup>10</sup> &#43; 60&#8729;x<sup>11</sup> &#43; 10&#8729;x<sup>12</sup><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="finding-one-max-cut-solution"><a class="docs-heading-anchor" href="#finding-one-max-cut-solution">finding one max cut solution</a><a id="finding-one-max-cut-solution-1"></a><a class="docs-heading-anchor-permalink" href="#finding-one-max-cut-solution" title="Permalink"></a></h5><pre><code class="language-julia hljs">max_edge_config = solve(problem, SingleConfigMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(12.0, ConfigSampler{15, 1, 1}(101111011111011))ₜ</code></pre><p>These configurations are defined on edges, we need to find a valid assignment on vertices</p><pre><code class="language-julia hljs">max_vertex_config = cut_assign(graph, max_edge_config.c.data)
+\end{matrix}\right),\]</p><p>where variable <span>$x_{\langle i, j\rangle}$</span> represents a cut on edge <span>$(i, j)$</span> or a domain wall of an Ising spin glass. Similar to other problems, we can define a polynomial about edges variables by setting <span>$x_{\langle i, j\rangle} = x$</span>, where its k-th coefficient is two times the number of configurations of cut size k. We define the cutting problem as</p><pre><code class="language-julia hljs">problem = MaxCut(graph);</code></pre><p>Its contraction time space complexity is <span>$2^{{\rm tw}(G)}$</span>, where <span>${\rm tw(G)}$</span> is the <a href="https://en.wikipedia.org/wiki/Treewidth">tree-width</a> of <span>$G$</span>.</p><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><h3 id="Maximum-cut-size-\\gamma(G)"><a class="docs-heading-anchor" href="#Maximum-cut-size-\\gamma(G)">Maximum cut size <span>$\gamma(G)$</span></a><a id="Maximum-cut-size-\\gamma(G)-1"></a><a class="docs-heading-anchor-permalink" href="#Maximum-cut-size-\\gamma(G)" title="Permalink"></a></h3><pre><code class="language-julia hljs">max_cut_size = solve(problem, SizeMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">12.0ₜ</code></pre><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="graph-polynomial"><a class="docs-heading-anchor" href="#graph-polynomial">graph polynomial</a><a id="graph-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#graph-polynomial" title="Permalink"></a></h5><p>The graph polynomial defined for the cutting problem is</p><p class="math-container">\[C(G, x) = \sum_{k=0}^{\gamma(G)} c_k x^k,\]</p><p>where <span>$\alpha(G)$</span> is the maximum independent set size, <span>$c_k/2$</span> is the number of cuts of size <span>$k$</span> in graph <span>$G=(V,E)$</span>. Since the variable <span>$x$</span> is defined on edges, the coefficients of the polynomial is the number of configurations having different number of anti-parallel edges.</p><pre><code class="language-julia hljs">max_config = solve(problem, GraphPolynomial())[]</code></pre>2 &#43; 20&#8729;x<sup>3</sup> &#43; 30&#8729;x<sup>4</sup> &#43; 72&#8729;x<sup>5</sup> &#43; 200&#8729;x<sup>6</sup> &#43; 240&#8729;x<sup>7</sup> &#43; 150&#8729;x<sup>8</sup> &#43; 120&#8729;x<sup>9</sup> &#43; 120&#8729;x<sup>10</sup> &#43; 60&#8729;x<sup>11</sup> &#43; 10&#8729;x<sup>12</sup><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="finding-one-max-cut-solution"><a class="docs-heading-anchor" href="#finding-one-max-cut-solution">finding one max cut solution</a><a id="finding-one-max-cut-solution-1"></a><a class="docs-heading-anchor-permalink" href="#finding-one-max-cut-solution" title="Permalink"></a></h5><pre><code class="language-julia hljs">max_edge_config = solve(problem, SingleConfigMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(12.0, ConfigSampler{15, 1, 1}(110110111111101))ₜ</code></pre><p>These configurations are defined on edges, we need to find a valid assignment on vertices</p><pre><code class="language-julia hljs">max_vertex_config = cut_assign(graph, max_edge_config.c.data)
 
 max_cut_size_verify = cut_size(graph, max_vertex_config)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">12</code></pre><p>You should see a consistent result as above <code>max_cut_size</code>.</p><pre><code class="language-julia hljs">show_graph(graph; locs=locations, vertex_colors=[
         iszero(max_vertex_config[i]) ? &quot;white&quot; : &quot;red&quot; for i=1:nv(graph)])</code></pre><?xml version="1.0" encoding="UTF-8"?>
@@ -313,13 +313,13 @@ max_cut_size_verify = cut_size(graph, max_vertex_config)</code></pre><pre class=
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-c052ef31">
+     id="img-6eb379c9">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-c052ef31-1">
+<g stroke-width="0.67" stroke="#000000" id="img-6eb379c9-1">
   <g transform="translate(76.48,39.02)">
     <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
   </g>
@@ -366,57 +366,57 @@ max_cut_size_verify = cut_size(graph, max_vertex_config)</code></pre><pre class=
     <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-c052ef31-2">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6eb379c9-2">
   <g transform="translate(40.23,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-c052ef31-3">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-6eb379c9-3">
   <g transform="translate(47.78,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-c052ef31-4">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-6eb379c9-4">
   <g transform="translate(72.22,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-c052ef31-5">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6eb379c9-5">
   <g transform="translate(79.77,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-c052ef31-6">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6eb379c9-6">
   <g transform="translate(60,40.9)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-c052ef31-7">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-6eb379c9-7">
   <g transform="translate(27.04,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-c052ef31-8">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6eb379c9-8">
   <g transform="translate(39.63,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-c052ef31-9">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6eb379c9-9">
   <g transform="translate(80.37,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-c052ef31-10">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-6eb379c9-10">
   <g transform="translate(92.96,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-c052ef31-11">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6eb379c9-11">
   <g transform="translate(60,27.04)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-c052ef31-12">
+<g fill="#000000" font-size="3.13" id="img-6eb379c9-12">
   <g transform="translate(60,27.04)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -615,4 +615,4 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 
 ]]> </script>
 </svg>
-<p>where red vertices and white vertices are seperated by the cut.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../MaximalIS/">« Maximal independent set problem</a><a class="docs-footer-nextpage" href="../Matching/">Matching problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.12 on <span class="colophon-date" title="Saturday 19 February 2022 05:41">Saturday 19 February 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<p>where red vertices and white vertices are seperated by the cut.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../MaximalIS/">« Maximal independent set problem</a><a class="docs-footer-nextpage" href="../Matching/">Matching problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.12 on <span class="colophon-date" title="Saturday 19 February 2022 05:44">Saturday 19 February 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

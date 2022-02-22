@@ -4,7 +4,7 @@ using Mods, Primes
 using Base.Cartesian
 import AbstractTrees: children, printnode, print_tree
 
-@enum TreeTag LEAF SUM PROD ZERO
+@enum TreeTag LEAF SUM PROD ZERO ONE
 
 # pirate
 Base.abs(x::Mod) = x
@@ -336,18 +336,20 @@ julia> one(s)
 
 ```
 """
-struct TreeConfigEnumerator{N,S,C}
+struct TreeConfigEnumerator{N,T}
     tag::TreeTag
-    data::StaticElementVector{N,S,C}
-    left::TreeConfigEnumerator{N,S,C}
-    right::TreeConfigEnumerator{N,S,C}
-    TreeConfigEnumerator(tag::TreeTag, left::TreeConfigEnumerator{N,S,C}, right::TreeConfigEnumerator{N,S,C}) where {N,S,C} = new{N,S,C}(tag, zero(StaticElementVector{N,S,C}), left, right)
-    function TreeConfigEnumerator(data::StaticElementVector{N,S,C}) where {N,S,C}
-        new{N,S,C}(LEAF, data)
+    data::T
+    left::TreeConfigEnumerator{N,T}
+    right::TreeConfigEnumerator{N,T}
+    function TreeConfigEnumerator(tag::TreeTag, left::TreeConfigEnumerator{N,T}, right::TreeConfigEnumerator{N,T}) where {N,T}
+        new{N, T}(tag, zero(T), left, right)
     end
-    function TreeConfigEnumerator{N,S,C}(tag::TreeTag) where {N,S,C}
-        @assert  tag === ZERO
-        return new{N,S,C}(tag)
+    function TreeConfigEnumerator{N}(data::T) where {N,T<:Integer}
+        new{N,T}(LEAF, data)
+    end
+    function TreeConfigEnumerator{N,T}(tag::TreeTag) where {N,T}
+        @assert  tag === ZERO || tag === ONE
+        return new{N,T}(tag)
     end
 end
 
@@ -371,11 +373,13 @@ function printnode(io::IO, t::TreeConfigEnumerator)
     if t.tag === LEAF
         print(io, t.data)
     elseif t.tag === ZERO
-        print(io, "")
+        print(io, "ZERO")
+    elseif t.tag === ONE
+        print(io, "ONE")
     elseif t.tag === SUM
-        print(io, "+")
+        print(io, "⊕")
     else  # PROD
-        print(io, "*")
+        print(io, "⊙")
     end
 end
 
@@ -386,6 +390,8 @@ function Base.length(x::TreeConfigEnumerator)
         return length(x.left) * length(x.right)
     elseif x.tag === ZERO
         return 0
+    elseif x.tag === ONE
+        return 1
     else
         return 1
     end
@@ -393,21 +399,28 @@ end
 
 function num_nodes(x::TreeConfigEnumerator)
     x.tag == ZERO && return 1
+    x.tag == ONE && return 1
     x.tag == LEAF && return 1
     return num_nodes(x.left) + num_nodes(x.right) + 1
 end
 
-function Base.:(==)(x::TreeConfigEnumerator{N,S,C}, y::TreeConfigEnumerator{N,S,C}) where {N,S,C}
+function Base.:(==)(x::TreeConfigEnumerator{N,T}, y::TreeConfigEnumerator{N,T}) where {N,T}
     return Set(collect(x)) == Set(collect(y))
 end
 
 Base.show(io::IO, t::TreeConfigEnumerator) = print_tree(io, t)
 
-function Base.collect(x::TreeConfigEnumerator{N,S,C}) where {N,S,C}
+function Base.collect(x::TreeConfigEnumerator{N,T}) where {N,T}
+    nflavor = 2
+    s = ceil(Int, log2(nflavor))
+    c = _nints(N,s)
+    ET = StaticElementVector{N,s,c}
     if x.tag == ZERO
-        return StaticElementVector{N,S,C}[]
+        return ET[]
+    elseif x.tag == ONE
+        return [zero(ET)]
     elseif x.tag == LEAF
-        return StaticElementVector{N,S,C}[x.data]
+        return [onehotv(ET, x.data, 1)]
     elseif x.tag == SUM
         return vcat(collect(x.left), collect(x.right))
     else   # PROD
@@ -415,30 +428,37 @@ function Base.collect(x::TreeConfigEnumerator{N,S,C}) where {N,S,C}
     end
 end
 
-function Base.:+(x::TreeConfigEnumerator{N,S,C}, y::TreeConfigEnumerator{N,S,C}) where {N,S,C}
-    TreeConfigEnumerator(SUM, x, y)
-end
-
-function Base.:*(x::TreeConfigEnumerator{L,S,C}, y::TreeConfigEnumerator{L,S,C}) where {L,S,C}
-    TreeConfigEnumerator(PROD, x, y)
-end
-
-Base.zero(::Type{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = TreeConfigEnumerator{N,S,C}(ZERO)
-Base.one(::Type{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = TreeConfigEnumerator(zero(StaticElementVector{N,S,C}))
-Base.zero(::TreeConfigEnumerator{N,S,C}) where {N,S,C} = zero(TreeConfigEnumerator{N,S,C})
-Base.one(::TreeConfigEnumerator{N,S,C}) where {N,S,C} = one(TreeConfigEnumerator{N,S,C})
-# todo, check siblings too?
-function Base.iszero(t::TreeConfigEnumerator)
-    if t.TAG == SUM
-        iszero(t.left) && iszero(t.right)
-    elseif t.TAG == ZERO
-        true
-    elseif t.TAG == LEAF
-        false
+function Base.:+(x::TreeConfigEnumerator{N,T}, y::TreeConfigEnumerator{N,T}) where {N,T}
+    if iszero(x)
+        return y
+    elseif iszero(y)
+        return x
     else
-        iszero(t.left) || iszero(t.right)
+        return TreeConfigEnumerator(SUM, x, y)
     end
 end
+
+function Base.:*(x::TreeConfigEnumerator{N,T}, y::TreeConfigEnumerator{N,T}) where {N,T}
+    if iszero(x)
+        return x
+    elseif isone(x)
+        return y
+    elseif iszero(y)
+        return y
+    elseif isone(y)
+        return x
+    else
+        return TreeConfigEnumerator(PROD, x, y)
+    end
+end
+
+Base.zero(::Type{TreeConfigEnumerator{N,T}}) where {N,T} = TreeConfigEnumerator{N,T}(ZERO)
+Base.one(::Type{TreeConfigEnumerator{N,T}}) where {N,T} = TreeConfigEnumerator{N,T}(ONE)
+Base.zero(::TreeConfigEnumerator{N,T}) where {N,T} = zero(TreeConfigEnumerator{N,T})
+Base.one(::TreeConfigEnumerator{N,T}) where {N,T} = one(TreeConfigEnumerator{N,T})
+# todo, check siblings too?
+Base.iszero(t::TreeConfigEnumerator) = t.tag === ZERO
+Base.isone(t::TreeConfigEnumerator) = t.tag === ONE
 
 # A patch to make `Polynomial{ConfigEnumerator}` work
 for T in [:ConfigEnumerator, :ConfigSampler, :TreeConfigEnumerator]
@@ -464,27 +484,42 @@ for (F,TP) in [(:set_type, :ConfigEnumerator), (:sampler_type, :ConfigSampler), 
         function $F(::Type{Real}, n::Int, nflavor::Int) where {TV}
             $F(n, nflavor)
         end
-        function $F(n::Integer, nflavor::Integer)
-            s = ceil(Int, log2(nflavor))
-            c = _nints(n,s)
-            return $TP{n,s,c}
-        end
     end
+end
+
+function set_type(n::Integer, nflavor::Integer)
+    s = ceil(Int, log2(nflavor))
+    c = _nints(n,s)
+    return ConfigEnumerator{n,s,c}
+end
+
+function sampler_type(n::Integer, nflavor::Integer)
+    s = ceil(Int, log2(nflavor))
+    c = _nints(n,s)
+    return ConfigSampler{n,s,c}
+end
+
+function treeset_type(n::Integer, nflavor::Integer)
+    s = ceil(Int, log2(nflavor))
+    c = _nints(n,s)
+    return TreeConfigEnumerator{n,typeof(nflavor)}
 end
 
 # utilities for creating onehot vectors
 onehotv(::Type{ConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigEnumerator([onehotv(StaticElementVector{N,S,C}, i, v)])
-onehotv(::Type{TreeConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = TreeConfigEnumerator(onehotv(StaticElementVector{N,S,C}, i, v))
+onehotv(::Type{TreeConfigEnumerator{N,T}}, i::Integer, v) where {N,T} = (@assert v == 1 || v== 0; v==1 ?  TreeConfigEnumerator{N}(i) : TreeConfigEnumerator{N,T}(ONE))
 onehotv(::Type{ConfigSampler{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigSampler(onehotv(StaticElementVector{N,S,C}, i, v))
 # just to make matrix transpose work
 Base.transpose(c::ConfigEnumerator) = c
 Base.copy(c::ConfigEnumerator) = ConfigEnumerator(copy(c.data))
 Base.transpose(c::TreeConfigEnumerator) = c
-function Base.copy(c::TreeConfigEnumerator)
+function Base.copy(c::TreeConfigEnumerator{N,T}) where {N,T}
     if c.tag == LEAF
-        TreeConfigEnumerator(c.data)
+        TreeConfigEnumerator{N}(c.data)
     elseif c.tag == ZERO
-        TreeConfigEnumerator(c.tag)
+        TreeConfigEnumerator{N,T}(c.tag)
+    elseif c.tag == ONE
+        TreeConfigEnumerator{N,T}(c.tag)
     else
         TreeConfigEnumerator(c.tag, c.left, c.right)
     end

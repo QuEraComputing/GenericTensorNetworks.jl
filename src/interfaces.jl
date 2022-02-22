@@ -202,12 +202,14 @@ Positional Arguments
     * [`SizeMax`](@ref) for finding maximum set size,
     * [`SizeMin`](@ref) for finding minimum set size,
 
-    * [`CountingMax`](@ref) for counting configurations with top `K` sizes,
+    * [`CountingMax`](@ref) for counting configurations with largest-K sizes,
+    * [`CountingMin`](@ref) for counting configurations with smallest-K sizes,
     * [`CountingAll`](@ref) for counting all configurations,
     * [`GraphPolynomial`](@ref) for evaluating the graph polynomial,
 
     * [`SingleConfigMax`](@ref) for finding one maximum configuration,
-    * [`ConfigsMax`](@ref) for enumerating configurations with top `K` sizes,
+    * [`ConfigsMax`](@ref) for enumerating configurations with largest-K sizes,
+    * [`ConfigsMin`](@ref) for enumerating configurations with smallest-K sizes,
     * [`ConfigsAll`](@ref) for enumerating all configurations,
 
 

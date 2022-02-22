@@ -62,6 +62,10 @@ ConfigsMin
 
 ## Element Algebras
 ```@docs
+is_commutative_semiring
+```
+
+```@docs
 TropicalNumbers.Tropical
 TropicalNumbers.CountingTropical
 Mods.Mod
@@ -80,7 +84,6 @@ save_configs
 load_configs
 @bv_str
 onehotv
-is_commutative_semiring
 ```
 
 ## Tensor Network
@@ -116,13 +119,8 @@ random_square_lattice_graph
 
 One can also use `random_regular_graph` and `smallgraph` in [Graphs](https://github.com/JuliaGraphs/Graphs.jl) to build special graphs.
 
-#### Lower level APIs
+#### Shortcuts
 ```@docs
-best_solutions
-best2_solutions
-solutions
-all_solutions
-graph_polynomial
 max_size
 max_size_count
 ```

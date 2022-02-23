@@ -336,7 +336,8 @@ julia> one(s)
 
 ```
 """
-struct TreeConfigEnumerator{N,S,C}
+# it must be mutable, otherwise the `IdDict` trick for computing the length does not work.
+mutable struct TreeConfigEnumerator{N,S,C}
     tag::TreeTag
     data::StaticElementVector{N,S,C}
     left::TreeConfigEnumerator{N,S,C}
@@ -379,11 +380,18 @@ function printnode(io::IO, t::TreeConfigEnumerator)
     end
 end
 
-function Base.length(x::TreeConfigEnumerator)
+Base.length(x::TreeConfigEnumerator) = _length(x, IdDict{typeof(x), Int}())
+
+function _length(x, d)
+    haskey(d, x) && return d[x]
     if x.tag === SUM
-        return length(x.left) + length(x.right)
+        l = _length(x.left, d) + _length(x.right, d)
+        d[x] = l
+        return l
     elseif x.tag === PROD
-        return length(x.left) * length(x.right)
+        l = _length(x.left, d) * _length(x.right, d)
+        d[x] = l
+        return l
     elseif x.tag === ZERO
         return 0
     else
@@ -391,10 +399,18 @@ function Base.length(x::TreeConfigEnumerator)
     end
 end
 
-function num_nodes(x::TreeConfigEnumerator)
-    x.tag == ZERO && return 1
-    x.tag == LEAF && return 1
-    return num_nodes(x.left) + num_nodes(x.right) + 1
+num_nodes(x::TreeConfigEnumerator) = _num_nodes(x, IdDict{typeof(x), Int}())
+function _num_nodes(x, d)
+    haskey(d, x) && return 0
+    if x.tag == ZERO
+        res = 1
+    elseif x.tag == LEAF
+        res = 1
+    else
+        res = _num_nodes(x.left, d) + _num_nodes(x.right, d) + 1
+    end
+    d[x] = res
+    return res
 end
 
 function Base.:(==)(x::TreeConfigEnumerator{N,S,C}, y::TreeConfigEnumerator{N,S,C}) where {N,S,C}

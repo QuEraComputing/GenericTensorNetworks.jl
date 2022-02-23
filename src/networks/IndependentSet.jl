@@ -23,22 +23,20 @@ function IndependentSet(g::SimpleGraph; weights=UnWeighted(), openvertices=(), o
 end
 
 flavors(::Type{<:IndependentSet}) = [0, 1]
-symbols(gp::IndependentSet) = [i for i in 1:gp.nv]
-get_weights(gp::IndependentSet, label) = [0, gp.weights[findfirst(==(label), symbols(gp))]]
+get_weights(gp::IndependentSet, i::Int) = [0, gp.weights[i]]
+terms(gp::IndependentSet) = getixsv(gp.code)[1:gp.nv]
 
 # generate tensors
-function generate_tensors(fx, gp::IndependentSet)
-    syms = symbols(gp)
-    isempty(syms) && return []
+function generate_tensors(x::T, gp::IndependentSet) where T
+    gp.nv == 0 && return []
     ixs = getixsv(gp.code)
-    T = eltype(fx(syms[1]))
-    return map(enumerate(ixs)) do (i, ix)
-        if i <= length(syms)
-            misv(fx(ix[1]))
+    return add_labels!(map(enumerate(ixs)) do (i, ix)
+        if i <= gp.nv
+            misv(Ref(x) .^ get_weights(gp, i))
         else
             misb(T, length(ix)) # if n!=2, it corresponds to set packing problem.
         end
-    end
+    end, ixs, labels(gp))
 end
 
 function misb(::Type{T}, n::Integer=2) where T

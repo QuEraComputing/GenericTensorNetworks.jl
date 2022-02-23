@@ -58,8 +58,8 @@ function Satisfiability(cnf::CNF{T}; openvertices=(), optimizer=GreedyMethod(), 
 end
 
 flavors(::Type{<:Satisfiability}) = [0, 1]  # false, true
-symbols(gp::Satisfiability) = [getfield.(c.vars, :name) for c in gp.cnf.clauses]
 get_weights(::Satisfiability, sym) = [0, 1]
+terms(gp::Satisfiability) = getixsv(gp.code)
 
 function satisfiable(cnf::CNF{T}, config::AbstractDict{T}) where T
     all(x->satisfiable(x, config), cnf.clauses)
@@ -72,13 +72,13 @@ function satisfiable(v::BoolVar{T}, config::AbstractDict{T}) where T
 end
 
 # the first argument is a function of variables
-function generate_tensors(fx, mi::Satisfiability{CT,T}) where {CT,T}
-    cnf = mi.cnf
-    ixs = getixsv(mi.code)
+function generate_tensors(x::VT, sa::Satisfiability{CT,T}) where {CT,T,VT}
+    cnf = sa.cnf
+    ixs = getixsv(sa.code)
     isempty(cnf.clauses) && return []
-	return map(1:length(cnf.clauses)) do i
-        tensor_for_clause(cnf.clauses[i], fx(ixs[i])...)
-    end
+	return add_labels!(map(1:length(cnf.clauses)) do i
+        tensor_for_clause(cnf.clauses[i], (Ref(x) .^ get_weights(sa, i))...)
+    end, ixs, labels(sa))
 end
 
 function tensor_for_clause(c::CNFClause{T}, a, b) where T

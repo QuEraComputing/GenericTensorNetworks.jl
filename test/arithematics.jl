@@ -84,3 +84,15 @@ end
     @test abs(Mod{5}(2)) == Mod{5}(2)
     @test Mod{5}(12) < Mod{5}(8)
 end
+
+@testset "powers" begin
+    x = ConfigEnumerator([bv"00111"])
+    @test x ^ 0 == one(x)
+    @test x ^ 2.0 == x
+    x = TreeConfigEnumerator(bv"00111")
+    @test x ^ 0 == one(x)
+    @test x ^ 2.0 == x
+    x = ConfigSampler(bv"00111")
+    @test x ^ 0 == one(x)
+    @test x ^ 2.0 == x
+end

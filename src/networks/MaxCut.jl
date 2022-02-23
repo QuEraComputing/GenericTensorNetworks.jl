@@ -18,14 +18,14 @@ function MaxCut(g::SimpleGraph; weights=UnWeighted(), openvertices=(), optimizer
 end
 
 flavors(::Type{<:MaxCut}) = [0, 1]
-symbols(gp::MaxCut) = getixsv(gp.code)
-get_weights(gp::MaxCut, label) = [0, gp.weights[findfirst(==(label), symbols(gp))]]
+get_weights(gp::MaxCut, i::Int) = [0, gp.weights[i]]
+terms(gp::MaxCut) = getixsv(gp.code)
 
-function generate_tensors(fx, gp::MaxCut)
+function generate_tensors(x::T, gp::MaxCut) where T
     ixs = getixsv(gp.code)
-    return map(enumerate(ixs)) do (i, ix)
-        maxcutb(fx(ix)...)
-    end
+    return add_labels!(map(enumerate(ixs)) do (i, ix)
+        maxcutb((Ref(x) .^ get_weights(gp, i)) ...)
+    end, ixs, labels(gp))
 end
 function maxcutb(a, b)
     return [a b; b a]

@@ -11,9 +11,9 @@ Example
 One can encode the paint shop problem `abaccb` as the following
 
 ```jldoctest; setup=:(using GraphTensorNetworks)
-julia> symbols = collect("abaccb");
+julia> syms = collect("abaccb");
 
-julia> pb = PaintShop(symbols);
+julia> pb = PaintShop(syms);
 
 julia> solve(pb, SizeMax())[]
 3.0ₜ
@@ -54,12 +54,12 @@ function PaintShop(labels::AbstractVector{T}; openvertices=(), optimizer=GreedyM
 end
 
 flavors(::Type{<:PaintShop}) = [0, 1]
-get_weights(::PaintShop, sym) = [0, 1]
-symbols(gp::PaintShop) = getixsv(gp.code)  # !!! may not be unique
+get_weights(::PaintShop, i::Int) = [0, 1]
+terms(gp::PaintShop) = getixsv(gp.code)
 
-function generate_tensors(fx, c::PaintShop)
+function generate_tensors(x::T, c::PaintShop) where T
     ixs = getixsv(c.code)
-    [paintshop_bond_tensor(fx(ixs[i])..., c.isfirst[i], c.isfirst[i+1]) for i=1:length(ixs)]
+    add_labels!([paintshop_bond_tensor((Ref(x) .^ get_weights(c, i))..., c.isfirst[i], c.isfirst[i+1]) for i=1:length(ixs)], ixs, labels(c))
 end
 
 function paintshop_bond_tensor(a::T, b::T, if1::Bool, if2::Bool) where T
@@ -104,8 +104,8 @@ function paint_shop_coloring_from_config(config; initial::Bool=false)
 end
 
 function fx_solutions(gp::PaintShop, ::Type{BT}, all::Bool, invert::Bool, tree_storage::Bool) where {BT}
-    syms = symbols(gp)
-    T = (all ? (tree_storage ? treeset_type : set_type) : sampler_type)(BT, length(syms), nflavor(gp))
+    lbs = labels(gp)
+    T = (all ? (tree_storage ? treeset_type : set_type) : sampler_type)(BT, length(lbs), nflavor(gp))
     counter = Ref(0)
     return function (l)
         ret = _onehotv.(Ref(T), (counter[]+=1; counter[]), flavors(gp), get_weights(gp, l))

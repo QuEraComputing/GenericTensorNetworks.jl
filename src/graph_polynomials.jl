@@ -95,7 +95,3 @@ function improved_counting(ys::AbstractArray...)
     map(yi->improved_counting(yi...), zip(ys...))
 end
 improved_counting(ys::Mod...) = Mods.CRT(ys...)
-
-for GP in [:IndependentSet, :Matching, :MaxCut, :MaximalIS, :PaintShop, :Coloring]
-    @eval contractx(gp::$GP, x::T; usecuda=false) where T = contractf(l->Ref(x) .^ get_weights(gp, l), gp; usecuda=usecuda)
-end

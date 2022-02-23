@@ -21,7 +21,7 @@ export CountingTropicalF64, CountingTropicalF32, TropicalF64, TropicalF32
 export AllConfigs, SingleConfig
 export best_solutions, best2_solutions, solutions, all_solutions
 export bestk_solutions
-export contractx, contractf, graph_polynomial, max_size, max_size_count
+export contractx, graph_polynomial, max_size, max_size_count
 
 # Graphs
 export random_regular_graph, diagonal_coupled_graph, is_independent_set, is_maximal_independent_set
@@ -32,7 +32,7 @@ export line_graph
 export GraphProblem, IndependentSet, MaximalIS, Matching, 
     Coloring, optimize_code, set_packing, MaxCut, PaintShop,
     paintshop_from_pairs, UnWeighted, Satisfiability
-export flavors, symbols, nflavor, get_weights
+export flavors, labels, terms, nflavor, get_weights
 export mis_compactify!, cut_assign, cut_size, num_paint_shop_color_switch, paint_shop_coloring_from_config
 export is_good_vertex_coloring
 export CNF, CNFClause, BoolVar, satisfiable, @bools, ∨, ¬, ∧

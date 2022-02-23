@@ -29,10 +29,13 @@ export square_lattice_graph, unit_disk_graph, random_diagonal_coupled_graph, ran
 export line_graph
 
 # Tensor Networks (Graph problems)
-export GraphProblem, IndependentSet, MaximalIS, Matching, Coloring, optimize_code, set_packing, MaxCut, PaintShop, paintshop_from_pairs, UnWeighted
+export GraphProblem, IndependentSet, MaximalIS, Matching, 
+    Coloring, optimize_code, set_packing, MaxCut, PaintShop,
+    paintshop_from_pairs, UnWeighted, Satisfiability
 export flavors, symbols, nflavor, get_weights
 export mis_compactify!, cut_assign, cut_size, num_paint_shop_color_switch, paint_shop_coloring_from_config
 export is_good_vertex_coloring
+export CNF, CNFClause, BoolVar, satisfiable, @bools, ∨, ¬, ∧
 
 # Interfaces
 export solve, SizeMax, SizeMin, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin

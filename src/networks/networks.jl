@@ -21,7 +21,10 @@ function get_weights end
 """
     symbols(problem::GraphProblem)
 
-The symbols of a graph problem, they are the degrees of freedoms in the graph problem.
+The symbols of a graph problem is defined as the terms to maximize.
+They are not equivalent to the degrees of freedoms in the graph problem.
+e.g. for the maximum independent set problems, they are the indices of vertices,
+while for the max cut problem, they are the edges.
 """
 function symbols end
 
@@ -97,6 +100,7 @@ include("MaxCut.jl")
 include("Matching.jl")
 include("Coloring.jl")
 include("PaintShop.jl")
+include("Satisfiability.jl")
 
 # forward the time, space and readwrite complexity
 OMEinsum.timespacereadwrite_complexity(gp::GraphProblem) = timespacereadwrite_complexity(gp.code, uniformsize(gp.code, nflavor(gp)))

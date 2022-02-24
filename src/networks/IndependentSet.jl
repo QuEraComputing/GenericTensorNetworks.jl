@@ -25,6 +25,7 @@ end
 flavors(::Type{<:IndependentSet}) = [0, 1]
 get_weights(gp::IndependentSet, i::Int) = [0, gp.weights[i]]
 terms(gp::IndependentSet) = getixsv(gp.code)[1:gp.nv]
+labels(gp::IndependentSet) = [1:gp.nv...]
 
 # generate tensors
 function generate_tensors(x::T, gp::IndependentSet) where T

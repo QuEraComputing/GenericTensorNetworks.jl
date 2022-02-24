@@ -24,6 +24,7 @@ using GraphTensorNetworks
 end
 
 @testset "enumerating - max cut" begin
+    @bools x y z a b c
     c1 = x ∨ ¬y
     c2 = c ∨ (¬a ∨ b)
     c3 = (z ∨ ¬a) ∨ y
@@ -32,7 +33,14 @@ end
     gp = Satisfiability(cnf)
 
     @test solve(gp, SizeMax())[].n == 4.0
-    res = best_solutions(gp; all=true)[]
-    @show res
+    res = best_solutions(gp; all=true)[].c.data
+    for i=0:1<<6-1
+        v = StaticBitVector(Bool[i>>(k-1) & 1 for k=1:6])
+        if v ∈ res
+            @test satisfiable(gp.cnf, Dict(zip(labels(gp), v)))
+        else
+            @test !satisfiable(gp.cnf, Dict(zip(labels(gp), v)))
+        end
+    end
 end
 

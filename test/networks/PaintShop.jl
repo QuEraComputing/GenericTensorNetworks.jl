@@ -1,11 +1,11 @@
 using GraphTensorNetworks, Test
 
 @testset "paint shop" begin
-    labels = collect("abaccb")
-    pb = PaintShop(labels)
-    @test solve(pb, SizeMax())[] == Tropical(3.0)
-    c = solve(pb, SingleConfigMax())[].c.data
-    coloring = paint_shop_coloring_from_config(c)
-    @test num_paint_shop_color_switch(labels, coloring) == 2
-    @test StaticBitVector(Bool[0,1,1,0,1]) ∈ solve(pb, ConfigsMax())[].c.data
+    syms = collect("abaccb")
+    pb = PaintShop(syms)
+    @test solve(pb, SizeMin())[] == Tropical(2.0)
+    config = solve(pb, SingleConfigMin())[].c.data
+    coloring = paint_shop_coloring_from_config(pb, config)
+    @test num_paint_shop_color_switch(syms, coloring) == 2
+    @test bv"100" ∈ solve(pb, ConfigsMin())[].c.data
 end

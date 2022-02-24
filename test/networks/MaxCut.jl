@@ -6,21 +6,17 @@ using GraphTensorNetworks, Test, Graphs
     for g in [smallgraph(:petersen), g2]
         gp = MaxCut(g)
         mc = max_size(gp)
-        config = solve(gp, SingleConfigMax())[]
-        assign = cut_assign(g, config.c.data)
-        @test assign isa Vector
-        @test cut_size(g, assign) == mc
+        config = solve(gp, SingleConfigMax())[].c.data
+        @test cut_size(g, config) == mc
     end
     g = smallgraph(:petersen)
     # weighted
     weights = collect(1:ne(g))
     gp = MaxCut(g; weights=weights)
     mc = max_size(gp)
-    config = solve(gp, SingleConfigMax())[]
+    config = solve(gp, SingleConfigMax())[].c.data
     @test solve(gp, CountingMax())[].c == 2
-    assign = cut_assign(g, config.c.data)
-    @test assign isa Vector
-    @test cut_size(g, assign; weights=weights) == mc
+    @test cut_size(g, config; weights=weights) == mc
 end
 
 @testset "spinglass" begin
@@ -40,6 +36,6 @@ end
     code = MaxCut(g; optimizer=GreedyMethod())
     res = best_solutions(code; all=true)[]
     @test length(res.c.data) == 2
-    @test sum(res.c.data[1]) == 5
+    @test cut_size(g, res.c.data[1]) == 5
 end
 

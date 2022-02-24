@@ -21,16 +21,17 @@ end
 flavors(::Type{<:Matching}) = [0, 1]
 get_weights(::Matching, i::Int) = [0, 1]
 terms(gp::Matching) = getixsv(gp.code)[1:gp.ne]
+labels(gp::Matching) = getindex.(terms(gp))
 
 function generate_tensors(x::T, m::Matching) where T
     m.ne == 0 && return []
     ixs = getixsv(m.code)
-    tensors = []
+    tensors = AbstractArray{T}[]
     for i=1:length(ixs)
         ix = ixs[i]
         if i<=m.ne
             @assert length(ix) == 1
-            t = Ref(x) .^ get_weights(m, i) # fx is defined on edges.
+            t = Ref(x) .^ get_weights(m, i) # x is defined on edges.
         else
             t = match_tensor(T, length(ix))
         end

@@ -1,6 +1,6 @@
 """
     PaintShop{CT<:AbstractEinsum} <: GraphProblem
-    PaintShop(labels::AbstractVector; openvertices=(),
+    PaintShop(sequence::AbstractVector; openvertices=(),
              optimizer=GreedyMethod(), simplifier=nothing)
 
 The [binary paint shop problem](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/PaintShop.html).
@@ -15,13 +15,13 @@ julia> syms = collect("abaccb");
 
 julia> pb = PaintShop(syms);
 
-julia> solve(pb, SizeMax())[]
-3.0ₜ
+julia> solve(pb, SizeMin())[]
+2.0ₜ
 
-julia> solve(pb, ConfigsMax())[].c.data
-2-element Vector{StaticBitVector{5, 1}}:
- 01101
- 01101
+julia> solve(pb, ConfigsMin())[].c.data
+2-element Vector{StaticBitVector{3, 1}}:
+ 100
+ 011
 ```
 In our definition, we find the maximum number of unchanged color in this sequence, i.e. (n-1) - (minimum number of color changes)
 In the output of maximum configurations, the two configurations are defined on 5 bonds i.e. pairs of (i, i+1), `0` means color changed, while `1` means color not changed.
@@ -29,86 +29,69 @@ If we denote two "colors" as `r` and `b`, then the optimal painting is `rbbbrr` 
 """
 struct PaintShop{CT<:AbstractEinsum,LT} <: GraphProblem
     code::CT
-    labels::Vector{LT}
+    sequence::Vector{LT}
     isfirst::Vector{Bool}
 end
 
 function paintshop_from_pairs(pairs::AbstractVector{Tuple{Int,Int}}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
     n = length(pairs)
     @assert sort!(vcat(collect.(pairs)...)) == collect(1:2n)
-    labels = zeros(Int, 2*n)
+    sequence = zeros(Int, 2*n)
     @inbounds for i=1:n
-        labels[pairs[i]] .= i
+        sequence[pairs[i]] .= i
     end
     return PaintShop(pairs; openvertices, optimizer, simplifier)
 end
-function PaintShop(labels::AbstractVector{T}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing) where T
-    @assert all(l->count(==(l), labels)==2, labels)
-    n = length(labels)
-    isfirst = [findfirst(==(labels[i]), labels) == i for i=1:n]
+function PaintShop(sequence::AbstractVector{T}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing) where T
+    @assert all(l->count(==(l), sequence)==2, sequence)
+    n = length(sequence)
+    isfirst = [findfirst(==(sequence[i]), sequence) == i for i=1:n]
     rawcode = EinCode(vcat(
-                [[labels[i], labels[i+1]] for i=1:n-1], # labels for edge tensors
+                [[sequence[i], sequence[i+1]] for i=1:n-1], # labels for edge tensors
                 ),
                 collect(T, openvertices))
-    PaintShop(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), labels, isfirst)
+    PaintShop(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), sequence, isfirst)
 end
 
 flavors(::Type{<:PaintShop}) = [0, 1]
 get_weights(::PaintShop, i::Int) = [0, 1]
 terms(gp::PaintShop) = getixsv(gp.code)
+labels(gp::PaintShop) = unique(gp.sequence)
 
 function generate_tensors(x::T, c::PaintShop) where T
     ixs = getixsv(c.code)
-    add_labels!([paintshop_bond_tensor((Ref(x) .^ get_weights(c, i))..., c.isfirst[i], c.isfirst[i+1]) for i=1:length(ixs)], ixs, labels(c))
+    tensors = [paintshop_bond_tensor((Ref(x) .^ get_weights(c, i))...) for i=1:length(ixs)]
+    return add_labels!([flip_labels(tensors[i], c.isfirst[i], c.isfirst[i+1]) for i=1:length(ixs)], ixs, labels(c))
 end
 
-function paintshop_bond_tensor(a::T, b::T, if1::Bool, if2::Bool) where T
-    m = T[b a; a b]
+function paintshop_bond_tensor(a::T, b::T) where T
+    m = T[a b; b a]
+    return m
+end
+function flip_labels(m, if1, if2)
     m = if1 ? m : m[[2,1],:]
     m = if2 ? m : m[:,[2,1]]
     return m
 end
 
 """
-    num_paint_shop_color_switch(labels::AbstractVector, coloring::AbstractVector)
+    num_paint_shop_color_switch(sequence::AbstractVector, coloring)
 
-Checks the validity of the painting and returns the number of color switches.
+Returns the number of color switches.
 """
-function num_paint_shop_color_switch(labels::AbstractVector, coloring::AbstractVector)
-    # check validity of solution
-    @assert length(unique(coloring)) == 2 && length(labels) == length(coloring)
-    unique_labels = unique(labels)
-    for l in unique_labels
-        locs = findall(==(l), labels)
-        @assert length(locs) == 2
-        c1, c2 = coloring[locs]
-        @assert c1 != c2
-    end
-    # counting color switch
-    return count(i->coloring[i] != coloring[i+1], 1:length(coloring)-1)
+function num_paint_shop_color_switch(sequence::AbstractVector, coloring)
+    return count(i->coloring[i] != coloring[i+1], 1:length(sequence)-1)
 end
 
 """
-    paint_shop_coloring_from_config(config; initial=false)
+    paint_shop_coloring_from_config(p::PaintShop, config)
 
 Returns a valid painting from the paint shop configuration (given by the configuration solvers).
-The `config` is a sequence of 0 and 1, where 0 means the color changed, 1 mean color unchanged.
+The `config` is a sequence of 0 and 1, where 0 means painting the first appearence of a car in blue, 1 otherwise.
 """
-function paint_shop_coloring_from_config(config; initial::Bool=false)
-    res = falses(length(config)+1)
-    res[1] = initial
-    @inbounds for i=2:length(res)
-        res[i] = res[i-1] ⊻ (1-config[i-1])
-    end
-    return res
-end
-
-function fx_solutions(gp::PaintShop, ::Type{BT}, all::Bool, invert::Bool, tree_storage::Bool) where {BT}
-    lbs = labels(gp)
-    T = (all ? (tree_storage ? treeset_type : set_type) : sampler_type)(BT, length(lbs), nflavor(gp))
-    counter = Ref(0)
-    return function (l)
-        ret = _onehotv.(Ref(T), (counter[]+=1; counter[]), flavors(gp), get_weights(gp, l))
-        invert ? pre_invert_exponent.(ret) : ret
+function paint_shop_coloring_from_config(p::PaintShop{CT,LT}, config) where {CT, LT}
+    d = Dict{LT,Bool}(zip(labels(p), config))
+    return map(1:length(p.sequence)) do i
+        p.isfirst[i] ? d[p.sequence[i]] : ~d[p.sequence[i]]
     end
 end

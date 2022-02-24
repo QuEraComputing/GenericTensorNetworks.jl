@@ -12,8 +12,8 @@ using GraphTensorNetworks: _onehotv, _x, sampler_type, set_type
     x = zero(T)
     @test x.n === Float32(-Inf)
     @test x.c.data == trues(5)
-    x = _onehotv(T, 2, 1) ^ 2
-    @test x.n === 2f0
+    x = _onehotv(T, 2, 1)
+    @test x.n === 0f0
     @test x.c.data == Bool[0,1,0,0,0]
 
     T = set_type(CountingTropical{Float32}, 5, 2)
@@ -23,8 +23,8 @@ using GraphTensorNetworks: _onehotv, _x, sampler_type, set_type
     x = zero(T)
     @test x.n === Float32(-Inf)
     @test length(x.c.data) == 0
-    x = _onehotv(T, 2, 1) ^ 2f0
-    @test x.n === 2f0
+    x = _onehotv(T, 2, 1)
+    @test x.n === 0f0
     @test length(x.c.data) == 1 && x.c.data[1] == Bool[0,1,0,0,0]
     x = _onehotv(T, 2, 0)
     @test x.c.data[1].data[1] == 0

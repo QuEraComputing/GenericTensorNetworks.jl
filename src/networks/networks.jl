@@ -25,9 +25,7 @@ The labels of a graph problem is defined as the degrees of freedoms in the graph
 e.g. for the maximum independent set problems, they are the indices of vertices: 1, 2, 3...,
 while for the max cut problem, they are the edges.
 """
-function labels(gp::GraphProblem)
-    unique!(vcat(getixsv(gp.code)...))
-end
+function labels end
 
 """
     terms(problem::GraphProblem)
@@ -69,9 +67,6 @@ julia> using Graphs, GraphTensorNetworks
 
 julia> gp = IndependentSet(smallgraph(:petersen));
 
-julia> f(x) = Tropical.([0, 1.0])
-f (generic function with 1 method)
-
 julia> getixsv(gp.code)
 25-element Vector{Vector{Int64}}:
  [1]
@@ -95,7 +90,7 @@ julia> getixsv(gp.code)
  [7, 10]
  [8, 10]
 
-julia> gp.code(GraphTensorNetworks.generate_tensors(f, gp)...)
+julia> gp.code(GraphTensorNetworks.generate_tensors(Tropical(1.0), gp)...)
 0-dimensional Array{TropicalF64, 0}:
 4.0ₜ
 ```

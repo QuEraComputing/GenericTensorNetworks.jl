@@ -61,7 +61,8 @@ function solutions(gp::GraphProblem, ::Type{BT}; all::Bool, usecuda::Bool=false,
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
-    ret = contractx(gp, _x(config_type(BT, length(labels(gp)), nflavor(gp); all, tree_storage); invert); usecuda=usecuda)
+    T = config_type(BT, length(labels(gp)), nflavor(gp); all, tree_storage)
+    ret = contractx(gp, _x(T; invert); usecuda=usecuda)
     return invert ? post_invert_exponent.(ret) : ret
 end
 

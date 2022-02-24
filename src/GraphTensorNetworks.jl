@@ -33,7 +33,7 @@ export GraphProblem, IndependentSet, MaximalIS, Matching,
     Coloring, optimize_code, set_packing, MaxCut, PaintShop,
     paintshop_from_pairs, UnWeighted, Satisfiability
 export flavors, labels, terms, nflavor, get_weights
-export mis_compactify!, cut_assign, cut_size, num_paint_shop_color_switch, paint_shop_coloring_from_config
+export mis_compactify!, cut_size, num_paint_shop_color_switch, paint_shop_coloring_from_config
 export is_good_vertex_coloring
 export CNF, CNFClause, BoolVar, satisfiable, @bools, ∨, ¬, ∧
 

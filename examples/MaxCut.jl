@@ -62,10 +62,7 @@ max_config = solve(problem, GraphPolynomial())[]
 
 # ### Configuration properties
 # ##### finding one max cut solution
-max_edge_config = solve(problem, SingleConfigMax())[]
-
-# These configurations are defined on edges, we need to find a valid assignment on vertices
-max_vertex_config = cut_assign(graph, max_edge_config.c.data)
+max_vertex_config = solve(problem, SingleConfigMax())[].c.data
 
 max_cut_size_verify = cut_size(graph, max_vertex_config)
 

@@ -21,8 +21,8 @@ end
 flavors(::Type{<:Coloring{K}}) where K = collect(0:K-1)
 get_weights(::Coloring{K}, i::Int) where K = ones(Int, K)
 terms(gp::Coloring) = getixsv(gp.code)[1:gp.nv]
+labels(gp::Coloring) = [1:gp.nv...]
 
-# `fx` is a function defined on labels, it returns a vector of elements, the size of vector is same as the number of flavors (or the bond dimension).
 function generate_tensors(x::T, c::Coloring{K}) where {K,T}
     ixs = getixsv(c.code)
     return add_labels!(map(1:length(ixs)) do i
@@ -39,7 +39,7 @@ function coloringb(::Type{T}, k::Int) where T
     return x
 end
 # coloring vertex tensor
-coloringv(x::T, k::Int) where T = repeat(x, k)
+coloringv(x::T, k::Int) where T = fill(x, k)
 
 # utilities
 """

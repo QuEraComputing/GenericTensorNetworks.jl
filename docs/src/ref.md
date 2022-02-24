@@ -37,12 +37,20 @@ mis_compactify!
 is_maximal_independent_set
 
 cut_size
-cut_assign
 
 num_paint_shop_color_switch
 paint_shop_coloring_from_config
 
 is_good_vertex_coloring
+
+CNF
+CNFClause
+BoolVar
+satisfiable
+@bools
+∨
+¬
+∧
 ```
 
 ## Properties

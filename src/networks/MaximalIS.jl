@@ -20,6 +20,7 @@ end
 flavors(::Type{<:MaximalIS}) = [0, 1]
 get_weights(gp::MaximalIS, i::Int) = [0, gp.weights[i]]
 terms(gp::MaximalIS) = getixsv(gp.code)
+labels(gp::MaximalIS) = [1:length(getixsv(gp.code))...]
 
 function generate_tensors(x::T, mi::MaximalIS) where T
     ixs = getixsv(mi.code)

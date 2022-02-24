@@ -49,7 +49,7 @@ problem = Coloring{3}(graph);
 
 # ## Solving properties
 # ##### counting all possible coloring
-num_of_coloring = solve(problem, CountingAll())[]
+num_of_coloring = solve(problem, CountingMax())[]
 
 # ##### finding one best coloring
 single_solution = solve(problem, SingleConfigMax())[]
@@ -70,6 +70,7 @@ show_graph(linegraph; locs=[0.5 .* (locations[e.src] .+ locations[e.dst])
 # Let us construct the tensor network and see if there are solutions.
 lineproblem = Coloring{3}(linegraph);
 
-num_of_coloring = solve(lineproblem, CountingAll())[]
+num_of_coloring = solve(lineproblem, CountingMax())[]
 
-# You will see a zero printed, meaning no solution for the 3-coloring on edges of a Petersen graph.
+# You will see the maximum size 28 is smaller than the number of edges in the `linegraph`,
+# meaning no solution for the 3-coloring on edges of a Petersen graph.

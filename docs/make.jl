@@ -36,6 +36,7 @@ makedocs(;
             "Matching problem" => "tutorials/Matching.md",
             "Binary paint shop problem" => "tutorials/PaintShop.md",
             "Coloring problem" => "tutorials/Coloring.md",
+            "Satisfiability problem" => "tutorials/Satisfiability.md",
             "Other problems" => "tutorials/Others.md",
         ],
         "Performance Tips" => "performancetips.md",

@@ -286,18 +286,15 @@ post_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
 Returns the maximum size of the graph problem. 
 A shorthand of `solve(problem, SizeMax(); usecuda=false)`.
 """
-function max_size end
+max_size(m::GraphProblem; usecuda=false) = Int(sum(solve(m, SizeMax(); usecuda=usecuda)).n)  # floating point number is faster (BLAS)
+
 """
     max_size_count(problem; usecuda=false)
 
 Returns the maximum size and the counting of the graph problem.
 It is a shorthand of `solve(problem, CountingMax(); usecuda=false)`.
 """
-function max_size_count end
-for TP in [:MaximalIS, :IndependentSet, :Matching, :MaxCut, :PaintShop]
-    @eval max_size(m::$TP; usecuda=false) = Int(sum(solve(m, SizeMax(); usecuda=usecuda)).n)  # floating point number is faster (BLAS)
-    @eval max_size_count(m::$TP; usecuda=false) = (r = sum(solve(m, CountingMax(); usecuda=usecuda)); (Int(r.n), Int(r.c)))
-end
+max_size_count(m::GraphProblem; usecuda=false) = (r = sum(solve(m, CountingMax(); usecuda=usecuda)); (Int(r.n), Int(r.c)))
 
 using DelimitedFiles
 

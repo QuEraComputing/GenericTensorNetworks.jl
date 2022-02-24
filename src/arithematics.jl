@@ -282,6 +282,7 @@ Base.zero(::ConfigSampler{N,S,C}) where {N,S,C} = zero(ConfigSampler{N,S,C})
 Base.one(::ConfigSampler{N,S,C}) where {N,S,C} = one(ConfigSampler{N,S,C})
 
 # tree config enumerator
+# it must be mutable, otherwise the `IdDict` trick for computing the length does not work.
 """
     TreeConfigEnumerator{N,S,C} <: AbstractSetNumber
 
@@ -339,7 +340,6 @@ julia> one(s)
 
 ```
 """
-# it must be mutable, otherwise the `IdDict` trick for computing the length does not work.
 mutable struct TreeConfigEnumerator{N,S,C} <: AbstractSetNumber
     tag::TreeTag
     data::StaticElementVector{N,S,C}

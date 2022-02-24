@@ -26,20 +26,20 @@ labels(gp::Coloring) = [1:gp.nv...]
 function generate_tensors(x::T, c::Coloring{K}) where {K,T}
     ixs = getixsv(c.code)
     return add_labels!(map(1:length(ixs)) do i
-        i <= c.nv ? coloringv(x, K) .^ get_weights(c, i) : coloringb(T, K)
+        i <= c.nv ? coloringv(T, K) .^ get_weights(c, i) : coloringb(x, K)
     end, ixs, labels(c))
 end
 
 # coloring bond tensor
-function coloringb(::Type{T}, k::Int) where T
-    x = ones(T, k, k)
+function coloringb(x::T, k::Int) where T
+    x = fill(x, k, k)
     for i=1:k
-        x[i,i] = zero(T)
+        x[i,i] = one(T)
     end
     return x
 end
 # coloring vertex tensor
-coloringv(x::T, k::Int) where T = fill(x, k)
+coloringv(::Type{T}, k::Int) where T = fill(one(T), k)
 
 # utilities
 """

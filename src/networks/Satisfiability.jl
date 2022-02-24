@@ -1,3 +1,9 @@
+"""
+    BoolVar{T}
+    BoolVar(name, neg)
+
+Boolean variable for constructing CNF clauses.
+"""
 struct BoolVar{T}
     name::T
     neg::Bool

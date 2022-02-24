@@ -1,11 +1,9 @@
 # # Vertex matching problem
 
 # !!! note
-#     This tutorial only covers the vertex matching problem specific features,
-#     It is recommended to read the [Independent set problem](@ref) tutorial too to know more about
+#     It is recommended to read the [Independent set problem](@ref) tutorial first to know more about
 #     * how to optimize the tensor network contraction order,
-#     * what are the other graph properties computable,
-#     * how to select correct method to compute graph properties,
+#     * what graph properties are available and how to select correct method to compute graph properties,
 #     * how to compute weighted graphs and handle open vertices.
 
 # ## Problem definition

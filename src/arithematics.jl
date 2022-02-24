@@ -331,6 +331,7 @@ julia> collect(y)
  10000
 
 julia> zero(s)
+∅
 
 
 

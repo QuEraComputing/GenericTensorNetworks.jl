@@ -19,16 +19,15 @@ function Coloring{K}(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), 
 end
 
 flavors(::Type{<:Coloring{K}}) where K = collect(0:K-1)
-symbols(c::Coloring{K}) where K = [i for i=1:c.nv]
-get_weights(::Coloring{K}, sym) where K = ones(Int, K)
+get_weights(::Coloring{K}, i::Int) where K = ones(Int, K)
+terms(gp::Coloring) = getixsv(gp.code)[1:gp.nv]
+labels(gp::Coloring) = [1:gp.nv...]
 
-# `fx` is a function defined on symbols, it returns a vector of elements, the size of vector is same as the number of flavors (or the bond dimension).
-function generate_tensors(fx, c::Coloring{K}) where K
+function generate_tensors(x::T, c::Coloring{K}) where {K,T}
     ixs = getixsv(c.code)
-    T = eltype(fx(ixs[1][1]))
-    return map(1:length(ixs)) do i
-        i <= c.nv ? coloringv(fx(ixs[i][1])) : coloringb(T, K)
-    end
+    return add_labels!(map(1:length(ixs)) do i
+        i <= c.nv ? coloringv(x, K) .^ get_weights(c, i) : coloringb(T, K)
+    end, ixs, labels(c))
 end
 
 # coloring bond tensor
@@ -40,7 +39,7 @@ function coloringb(::Type{T}, k::Int) where T
     return x
 end
 # coloring vertex tensor
-coloringv(vals::Vector{T}) where T = vals
+coloringv(x::T, k::Int) where T = fill(x, k)
 
 # utilities
 """

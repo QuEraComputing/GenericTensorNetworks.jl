@@ -88,11 +88,11 @@ paint_polynomial = solve(problem, GraphPolynomial())[]
 
 # ### Configuration properties
 # ##### finding best solutions
-best_configs = solve(problem, ConfigsMax())[]
+best_configs = solve(problem, ConfigsMin())[]
 
 # One can see to identical bitstrings corresponding two different vertex configurations, they are related to bit-flip symmetry.
 
-painting1 = paint_shop_coloring_from_config(best_configs.c.data[1]; initial=false)
+painting1 = paint_shop_coloring_from_config(problem, best_configs.c.data[1])
 
 show_graph(graph; locs=locations, texts=string.(sequence),
     edge_colors=[sequence[e.src] == sequence[e.dst] ? "blue" : "black" for e in edges(graph)],

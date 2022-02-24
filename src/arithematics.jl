@@ -165,8 +165,11 @@ function Base.show(io::IO, ::MIME"text/plain", x::TruncatedPoly{K}) where K
     end
 end
 
+############################ SET Numbers ##########################
+abstract type AbstractSetNumber end
+
 """
-    ConfigEnumerator{N,S,C}
+    ConfigEnumerator{N,S,C} <: AbstractSetNumber
 
 Set algebra for enumerating configurations, where `N` is the length of configurations,
 `C` is the size of storage in unit of `UInt64`,
@@ -191,7 +194,7 @@ julia> zero(a)
 {}
 ```
 """
-struct ConfigEnumerator{N,S,C}
+struct ConfigEnumerator{N,S,C} <: AbstractSetNumber
     data::Vector{StaticElementVector{N,S,C}}
 end
 
@@ -227,7 +230,7 @@ Base.show(io::IO, ::MIME"text/plain", x::ConfigEnumerator) = Base.show(io, x)
 
 # the algebra sampling one of the configurations
 """
-    ConfigSampler{N,S,C}
+    ConfigSampler{N,S,C} <: AbstractSetNumber
     ConfigSampler(elements::StaticElementVector)
 
 The algebra for sampling one configuration, where `N` is the length of configurations,
@@ -256,7 +259,7 @@ julia> zero(ConfigSampler{5, 1, 1})
 ConfigSampler{5, 1, 1}(11111)
 ```
 """
-struct ConfigSampler{N,S,C}
+struct ConfigSampler{N,S,C} <: AbstractSetNumber
     data::StaticElementVector{N,S,C}
 end
 
@@ -280,7 +283,7 @@ Base.one(::ConfigSampler{N,S,C}) where {N,S,C} = one(ConfigSampler{N,S,C})
 
 # tree config enumerator
 """
-    TreeConfigEnumerator{N,S,C}
+    TreeConfigEnumerator{N,S,C} <: AbstractSetNumber
 
 Configuration enumerator encoded in a tree, it is the most natural representation given by a sum-product network
 and is often more memory efficient than putting the configurations in a vector.
@@ -337,7 +340,7 @@ julia> one(s)
 ```
 """
 # it must be mutable, otherwise the `IdDict` trick for computing the length does not work.
-mutable struct TreeConfigEnumerator{N,S,C}
+mutable struct TreeConfigEnumerator{N,S,C} <: AbstractSetNumber
     tag::TreeTag
     data::StaticElementVector{N,S,C}
     left::TreeConfigEnumerator{N,S,C}
@@ -457,12 +460,10 @@ function Base.iszero(t::TreeConfigEnumerator)
 end
 
 # A patch to make `Polynomial{ConfigEnumerator}` work
-for T in [:ConfigEnumerator, :ConfigSampler, :TreeConfigEnumerator]
-    @eval function Base.:*(a::Int, y::$T)
-        a == 0 && return zero(y)
-        a == 1 && return y
-        error("multiplication between int and `$(typeof(y))` is not defined.")
-    end
+function Base.:*(a::Int, y::AbstractSetNumber)
+    a == 0 && return zero(y)
+    a == 1 && return y
+    error("multiplication between int and `$(typeof(y))` is not defined.")
 end
 
 # convert from counting type to bitstring type
@@ -507,7 +508,58 @@ function Base.copy(c::TreeConfigEnumerator)
 end
 
 # Handle boolean, this is a patch for CUDA matmul
-for TYPE in [:ConfigEnumerator, :ConfigSampler, :TruncatedPoly, :TreeConfigEnumerator]
+for TYPE in [:AbstractSetNumber, :TruncatedPoly]
     @eval Base.:*(a::Bool, y::$TYPE) = a ? y : zero(y)
     @eval Base.:*(y::$TYPE, a::Bool) = a ? y : zero(y)
+end
+
+# to handle power of polynomials
+function Base.:^(x::TreeConfigEnumerator, y::Real)
+    if y <= 0
+        return one(x)
+    elseif x.tag == LEAF
+        return x
+    else
+        error("pow of non-leaf nodes is forbidden!")
+    end
+end
+function Base.:^(x::ConfigEnumerator, y::Real)
+    if y <= 0
+        return one(x)
+    elseif length(x) <= 1
+        return x
+    else
+        error("pow of configuration enumerator of `size > 1` is forbidden!")
+    end
+end
+function Base.:^(x::ConfigSampler, y::Real)
+    if y <= 0
+        return one(x)
+    else
+        return x
+    end
+end
+
+# variable `x`
+function _x(::Type{Polynomial{BS,X}}; invert) where {BS,X}
+    @assert !invert   # not supported, because it is not useful
+    Polynomial{BS,X}([zero(BS), one(BS)])
+end
+function _x(::Type{TruncatedPoly{K,BS,OS}}; invert) where {K,BS,OS}
+    ret = TruncatedPoly{K,BS,OS}(ntuple(i->i<K ? zero(BS) : one(BS), K),one(OS))
+    invert ? pre_invert_exponent(ret) : ret
+end
+function _x(::Type{CountingTropical{TV,BS}}; invert) where {TV,BS}
+    ret = CountingTropical{TV,BS}(one(TV), one(BS))
+    invert ? pre_invert_exponent(ret) : ret
+end
+function _x(::Type{Tropical{TV}}; invert) where {TV}
+    ret = Tropical{TV}(one(TV))
+    invert ? pre_invert_exponent(ret) : ret
+end
+
+# for finding all solutions
+function _x(::Type{T}; invert) where {T<:AbstractSetNumber}
+    ret = one(T)
+    invert ? pre_invert_exponent(ret) : ret
 end

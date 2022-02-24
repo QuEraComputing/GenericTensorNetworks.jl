@@ -223,18 +223,15 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
         throw(ArgumentError("Graph property `$(typeof(property))` is not computable for graph problem of type `$(typeof(gp))`."))
     end
     if property isa SizeMax
-        syms = symbols(gp)
-        return contractf(x->Tropical{T}.(get_weights(gp, x)), gp; usecuda=usecuda)
+        return contractx(gp, _x(Tropical{T}; invert=false); usecuda=usecuda)
     elseif property isa SizeMin
-        syms = symbols(gp)
-        return post_invert_exponent.(contractf(x->pre_invert_exponent.(Tropical{T}.(get_weights(gp, x))), gp; usecuda=usecuda))
+        return post_invert_exponent.(contractx(gp, _x(Tropical{T}; invert=true); usecuda=usecuda))
     elseif property isa CountingAll
         return contractx(gp, one(T); usecuda=usecuda)
     elseif property isa CountingMax{1}
-        syms = symbols(gp)
-        return contractf(x->CountingTropical{T,T}.(get_weights(gp, x)), gp; usecuda=usecuda)
+        return contractx(gp, _x(CountingTropical{T,T}; invert=false); usecuda=usecuda)
     elseif property isa CountingMin{1}
-        return post_invert_exponent.(contractf(x->pre_invert_exponent.(CountingTropical{T,T}.(get_weights(gp, x))), gp; usecuda=usecuda))
+        return post_invert_exponent.(contractx(gp, _x(CountingTropical{T,T}; invert=true); usecuda=usecuda))
     elseif property isa CountingMax
         return contractx(gp, TruncatedPoly(ntuple(i->i == max_k(property) ? one(T) : zero(T), max_k(property)), one(T)); usecuda=usecuda)
     elseif property isa CountingMin

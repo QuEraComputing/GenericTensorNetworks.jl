@@ -18,16 +18,16 @@ function MaximalIS(g::SimpleGraph; weights=UnWeighted(), openvertices=(), optimi
 end
 
 flavors(::Type{<:MaximalIS}) = [0, 1]
-symbols(gp::MaximalIS) = [i for i in 1:length(getixsv(gp.code))]
-get_weights(gp::MaximalIS, label) = [0, gp.weights[findfirst(==(label), symbols(gp))]]
+get_weights(gp::MaximalIS, i::Int) = [0, gp.weights[i]]
+terms(gp::MaximalIS) = getixsv(gp.code)
+labels(gp::MaximalIS) = [1:length(getixsv(gp.code))...]
 
-function generate_tensors(fx, mi::MaximalIS)
+function generate_tensors(x::T, mi::MaximalIS) where T
     ixs = getixsv(mi.code)
     isempty(ixs) && return []
-    T = eltype(fx(ixs[1][end]))
-	return map(ixs) do ix
-        neighbortensor(fx(ix[end])..., length(ix))
-    end
+	return add_labels!(map(enumerate(ixs)) do (i, ix)
+        neighbortensor((Ref(x) .^ get_weights(mi, i))..., length(ix))
+    end, ixs, labels(mi))
 end
 function neighbortensor(a::T, b::T, d::Int) where T
     t = zeros(T, fill(2, d)...)

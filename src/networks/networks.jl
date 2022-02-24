@@ -19,11 +19,22 @@ In graph polynomial, integer weights are the orders of `x`.
 function get_weights end
 
 """
-    symbols(problem::GraphProblem)
+    labels(problem::GraphProblem)
 
-The symbols of a graph problem, they are the degrees of freedoms in the graph problem.
+The labels of a graph problem is defined as the degrees of freedoms in the graph problem.
+e.g. for the maximum independent set problems, they are the indices of vertices: 1, 2, 3...,
+while for the max cut problem, they are the edges.
 """
-function symbols end
+function labels end
+
+"""
+    terms(problem::GraphProblem)
+
+The terms of a graph problem is defined as the tensor labels that defining local energies (or weights) in the graph problem.
+e.g. for the maximum independent set problems, they are the vertex-tensor labels: [1], [2], [3]...
+The weight of a term is same as the power of `x` in the graph polynomial.
+"""
+function terms end
 
 """
     flavors(::Type{<:GraphProblem})
@@ -56,9 +67,6 @@ julia> using Graphs, GraphTensorNetworks
 
 julia> gp = IndependentSet(smallgraph(:petersen));
 
-julia> f(x) = Tropical.([0, 1.0])
-f (generic function with 1 method)
-
 julia> getixsv(gp.code)
 25-element Vector{Vector{Int64}}:
  [1]
@@ -82,7 +90,7 @@ julia> getixsv(gp.code)
  [7, 10]
  [8, 10]
 
-julia> gp.code(GraphTensorNetworks.generate_tensors(f, gp)...)
+julia> gp.code(GraphTensorNetworks.generate_tensors(Tropical(1.0), gp)...)
 0-dimensional Array{TropicalF64, 0}:
 4.0ₜ
 ```
@@ -97,20 +105,36 @@ include("MaxCut.jl")
 include("Matching.jl")
 include("Coloring.jl")
 include("PaintShop.jl")
+include("Satisfiability.jl")
 
 # forward the time, space and readwrite complexity
 OMEinsum.timespacereadwrite_complexity(gp::GraphProblem) = timespacereadwrite_complexity(gp.code, uniformsize(gp.code, nflavor(gp)))
 
 # contract the graph tensor network
-function contractf(f, gp::GraphProblem; usecuda=false)
-    @debug "generating tensors ..."
-    xs = generate_tensors(f, gp)
+function contractx(gp::GraphProblem, x; usecuda=false)
+    @debug "generating tensors for x = `$x` ..."
+    xs = generate_tensors(x, gp)
     @debug "contracting tensors ..."
     if usecuda
         gp.code([CuArray(x) for x in xs]...)
     else
         gp.code(xs...)
     end
+end
+
+# multiply labels vectors to the generate tensor.
+add_labels!(tensors::AbstractVector{<:AbstractArray}, ixs, labels) = tensors
+
+const SetPolyNumbers{T} = Union{Polynomial{T}, TruncatedPoly{K,T} where K, CountingTropical{TV,T} where TV} where T<:AbstractSetNumber
+function add_labels!(tensors::AbstractVector{<:AbstractArray{T}}, ixs, labels) where T <: Union{AbstractSetNumber, SetPolyNumbers}
+    for (t, ix) in zip(tensors, ixs)
+        for (dim, l) in enumerate(ix)
+            index = findfirst(==(l), labels)
+            v = [_onehotv(T, index, k-1) for k=1:size(t, dim)]
+            t .*= reshape(v, ntuple(j->dim==j ? length(v) : 1, ndims(t)))
+        end
+    end
+    return tensors
 end
 
 # TODOs:

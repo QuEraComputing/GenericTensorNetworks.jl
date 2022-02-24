@@ -1,3 +1,15 @@
+function config_type(::Type{T}, n, nflavor; all::Bool, tree_storage::Bool) where T
+    if all
+        if tree_storage
+            return treeset_type(T, n, nflavor)
+        else
+            return set_type(T, n, nflavor)
+        end
+    else
+        return sampler_type(T, n, nflavor)
+    end
+end
+
 """
     best_solutions(problem; all=false, usecuda=false, invert=false, tree_storage::Bool=false)
     
@@ -12,7 +24,7 @@ function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
-    xst = generate_tensors(l->(vs = TropicalF64.(get_weights(gp, l)); invert ? pre_invert_exponent.(vs) : vs), gp)
+    xst = generate_tensors(_x(TropicalF64; invert), gp)
     ymask = trues(fill(2, length(getiyv(gp.code)))...)
     if usecuda
         xst = CuArray.(xst)
@@ -20,7 +32,8 @@ function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false
     end
     if all
         # we use `Float64` types because we want to support weighted graphs.
-        xs = generate_tensors(fx_solutions(gp, CountingTropical{Float64,Float64}, all, invert, tree_storage), gp)
+        T = config_type(CountingTropical{Float64,Float64}, length(labels(gp)), nflavor(gp); all, tree_storage)
+        xs = generate_tensors(_x(T; invert), gp)
         ret = bounding_contract(AllConfigs{1}(), gp.code, xst, ymask, xs)
         return invert ? post_invert_exponent.(ret) : ret
     else
@@ -48,7 +61,8 @@ function solutions(gp::GraphProblem, ::Type{BT}; all::Bool, usecuda::Bool=false,
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
-    ret = contractf(fx_solutions(gp, BT, all, invert, tree_storage), gp; usecuda=usecuda)
+    T = config_type(BT, length(labels(gp)), nflavor(gp); all, tree_storage)
+    ret = contractx(gp, _x(T; invert); usecuda=usecuda)
     return invert ? post_invert_exponent.(ret) : ret
 end
 
@@ -60,9 +74,10 @@ Finding optimal and suboptimal solutions.
 best2_solutions(gp::GraphProblem; all=true, usecuda=false, invert::Bool=false) = solutions(gp, Max2Poly{Float64,Float64}; all, usecuda, invert)
 
 function bestk_solutions(gp::GraphProblem, k::Int; invert::Bool=false, tree_storage::Bool=false)
-    xst = generate_tensors(l->TropicalF64.(get_weights(gp, l)), gp)
+    xst = generate_tensors(_x(TropicalF64; invert), gp)
     ymask = trues(fill(2, length(getiyv(gp.code)))...)
-    xs = generate_tensors(fx_solutions(gp, TruncatedPoly{k,Float64,Float64}, true, invert, tree_storage), gp)
+    T = config_type(TruncatedPoly{k,Float64,Float64}, length(labels(gp)), nflavor(gp); all=true, tree_storage)
+    xs = generate_tensors(_x(T; invert), gp)
     ret = bounding_contract(AllConfigs{k}(), gp.code, xst, ymask, xs)
     return invert ? post_invert_exponent.(ret) : ret
 end
@@ -75,25 +90,15 @@ e.g. when the problem is [`MaximalIS`](@ref), it computes all maximal independen
 """
 all_solutions(gp::GraphProblem) = solutions(gp, Polynomial{Float64,:x}, all=true, usecuda=false, tree_storage=false)
 
-# return a mapping from label to onehot bitstrings (degree of freedoms).
-function fx_solutions(gp::GraphProblem, ::Type{BT}, all::Bool, invert::Bool, tree_storage::Bool) where {BT}
-    syms = symbols(gp)
-    T = (all ? (tree_storage ? treeset_type : set_type) : sampler_type)(BT, length(syms), nflavor(gp))
-    vertex_index = Dict([s=>i for (i, s) in enumerate(syms)])
-    return function (l)
-        ret = _onehotv.(Ref(T), vertex_index[l], flavors(gp), get_weights(gp, l))
-        invert ? pre_invert_exponent.(ret) : ret
-    end
+function _onehotv(::Type{Polynomial{BS,X}}, x, v) where {BS,X}
+    Polynomial{BS,X}([onehotv(BS, x, v)])
 end
-function _onehotv(::Type{Polynomial{BS,X}}, x, v, w) where {BS,X}
-    Polynomial{BS,X}([zero(BS), onehotv(BS, x, v)])^w
+function _onehotv(::Type{TruncatedPoly{K,BS,OS}}, x, v) where {K,BS,OS}
+    TruncatedPoly{K,BS,OS}(ntuple(i->i != K ? zero(BS) : onehotv(BS, x, v), K),zero(OS))
 end
-function _onehotv(::Type{TruncatedPoly{K,BS,OS}}, x, v, w) where {K,BS,OS}
-    TruncatedPoly{K,BS,OS}(ntuple(i->i<K ? zero(BS) : onehotv(BS, x, v), K),one(OS))^w
+function _onehotv(::Type{CountingTropical{TV,BS}}, x, v) where {TV,BS}
+    CountingTropical{TV,BS}(zero(TV), onehotv(BS, x, v))
 end
-function _onehotv(::Type{CountingTropical{TV,BS}}, x, v, w) where {TV,BS}
-    CountingTropical{TV,BS}(TV(w), onehotv(BS, x, v))
-end
-function _onehotv(::Type{BS}, x, v, w) where {BS<:Union{ConfigEnumerator, TreeConfigEnumerator}}
+function _onehotv(::Type{BS}, x, v) where {BS<:AbstractSetNumber}
     onehotv(BS, x, v)
 end

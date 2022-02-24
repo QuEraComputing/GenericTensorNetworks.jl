@@ -42,6 +42,7 @@ end
         println("bounded = ", bounded, ", single config min")
         c = solve(MaximalIS(g), SingleConfigMin(; bounded=bounded), T=Int64)[].c.data
         @test c ∈ cmin2.coeffs[1].data
-        @test is_maximal_independent_set(g, c) && count(!iszero, c) == 13
+        @test is_maximal_independent_set(g, c)
+        @test count(!iszero, c) == 13
     end
 end

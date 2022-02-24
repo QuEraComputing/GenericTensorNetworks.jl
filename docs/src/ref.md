@@ -9,6 +9,7 @@ Matching
 Coloring
 MaxCut
 PaintShop
+Satisfiability
 ```
 
 ```@docs

@@ -29,17 +29,17 @@ show_graph(graph; locs=locations)
 # For a vertex ``v``, we define the degree of freedoms ``c_v\in\{1,2,3\}`` and a vertex tensor labelled by it as
 # ```math
 # W(v) = \left(\begin{matrix}
-#     r_v\\
-#     g_v\\
-#     b_v
+#     1\\
+#     1\\
+#     1
 # \end{matrix}\right).
 # ```
 # For an edge ``(u, v)``, we define an edge tensor as a matrix labelled by ``(c_u, c_v)`` to specify the constraint
 # ```math
 # B = \left(\begin{matrix}
-#     0 & 1 & 1\\
-#     1 & 0 & 1\\
-#     1 & 1 & 0
+#     1 & x & x\\
+#     x & 1 & x\\
+#     x & x & 1
 # \end{matrix}\right).
 # ```
 # The number of possible colouring can be obtained by contracting this tensor network by setting vertex tensor elements ``r_v, g_v`` and ``b_v`` to 1.

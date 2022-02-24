@@ -357,25 +357,17 @@ end
 
 # AbstractTree APIs
 function children(t::TreeConfigEnumerator)
-    if isdefined(t, :left)
-        if isdefined(t, :right)
-            return [t.left, t.right]
-        else
-            return [t.left]
-        end
+    if t.tag == ZERO || t.tag == LEAF
+        return typeof(t)[]
     else
-        if isdefined(t, :right)
-            return [t.right]
-        else
-            return typeof(t)[]
-        end
+        return [t.left, t.right]
     end
 end
 function printnode(io::IO, t::TreeConfigEnumerator)
     if t.tag === LEAF
         print(io, t.data)
     elseif t.tag === ZERO
-        print(io, "")
+        print(io, "∅")
     elseif t.tag === SUM
         print(io, "+")
     else  # PROD
@@ -448,11 +440,11 @@ Base.zero(::TreeConfigEnumerator{N,S,C}) where {N,S,C} = zero(TreeConfigEnumerat
 Base.one(::TreeConfigEnumerator{N,S,C}) where {N,S,C} = one(TreeConfigEnumerator{N,S,C})
 # todo, check siblings too?
 function Base.iszero(t::TreeConfigEnumerator)
-    if t.TAG == SUM
+    if t.tag == SUM
         iszero(t.left) && iszero(t.right)
-    elseif t.TAG == ZERO
+    elseif t.tag == ZERO
         true
-    elseif t.TAG == LEAF
+    elseif t.tag == LEAF
         false
     else
         iszero(t.left) || iszero(t.right)
@@ -497,11 +489,11 @@ onehotv(::Type{ConfigSampler{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigSampl
 Base.transpose(c::ConfigEnumerator) = c
 Base.copy(c::ConfigEnumerator) = ConfigEnumerator(copy(c.data))
 Base.transpose(c::TreeConfigEnumerator) = c
-function Base.copy(c::TreeConfigEnumerator)
+function Base.copy(c::TreeConfigEnumerator{N,S,C}) where {N,S,C}
     if c.tag == LEAF
         TreeConfigEnumerator(c.data)
     elseif c.tag == ZERO
-        TreeConfigEnumerator(c.tag)
+        TreeConfigEnumerator{N,S,C}(c.tag)
     else
         TreeConfigEnumerator(c.tag, c.left, c.right)
     end

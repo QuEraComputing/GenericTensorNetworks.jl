@@ -9,3 +9,10 @@ using GraphTensorNetworks, Test, Graphs
     @test ne(g) == 1
     @test nv(g) == 3
 end
+
+@testset "line graph" begin
+    g = smallgraph(:petersen)
+    lg = line_graph(g)
+    @test nv(lg) == 15
+    @test ne(lg) == 45
+end

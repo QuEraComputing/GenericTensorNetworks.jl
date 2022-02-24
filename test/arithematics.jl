@@ -75,6 +75,8 @@ end
     @test length(a + a) == 2
     @test length(a * a) == 1
     print((a+a) * a)
+    b = a + a
+    @test GraphTensorNetworks.num_nodes(b * b) == 3
  
     a = ConfigSampler(StaticBitVector(rand(Bool, 10)))
     @test 1 * a == a
@@ -95,4 +97,20 @@ end
     x = ConfigSampler(bv"00111")
     @test x ^ 0 == one(x)
     @test x ^ 2.0 == x
+end
+
+@testset "push coverage" begin
+    @test abs(Mod{5}(2)) == Mod{5}(2)
+    @test one(ConfigSampler(bv"11100")) == ConfigSampler(bv"00000")
+    @test one(TreeConfigEnumerator{5,1,1}(GraphTensorNetworks.ZERO)) == TreeConfigEnumerator(bv"00000")
+    @test iszero(copy(TreeConfigEnumerator{5,1,1}(GraphTensorNetworks.ZERO)))
+    x = TreeConfigEnumerator(bv"00111")
+    @test copy(x) == x
+    @test copy(x) !== x
+    @test !iszero(x)
+    y = x + x
+    @test copy(y) == y
+    @test copy(y) !== y
+    @test !iszero(y)
+    println((x * x) * zero(x))
 end

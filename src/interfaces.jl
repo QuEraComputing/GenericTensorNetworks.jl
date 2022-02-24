@@ -271,7 +271,6 @@ end
 
 # raise an error if the property for problem can not be computed
 _solvable(::Any, ::Any) = true
-_solvable(::Coloring, ::GraphPolynomial) = false
 
 # negate the exponents before entering the solver
 pre_invert_exponent(t::TruncatedPoly{K}) where K = TruncatedPoly(t.coeffs, -t.maxorder)

@@ -1,18 +1,18 @@
 """
-    MaximalIS{CT<:AbstractEinsum,WT<:Union{UnWeighted, Vector}} <: GraphProblem
-    MaximalIS(graph; weights=UnWeighted(), openvertices=(),
+    MaximalIS{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
+    MaximalIS(graph; weights=NoWeight(), openvertices=(),
                  optimizer=GreedyMethod(), simplifier=nothing)
 
 The [maximal independent set](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/MaximalIS.html) problem. In the constructor, `weights` are the weights of vertices.
 `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
 """
-struct MaximalIS{CT<:AbstractEinsum,WT<:Union{UnWeighted, Vector}} <: GraphProblem
+struct MaximalIS{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
     code::CT
     weights::WT
 end
 
-function MaximalIS(g::SimpleGraph; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
-    @assert weights isa UnWeighted || length(weights) == nv(g)
+function MaximalIS(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+    @assert weights isa NoWeight || length(weights) == nv(g)
     rawcode = EinCode(([[Graphs.neighbors(g, v)..., v] for v in Graphs.vertices(g)]...,), collect(Int, openvertices))
     MaximalIS(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), weights)
 end

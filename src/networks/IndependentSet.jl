@@ -1,6 +1,6 @@
 """
-    IndependentSet{CT<:AbstractEinsum,WT<:Union{UnWeighted, Vector}} <: GraphProblem
-    IndependentSet(graph; weights=UnWeighted(), openvertices=(),
+    IndependentSet{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
+    IndependentSet(graph; weights=NoWeight(), openvertices=(),
                  optimizer=GreedyMethod(), simplifier=nothing)
 
 The [independent set problem](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/IndependentSet.html) in graph theory.
@@ -8,14 +8,14 @@ In the constructor, `weights` are the weights of vertices.
 `openvertices` specifies labels for the output tensor.
 `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
 """
-struct IndependentSet{CT<:AbstractEinsum,WT<:Union{UnWeighted, Vector}} <: GraphProblem
+struct IndependentSet{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
     code::CT
     nv::Int
     weights::WT
 end
 
-function IndependentSet(g::SimpleGraph; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
-    @assert weights isa UnWeighted || length(weights) == nv(g)
+function IndependentSet(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+    @assert weights isa NoWeight || length(weights) == nv(g)
     rawcode = EinCode([[[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
                        [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...], collect(Int, openvertices))  # labels for edge tensors
     code = _optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier)
@@ -70,7 +70,7 @@ julia> res = best_solutions(gp; all=true)[]
 (2, {10010, 00110, 01100})ₜ
 ```
 """
-function set_packing(sets; weights=UnWeighted(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+function set_packing(sets; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
     n = length(sets)
     code = EinCode(vcat([[i] for i=1:n], [[i,j] for i=1:n,j=1:n if j>i && !isempty(sets[i] ∩ sets[j])]), collect(Int,openvertices))
     IndependentSet(_optimize_code(code, uniformsize(code, 2), optimizer, simplifier), n, weights)

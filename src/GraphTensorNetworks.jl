@@ -31,7 +31,7 @@ export line_graph
 # Tensor Networks (Graph problems)
 export GraphProblem, IndependentSet, MaximalIS, Matching, 
     Coloring, optimize_code, set_packing, MaxCut, PaintShop,
-    paintshop_from_pairs, UnWeighted, Satisfiability
+    paintshop_from_pairs, NoWeight, Satisfiability
 export flavors, labels, terms, nflavor, get_weights
 export mis_compactify!, cut_size, num_paint_shop_color_switch, paint_shop_coloring_from_config
 export is_good_vertex_coloring

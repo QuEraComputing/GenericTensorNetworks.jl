@@ -104,7 +104,7 @@ macro bools(syms::Symbol...)
 end
 
 """
-    Satisfiability{CT<:AbstractEinsum,WT<:Union{UnWeighted, Vector}} <: GraphProblem
+    Satisfiability{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
     Satisfiability(cnf::CNF; openvertices=(),
                  optimizer=GreedyMethod(), simplifier=nothing)
 

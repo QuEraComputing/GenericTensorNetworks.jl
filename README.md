@@ -52,9 +52,7 @@ end
 
 ## Examples
 
-You can find many examples in the documentation, a good one to start with is solving the independent set problem.
-
-https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/IndependentSet/
+You can find many examples in the documentation, a good one to start with is [solving the independent set problem](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/IndependentSet/)
 
 ## Supporting and Citing
 

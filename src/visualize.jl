@@ -52,7 +52,7 @@ function get_rescaler(locs::AbstractVector{<:Tuple}, pad)
     return Rescaler(promote(xmin, xmax, ymin, ymax, pad)...)
 end
 
-default_vertex_style(scale, stroke_color, fill_color) = compose(context(), Viznet.nodestyle(:default, r=0.15cm*scale), Compose.stroke(stroke_color), fill(fill_color), linewidth(0.3mm*scale))
+default_vertex_style(scale, stroke_color, fill_color) = compose(Compose.context(), Viznet.nodestyle(:default, r=0.15cm*scale), Compose.stroke(stroke_color), fill(fill_color), linewidth(0.3mm*scale))
 default_text_style(scale, color) = Viznet.textstyle(:default, fontsize(4pt*scale), fill(color))
 default_edge_style(scale, color) = Viznet.bondstyle(:default, Compose.stroke(color), linewidth(0.3mm*scale))
 
@@ -101,7 +101,7 @@ function show_graph(locations, edges;
         kwargs...)
     if length(locations) == 0
         dx, dy = 12cm, 12cm
-        img = Compose.compose(context())
+        img = Compose.compose(Compose.context())
     else
         img, (dx, dy) = viz_atoms(locations, edges; vertex_colors=vertex_colors, edge_colors=edge_colors, texts=texts, config=GraphDisplayConfig(; config_plotting(locations)..., kwargs...))
     end
@@ -121,9 +121,9 @@ function fit_image(rescaler::Rescaler, image_size, imgs...)
     Y = rescaler.ymax - rescaler.ymin + 2*rescaler.pad
     img_rescale = image_size/max(X, Y)*cm
     if Y < X
-        return Compose.compose(context(0, 0, 1.0, X/Y), imgs...), (X*img_rescale, Y*img_rescale)
+        return Compose.compose(Compose.context(0, 0, 1.0, X/Y), imgs...), (X*img_rescale, Y*img_rescale)
     else
-        return Compose.compose(context(0, 0, Y/X, 1.0), imgs...), (X*img_rescale, Y*img_rescale)
+        return Compose.compose(Compose.context(0, 0, Y/X, 1.0), imgs...), (X*img_rescale, Y*img_rescale)
     end
 end
 
@@ -178,7 +178,7 @@ function _viz_atoms(locs, edges, vertex_colors, edge_colors, texts, config, resc
             edge_styles[k] >> (locs[i], locs[j])
         end
     end
-    Compose.compose(context(), img1)
+    Compose.compose(Compose.context(), img1)
 end
 
 """

@@ -15,13 +15,13 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-8a944ada">
+     id="img-e9ae911f">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-8a944ada-1">
+<g stroke-width="0.67" stroke="#000000" id="img-e9ae911f-1">
   <g transform="translate(76.48,39.02)">
     <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
   </g>
@@ -68,7 +68,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-8a944ada-2">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-e9ae911f-2">
   <g transform="translate(60,27.04)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
@@ -100,7 +100,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-8a944ada-3">
+<g fill="#000000" font-size="3.13" id="img-e9ae911f-3">
   <g transform="translate(60,27.04)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -305,7 +305,7 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 \end{matrix}\right).\]</p><p>We use subscripts to index tensor elements, e.g. <span>$W(x_i)_0=1$</span> is the first element associated with <span>$s_i=0$</span> and <span>$W(x_i)_1=x_i$</span> is the second element associated with <span>$s_i=1$</span>. Similarly, on each edge <span>$(u, v)$</span>, we define a matrix <span>$B$</span> indexed by <span>$s_u$</span> and <span>$s_v$</span> as</p><p class="math-container">\[B = \left(\begin{matrix}
     1  &amp; 1\\
     1 &amp; 0
-\end{matrix}\right).\]</p><p>We can use <a href="../../ref/#GraphTensorNetworks.IndependentSet"><code>IndependentSet</code></a> to construct a tensor network corresponding to the independent set problem on our target graph.</p><pre><code class="language-julia hljs">problem = IndependentSet(graph; optimizer=TreeSA());</code></pre><p>Key word argument <code>optimizer</code> specifies the contraction order optimizer of the tensor network. Here we use the local search based optimizer <a href="../../ref/#OMEinsumContractionOrders.TreeSA"><code>TreeSA</code></a>. The return value <code>problem</code> contains a field <code>code</code> that specifies the tensor network and its contraction order. The optimal contraction time and space complexity of an independent set problem is <span>$2^{{\rm tw}(G)}$</span>, where <span>${\rm tw(G)}$</span> is the <a href="https://en.wikipedia.org/wiki/Treewidth">tree-width</a> of <span>$G$</span>. One can check the time, space and read-write complexity with the following function.</p><pre><code class="language-julia hljs">timespacereadwrite_complexity(problem)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(7.965784284662088, 4.0, 8.661778097771988)</code></pre><p>The return values are <code>log2</code> of the the number of iterations, the number elements in the largest tensor during contraction and the number of tensor element read-write operations. For more information about how to improve the contraction order, please check the <a href="../../performancetips/#Performance-Tips">Performance Tips</a>.</p><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><h3 id="Maximum-independent-set-size-\\alpha(G)"><a class="docs-heading-anchor" href="#Maximum-independent-set-size-\\alpha(G)">Maximum independent set size <span>$\alpha(G)$</span></a><a id="Maximum-independent-set-size-\\alpha(G)-1"></a><a class="docs-heading-anchor-permalink" href="#Maximum-independent-set-size-\\alpha(G)" title="Permalink"></a></h3><pre><code class="language-julia hljs">maximum_independent_set_size = solve(problem, SizeMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4.0ₜ</code></pre><p>Function <a href="../../ref/#GraphTensorNetworks.solve"><code>solve</code></a> takes two positional arguments, the problem instance and the wanted property. Here <a href="../../ref/#GraphTensorNetworks.SizeMax"><code>SizeMax</code></a> means finding the solution with maximum set size.</p><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="counting-all-independent-sets"><a class="docs-heading-anchor" href="#counting-all-independent-sets">counting all independent sets</a><a id="counting-all-independent-sets-1"></a><a class="docs-heading-anchor-permalink" href="#counting-all-independent-sets" title="Permalink"></a></h5><pre><code class="language-julia hljs">count_all_independent_sets = solve(problem, CountingAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">76.0</code></pre><p>Here <a href="../../ref/#GraphTensorNetworks.CountingAll"><code>CountingAll</code></a> means finding all possible solutions.</p><h5 id="counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1"><a class="docs-heading-anchor" href="#counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1">counting independent sets with sizes <span>$\alpha(G)$</span> and <span>$\alpha(G)-1$</span></a><a id="counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1-1"></a><a class="docs-heading-anchor-permalink" href="#counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1" title="Permalink"></a></h5><pre><code class="language-julia hljs">count_max2_independent_sets = solve(problem, CountingMax(2))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">30.0*x^3 + 5.0*x^4</code></pre><p>Here <a href="../../ref/#GraphTensorNetworks.CountingMax"><code>CountingMax</code></a> means finding solutions with largest-2 sizes, the positional argument has default value <code>1</code>.</p><h5 id="independence-polynomial"><a class="docs-heading-anchor" href="#independence-polynomial">independence polynomial</a><a id="independence-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#independence-polynomial" title="Permalink"></a></h5><p>The graph polynomial for the independent set problem is known as the independence polynomial.</p><p class="math-container">\[I(G, x) = \sum_{k=0}^{\alpha(G)} a_k x^k,\]</p><p>where <span>$\alpha(G)$</span> is the maximum independent set size, <span>$a_k$</span> is the number of independent sets of size <span>$k$</span>. The total number of independent sets is thus equal to <span>$I(G, 1)$</span>. There are 3 methods to compute a graph polynomial, <code>:finitefield</code>, <code>:fft</code> and <code>:polynomial</code>. These methods are introduced in the docstring of <a href="../../ref/#GraphTensorNetworks.GraphPolynomial"><code>GraphPolynomial</code></a>.</p><pre><code class="language-julia hljs">independence_polynomial = solve(problem, GraphPolynomial(; method=:finitefield))[]</code></pre>1 &#43; 10&#8729;x &#43; 30&#8729;x<sup>2</sup> &#43; 30&#8729;x<sup>3</sup> &#43; 5&#8729;x<sup>4</sup><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="finding-one-maximum-independent-set-(MIS)"><a class="docs-heading-anchor" href="#finding-one-maximum-independent-set-(MIS)">finding one maximum independent set (MIS)</a><a id="finding-one-maximum-independent-set-(MIS)-1"></a><a class="docs-heading-anchor-permalink" href="#finding-one-maximum-independent-set-(MIS)" title="Permalink"></a></h5><p>One can use <a href="../../ref/#GraphTensorNetworks.SingleConfigMax"><code>SingleConfigMax</code></a> to find one of the solution with largest set size, and it has two implementations. The unbounded (default) version uses <a href="../../ref/#GraphTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> to sample one of the best solutions directly. The bounded version uses the binary gradient back-propagation (see our paper) to compute the gradients. It requires caching intermediate states, but is often faster (on CPU) because it can use <a href="https://github.com/TensorBFS/TropicalGEMM.jl"><code>TropicalGEMM</code></a> (see <a href="../../performancetips/#Performance-Tips">Performance Tips</a>).</p><pre><code class="language-julia hljs">max_config = solve(problem, SingleConfigMax(; bounded=false))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, ConfigSampler{10, 1, 1}(0101010001))ₜ</code></pre><p>The return value contains a bit string, and one should read this bit string from left to right. Having value 1 at i-th bit means vertex <span>$i$</span> is in the maximum independent set. One can visualize this MIS with the following function.</p><pre><code class="language-julia hljs">show_graph(graph; locs=locations, vertex_colors=
+\end{matrix}\right).\]</p><p>We can use <a href="../../ref/#GraphTensorNetworks.IndependentSet"><code>IndependentSet</code></a> to construct a tensor network corresponding to the independent set problem on our target graph.</p><pre><code class="language-julia hljs">problem = IndependentSet(graph; optimizer=TreeSA());</code></pre><p>Key word argument <code>optimizer</code> specifies the contraction order optimizer of the tensor network. Here we use the local search based optimizer <a href="../../ref/#OMEinsumContractionOrders.TreeSA"><code>TreeSA</code></a>. The return value <code>problem</code> contains a field <code>code</code> that specifies the tensor network and its contraction order. The optimal contraction time and space complexity of an independent set problem is <span>$2^{{\rm tw}(G)}$</span>, where <span>${\rm tw(G)}$</span> is the <a href="https://en.wikipedia.org/wiki/Treewidth">tree-width</a> of <span>$G$</span>. One can check the time, space and read-write complexity with the following function.</p><pre><code class="language-julia hljs">timespacereadwrite_complexity(problem)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(7.965784284662087, 4.0, 8.661778097771986)</code></pre><p>The return values are <code>log2</code> of the the number of iterations, the number elements in the largest tensor during contraction and the number of tensor element read-write operations. For more information about how to improve the contraction order, please check the <a href="../../performancetips/#Performance-Tips">Performance Tips</a>.</p><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><h3 id="Maximum-independent-set-size-\\alpha(G)"><a class="docs-heading-anchor" href="#Maximum-independent-set-size-\\alpha(G)">Maximum independent set size <span>$\alpha(G)$</span></a><a id="Maximum-independent-set-size-\\alpha(G)-1"></a><a class="docs-heading-anchor-permalink" href="#Maximum-independent-set-size-\\alpha(G)" title="Permalink"></a></h3><pre><code class="language-julia hljs">maximum_independent_set_size = solve(problem, SizeMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4.0ₜ</code></pre><p>Function <a href="../../ref/#GraphTensorNetworks.solve"><code>solve</code></a> takes two positional arguments, the problem instance and the wanted property. Here <a href="../../ref/#GraphTensorNetworks.SizeMax"><code>SizeMax</code></a> means finding the solution with maximum set size.</p><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="counting-all-independent-sets"><a class="docs-heading-anchor" href="#counting-all-independent-sets">counting all independent sets</a><a id="counting-all-independent-sets-1"></a><a class="docs-heading-anchor-permalink" href="#counting-all-independent-sets" title="Permalink"></a></h5><pre><code class="language-julia hljs">count_all_independent_sets = solve(problem, CountingAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">76.0</code></pre><p>Here <a href="../../ref/#GraphTensorNetworks.CountingAll"><code>CountingAll</code></a> means finding all possible solutions.</p><h5 id="counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1"><a class="docs-heading-anchor" href="#counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1">counting independent sets with sizes <span>$\alpha(G)$</span> and <span>$\alpha(G)-1$</span></a><a id="counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1-1"></a><a class="docs-heading-anchor-permalink" href="#counting-independent-sets-with-sizes-\\alpha(G)-and-\\alpha(G)-1" title="Permalink"></a></h5><pre><code class="language-julia hljs">count_max2_independent_sets = solve(problem, CountingMax(2))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">30.0*x^3 + 5.0*x^4</code></pre><p>Here <a href="../../ref/#GraphTensorNetworks.CountingMax"><code>CountingMax</code></a> means finding solutions with largest-2 sizes, the positional argument has default value <code>1</code>.</p><h5 id="independence-polynomial"><a class="docs-heading-anchor" href="#independence-polynomial">independence polynomial</a><a id="independence-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#independence-polynomial" title="Permalink"></a></h5><p>The graph polynomial for the independent set problem is known as the independence polynomial.</p><p class="math-container">\[I(G, x) = \sum_{k=0}^{\alpha(G)} a_k x^k,\]</p><p>where <span>$\alpha(G)$</span> is the maximum independent set size, <span>$a_k$</span> is the number of independent sets of size <span>$k$</span>. The total number of independent sets is thus equal to <span>$I(G, 1)$</span>. There are 3 methods to compute a graph polynomial, <code>:finitefield</code>, <code>:fft</code> and <code>:polynomial</code>. These methods are introduced in the docstring of <a href="../../ref/#GraphTensorNetworks.GraphPolynomial"><code>GraphPolynomial</code></a>.</p><pre><code class="language-julia hljs">independence_polynomial = solve(problem, GraphPolynomial(; method=:finitefield))[]</code></pre>1 &#43; 10&#8729;x &#43; 30&#8729;x<sup>2</sup> &#43; 30&#8729;x<sup>3</sup> &#43; 5&#8729;x<sup>4</sup><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="finding-one-maximum-independent-set-(MIS)"><a class="docs-heading-anchor" href="#finding-one-maximum-independent-set-(MIS)">finding one maximum independent set (MIS)</a><a id="finding-one-maximum-independent-set-(MIS)-1"></a><a class="docs-heading-anchor-permalink" href="#finding-one-maximum-independent-set-(MIS)" title="Permalink"></a></h5><p>One can use <a href="../../ref/#GraphTensorNetworks.SingleConfigMax"><code>SingleConfigMax</code></a> to find one of the solution with largest set size, and it has two implementations. The unbounded (default) version uses <a href="../../ref/#GraphTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> to sample one of the best solutions directly. The bounded version uses the binary gradient back-propagation (see our paper) to compute the gradients. It requires caching intermediate states, but is often faster (on CPU) because it can use <a href="https://github.com/TensorBFS/TropicalGEMM.jl"><code>TropicalGEMM</code></a> (see <a href="../../performancetips/#Performance-Tips">Performance Tips</a>).</p><pre><code class="language-julia hljs">max_config = solve(problem, SingleConfigMax(; bounded=false))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, ConfigSampler{10, 1, 1}(0100100110))ₜ</code></pre><p>The return value contains a bit string, and one should read this bit string from left to right. Having value 1 at i-th bit means vertex <span>$i$</span> is in the maximum independent set. One can visualize this MIS with the following function.</p><pre><code class="language-julia hljs">show_graph(graph; locs=locations, vertex_colors=
     [iszero(max_config.c.data[i]) ? &quot;white&quot; : &quot;red&quot; for i=1:nv(graph)])</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -316,13 +316,13 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-6718613a">
+     id="img-19a764ed">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-6718613a-1">
+<g stroke-width="0.67" stroke="#000000" id="img-19a764ed-1">
   <g transform="translate(76.48,39.02)">
     <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
   </g>
@@ -369,57 +369,57 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
     <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-6718613a-2">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-19a764ed-2">
   <g transform="translate(40.23,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6718613a-3">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-19a764ed-3">
   <g transform="translate(47.78,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6718613a-4">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-19a764ed-4">
   <g transform="translate(72.22,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6718613a-5">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-19a764ed-5">
   <g transform="translate(79.77,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-6718613a-6">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-19a764ed-6">
   <g transform="translate(60,40.9)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6718613a-7">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-19a764ed-7">
   <g transform="translate(27.04,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-6718613a-8">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-19a764ed-8">
   <g transform="translate(39.63,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6718613a-9">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-19a764ed-9">
   <g transform="translate(80.37,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-6718613a-10">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-19a764ed-10">
   <g transform="translate(92.96,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-6718613a-11">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-19a764ed-11">
   <g transform="translate(60,27.04)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-6718613a-12">
+<g fill="#000000" font-size="3.13" id="img-19a764ed-12">
   <g transform="translate(60,27.04)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -642,13 +642,13 @@ Compose.compose(context(),
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-1e3587c4">
+     id="img-87de55a5">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.42" stroke="#000000" id="img-1e3587c4-1">
+<g stroke-width="0.42" stroke="#000000" id="img-87de55a5-1">
   <g transform="translate(171.53,13.36)">
     <path fill="none" d="M-5.93,-4.1 L5.93,4.1 " class="primitive"/>
   </g>
@@ -695,57 +695,57 @@ Compose.compose(context(),
     <path fill="none" d="M5.76,3.98 L-5.76,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-2">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-2">
   <g transform="translate(158.48,18.93)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-3">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-3">
   <g transform="translate(161.2,26.9)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-4">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-4">
   <g transform="translate(170,26.9)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-5">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-5">
   <g transform="translate(172.72,18.93)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-6">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-6">
   <g transform="translate(165.6,14.01)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-7">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-7">
   <g transform="translate(153.74,17.47)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-8">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-8">
   <g transform="translate(158.27,30.74)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-9">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-9">
   <g transform="translate(172.93,30.74)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-10">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-10">
   <g transform="translate(177.46,17.47)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-11">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-11">
   <g transform="translate(165.6,9.26)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.96" id="img-1e3587c4-12">
+<g fill="#000000" font-size="1.96" id="img-87de55a5-12">
   <g transform="translate(165.6,9.26)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -797,7 +797,7 @@ Compose.compose(context(),
     </g>
   </g>
 </g>
-<g stroke-width="0.42" stroke="#000000" id="img-1e3587c4-13">
+<g stroke-width="0.42" stroke="#000000" id="img-87de55a5-13">
   <g transform="translate(135.53,13.36)">
     <path fill="none" d="M-5.93,-4.1 L5.93,4.1 " class="primitive"/>
   </g>
@@ -844,57 +844,57 @@ Compose.compose(context(),
     <path fill="none" d="M5.76,3.98 L-5.76,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-14">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-14">
   <g transform="translate(122.48,18.93)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-15">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-15">
   <g transform="translate(125.2,26.9)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-16">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-16">
   <g transform="translate(134,26.9)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-17">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-17">
   <g transform="translate(136.72,18.93)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-18">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-18">
   <g transform="translate(129.6,14.01)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-19">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-19">
   <g transform="translate(117.74,17.47)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-20">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-20">
   <g transform="translate(122.27,30.74)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-21">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-21">
   <g transform="translate(136.93,30.74)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-22">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-22">
   <g transform="translate(141.46,17.47)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-23">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-23">
   <g transform="translate(129.6,9.26)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.96" id="img-1e3587c4-24">
+<g fill="#000000" font-size="1.96" id="img-87de55a5-24">
   <g transform="translate(129.6,9.26)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -946,7 +946,7 @@ Compose.compose(context(),
     </g>
   </g>
 </g>
-<g stroke-width="0.42" stroke="#000000" id="img-1e3587c4-25">
+<g stroke-width="0.42" stroke="#000000" id="img-87de55a5-25">
   <g transform="translate(99.53,13.36)">
     <path fill="none" d="M-5.93,-4.1 L5.93,4.1 " class="primitive"/>
   </g>
@@ -993,57 +993,57 @@ Compose.compose(context(),
     <path fill="none" d="M5.76,3.98 L-5.76,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-26">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-26">
   <g transform="translate(86.48,18.93)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-27">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-27">
   <g transform="translate(89.2,26.9)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-28">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-28">
   <g transform="translate(98,26.9)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-29">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-29">
   <g transform="translate(100.72,18.93)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-30">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-30">
   <g transform="translate(93.6,14.01)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-31">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-31">
   <g transform="translate(81.74,17.47)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-32">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-32">
   <g transform="translate(86.27,30.74)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-33">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-33">
   <g transform="translate(100.93,30.74)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-34">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-34">
   <g transform="translate(105.46,17.47)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-35">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-35">
   <g transform="translate(93.6,9.26)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.96" id="img-1e3587c4-36">
+<g fill="#000000" font-size="1.96" id="img-87de55a5-36">
   <g transform="translate(93.6,9.26)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -1095,7 +1095,7 @@ Compose.compose(context(),
     </g>
   </g>
 </g>
-<g stroke-width="0.42" stroke="#000000" id="img-1e3587c4-37">
+<g stroke-width="0.42" stroke="#000000" id="img-87de55a5-37">
   <g transform="translate(63.53,13.36)">
     <path fill="none" d="M-5.93,-4.1 L5.93,4.1 " class="primitive"/>
   </g>
@@ -1142,57 +1142,57 @@ Compose.compose(context(),
     <path fill="none" d="M5.76,3.98 L-5.76,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-38">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-38">
   <g transform="translate(50.48,18.93)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-39">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-39">
   <g transform="translate(53.2,26.9)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-40">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-40">
   <g transform="translate(62,26.9)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-41">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-41">
   <g transform="translate(64.72,18.93)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-42">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-42">
   <g transform="translate(57.6,14.01)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-43">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-43">
   <g transform="translate(45.74,17.47)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-44">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-44">
   <g transform="translate(50.27,30.74)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-45">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-45">
   <g transform="translate(64.93,30.74)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-46">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-46">
   <g transform="translate(69.46,17.47)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-47">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-47">
   <g transform="translate(57.6,9.26)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.96" id="img-1e3587c4-48">
+<g fill="#000000" font-size="1.96" id="img-87de55a5-48">
   <g transform="translate(57.6,9.26)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -1244,7 +1244,7 @@ Compose.compose(context(),
     </g>
   </g>
 </g>
-<g stroke-width="0.42" stroke="#000000" id="img-1e3587c4-49">
+<g stroke-width="0.42" stroke="#000000" id="img-87de55a5-49">
   <g transform="translate(27.53,13.36)">
     <path fill="none" d="M-5.93,-4.1 L5.93,4.1 " class="primitive"/>
   </g>
@@ -1291,57 +1291,57 @@ Compose.compose(context(),
     <path fill="none" d="M5.76,3.98 L-5.76,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-50">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-50">
   <g transform="translate(14.48,18.93)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-51">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-51">
   <g transform="translate(17.2,26.9)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-52">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-52">
   <g transform="translate(26,26.9)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-53">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-53">
   <g transform="translate(28.72,18.93)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-54">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-54">
   <g transform="translate(21.6,14.01)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-55">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-55">
   <g transform="translate(9.74,17.47)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-56">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-56">
   <g transform="translate(14.27,30.74)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-1e3587c4-57">
+<g stroke-width="0.42" fill="#FF0000" stroke="#000000" id="img-87de55a5-57">
   <g transform="translate(28.93,30.74)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-58">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-58">
   <g transform="translate(33.46,17.47)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-1e3587c4-59">
+<g stroke-width="0.42" fill="#FFFFFF" stroke="#000000" id="img-87de55a5-59">
   <g transform="translate(21.6,9.26)">
     <circle cx="0" cy="0" r="2.08" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.96" id="img-1e3587c4-60">
+<g fill="#000000" font-size="1.96" id="img-87de55a5-60">
   <g transform="translate(21.6,9.26)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -1540,7 +1540,7 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 
 ]]> </script>
 </svg>
-<h5 id="enumeration-of-all-IS-configurations"><a class="docs-heading-anchor" href="#enumeration-of-all-IS-configurations">enumeration of all IS configurations</a><a id="enumeration-of-all-IS-configurations-1"></a><a class="docs-heading-anchor-permalink" href="#enumeration-of-all-IS-configurations" title="Permalink"></a></h5><p>One can use <a href="../../ref/#GraphTensorNetworks.ConfigsAll"><code>ConfigsAll</code></a> to enumerate all sets satisfying the problem constraint.</p><pre><code class="language-julia hljs">all_independent_sets = solve(problem, ConfigsAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0000000001, 0000100000, 0000000010, 0000000011, 0000100010, 0000010000, 0000010001, 0000110000, 0010000000, 0010000001, 0010100000, 0010000010, 0010000011, 0010100010, 0010010000, 0010010001, 0010110000, 0000000100, 0000100100, 0000000110, 0000100110, 0001000000, 0001000001, 0001010000, 0001010001, 0001000100, 0000001000, 0000101000, 0000011000, 0000111000, 0010001000, 0010101000, 0010011000, 0010111000, 0000001100, 0000101100, 0001001000, 0001011000, 0001001100, 1000000000, 1000000001, 1000000010, 1000000011, 1010000000, 1010000001, 1010000010, 1010000011, 1000000100, 1000000110, 1001000000, 1001000001, 1001000100, 1000001000, 1010001000, 1000001100, 1001001000, 1001001100, 0100000000, 0100000001, 0100100000, 0100000010, 0100000011, 0100100010, 0100010000, 0100010001, 0100110000, 0100000100, 0100100100, 0100000110, 0100100110, 0101000000, 0101000001, 0101010000, 0101010001, 0101000100}</code></pre><p>It is often difficult to store all configurations in a vector. A more clever way to store the data is using the <a href="../../ref/#GraphTensorNetworks.TreeConfigEnumerator"><code>TreeConfigEnumerator</code></a> format.</p><pre><code class="language-julia hljs">all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+
+<h5 id="enumeration-of-all-IS-configurations"><a class="docs-heading-anchor" href="#enumeration-of-all-IS-configurations">enumeration of all IS configurations</a><a id="enumeration-of-all-IS-configurations-1"></a><a class="docs-heading-anchor-permalink" href="#enumeration-of-all-IS-configurations" title="Permalink"></a></h5><p>One can use <a href="../../ref/#GraphTensorNetworks.ConfigsAll"><code>ConfigsAll</code></a> to enumerate all sets satisfying the problem constraint.</p><pre><code class="language-julia hljs">all_independent_sets = solve(problem, ConfigsAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0001000000, 0000100000, 0000010000, 0001010000, 0000110000, 0000000100, 0001000100, 0000100100, 0000000010, 0000100010, 0000000110, 0000100110, 0000000001, 0001000001, 0000010001, 0001010001, 0000000011, 0000001000, 0001001000, 0000101000, 0000011000, 0001011000, 0000111000, 0000001100, 0001001100, 0000101100, 0010000000, 0010100000, 0010010000, 0010110000, 0010000010, 0010100010, 0010000001, 0010010001, 0010000011, 0010001000, 0010101000, 0010011000, 0010111000, 1000000000, 1001000000, 1000000100, 1001000100, 1000000010, 1000000110, 1000000001, 1001000001, 1000000011, 1000001000, 1001001000, 1000001100, 1001001100, 1010000000, 1010000010, 1010000001, 1010000011, 1010001000, 0100000000, 0101000000, 0100100000, 0100010000, 0101010000, 0100110000, 0100000100, 0101000100, 0100100100, 0100000010, 0100100010, 0100000110, 0100100110, 0100000001, 0101000001, 0100010001, 0101010001, 0100000011}</code></pre><p>It is often difficult to store all configurations in a vector. A more clever way to store the data is using the <a href="../../ref/#GraphTensorNetworks.TreeConfigEnumerator"><code>TreeConfigEnumerator</code></a> format.</p><pre><code class="language-julia hljs">all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+
 ├─ *
 │  ├─ *
 │  │  ├─ 0000000000
@@ -1558,22 +1558,22 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 │     │     ├─ *
 │     │     │  ⋮
 │     │     │  
-│     │     └─ *
+│     │     └─ +
 │     │        ⋮
 │     │        
 │     └─ *
 │        ├─ *
-│        │  ├─ +
+│        │  ├─ *
 │        │  │  ⋮
 │        │  │  
-│        │  └─ *
+│        │  └─ 0000000000
 │        │     ⋮
 │        │     
-│        └─ *
-│           ├─ *
+│        └─ +
+│           ├─ +
 │           │  ⋮
 │           │  
-│           └─ 0000000000
+│           └─ *
 │              ⋮
 │              
 └─ *
@@ -1593,49 +1593,49 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
       │     ├─ *
       │     │  ⋮
       │     │  
-      │     └─ *
+      │     └─ +
       │        ⋮
       │        
       └─ *
          ├─ *
-         │  ├─ +
+         │  ├─ *
          │  │  ⋮
          │  │  
-         │  └─ *
+         │  └─ 0100000000
          │     ⋮
          │     
-         └─ *
-            ├─ *
+         └─ +
+            ├─ +
             │  ⋮
             │  
-            └─ 0100000000
+            └─ *
                ⋮
                
 </code></pre><p>The results encode the configurations in the sum-product-tree format. One can count and enumerate them explicitly by typing</p><pre><code class="language-julia hljs">length(all_independent_sets_tree)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">76</code></pre><pre><code class="language-julia hljs">collect(all_independent_sets_tree)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">76-element Vector{StaticBitVector{10, 1}}:
  0000000000
- 0000000001
+ 0001000000
  0000100000
- 0000000010
- 0000000011
- 0000100010
  0000010000
- 0000010001
+ 0001010000
  0000110000
- 0010000000
+ 0000000100
+ 0001000100
+ 0000100100
+ 0000000010
  ⋮
- 0100000100
- 0100100100
+ 0100000010
+ 0100100010
  0100000110
  0100100110
- 0101000000
+ 0100000001
  0101000001
- 0101010000
+ 0100010001
  0101010001
- 0101000100</code></pre><p>To save/read a set of configuration to disk, one can type the following</p><pre><code class="language-julia hljs">filename = tempname()
+ 0100000011</code></pre><p>To save/read a set of configuration to disk, one can type the following</p><pre><code class="language-julia hljs">filename = tempname()
 
 save_configs(filename, all_independent_sets; format=:binary)
 
-loaded_sets = load_configs(filename; format=:binary, bitlength=10)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0000000001, 0000100000, 0000000010, 0000000011, 0000100010, 0000010000, 0000010001, 0000110000, 0010000000, 0010000001, 0010100000, 0010000010, 0010000011, 0010100010, 0010010000, 0010010001, 0010110000, 0000000100, 0000100100, 0000000110, 0000100110, 0001000000, 0001000001, 0001010000, 0001010001, 0001000100, 0000001000, 0000101000, 0000011000, 0000111000, 0010001000, 0010101000, 0010011000, 0010111000, 0000001100, 0000101100, 0001001000, 0001011000, 0001001100, 1000000000, 1000000001, 1000000010, 1000000011, 1010000000, 1010000001, 1010000010, 1010000011, 1000000100, 1000000110, 1001000000, 1001000001, 1001000100, 1000001000, 1010001000, 1000001100, 1001001000, 1001001100, 0100000000, 0100000001, 0100100000, 0100000010, 0100000011, 0100100010, 0100010000, 0100010001, 0100110000, 0100000100, 0100100100, 0100000110, 0100100110, 0101000000, 0101000001, 0101010000, 0101010001, 0101000100}</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>When loading data, one needs to provide the <code>bitlength</code> if the data is saved in binary format. Because the bitstring length is not stored.</p></div></div><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>Check section <a href="../MaximalIS/#Maximal-independent-set-problem">Maximal independent set problem</a> for examples of finding graph properties related to minimum sizes:</p><ul><li><a href="../../ref/#GraphTensorNetworks.SizeMin"><code>SizeMin</code></a> for enumerating minimum set size,</li><li><a href="../../ref/#GraphTensorNetworks.CountingMin"><code>CountingMin</code></a> for enumerating minimum set size,</li><li><a href="../../ref/#GraphTensorNetworks.SingleConfigMin"><code>SingleConfigMin</code></a> for enumerating minimum set size,</li><li><a href="../../ref/#GraphTensorNetworks.ConfigsMin"><code>ConfigsMin</code></a> for enumerating minimum set size,</li></ul></div></div><h2 id="Weights-and-open-vertices"><a class="docs-heading-anchor" href="#Weights-and-open-vertices">Weights and open vertices</a><a id="Weights-and-open-vertices-1"></a><a class="docs-heading-anchor-permalink" href="#Weights-and-open-vertices" title="Permalink"></a></h2><p><a href="../../ref/#GraphTensorNetworks.IndependentSet"><code>IndependentSet</code></a> accepts weights as a key word argument. The following code computes the weighted MIS problem.</p><pre><code class="language-julia hljs">problem = IndependentSet(graph; weights=collect(1:10))
+loaded_sets = load_configs(filename; format=:binary, bitlength=10)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0001000000, 0000100000, 0000010000, 0001010000, 0000110000, 0000000100, 0001000100, 0000100100, 0000000010, 0000100010, 0000000110, 0000100110, 0000000001, 0001000001, 0000010001, 0001010001, 0000000011, 0000001000, 0001001000, 0000101000, 0000011000, 0001011000, 0000111000, 0000001100, 0001001100, 0000101100, 0010000000, 0010100000, 0010010000, 0010110000, 0010000010, 0010100010, 0010000001, 0010010001, 0010000011, 0010001000, 0010101000, 0010011000, 0010111000, 1000000000, 1001000000, 1000000100, 1001000100, 1000000010, 1000000110, 1000000001, 1001000001, 1000000011, 1000001000, 1001001000, 1000001100, 1001001100, 1010000000, 1010000010, 1010000001, 1010000011, 1010001000, 0100000000, 0101000000, 0100100000, 0100010000, 0101010000, 0100110000, 0100000100, 0101000100, 0100100100, 0100000010, 0100100010, 0100000110, 0100100110, 0100000001, 0101000001, 0100010001, 0101010001, 0100000011}</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>When loading data, one needs to provide the <code>bitlength</code> if the data is saved in binary format. Because the bitstring length is not stored.</p></div></div><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>Check section <a href="../MaximalIS/#Maximal-independent-set-problem">Maximal independent set problem</a> for examples of finding graph properties related to minimum sizes:</p><ul><li><a href="../../ref/#GraphTensorNetworks.SizeMin"><code>SizeMin</code></a> for enumerating minimum set size,</li><li><a href="../../ref/#GraphTensorNetworks.CountingMin"><code>CountingMin</code></a> for enumerating minimum set size,</li><li><a href="../../ref/#GraphTensorNetworks.SingleConfigMin"><code>SingleConfigMin</code></a> for enumerating minimum set size,</li><li><a href="../../ref/#GraphTensorNetworks.ConfigsMin"><code>ConfigsMin</code></a> for enumerating minimum set size,</li></ul></div></div><h2 id="Weights-and-open-vertices"><a class="docs-heading-anchor" href="#Weights-and-open-vertices">Weights and open vertices</a><a id="Weights-and-open-vertices-1"></a><a class="docs-heading-anchor-permalink" href="#Weights-and-open-vertices" title="Permalink"></a></h2><p><a href="../../ref/#GraphTensorNetworks.IndependentSet"><code>IndependentSet</code></a> accepts weights as a key word argument. The following code computes the weighted MIS problem.</p><pre><code class="language-julia hljs">problem = IndependentSet(graph; weights=collect(1:10))
 
 max_config_weighted = solve(problem, SingleConfigMax())[]
 
@@ -1650,13 +1650,13 @@ show_graph(graph; locs=locations, vertex_colors=
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-920e9639">
+     id="img-d7a6b02c">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-920e9639-1">
+<g stroke-width="0.67" stroke="#000000" id="img-d7a6b02c-1">
   <g transform="translate(76.48,39.02)">
     <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
   </g>
@@ -1703,57 +1703,57 @@ show_graph(graph; locs=locations, vertex_colors=
     <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-920e9639-2">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-d7a6b02c-2">
   <g transform="translate(40.23,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-920e9639-3">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-d7a6b02c-3">
   <g transform="translate(47.78,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-920e9639-4">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-d7a6b02c-4">
   <g transform="translate(72.22,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-920e9639-5">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-d7a6b02c-5">
   <g transform="translate(79.77,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-920e9639-6">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-d7a6b02c-6">
   <g transform="translate(60,40.9)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-920e9639-7">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-d7a6b02c-7">
   <g transform="translate(27.04,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-920e9639-8">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-d7a6b02c-8">
   <g transform="translate(39.63,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-920e9639-9">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-d7a6b02c-9">
   <g transform="translate(80.37,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-920e9639-10">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-d7a6b02c-10">
   <g transform="translate(92.96,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-920e9639-11">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-d7a6b02c-11">
   <g transform="translate(60,27.04)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-920e9639-12">
+<g fill="#000000" font-size="3.13" id="img-d7a6b02c-12">
   <g transform="translate(60,27.04)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -1968,4 +1968,4 @@ mis_tropical_tensor = solve(problem, SizeMax())</code></pre><pre class="document
 
 [:, :, 2] =
   4.0ₜ  -Infₜ
- -Infₜ  -Infₜ</code></pre><p>It will eliminate some entries having no contribution to the MIS size when embeding this local graph into a larger one.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../MaximalIS/">Maximal independent set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.12 on <span class="colophon-date" title="Thursday 24 February 2022 15:18">Thursday 24 February 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ -Infₜ  -Infₜ</code></pre><p>It will eliminate some entries having no contribution to the MIS size when embeding this local graph into a larger one.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../MaximalIS/">Maximal independent set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.12 on <span class="colophon-date" title="Friday 25 February 2022 05:25">Friday 25 February 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

@@ -7,6 +7,7 @@ IndependentSet
 MaximalIS
 Matching
 Coloring
+DominatingSet
 MaxCut
 PaintShop
 Satisfiability
@@ -36,6 +37,8 @@ is_independent_set
 mis_compactify!
 
 is_maximal_independent_set
+
+is_dominating_set
 
 cut_size
 

@@ -46,7 +46,9 @@ problem = DominatingSet(graph; optimizer=TreeSA());
 
 timespacereadwrite_complexity(problem)
 
-# Results are `log2` values.
+# Results are `log2` values of time (number of iterations),
+# space (number of items in the largest tensor)
+# and read-write (number of read-write of operations to elements).
 
 # ## Solving properties
 

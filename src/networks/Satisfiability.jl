@@ -68,7 +68,8 @@ Negation of a boolean variables of type [`BoolVar`](@ref).
 """
     ∨(vars...)
 
-Logical or that applied on [`BoolVar`](@ref) and [`CNFClause`](@ref) and returns a [`CNFClause`].
+Logical `or` applied on [`BoolVar`](@ref) and [`CNFClause`](@ref).
+Returns a [`CNFClause`](@ref).
 """
 ∨(var::BoolVar{T}, vars::BoolVar{T}...) where T = CNFClause([var, vars...])
 ∨(c::CNFClause{T}, var::BoolVar{T}) where T = CNFClause([c.vars..., var])
@@ -78,7 +79,8 @@ Logical or that applied on [`BoolVar`](@ref) and [`CNFClause`](@ref) and returns
 """
     ∧(vars...)
 
-Logical and applied on [`CNFClause`](@ref) and [`CNF`](@ref) and returns a new [`CNF`].
+Logical `and` applied on [`CNFClause`](@ref) and [`CNF`](@ref).
+Returns a new [`CNF`](@ref).
 """
 ∧(c::CNFClause{T}, cs::CNFClause{T}...) where T = CNF([c, cs...])
 ∧(c::CNFClause{T}, cs::CNF{T}) where T = CNF([c, cs.clauses...])

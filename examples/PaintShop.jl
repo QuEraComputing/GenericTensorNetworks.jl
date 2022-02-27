@@ -79,9 +79,9 @@ max_config = solve(problem, GraphPolynomial())[]
 # ##### graph polynomial
 # The graph polynomial of the binary paint shop problem in our convension is defined as
 # ```math
-# D(G, x) = \sum_{k=0}^{\delta(G)} d_k x^k 
+# P(G, x) = \sum_{k=0}^{\delta(G)} p_k x^k 
 # ```
-# where ``d_k`` is the number of possible coloring with number of color changes ``2m-1-k``.
+# where ``p_k`` is the number of possible coloring with number of color changes ``2m-1-k``.
 paint_polynomial = solve(problem, GraphPolynomial())[]
 
 # ### Configuration properties

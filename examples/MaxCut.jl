@@ -30,11 +30,13 @@ show_graph(graph; locs=locations)
 # Then the maximum cutting problem can be encoded to tensor networks by mapping an edge ``(i,j)\in E`` to an edge matrix labelled by ``s_is_j``
 # ```math
 # B(x_{\langle i, j\rangle}) = \left(\begin{matrix}
-#     1 & x_{\langle i, j\rangle}\\
-#     x_{\langle i, j\rangle} & 1
+#     1 & x_{\langle i, j\rangle}^{w_{\langle i,j \rangle}}\\
+#     x_{\langle i, j\rangle}^{w_{\langle i,j \rangle}} & 1
 # \end{matrix}\right),
 # ```
-# where variable ``x_{\langle i, j\rangle}`` represents a cut on edge ``(i, j)`` or a domain wall of an Ising spin glass.
+# If and only if there is a cut on edge ``(i, j)``,
+# this tensor contributes a factor ``x_{\langle i, j\rangle}^{w_{\langle i,j \rangle}}``,
+# where ``w_{\langle i,j\rangle}`` is the weight of this edge.
 # Similar to other problems, we can define a polynomial about edges variables by setting ``x_{\langle i, j\rangle} = x``,
 # where its k-th coefficient is two times the number of configurations of cut size k.
 # We define the cutting problem as

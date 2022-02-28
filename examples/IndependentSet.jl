@@ -24,15 +24,15 @@ show_graph(graph; locs=locations)
 
 # ## Tensor network representation
 # Let ``G=(V,E)`` be the target graph that we want to solve.
-# The tensor network representation map a vertex ``i\in V`` to a label ``s_i \in \{0, 1\}`` of dimension ``2`` in a tensor network, where we use ``0`` (``1``) to denote a vertex is absent (present) in the set.
+# We map a vertex ``i\in V`` to a label ``s_i \in \{0, 1\}`` of dimension ``2`` in a tensor network, where we use ``0`` (``1``) to denote a vertex is absent (present) in the set.
 # For each label ``s_i``, we defined a parametrized rank-one vertex tensor ``W(x_i)`` as
 # ```math
 # W(x_i) = \left(\begin{matrix}
 #     1 \\
-#     x_i
-# \end{matrix}\right).
+#     x_i^{w_i}
+# \end{matrix}\right),
 # ```
-# We use subscripts to index tensor elements, e.g. ``W(x_i)_0=1`` is the first element associated with ``s_i=0`` and ``W(x_i)_1=x_i`` is the second element associated with ``s_i=1``.
+# where ``W(x_i)_0=1`` is the first element associated with ``s_i=0`` and ``W(x_i)_1=x_i^{w_i}`` is the second element associated with ``s_i=1``, and `w_i` is the weight of vertex ``i``.
 # Similarly, on each edge ``(u, v)``, we define a matrix ``B`` indexed by ``s_u`` and ``s_v`` as
 # ```math
 # B = \left(\begin{matrix}

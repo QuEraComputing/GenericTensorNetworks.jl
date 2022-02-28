@@ -392,19 +392,29 @@ Memory estimation in number of bytes to compute certain `property` of a `problem
 `T` is the base type.
 """
 function estimate_memory(problem::GraphProblem, property::AbstractProperty; T=Float64)
-    if property isa SingleConfigMax{true} || property isa SingleConfigMin{true}
-        # TODO: fix this
-        @warn "The estimation of memory might be unreliable for the bounded computation of a single solution due to the caching."
-    end
-    estimate_memory(tensor_element_type(T, length(labels(problem)), nflavor(problem), property), problem)
+    _estimate_memory(tensor_element_type(T, length(labels(problem)), nflavor(problem), property), problem)
 end
-function estimate_memory(::Type{ET}, problem::GraphProblem) where ET
+function estimate_memory(problem::GraphProblem, ::Union{SingleConfigMax{true},SingleConfigMin{true}}; T=Float64)
+    tc, sc, rw = timespacereadwrite_complexity(problem.code, _size_dict(problem))
+    # caching all tensors is equivalent to counting the total number of writes
+    return ceil(Int, exp2(rw - 1)) * sizeof(Tropical{T})
+end
+function estimate_memory(problem::GraphProblem, ::GraphPolynomial{:polynomial}; T=Float64)
+    # this is the upper bound
+    return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * length(labels(problem)))
+end
+
+function _size_dict(problem)
+    lbs = labels(problem)
+    nf = nflavor(problem)
+    return Dict([lb=>nf for lb in lbs])
+end
+
+function _estimate_memory(::Type{ET}, problem::GraphProblem) where ET
     if !isbitstype(ET) && !(ET <: Mod)
         @warn "Target tensor element type `$ET` is not a bits type, the estimation of memory might be unreliable."
     end
-    lbs = labels(problem)
-    nf = nflavor(problem)
-    return peak_memory(problem.code, Dict([lb=>nf for lb in lbs])) * sizeof(ET)
+    return peak_memory(problem.code, _size_dict(problem)) * sizeof(ET)
 end
 
 for (PROP, ET) in [(:SizeMax, :(Tropical{T})), (:SizeMin, :(Tropical{T})),

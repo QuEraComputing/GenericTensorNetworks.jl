@@ -49,6 +49,17 @@ julia> sizeof(TruncatedPoly{5,Float64,Float64})
 48
 ```
 
+One can use [`estimate_memory`](@ref) to get a good estimation of peak memory in bytes.
+```julia
+julia> estimate_memory(problem, GraphPolynomial(; method=:finitefield))
+297616
+
+julia> estimate_memory(problem, GraphPolynomial(; method=:polynomial))
+71427840
+```
+It means one only needs 298 KB memory to find the graph polynomial with the finite field approach,
+but needs 71 MB memory to find the graph polynomial using the [`Polynomial`](@ref) type.
+
 !!! note
     * The actual run time memory can be several times larger than the size of the maximum tensor.
     There is no constant bound for the factor, an empirical value for it is 3x.

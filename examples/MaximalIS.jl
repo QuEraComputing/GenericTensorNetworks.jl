@@ -26,7 +26,7 @@ show_graph(graph; locs=locations)
 # ## Tensor network representation
 # Let ``G=(V,E)`` be the target graph that we want to solve.
 # The tensor network representation map a vertex ``v\in V`` to a boolean degree of freedom ``s_v\in\{0, 1\}``.
-# We defined the restriction on its neighbourhood ``N[v]``:
+# We defined the restriction on its neighbourhood ``N(v)``:
 # ```math
 # T(x_v)_{s_1,s_2,\ldots,s_{|N(v)|},s_v} = \begin{cases}
 #     s_vx_v & s_1=s_2=\ldots=s_{|N(v)|}=0,\\

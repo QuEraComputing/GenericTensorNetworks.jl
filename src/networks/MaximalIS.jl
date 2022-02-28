@@ -26,15 +26,14 @@ function generate_tensors(x::T, mi::MaximalIS) where T
     ixs = getixsv(mi.code)
     isempty(ixs) && return []
 	return add_labels!(map(enumerate(ixs)) do (i, ix)
-        neighbortensor((Ref(x) .^ get_weights(mi, i))..., length(ix))
+        maximal_independent_set_tensor((Ref(x) .^ get_weights(mi, i))..., length(ix))
     end, ixs, labels(mi))
 end
-function neighbortensor(a::T, b::T, d::Int) where T
+function maximal_independent_set_tensor(a::T, b::T, d::Int) where T
     t = zeros(T, fill(2, d)...)
     for i = 2:1<<(d-1)
-        t[i] = one(T)
+        t[i] = a
     end
-    t[1<<(d-1)+1] = a
     t[1<<(d-1)+1] = b
     return t
 end

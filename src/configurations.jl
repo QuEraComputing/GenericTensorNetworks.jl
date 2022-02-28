@@ -20,19 +20,19 @@ Find optimal solutions with bounding.
 * If `invert` is true, find the minimum.
 * If `tree_storage` is true, use [`TreeConfigEnumerator`](@ref) as the storage of solutions.
 """
-function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false, tree_storage::Bool=false)
+function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false, tree_storage::Bool=false, T=Float64)
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
-    xst = generate_tensors(_x(TropicalF64; invert), gp)
+    xst = generate_tensors(_x(Tropical{T}; invert), gp)
     ymask = trues(fill(2, length(getiyv(gp.code)))...)
     if usecuda
         xst = CuArray.(xst)
         ymask = CuArray(ymask)
     end
     if all
-        # we use `Float64` types because we want to support weighted graphs.
-        T = config_type(CountingTropical{Float64,Float64}, length(labels(gp)), nflavor(gp); all, tree_storage)
+        # we use `Float64` as default because we want to support weighted graphs.
+        T = config_type(CountingTropical{T,T}, length(labels(gp)), nflavor(gp); all, tree_storage)
         xs = generate_tensors(_x(T; invert), gp)
         ret = bounding_contract(AllConfigs{1}(), gp.code, xst, ymask, xs)
         return invert ? post_invert_exponent.(ret) : ret
@@ -71,12 +71,12 @@ end
 
 Finding optimal and suboptimal solutions.
 """
-best2_solutions(gp::GraphProblem; all=true, usecuda=false, invert::Bool=false) = solutions(gp, Max2Poly{Float64,Float64}; all, usecuda, invert)
+best2_solutions(gp::GraphProblem; all=true, usecuda=false, invert::Bool=false, T=Float64) = solutions(gp, Max2Poly{T,T}; all, usecuda, invert)
 
-function bestk_solutions(gp::GraphProblem, k::Int; invert::Bool=false, tree_storage::Bool=false)
-    xst = generate_tensors(_x(TropicalF64; invert), gp)
+function bestk_solutions(gp::GraphProblem, k::Int; invert::Bool=false, tree_storage::Bool=false, T=Float64)
+    xst = generate_tensors(_x(Tropical{T}; invert), gp)
     ymask = trues(fill(2, length(getiyv(gp.code)))...)
-    T = config_type(TruncatedPoly{k,Float64,Float64}, length(labels(gp)), nflavor(gp); all=true, tree_storage)
+    T = config_type(TruncatedPoly{k,T,T}, length(labels(gp)), nflavor(gp); all=true, tree_storage)
     xs = generate_tensors(_x(T; invert), gp)
     ret = bounding_contract(AllConfigs{k}(), gp.code, xst, ymask, xs)
     return invert ? post_invert_exponent.(ret) : ret
@@ -88,7 +88,7 @@ end
 Finding all solutions grouped by size.
 e.g. when the problem is [`MaximalIS`](@ref), it computes all maximal independent sets, or the maximal cliques of it complement.
 """
-all_solutions(gp::GraphProblem) = solutions(gp, Polynomial{Float64,:x}, all=true, usecuda=false, tree_storage=false)
+all_solutions(gp::GraphProblem; T=Float64) = solutions(gp, Polynomial{T,:x}, all=true, usecuda=false, tree_storage=false)
 
 function _onehotv(::Type{Polynomial{BS,X}}, x, v) where {BS,X}
     Polynomial{BS,X}([onehotv(BS, x, v)])

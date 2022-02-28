@@ -180,3 +180,30 @@ end
         @test Set(res2 |> collect) == Set(res1 |> collect)
     end
 end
+
+@testset "memory estimation" begin
+    gp = IndependentSet(smallgraph(:petersen))
+    for property in [
+            SizeMax(), SizeMin(), CountingMax(), CountingMin(), CountingMax(2), CountingMin(2),
+            ConfigsMax(;bounded=true), ConfigsMin(;bounded=true), ConfigsMax(2;bounded=true), ConfigsMin(2;bounded=true), 
+            ConfigsMax(;bounded=false), ConfigsMin(;bounded=false), ConfigsMax(2;bounded=false), ConfigsMin(2;bounded=false), SingleConfigMax(;bounded=false), SingleConfigMin(;bounded=false),
+            CountingAll(), ConfigsAll(),
+        ]
+        @show property
+        ET = GraphTensorNetworks.tensor_element_type(Float32, 10, 2, property)
+        @test eltype(solve(gp, property, T=Float32)) <: ET
+        @test estimate_memory(gp, property) isa Integer
+    end
+    @test GraphTensorNetworks.tensor_element_type(Float32, 10, 2, GraphPolynomial(method=:polynomial)) == Polynomial{Float32, :x}
+    @test sizeof(GraphTensorNetworks.tensor_element_type(Float32, 10, 2, GraphPolynomial(method=:fitting))) == 4
+    @test sizeof(GraphTensorNetworks.tensor_element_type(Float32, 10, 2, GraphPolynomial(method=:fft))) == 8
+    @test sizeof(GraphTensorNetworks.tensor_element_type(Float64, 10, 2, GraphPolynomial(method=:finitefield))) == 4
+    @test GraphTensorNetworks.tensor_element_type(Float32, 10, 2, SingleConfigMax(;bounded=true)) == Tropical{Float32}
+    @test GraphTensorNetworks.tensor_element_type(Float32, 10, 2, SingleConfigMin(;bounded=true)) == Tropical{Float32}
+
+    @test estimate_memory(gp, SizeMax()) * 2 == estimate_memory(gp, CountingMax())
+    @test estimate_memory(gp, SingleConfigMax(bounded=true)) > estimate_memory(gp, SingleConfigMax(bounded=false))
+    @test estimate_memory(gp, ConfigsMax(bounded=true)) == estimate_memory(gp, SingleConfigMax(bounded=false))
+    @test estimate_memory(gp, GraphPolynomial(method=:fitting); T=Float32) * 4 == estimate_memory(gp, GraphPolynomial(method=:fft))
+    @test estimate_memory(gp, GraphPolynomial(method=:finitefield)) * 10 == estimate_memory(gp, GraphPolynomial(method=:polynomial); T=Float32)
+end

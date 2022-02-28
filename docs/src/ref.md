@@ -105,6 +105,7 @@ getixsv
 getiyv
 timespace_complexity
 timespacereadwrite_complexity
+estimate_memory
 @ein_str
 GreedyMethod
 TreeSA

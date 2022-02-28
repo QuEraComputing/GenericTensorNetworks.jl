@@ -90,6 +90,10 @@ Method Argument
     * It accepts keyword arguments `maxorder` (optional) and `r`,
         if `r > 1`, one has better precision for coefficients of large order, if `r < 1`,
         one has better precision for coefficients of small order.
+* `:fitting`, fit the polynomial directly.
+    * The corresponding tensor element type is floating point numbers like `Base.Float64`.
+    * It has round-off error.
+    * BLAS and GPU are supported, it is the fastest among all methods.
 
 Graph polynomials are not defined for weighted graph problems.
 """
@@ -237,7 +241,7 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
     elseif property isa CountingMin
         return post_invert_exponent.(contractx(gp, pre_invert_exponent(TruncatedPoly(ntuple(i->i == min_k(property) ? one(T) : zero(T), min_k(property)), one(T))); usecuda=usecuda))
     elseif property isa GraphPolynomial
-        return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, property.kwargs...)
+        return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
     elseif property isa SingleConfigMax{false}
         return solutions(gp, CountingTropical{T,T}; all=false, usecuda=usecuda, )
     elseif property isa SingleConfigMin{false}
@@ -253,19 +257,19 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
     elseif property isa ConfigsAll
         return solutions(gp, Real; all=true, usecuda=usecuda, tree_storage=tree_storage(property))
     elseif property isa SingleConfigMax{true}
-        return best_solutions(gp; all=false, usecuda=usecuda)
+        return best_solutions(gp; all=false, usecuda=usecuda, T=T)
     elseif property isa SingleConfigMin{true}
-        return best_solutions(gp; all=false, usecuda=usecuda, invert=true)
+        return best_solutions(gp; all=false, usecuda=usecuda, invert=true, T=T)
     elseif property isa ConfigsMax{1,true}
-        return best_solutions(gp; all=true, usecuda=usecuda, tree_storage=tree_storage(property))
+        return best_solutions(gp; all=true, usecuda=usecuda, tree_storage=tree_storage(property), T=T)
     elseif property isa ConfigsMin{1,true}
-        return best_solutions(gp; all=true, usecuda=usecuda, invert=true, tree_storage=tree_storage(property))
+        return best_solutions(gp; all=true, usecuda=usecuda, invert=true, tree_storage=tree_storage(property), T=T)
     elseif property isa (ConfigsMax{K,true} where K)
-        return bestk_solutions(gp, max_k(property), tree_storage=tree_storage(property))
+        return bestk_solutions(gp, max_k(property), tree_storage=tree_storage(property), T=T)
     elseif property isa (ConfigsMin{K,true} where K)
-        return bestk_solutions(gp, min_k(property), invert=true, tree_storage=tree_storage(property))
+        return bestk_solutions(gp, min_k(property), invert=true, tree_storage=tree_storage(property), T=T)
     else
-        error("unknown property $property.")
+        error("unknown property: `$property`.")
     end
 end
 
@@ -379,3 +383,61 @@ end
 # convert to Matrix
 Base.Matrix(ce::ConfigEnumerator) = plain_matrix(ce)
 Base.Vector(ce::StaticElementVector) = collect(ce)
+
+########## memory estimation ###############
+"""
+    estimate_memory(problem, property; T=Float64)
+
+Memory estimation in number of bytes to compute certain `property` of a `problem`.
+`T` is the base type.
+"""
+function estimate_memory(problem::GraphProblem, property::AbstractProperty; T=Float64)
+    _estimate_memory(tensor_element_type(T, length(labels(problem)), nflavor(problem), property), problem)
+end
+function estimate_memory(problem::GraphProblem, ::Union{SingleConfigMax{true},SingleConfigMin{true}}; T=Float64)
+    tc, sc, rw = timespacereadwrite_complexity(problem.code, _size_dict(problem))
+    # caching all tensors is equivalent to counting the total number of writes
+    return ceil(Int, exp2(rw - 1)) * sizeof(Tropical{T})
+end
+function estimate_memory(problem::GraphProblem, ::GraphPolynomial{:polynomial}; T=Float64)
+    # this is the upper bound
+    return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * length(labels(problem)))
+end
+
+function _size_dict(problem)
+    lbs = labels(problem)
+    nf = nflavor(problem)
+    return Dict([lb=>nf for lb in lbs])
+end
+
+function _estimate_memory(::Type{ET}, problem::GraphProblem) where ET
+    if !isbitstype(ET) && !(ET <: Mod)
+        @warn "Target tensor element type `$ET` is not a bits type, the estimation of memory might be unreliable."
+    end
+    return peak_memory(problem.code, _size_dict(problem)) * sizeof(ET)
+end
+
+for (PROP, ET) in [(:SizeMax, :(Tropical{T})), (:SizeMin, :(Tropical{T})),
+        (:(SingleConfigMax{true}), :(Tropical{T})), (:(SingleConfigMin{true}), :(Tropical{T})),
+        (:(CountingAll), :T), (:(CountingMax{1}), :(CountingTropical{T,T})), (:(CountingMin{1}), :(CountingTropical{T,T})),
+        (:(CountingMax{K}), :(TruncatedPoly{K,T,T})), (:(CountingMin{K}), :(TruncatedPoly{K,T,T})),
+        (:(GraphPolynomial{:finitefield}), :(Mod{N,Int32} where N)), (:(GraphPolynomial{:fft}), :(Complex{T})), 
+        (:(GraphPolynomial{:polynomial}), :(Polynomial{T, :x})), (:(GraphPolynomial{:fitting}), :T),
+    ]
+    @eval tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T,K} = $ET
+end
+
+for (PROP, ET) in [(:(SingleConfigMax{false}), :(CountingTropical{T,T})), (:(SingleConfigMin{false}), :(CountingTropical{T,T}))]
+    @eval function tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T}
+        sampler_type($ET, n, nflavor)
+    end
+end
+for (PROP, ET) in [
+        (:(ConfigsMax{1}), :(CountingTropical{T,T})), (:(ConfigsMin{1}), :(CountingTropical{T,T})),
+        (:(ConfigsMax{K}), :(TruncatedPoly{K,T,T})), (:(ConfigsMin{K}), :(TruncatedPoly{K,T,T})),
+        (:(ConfigsAll), :(Real))
+    ]
+    @eval function tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T,K}
+        set_type($ET, n, nflavor)
+    end
+end

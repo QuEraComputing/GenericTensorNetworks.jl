@@ -11,6 +11,9 @@ using Graphs
 export timespace_complexity, timespacereadwrite_complexity, @ein_str, getixsv, getiyv
 export GreedyMethod, TreeSA, SABipartite, KaHyParBipartite, MergeVectors, MergeGreedy
 
+# estimate memory
+export estimate_memory
+
 # Algebras
 export StaticBitVector, StaticElementVector, @bv_str
 export is_commutative_semiring

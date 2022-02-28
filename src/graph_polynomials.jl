@@ -4,10 +4,12 @@ using FFTW
 using Graphs
 
 """
-    graph_polynomial(problem, method; usecuda=false, kwargs...)
+    graph_polynomial(problem, method; usecuda=false, T=Float64, kwargs...)
 
 Computing the graph polynomial for specific problem.
 
+Positional Arguments
+----------------------------------
 * `problem` can be one of the following instances,
     * `IndependentSet` for the independence polynomial,
     * `MaximalIS` for the maximal independence polynomial,
@@ -23,27 +25,32 @@ Computing the graph polynomial for specific problem.
         It Consumes additional kwargs [`maxorder`, `r`]. The larger `r` is,
         the more accurate the factors of high order terms, and the less accurate the factors of low order terms.
     * `Val(:fitting)`, compute with the polynomial fitting approach, fast but inaccurate for large graphs.
+
+Keyword Arguments
+----------------------------------
+* `usecuda` is true if one wants to compute with CUDA arrays,
+* `T` is the base type
 """
 function graph_polynomial end
 
-function graph_polynomial(gp::GraphProblem, ::Val{:fft}; usecuda=false, 
+function graph_polynomial(gp::GraphProblem, ::Val{:fft}; usecuda=false, T=Float64,
         maxorder=max_size(gp; usecuda=usecuda), r=1.0)
     ω = exp(-2im*π/(maxorder+1))
     xs = r .* collect(ω .^ (0:maxorder))
-    ys = [Array(contractx(gp, x; usecuda=usecuda)) for x in xs]
+    ys = [Array(contractx(gp, Complex{T}(x); usecuda=usecuda)) for x in xs]
     map(ci->Polynomial(ifft(getindex.(ys, Ref(ci))) ./ (r .^ (0:maxorder))), CartesianIndices(ys[1]))
 end
 
-function graph_polynomial(gp::GraphProblem, ::Val{:fitting}; usecuda=false,
+function graph_polynomial(gp::GraphProblem, ::Val{:fitting}; usecuda=false, T=Float64,
         maxorder = max_size(gp; usecuda=usecuda))
     xs = (0:maxorder)
-    ys = [Array(contractx(gp, x; usecuda=usecuda)) for x in xs]
+    ys = [Array(contractx(gp, T(x); usecuda=usecuda)) for x in xs]
     map(ci->fit(xs, getindex.(ys, Ref(ci))), CartesianIndices(ys[1]))
 end
 
-function graph_polynomial(gp::GraphProblem, ::Val{:polynomial}; usecuda=false)
+function graph_polynomial(gp::GraphProblem, ::Val{:polynomial}; usecuda=false, T=Float64)
     @assert !usecuda "Polynomial type can not be computed on GPU!"
-    contractx(gp::GraphProblem, Polynomial([0, 1.0]))
+    contractx(gp::GraphProblem, Polynomial(T[0, 1]))
 end
 
 function _polynomial_single(gp::GraphProblem, ::Type{T}; usecuda, maxorder) where T
@@ -60,7 +67,8 @@ function _polynomial_single(gp::GraphProblem, ::Type{T}; usecuda, maxorder) wher
     return res
 end
 
-function graph_polynomial(gp::GraphProblem, ::Val{:finitefield}; usecuda=false,
+# T is not used in finitefield approach
+function graph_polynomial(gp::GraphProblem, ::Val{:finitefield}; usecuda=false, T=Float64,
         maxorder=max_size(gp; usecuda=usecuda), max_iter=100)
     return map(Polynomial, big_integer_solve(T->_polynomial_single(gp, T; usecuda=usecuda, maxorder=maxorder), Int32, max_iter))
 end

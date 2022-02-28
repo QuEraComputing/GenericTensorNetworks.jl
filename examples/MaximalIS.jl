@@ -29,12 +29,13 @@ show_graph(graph; locs=locations)
 # We defined the restriction on its neighbourhood ``N(v)``:
 # ```math
 # T(x_v)_{s_1,s_2,\ldots,s_{|N(v)|},s_v} = \begin{cases}
-#     s_vx_v & s_1=s_2=\ldots=s_{|N(v)|}=0,\\
+#     s_vx_v^{w_v} & s_1=s_2=\ldots=s_{|N(v)|}=0,\\
 #     1-s_v& \text{otherwise}.
 # \end{cases}
 # ```
-# Intuitively, it means if all the neighbourhood vertices are not in ``I_{m}``, i.e., ``s_1=s_2=\ldots=s_{|N(v)|}=0``, then ``v`` should be in ``I_{m}`` and contribute a factor ``x_{v}``,
-# otherwise, if any of the neighbourhood vertices is in ``I_{m}``, then ``v`` cannot be in ``I_{m}``.
+# The first case corresponds to all the neighbourhood vertices of ``v`` are not in ``I_{m}``, then ``v`` must be in ``I_{m}`` and contribute a factor ``x_{v}^{w_v}``,
+# where ``w_v`` is the weight of vertex ``v``.
+# Otherwise, if any of the neighbouring vertices of ``v`` is in ``I_{m}``, ``v`` must not be in ``I_{m}`` by the independence requirement.
 # We can use [`MaximalIS`](@ref) to construct the tensor network for solving the maximal independent set problem as
 problem = MaximalIS(graph; optimizer=TreeSA());
 

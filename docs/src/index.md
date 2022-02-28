@@ -5,7 +5,7 @@ CurrentModule = GraphTensorNetworks
 # GraphTensorNetworks
 
 This package uses generic tensor network to compute properties of combinatorial problems defined on graph.
-The properties includes the size of the maximum set size, the number of sets of a given size and the enumeration of configurations of a given set size.
+The properties includes the size of the maximum/minimum set size, the number of sets of a given size and the enumeration of configurations of a given set size.
 
 ## Background knowledge
 

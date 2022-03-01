@@ -23,13 +23,13 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-722c250a">
+     id="img-b5ffc3be">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.39" stroke="#000000" id="img-722c250a-1">
+<g stroke-width="0.39" stroke="#000000" id="img-b5ffc3be-1">
   <g transform="translate(72.33,60)">
     <path fill="none" d="M0,4.11 L0,-4.11 " class="primitive"/>
   </g>
@@ -115,7 +115,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <path fill="none" d="M-4.11,4.11 L4.11,-4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-722c250a-2">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-b5ffc3be-2">
   <g transform="translate(72.33,64.11)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
@@ -180,7 +180,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.86" id="img-722c250a-3">
+<g fill="#000000" font-size="1.86" id="img-b5ffc3be-3">
   <g transform="translate(72.33,64.11)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -434,7 +434,7 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 
 ]]> </script>
 </svg>
-<h2 id="Find-the-best-configurations"><a class="docs-heading-anchor" href="#Find-the-best-configurations">Find the best configurations</a><a id="Find-the-best-configurations-1"></a><a class="docs-heading-anchor-permalink" href="#Find-the-best-configurations" title="Permalink"></a></h2><p>We can easily check the MIS degeneracy by computing the <a href="../../ref/#GraphTensorNetworks.CountingMax"><code>CountingMax</code></a> property.</p><pre><code class="language-julia hljs">counting_mapped = solve(IndependentSet(graph; weights=weights), CountingMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(9.694180821239762, 3.0)ₜ</code></pre><p>The MIS degeneracy is the second field, which is 3. We can compute the <a href="../../ref/#GraphTensorNetworks.ConfigsMax"><code>ConfigsMax</code></a> to enumerate all configurations with maximum independent set size.</p><pre><code class="language-julia hljs">configs_mapped = solve(IndependentSet(graph; weights=weights), ConfigsMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(9.694180821239762, {101001110011000100110, 101001110001100100110, 101001110011001000110})ₜ</code></pre><ul><li>Solution 1</li></ul><pre><code class="language-julia hljs">show_graph(graph; locs=locations, vertex_colors=
+<h2 id="Find-the-best-configurations"><a class="docs-heading-anchor" href="#Find-the-best-configurations">Find the best configurations</a><a id="Find-the-best-configurations-1"></a><a class="docs-heading-anchor-permalink" href="#Find-the-best-configurations" title="Permalink"></a></h2><p>We can easily check the MIS degeneracy by computing the <a href="../../ref/#GraphTensorNetworks.CountingMax"><code>CountingMax</code></a> property.</p><pre><code class="language-julia hljs">counting_mapped = solve(IndependentSet(graph; weights=weights), CountingMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(9.694180821239762, 3.0)ₜ</code></pre><p>The MIS degeneracy is the second field, which is 3. We can compute the <a href="../../ref/#GraphTensorNetworks.ConfigsMax"><code>ConfigsMax</code></a> to enumerate all configurations with maximum independent set size.</p><pre><code class="language-julia hljs">configs_mapped = solve(IndependentSet(graph; weights=weights), ConfigsMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(9.694180821239762, {101001110011001000110, 101001110011000100110, 101001110001100100110})ₜ</code></pre><ul><li>Solution 1</li></ul><pre><code class="language-julia hljs">show_graph(graph; locs=locations, vertex_colors=
           [iszero(configs_mapped.c[1][i]) ? &quot;white&quot; : &quot;red&quot; for i=1:nv(graph)])</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -445,13 +445,13 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-22322079">
+     id="img-9edd1457">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.39" stroke="#000000" id="img-22322079-1">
+<g stroke-width="0.39" stroke="#000000" id="img-9edd1457-1">
   <g transform="translate(72.33,60)">
     <path fill="none" d="M0,4.11 L0,-4.11 " class="primitive"/>
   </g>
@@ -537,112 +537,112 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
     <path fill="none" d="M-4.11,4.11 L4.11,-4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-22322079-2">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-9edd1457-2">
   <g transform="translate(96.99,64.11)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-22322079-3">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-9edd1457-3">
   <g transform="translate(88.77,72.33)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-22322079-4">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-9edd1457-4">
   <g transform="translate(88.77,55.89)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-22322079-5">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-9edd1457-5">
   <g transform="translate(80.55,72.33)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-22322079-6">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-9edd1457-6">
   <g transform="translate(80.55,47.67)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-22322079-7">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-9edd1457-7">
   <g transform="translate(72.33,47.67)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-22322079-8">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-9edd1457-8">
   <g transform="translate(72.33,39.45)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-22322079-9">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-9edd1457-9">
   <g transform="translate(64.11,47.67)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-22322079-10">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-9edd1457-10">
   <g transform="translate(64.11,31.23)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-22322079-11">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-9edd1457-11">
   <g transform="translate(55.89,47.67)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-22322079-12">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-9edd1457-12">
   <g transform="translate(55.89,31.23)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-22322079-13">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-9edd1457-13">
   <g transform="translate(47.67,55.89)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-22322079-14">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-9edd1457-14">
   <g transform="translate(47.67,31.23)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-22322079-15">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-9edd1457-15">
   <g transform="translate(39.45,55.89)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-22322079-16">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-9edd1457-16">
   <g transform="translate(39.45,23.01)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-22322079-17">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-9edd1457-17">
   <g transform="translate(39.45,39.45)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-22322079-18">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-9edd1457-18">
   <g transform="translate(31.23,31.23)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-22322079-19">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-9edd1457-19">
   <g transform="translate(72.33,55.89)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-22322079-20">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-9edd1457-20">
   <g transform="translate(23.01,39.45)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-22322079-21">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-9edd1457-21">
   <g transform="translate(31.23,47.67)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-22322079-22">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-9edd1457-22">
   <g transform="translate(72.33,64.11)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.86" id="img-22322079-23">
+<g fill="#000000" font-size="1.86" id="img-9edd1457-23">
   <g transform="translate(72.33,64.11)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -907,13 +907,13 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-74bb3ffa">
+     id="img-68782a69">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.39" stroke="#000000" id="img-74bb3ffa-1">
+<g stroke-width="0.39" stroke="#000000" id="img-68782a69-1">
   <g transform="translate(72.33,60)">
     <path fill="none" d="M0,4.11 L0,-4.11 " class="primitive"/>
   </g>
@@ -999,112 +999,112 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
     <path fill="none" d="M-4.11,4.11 L4.11,-4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-74bb3ffa-2">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-68782a69-2">
   <g transform="translate(96.99,64.11)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-74bb3ffa-3">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-68782a69-3">
   <g transform="translate(88.77,72.33)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-74bb3ffa-4">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-68782a69-4">
   <g transform="translate(88.77,55.89)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-74bb3ffa-5">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-68782a69-5">
   <g transform="translate(80.55,72.33)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-74bb3ffa-6">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-68782a69-6">
   <g transform="translate(80.55,47.67)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-74bb3ffa-7">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-68782a69-7">
   <g transform="translate(72.33,47.67)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-74bb3ffa-8">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-68782a69-8">
   <g transform="translate(72.33,39.45)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-74bb3ffa-9">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-68782a69-9">
   <g transform="translate(64.11,47.67)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-74bb3ffa-10">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-68782a69-10">
   <g transform="translate(64.11,31.23)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-74bb3ffa-11">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-68782a69-11">
   <g transform="translate(55.89,47.67)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-74bb3ffa-12">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-68782a69-12">
   <g transform="translate(55.89,31.23)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-74bb3ffa-13">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-68782a69-13">
   <g transform="translate(47.67,55.89)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-74bb3ffa-14">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-68782a69-14">
   <g transform="translate(47.67,31.23)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-74bb3ffa-15">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-68782a69-15">
   <g transform="translate(39.45,55.89)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-74bb3ffa-16">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-68782a69-16">
   <g transform="translate(39.45,23.01)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-74bb3ffa-17">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-68782a69-17">
   <g transform="translate(39.45,39.45)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-74bb3ffa-18">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-68782a69-18">
   <g transform="translate(31.23,31.23)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-74bb3ffa-19">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-68782a69-19">
   <g transform="translate(72.33,55.89)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-74bb3ffa-20">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-68782a69-20">
   <g transform="translate(23.01,39.45)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-74bb3ffa-21">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-68782a69-21">
   <g transform="translate(31.23,47.67)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-74bb3ffa-22">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-68782a69-22">
   <g transform="translate(72.33,64.11)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.86" id="img-74bb3ffa-23">
+<g fill="#000000" font-size="1.86" id="img-68782a69-23">
   <g transform="translate(72.33,64.11)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -1369,13 +1369,13 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-4dcc35c9">
+     id="img-64f0160d">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.39" stroke="#000000" id="img-4dcc35c9-1">
+<g stroke-width="0.39" stroke="#000000" id="img-64f0160d-1">
   <g transform="translate(72.33,60)">
     <path fill="none" d="M0,4.11 L0,-4.11 " class="primitive"/>
   </g>
@@ -1461,112 +1461,112 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
     <path fill="none" d="M-4.11,4.11 L4.11,-4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-4dcc35c9-2">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-64f0160d-2">
   <g transform="translate(96.99,64.11)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-4dcc35c9-3">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-64f0160d-3">
   <g transform="translate(88.77,72.33)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-4dcc35c9-4">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-64f0160d-4">
   <g transform="translate(88.77,55.89)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-4dcc35c9-5">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-64f0160d-5">
   <g transform="translate(80.55,72.33)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-4dcc35c9-6">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-64f0160d-6">
   <g transform="translate(80.55,47.67)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-4dcc35c9-7">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-64f0160d-7">
   <g transform="translate(72.33,47.67)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-4dcc35c9-8">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-64f0160d-8">
   <g transform="translate(72.33,39.45)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-4dcc35c9-9">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-64f0160d-9">
   <g transform="translate(64.11,47.67)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-4dcc35c9-10">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-64f0160d-10">
   <g transform="translate(64.11,31.23)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-4dcc35c9-11">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-64f0160d-11">
   <g transform="translate(55.89,47.67)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-4dcc35c9-12">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-64f0160d-12">
   <g transform="translate(55.89,31.23)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-4dcc35c9-13">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-64f0160d-13">
   <g transform="translate(47.67,55.89)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-4dcc35c9-14">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-64f0160d-14">
   <g transform="translate(47.67,31.23)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-4dcc35c9-15">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-64f0160d-15">
   <g transform="translate(39.45,55.89)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-4dcc35c9-16">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-64f0160d-16">
   <g transform="translate(39.45,23.01)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-4dcc35c9-17">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-64f0160d-17">
   <g transform="translate(39.45,39.45)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-4dcc35c9-18">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-64f0160d-18">
   <g transform="translate(31.23,31.23)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-4dcc35c9-19">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-64f0160d-19">
   <g transform="translate(72.33,55.89)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-4dcc35c9-20">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-64f0160d-20">
   <g transform="translate(23.01,39.45)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-4dcc35c9-21">
+<g stroke-width="0.39" fill="#FFFFFF" stroke="#000000" id="img-64f0160d-21">
   <g transform="translate(31.23,47.67)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-4dcc35c9-22">
+<g stroke-width="0.39" fill="#FF0000" stroke="#000000" id="img-64f0160d-22">
   <g transform="translate(72.33,64.11)">
     <circle cx="0" cy="0" r="1.97" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.86" id="img-4dcc35c9-23">
+<g fill="#000000" font-size="1.86" id="img-64f0160d-23">
   <g transform="translate(72.33,64.11)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -1820,4 +1820,4 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 
 ]]> </script>
 </svg>
-<hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.13 on <span class="colophon-date" title="Monday 28 February 2022 05:55">Monday 28 February 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.13 on <span class="colophon-date" title="Tuesday 1 March 2022 09:04">Tuesday 1 March 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

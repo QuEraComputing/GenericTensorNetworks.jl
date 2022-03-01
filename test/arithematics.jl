@@ -125,6 +125,7 @@ end
 end
 
 @testset "Truncated Tropical" begin
+    Random.seed!(6)
     # +
     a = ExtendedTropical{3}([1,2,3])
     b = ExtendedTropical{3}([4,5,6])

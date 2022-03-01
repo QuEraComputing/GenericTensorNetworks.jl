@@ -217,37 +217,35 @@ end
 function sorted_sum_combination!(res::AbstractVector{TO}, A::AbstractVector{TO}, B::AbstractVector{TO}) where TO
     K = length(res)
     @assert length(B) == length(A) == K
-    maxval = A[K] + B[K]
-    ptr = K
-    res[ptr] = maxval
-    queue = [(K,K-1,A[K]+B[K-1]), (K-1,K,A[K-1]+B[K])]
+    queue = Vector{Tuple{TO,Int,Int}}(undef, K)
+    ptr_q = K
+    queue[ptr_q] = (A[K]+B[K], K, K)
     for k = 1:K-1
-        (i, j, res[K-k]) = _pop_max_sum!(queue)   # TODO: do not enumerate, use better data structures
-        _push_if_not_exists!(queue, i, j-1, A, B)
-        _push_if_not_exists!(queue, i-1, j, A, B)
+        # push the lagest entry
+        s, i, j = queue[K-k+1]
+        ptr_q = _push_if_not_exists!(queue, ptr_q, K-k, i, j-1, A, B)
+        ptr_q = _push_if_not_exists!(queue, ptr_q, K-k, i-1, j, A, B)
     end
+    res .= getfield.(queue, 1)
     return res
 end
 
-function _push_if_not_exists!(queue, i, j, A, B)
-    @inbounds if j>=1 && i>=1 && !any(x->x[1] >= i && x[2] >= j, queue)
-        push!(queue, (i, j, A[i] + B[j]))
-    end
-end
-
-function _pop_max_sum!(queue)
-    maxsum = first(queue)[3]
-    maxloc = 1
-    @inbounds for i=2:length(queue)
-        m = queue[i][3]
-        if m > maxsum
-            maxsum = m
-            maxloc = i
+function _push_if_not_exists!(queue, ptr_q, ptr_r, i, j, A, B)
+    @inbounds if j>=1 && i>=1
+        s = A[i] + B[j]
+        first = searchsortedlast(queue, (s, i, j), ptr_q, ptr_r, Base.Order.Forward)
+        if first != 0 && (s, i, j) != queue[first]
+            if ptr_q > 1
+                ptr_q -= 1
+            end
+            # move
+            for l=ptr_q:first-1
+                queue[l] = queue[l+1]
+            end
+            queue[first] = (s, i, j)
         end
     end
-    @inbounds data = queue[maxloc]
-    deleteat!(queue, maxloc)
-    return data
+    return ptr_q
 end
 
 function Base.:+(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,TO}

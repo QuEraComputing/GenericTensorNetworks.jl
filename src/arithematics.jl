@@ -209,12 +209,67 @@ function ExtendedTropical{K}(x::Vector{T}) where {T, K}
 end
 Base.:(==)(a::ExtendedTropical{K}, b::ExtendedTropical{K}) where K = all(i->a.orders[i] == b.orders[i], 1:K)
 
-function Base.:+(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,TO}
-    return ExtendedTropical{K,TO}(sort!([a.orders..., b.orders...])[end-K+1:end])
+function Base.:*(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,TO}
+    res = Vector{TO}(undef, K)
+    return ExtendedTropical{K,TO}(sorted_sum_combination!(res, a.orders, b.orders))
 end
 
-function Base.:*(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,TO}
-    return ExtendedTropical{K,TO}(sort!(vec([x+y for x in a.orders, y in b.orders]))[end-K+1:end])
+function sorted_sum_combination!(res::AbstractVector{TO}, A::AbstractVector{TO}, B::AbstractVector{TO}) where TO
+    K = length(res)
+    @assert length(B) == length(A) == K
+    maxval = A[K] + B[K]
+    ptr = K
+    res[ptr] = maxval
+    queue = [(K,K-1,A[K]+B[K-1]), (K-1,K,A[K-1]+B[K])]
+    for k = 1:K-1
+        (i, j, res[K-k]) = _pop_max_sum!(queue)   # TODO: do not enumerate, use better data structures
+        _push_if_not_exists!(queue, i, j-1, A, B)
+        _push_if_not_exists!(queue, i-1, j, A, B)
+    end
+    return res
+end
+
+function _push_if_not_exists!(queue, i, j, A, B)
+    @inbounds if j>=1 && i>=1 && !any(x->x[1] >= i && x[2] >= j, queue)
+        push!(queue, (i, j, A[i] + B[j]))
+    end
+end
+
+function _pop_max_sum!(queue)
+    maxsum = first(queue)[3]
+    maxloc = 1
+    @inbounds for i=2:length(queue)
+        m = queue[i][3]
+        if m > maxsum
+            maxsum = m
+            maxloc = i
+        end
+    end
+    @inbounds data = queue[maxloc]
+    deleteat!(queue, maxloc)
+    return data
+end
+
+function Base.:+(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,TO}
+    res = Vector{TO}(undef, K)
+    ptr1, ptr2 = K, K
+    @inbounds va, vb = a.orders[ptr1], b.orders[ptr2]
+    @inbounds for i=K:-1:1
+        if va > vb
+            res[i] = va
+            if ptr1 != 1
+                ptr1 -= 1
+                va = a.orders[ptr1]
+            end
+        else
+            res[i] = vb
+            if ptr2 != 1
+                ptr2 -= 1
+                vb = b.orders[ptr2]
+            end
+        end
+    end
+    return ExtendedTropical{K,TO}(res)
 end
 
 Base.:^(a::ExtendedTropical, b::Integer) = Base.invoke(^, Tuple{ExtendedTropical, Real}, a, b)
@@ -224,11 +279,6 @@ function Base.:^(a::ExtendedTropical{K,TO}, b::Real) where {K,TO}
     else
         return ExtendedTropical{K,TO}(a.orders .* b)
     end
-end
-
-function sorted_sum_combination_2(sorted_A, sorted_B)
-    NA = length(sorted_A)
-    NB = length(sorted_B)
 end
 
 Base.zero(::Type{ExtendedTropical{K,TO}}) where {K,TO} = ExtendedTropical{K,TO}(fill(zero(Tropical{TO}).n, K))

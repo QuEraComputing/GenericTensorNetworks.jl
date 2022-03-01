@@ -123,3 +123,31 @@ end
     @test !iszero(y)
     println((x * x) * zero(x))
 end
+
+@testset "Truncated Tropical" begin
+    # +
+    a = ExtendedTropical{3}([1,2,3])
+    b = ExtendedTropical{3}([4,5,6])
+    c = ExtendedTropical{3}([0,1,2])
+    @test a + b == ExtendedTropical{3}([4,5,6])
+    @test b + a == ExtendedTropical{3}([4,5,6])
+    @test c + a == ExtendedTropical{3}([2,2,3])
+    @test a + c == ExtendedTropical{3}([2,2,3])
+
+    # *
+    function naive_mul(a, b)
+        K = length(a)
+        return sort!(vec([x+y for x in a, y in b]))[end-K+1:end]
+    end
+    d = ExtendedTropical{3}([0,1,20])
+    @test naive_mul(a.orders, b.orders) == (a * b).orders
+    @test naive_mul(b.orders, a.orders) == (b * a).orders
+    @test naive_mul(a.orders, d.orders) == (a * d).orders
+    @test naive_mul(d.orders, a.orders) == (d * a).orders
+    @test naive_mul(d.orders, d.orders) == (d * d).orders
+    for i=1:20
+        a = ExtendedTropical{100}(sort!(randn(100)))
+        b = ExtendedTropical{100}(sort!(randn(100)))
+        @test naive_mul(a.orders, b.orders) == (a * b).orders
+    end
+end

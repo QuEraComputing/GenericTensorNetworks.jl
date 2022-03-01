@@ -34,6 +34,7 @@ end
                     (Max2Poly(1,2,3.0), Max2Poly(3,2,2.0), Max2Poly(4,7,1.0)),
                     (TruncatedPoly((1,2,3),3.0), TruncatedPoly((7,3,2),2.0), TruncatedPoly((1,4,7),1.0)),
                     (TropicalF64(5), TropicalF64(3), TropicalF64(-9)),
+                    (ExtendedTropical{2}([2.2,3.1]), ExtendedTropical{2}([-1.0, 4.0]), ExtendedTropical{2}([-Inf, 0.6])),
                     (CountingTropicalF64(5, 3), CountingTropicalF64(3, 9), CountingTropicalF64(-3, 2)),
                     (CountingTropical(5.0, ConfigSampler(StaticBitVector(rand(Bool, 10)))), CountingTropical(3.0, ConfigSampler(StaticBitVector(rand(Bool, 10)))), CountingTropical(-3.0, ConfigSampler(StaticBitVector(rand(Bool, 10))))),
                     (CountingTropical(5.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:3])), CountingTropical(3.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:4])), CountingTropical(-3.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:5]))),
@@ -97,6 +98,14 @@ end
     x = ConfigSampler(bv"00111")
     @test x ^ 0 == one(x)
     @test x ^ 2.0 == x
+
+    x = ExtendedTropical{3}([1.0, 2.0, 3.0])
+    @test x ^ 1 == x
+    @test x ^ 0 == one(x)
+    @test x ^ 1.0 == x
+    @test x ^ 0.0 == one(x)
+    @test x ^ 2 == ExtendedTropical{3}([2.0, 4.0, 6.0])
+    @test x ^ 2.0 == ExtendedTropical{3}([2.0, 4.0, 6.0])
 end
 
 @testset "push coverage" begin

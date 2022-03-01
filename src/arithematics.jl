@@ -174,18 +174,56 @@ end
     ExtendedTropical(orders)
 
 Extended Tropical numbers with largest `K` orders keeped,
-or the [`TruncatedPoly`](@ref) without coefficients,`TO` is the orders type.
+or the [`TruncatedPoly`](@ref) without coefficients,
+`TO` is the element type of orders.
+
+Example
+------------------------------
+```jldoctest; setup=(using GraphTensorNetworks)
+julia> x = ExtendedTropical{3}([1.0, 2, 3])
+ExtendedTropical{3, Float64}([1.0, 2.0, 3.0])
+
+julia> y = ExtendedTropical{3}([-Inf, 2, 5])
+ExtendedTropical{3, Float64}([-Inf, 2.0, 5.0])
+
+julia> x * y
+ExtendedTropical{3, Float64}([6.0, 7.0, 8.0])
+
+julia> x + y
+ExtendedTropical{3, Float64}([2.0, 3.0, 5.0])
+
+julia> one(x)
+ExtendedTropical{3, Float64}([-Inf, -Inf, 0.0])
+
+julia> zero(x)
+ExtendedTropical{3, Float64}([-Inf, -Inf, -Inf])
+```
 """
 struct ExtendedTropical{K,TO} <: Number
-    orders::NTuple{K,TO}
+    orders::Vector{TO}
 end
+function ExtendedTropical{K}(x::Vector{T}) where {T, K}
+    @assert length(x) == K
+    @assert issorted(x)
+    ExtendedTropical{K,T}(x)
+end
+Base.:(==)(a::ExtendedTropical{K}, b::ExtendedTropical{K}) where K = all(i->a.orders[i] == b.orders[i], 1:K)
 
 function Base.:+(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,TO}
-    return ExtendedTropical{K,TO}((sort!([a.orders..., b.orders...])[end-K+1:end]...,))
+    return ExtendedTropical{K,TO}(sort!([a.orders..., b.orders...])[end-K+1:end])
 end
 
-function Base.:*(a::ExtendedTropical{K,T}, b::ExtendedTropical{K,T}) where {K,T}
-    return ExtendedTropical{K,TO}((sort!(vec([x+y for x in a.orders, y in b.orders]))[end-K+1:end]...,))
+function Base.:*(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,TO}
+    return ExtendedTropical{K,TO}(sort!(vec([x+y for x in a.orders, y in b.orders]))[end-K+1:end])
+end
+
+Base.:^(a::ExtendedTropical, b::Integer) = Base.invoke(^, Tuple{ExtendedTropical, Real}, a, b)
+function Base.:^(a::ExtendedTropical{K,TO}, b::Real) where {K,TO}
+    if iszero(b)  # to avoid NaN
+        return one(ExtendedTropical{K,promote_type(TO,typeof(b))})
+    else
+        return ExtendedTropical{K,TO}(a.orders .* b)
+    end
 end
 
 function sorted_sum_combination_2(sorted_A, sorted_B)
@@ -193,8 +231,8 @@ function sorted_sum_combination_2(sorted_A, sorted_B)
     NB = length(sorted_B)
 end
 
-Base.zero(::Type{ExtendedTropical{K,TO}}) where {K,TO} = ExtendedTropical(ntuple(i->zero(Tropical{TO}).n, K))
-Base.one(::Type{ExtendedTropical{K,TO}}) where {K,TO} = ExtendedTropical(ntuple(i->i==K ? zero(Tropical{TO}).n : one(Tropical{TO}).n, K))
+Base.zero(::Type{ExtendedTropical{K,TO}}) where {K,TO} = ExtendedTropical{K,TO}(fill(zero(Tropical{TO}).n, K))
+Base.one(::Type{ExtendedTropical{K,TO}}) where {K,TO} = ExtendedTropical{K,TO}(map(i->i==K ? one(Tropical{TO}).n : zero(Tropical{TO}).n, 1:K))
 Base.zero(::ExtendedTropical{K,TO}) where {K,TO} = zero(ExtendedTropical{K,TO})
 Base.one(::ExtendedTropical{K,TO}) where {K,TO} = one(ExtendedTropical{K,TO})
 
@@ -534,7 +572,7 @@ function Base.copy(c::TreeConfigEnumerator{N,S,C}) where {N,S,C}
 end
 
 # Handle boolean, this is a patch for CUDA matmul
-for TYPE in [:AbstractSetNumber, :TruncatedPoly]
+for TYPE in [:AbstractSetNumber, :TruncatedPoly, :ExtendedTropical]
     @eval Base.:*(a::Bool, y::$TYPE) = a ? y : zero(y)
     @eval Base.:*(y::$TYPE, a::Bool) = a ? y : zero(y)
 end
@@ -583,9 +621,22 @@ function _x(::Type{Tropical{TV}}; invert) where {TV}
     ret = Tropical{TV}(one(TV))
     invert ? pre_invert_exponent(ret) : ret
 end
+function _x(::Type{ExtendedTropical{K,TO}}; invert) where {K,TO}
+    ret =ExtendedTropical{K,TO}(map(i->i==K ? one(TO) : zero(Tropical{TO}).n, 1:K))
+    invert ? pre_invert_exponent(ret) : ret
+end
 
 # for finding all solutions
 function _x(::Type{T}; invert) where {T<:AbstractSetNumber}
     ret = one(T)
     invert ? pre_invert_exponent(ret) : ret
 end
+
+# negate the exponents before entering the solver
+pre_invert_exponent(t::TruncatedPoly{K}) where K = TruncatedPoly(t.coeffs, -t.maxorder)
+pre_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
+pre_invert_exponent(t::ExtendedTropical{K}) where K = ExtendedTropical{K}(map(i->i==K ? -t.orders[i] : t.orders[i], 1:K))
+# negate the exponents after entering the solver
+post_invert_exponent(t::TruncatedPoly{K}) where K = TruncatedPoly(ntuple(i->t.coeffs[K-i+1], K), -t.maxorder+(K-1))
+post_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
+post_invert_exponent(t::ExtendedTropical{K}) where K = ExtendedTropical{K}(map(i->-t.orders[i], K:-1:1))

@@ -214,19 +214,32 @@ function Base.:*(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,
     return ExtendedTropical{K,TO}(sorted_sum_combination!(res, a.orders, b.orders))
 end
 
+using DataStructures: BinaryHeap
 function sorted_sum_combination!(res::AbstractVector{TO}, A::AbstractVector{TO}, B::AbstractVector{TO}) where TO
     K = length(res)
     @assert length(B) == length(A) == K
     maxval = A[K] + B[K]
     ptr = K
     res[ptr] = maxval
-    queue = [(K,K-1,A[K]+B[K-1]), (K-1,K,A[K-1]+B[K])]
+    #queue = [(A[K]+B[K-1],K,K-1), (A[K-1]+B[K],K-1,K)]
+    queue = BinaryHeap(Base.Order.Reverse, [(A[K]+B[K-1],K,K-1), (A[K-1]+B[K],K-1,K)])
     for k = 1:K-1
-        (i, j, res[K-k]) = _pop_max_sum!(queue)   # TODO: do not enumerate, use better data structures
+        (res[K-k], i, j) = pop!(queue)   # TODO: do not enumerate, use better data structures
         _push_if_not_exists!(queue, i, j-1, A, B)
         _push_if_not_exists!(queue, i-1, j, A, B)
     end
     return res
+end
+
+@inline function push_norepeat!(h::BinaryHeap, v)
+    push!(h, v)
+    return h
+end
+
+function _push_if_not_exists!(queue::BinaryHeap, i, j, A, B)
+    @inbounds if j>=1 && i>=1
+        push_norepeat!(queue, (A[i] + B[j], i, j))
+    end
 end
 
 function _push_if_not_exists!(queue, i, j, A, B)

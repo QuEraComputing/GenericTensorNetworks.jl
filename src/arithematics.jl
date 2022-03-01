@@ -79,6 +79,9 @@ function is_commutative_semiring(a::T, b::T, c::T) where T
     return true
 end
 
+######################## Truncated Polynomial ######################
+# TODO: store orders to support non-integer weights
+# (↑) Maybe not so nessesary, no use case for counting degeneracy when using floating point weights.
 """
     TruncatedPoly{K,T,TO} <: Number
     TruncatedPoly(coeffs::Tuple, maxorder)
@@ -164,6 +167,36 @@ function Base.show(io::IO, ::MIME"text/plain", x::TruncatedPoly{K}) where K
         printpoly(io, Polynomial([x.coeffs...], :x), offset=Int(x.maxorder-K+1))
     end
 end
+
+############################ ExtendedTropical #####################
+"""
+    ExtendedTropical{K,TO} <: Number
+    ExtendedTropical(orders)
+
+Extended Tropical numbers with largest `K` orders keeped,
+or the [`TruncatedPoly`](@ref) without coefficients,`TO` is the orders type.
+"""
+struct ExtendedTropical{K,TO} <: Number
+    orders::NTuple{K,TO}
+end
+
+function Base.:+(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,TO}
+    return ExtendedTropical{K,TO}((sort!([a.orders..., b.orders...])[end-K+1:end]...,))
+end
+
+function Base.:*(a::ExtendedTropical{K,T}, b::ExtendedTropical{K,T}) where {K,T}
+    return ExtendedTropical{K,TO}((sort!(vec([x+y for x in a.orders, y in b.orders]))[end-K+1:end]...,))
+end
+
+function sorted_sum_combination_2(sorted_A, sorted_B)
+    NA = length(sorted_A)
+    NB = length(sorted_B)
+end
+
+Base.zero(::Type{ExtendedTropical{K,TO}}) where {K,TO} = ExtendedTropical(ntuple(i->zero(Tropical{TO}).n, K))
+Base.one(::Type{ExtendedTropical{K,TO}}) where {K,TO} = ExtendedTropical(ntuple(i->i==K ? zero(Tropical{TO}).n : one(Tropical{TO}).n, K))
+Base.zero(::ExtendedTropical{K,TO}) where {K,TO} = zero(ExtendedTropical{K,TO})
+Base.one(::ExtendedTropical{K,TO}) where {K,TO} = one(ExtendedTropical{K,TO})
 
 ############################ SET Numbers ##########################
 abstract type AbstractSetNumber end

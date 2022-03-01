@@ -1,28 +1,30 @@
 abstract type AbstractProperty end
 
 """
-    SizeMax <: AbstractProperty
-    SizeMax()
+    SizeMax{K} <: AbstractProperty
+    SizeMax(k::Int)
 
-The maximum set size. e.g. the largest size of the [`IndependentSet`](@ref)  problem is also know as the independence number.
+The maximum-K set sizes. e.g. the largest size of the [`IndependentSet`](@ref)  problem is also know as the independence number.
 
 * The corresponding tensor element type is max-plus tropical number [`Tropical`](@ref).
 * It is compatible with weighted graph problems.
 * BLAS (on CPU) and GPU are supported,
 """
-struct SizeMax <: AbstractProperty end
+struct SizeMax{K} <: AbstractProperty end
+SizeMax(k::Int=1) = SizeMax{k}()
 
 """
-    SizeMin <: AbstractProperty
-    SizeMin()
+    SizeMin{K} <: AbstractProperty
+    SizeMin(k::Int)
 
-The maximum set size. e.g. the smallest size ofthe [`MaximalIS`](@ref) problem is also known as the independent domination number.
+The minimum-K set sizes. e.g. the smallest size ofthe [`MaximalIS`](@ref) problem is also known as the independent domination number.
 
 * The corresponding tensor element type inverted max-plus tropical number [`Tropical`](@ref), which is equivalent to the min-plus tropical number.
 * It is compatible with weighted graph problems.
 * BLAS (on CPU) and GPU are supported,
 """
-struct SizeMin <: AbstractProperty end
+struct SizeMin{K} <: AbstractProperty end
+SizeMin(k::Int=1) = SizeMin{k}()
 
 """
     CountingAll <: AbstractProperty
@@ -417,7 +419,9 @@ function _estimate_memory(::Type{ET}, problem::GraphProblem) where ET
     return peak_memory(problem.code, _size_dict(problem)) * sizeof(ET)
 end
 
-for (PROP, ET) in [(:SizeMax, :(Tropical{T})), (:SizeMin, :(Tropical{T})),
+for (PROP, ET) in [
+        (:SizeMax{1}, :(Tropical{T})), (:SizeMin{1}, :(Tropical{T})),
+        (:SizeMax{K}, :(ExtendedTropical{K,T})), (:SizeMin{K}, :(ExtendedTropical{K,T})),
         (:(SingleConfigMax{true}), :(Tropical{T})), (:(SingleConfigMin{true}), :(Tropical{T})),
         (:(CountingAll), :T), (:(CountingMax{1}), :(CountingTropical{T,T})), (:(CountingMin{1}), :(CountingTropical{T,T})),
         (:(CountingMax{K}), :(TruncatedPoly{K,T,T})), (:(CountingMin{K}), :(TruncatedPoly{K,T,T})),

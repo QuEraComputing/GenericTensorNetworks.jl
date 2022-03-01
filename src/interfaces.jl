@@ -6,9 +6,9 @@ abstract type AbstractProperty end
 
 The maximum-K set sizes. e.g. the largest size of the [`IndependentSet`](@ref)  problem is also know as the independence number.
 
-* The corresponding tensor element type is max-plus tropical number [`Tropical`](@ref).
+* The corresponding tensor element type are max-plus tropical number [`Tropical`](@ref) for `K == 1` and [`ExtendedTropical`](@ref) for `K > 1`.
 * It is compatible with weighted graph problems.
-* BLAS (on CPU) and GPU are supported,
+* BLAS (on CPU) and GPU are supported only for `K == 1`,
 """
 struct SizeMax{K} <: AbstractProperty end
 SizeMax(k::Int=1) = SizeMax{k}()
@@ -20,9 +20,10 @@ max_k(::SizeMax{K}) where K = K
 
 The minimum-K set sizes. e.g. the smallest size ofthe [`MaximalIS`](@ref) problem is also known as the independent domination number.
 
-* The corresponding tensor element type inverted max-plus tropical number [`Tropical`](@ref), which is equivalent to the min-plus tropical number.
+* The corresponding tensor element type are inverted max-plus tropical number [`Tropical`](@ref) for `K == 1` and inverted [`ExtendedTropical`](@ref) for `K > 1`.
+The inverted Tropical number emulates the min-plus tropical number.
 * It is compatible with weighted graph problems.
-* BLAS (on CPU) and GPU are supported,
+* BLAS (on CPU) and GPU are supported only for `K == 1`,
 """
 struct SizeMin{K} <: AbstractProperty end
 SizeMin(k::Int=1) = SizeMin{k}()

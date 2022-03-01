@@ -80,6 +80,7 @@ is_commutative_semiring
 ```@docs
 TropicalNumbers.Tropical
 TropicalNumbers.CountingTropical
+ExtendedTropical
 Mods.Mod
 Polynomials.Polynomial
 TruncatedPoly

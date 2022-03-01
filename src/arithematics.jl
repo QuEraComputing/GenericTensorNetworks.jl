@@ -79,6 +79,9 @@ function is_commutative_semiring(a::T, b::T, c::T) where T
     return true
 end
 
+######################## Truncated Polynomial ######################
+# TODO: store orders to support non-integer weights
+# (↑) Maybe not so nessesary, no use case for counting degeneracy when using floating point weights.
 """
     TruncatedPoly{K,T,TO} <: Number
     TruncatedPoly(coeffs::Tuple, maxorder)
@@ -164,6 +167,124 @@ function Base.show(io::IO, ::MIME"text/plain", x::TruncatedPoly{K}) where K
         printpoly(io, Polynomial([x.coeffs...], :x), offset=Int(x.maxorder-K+1))
     end
 end
+
+############################ ExtendedTropical #####################
+"""
+    ExtendedTropical{K,TO} <: Number
+    ExtendedTropical(orders)
+
+Extended Tropical numbers with largest `K` orders keeped,
+or the [`TruncatedPoly`](@ref) without coefficients,
+`TO` is the element type of orders.
+
+Example
+------------------------------
+```jldoctest; setup=(using GraphTensorNetworks)
+julia> x = ExtendedTropical{3}([1.0, 2, 3])
+ExtendedTropical{3, Float64}([1.0, 2.0, 3.0])
+
+julia> y = ExtendedTropical{3}([-Inf, 2, 5])
+ExtendedTropical{3, Float64}([-Inf, 2.0, 5.0])
+
+julia> x * y
+ExtendedTropical{3, Float64}([6.0, 7.0, 8.0])
+
+julia> x + y
+ExtendedTropical{3, Float64}([2.0, 3.0, 5.0])
+
+julia> one(x)
+ExtendedTropical{3, Float64}([-Inf, -Inf, 0.0])
+
+julia> zero(x)
+ExtendedTropical{3, Float64}([-Inf, -Inf, -Inf])
+```
+"""
+struct ExtendedTropical{K,TO} <: Number
+    orders::Vector{TO}
+end
+function ExtendedTropical{K}(x::Vector{T}) where {T, K}
+    @assert length(x) == K
+    @assert issorted(x)
+    ExtendedTropical{K,T}(x)
+end
+Base.:(==)(a::ExtendedTropical{K}, b::ExtendedTropical{K}) where K = all(i->a.orders[i] == b.orders[i], 1:K)
+
+function Base.:*(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,TO}
+    res = Vector{TO}(undef, K)
+    return ExtendedTropical{K,TO}(sorted_sum_combination!(res, a.orders, b.orders))
+end
+
+function sorted_sum_combination!(res::AbstractVector{TO}, A::AbstractVector{TO}, B::AbstractVector{TO}) where TO
+    K = length(res)
+    @assert length(B) == length(A) == K
+    maxval = A[K] + B[K]
+    ptr = K
+    res[ptr] = maxval
+    queue = [(K,K-1,A[K]+B[K-1]), (K-1,K,A[K-1]+B[K])]
+    for k = 1:K-1
+        (i, j, res[K-k]) = _pop_max_sum!(queue)   # TODO: do not enumerate, use better data structures
+        _push_if_not_exists!(queue, i, j-1, A, B)
+        _push_if_not_exists!(queue, i-1, j, A, B)
+    end
+    return res
+end
+
+function _push_if_not_exists!(queue, i, j, A, B)
+    @inbounds if j>=1 && i>=1 && !any(x->x[1] >= i && x[2] >= j, queue)
+        push!(queue, (i, j, A[i] + B[j]))
+    end
+end
+
+function _pop_max_sum!(queue)
+    maxsum = first(queue)[3]
+    maxloc = 1
+    @inbounds for i=2:length(queue)
+        m = queue[i][3]
+        if m > maxsum
+            maxsum = m
+            maxloc = i
+        end
+    end
+    @inbounds data = queue[maxloc]
+    deleteat!(queue, maxloc)
+    return data
+end
+
+function Base.:+(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,TO}
+    res = Vector{TO}(undef, K)
+    ptr1, ptr2 = K, K
+    @inbounds va, vb = a.orders[ptr1], b.orders[ptr2]
+    @inbounds for i=K:-1:1
+        if va > vb
+            res[i] = va
+            if ptr1 != 1
+                ptr1 -= 1
+                va = a.orders[ptr1]
+            end
+        else
+            res[i] = vb
+            if ptr2 != 1
+                ptr2 -= 1
+                vb = b.orders[ptr2]
+            end
+        end
+    end
+    return ExtendedTropical{K,TO}(res)
+end
+
+Base.:^(a::ExtendedTropical, b::Integer) = Base.invoke(^, Tuple{ExtendedTropical, Real}, a, b)
+function Base.:^(a::ExtendedTropical{K,TO}, b::Real) where {K,TO}
+    if iszero(b)  # to avoid NaN
+        return one(ExtendedTropical{K,promote_type(TO,typeof(b))})
+    else
+        return ExtendedTropical{K,TO}(a.orders .* b)
+    end
+end
+
+Base.zero(::Type{ExtendedTropical{K,TO}}) where {K,TO} = ExtendedTropical{K,TO}(fill(zero(Tropical{TO}).n, K))
+Base.one(::Type{ExtendedTropical{K,TO}}) where {K,TO} = ExtendedTropical{K,TO}(map(i->i==K ? one(Tropical{TO}).n : zero(Tropical{TO}).n, 1:K))
+Base.zero(::ExtendedTropical{K,TO}) where {K,TO} = zero(ExtendedTropical{K,TO})
+Base.one(::ExtendedTropical{K,TO}) where {K,TO} = one(ExtendedTropical{K,TO})
 
 ############################ SET Numbers ##########################
 abstract type AbstractSetNumber end
@@ -501,7 +622,7 @@ function Base.copy(c::TreeConfigEnumerator{N,S,C}) where {N,S,C}
 end
 
 # Handle boolean, this is a patch for CUDA matmul
-for TYPE in [:AbstractSetNumber, :TruncatedPoly]
+for TYPE in [:AbstractSetNumber, :TruncatedPoly, :ExtendedTropical]
     @eval Base.:*(a::Bool, y::$TYPE) = a ? y : zero(y)
     @eval Base.:*(y::$TYPE, a::Bool) = a ? y : zero(y)
 end
@@ -550,9 +671,22 @@ function _x(::Type{Tropical{TV}}; invert) where {TV}
     ret = Tropical{TV}(one(TV))
     invert ? pre_invert_exponent(ret) : ret
 end
+function _x(::Type{ExtendedTropical{K,TO}}; invert) where {K,TO}
+    ret =ExtendedTropical{K,TO}(map(i->i==K ? one(TO) : zero(Tropical{TO}).n, 1:K))
+    invert ? pre_invert_exponent(ret) : ret
+end
 
 # for finding all solutions
 function _x(::Type{T}; invert) where {T<:AbstractSetNumber}
     ret = one(T)
     invert ? pre_invert_exponent(ret) : ret
 end
+
+# negate the exponents before entering the solver
+pre_invert_exponent(t::TruncatedPoly{K}) where K = TruncatedPoly(t.coeffs, -t.maxorder)
+pre_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
+pre_invert_exponent(t::ExtendedTropical{K}) where K = ExtendedTropical{K}(map(i->i==K ? -t.orders[i] : t.orders[i], 1:K))
+# negate the exponents after entering the solver
+post_invert_exponent(t::TruncatedPoly{K}) where K = TruncatedPoly(ntuple(i->t.coeffs[K-i+1], K), -t.maxorder+(K-1))
+post_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
+post_invert_exponent(t::ExtendedTropical{K}) where K = ExtendedTropical{K}(map(i->-t.orders[i], K:-1:1))

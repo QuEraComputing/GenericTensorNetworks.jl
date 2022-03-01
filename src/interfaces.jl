@@ -1,28 +1,33 @@
 abstract type AbstractProperty end
 
 """
-    SizeMax <: AbstractProperty
-    SizeMax()
+    SizeMax{K} <: AbstractProperty
+    SizeMax(k::Int)
 
-The maximum set size. e.g. the largest size of the [`IndependentSet`](@ref)  problem is also know as the independence number.
+The maximum-K set sizes. e.g. the largest size of the [`IndependentSet`](@ref)  problem is also know as the independence number.
 
-* The corresponding tensor element type is max-plus tropical number [`Tropical`](@ref).
+* The corresponding tensor element type are max-plus tropical number [`Tropical`](@ref) for `K == 1` and [`ExtendedTropical`](@ref) for `K > 1`.
 * It is compatible with weighted graph problems.
-* BLAS (on CPU) and GPU are supported,
+* BLAS (on CPU) and GPU are supported only for `K == 1`,
 """
-struct SizeMax <: AbstractProperty end
+struct SizeMax{K} <: AbstractProperty end
+SizeMax(k::Int=1) = SizeMax{k}()
+max_k(::SizeMax{K}) where K = K
 
 """
-    SizeMin <: AbstractProperty
-    SizeMin()
+    SizeMin{K} <: AbstractProperty
+    SizeMin(k::Int)
 
-The maximum set size. e.g. the smallest size ofthe [`MaximalIS`](@ref) problem is also known as the independent domination number.
+The minimum-K set sizes. e.g. the smallest size ofthe [`MaximalIS`](@ref) problem is also known as the independent domination number.
 
-* The corresponding tensor element type inverted max-plus tropical number [`Tropical`](@ref), which is equivalent to the min-plus tropical number.
+* The corresponding tensor element type are inverted max-plus tropical number [`Tropical`](@ref) for `K == 1` and inverted [`ExtendedTropical`](@ref) for `K > 1`.
+The inverted Tropical number emulates the min-plus tropical number.
 * It is compatible with weighted graph problems.
-* BLAS (on CPU) and GPU are supported,
+* BLAS (on CPU) and GPU are supported only for `K == 1`,
 """
-struct SizeMin <: AbstractProperty end
+struct SizeMin{K} <: AbstractProperty end
+SizeMin(k::Int=1) = SizeMin{k}()
+max_k(::SizeMin{K}) where K = K
 
 """
     CountingAll <: AbstractProperty
@@ -226,10 +231,14 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
     if !_solvable(gp, property)
         throw(ArgumentError("Graph property `$(typeof(property))` is not computable for graph problem of type `$(typeof(gp))`."))
     end
-    if property isa SizeMax
+    if property isa SizeMax{1}
         return contractx(gp, _x(Tropical{T}; invert=false); usecuda=usecuda)
-    elseif property isa SizeMin
+    elseif property isa SizeMin{1}
         return post_invert_exponent.(contractx(gp, _x(Tropical{T}; invert=true); usecuda=usecuda))
+    elseif property isa SizeMax
+        return contractx(gp, _x(ExtendedTropical{max_k(property), T}; invert=false); usecuda=usecuda)
+    elseif property isa SizeMin
+        return post_invert_exponent.(contractx(gp, _x(ExtendedTropical{max_k(property), T}; invert=true); usecuda=usecuda))
     elseif property isa CountingAll
         return contractx(gp, one(T); usecuda=usecuda)
     elseif property isa CountingMax{1}
@@ -275,13 +284,6 @@ end
 
 # raise an error if the property for problem can not be computed
 _solvable(::Any, ::Any) = true
-
-# negate the exponents before entering the solver
-pre_invert_exponent(t::TruncatedPoly{K}) where K = TruncatedPoly(t.coeffs, -t.maxorder)
-pre_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
-# negate the exponents after entering the solver
-post_invert_exponent(t::TruncatedPoly{K}) where K = TruncatedPoly(ntuple(i->t.coeffs[K-i+1], K), -t.maxorder+(K-1))
-post_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
 
 """
     max_size(problem; usecuda=false)
@@ -403,6 +405,9 @@ function estimate_memory(problem::GraphProblem, ::GraphPolynomial{:polynomial}; 
     # this is the upper bound
     return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * length(labels(problem)))
 end
+function estimate_memory(problem::GraphProblem, ::Union{SizeMax{K},SizeMin{K}}; T=Float64) where K
+    return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * K)
+end
 
 function _size_dict(problem)
     lbs = labels(problem)
@@ -417,7 +422,9 @@ function _estimate_memory(::Type{ET}, problem::GraphProblem) where ET
     return peak_memory(problem.code, _size_dict(problem)) * sizeof(ET)
 end
 
-for (PROP, ET) in [(:SizeMax, :(Tropical{T})), (:SizeMin, :(Tropical{T})),
+for (PROP, ET) in [
+        (:(SizeMax{1}), :(Tropical{T})), (:(SizeMin{1}), :(Tropical{T})),
+        (:(SizeMax{K}), :(ExtendedTropical{K,T})), (:(SizeMin{K}), :(ExtendedTropical{K,T})),
         (:(SingleConfigMax{true}), :(Tropical{T})), (:(SingleConfigMin{true}), :(Tropical{T})),
         (:(CountingAll), :T), (:(CountingMax{1}), :(CountingTropical{T,T})), (:(CountingMin{1}), :(CountingTropical{T,T})),
         (:(CountingMax{K}), :(TruncatedPoly{K,T,T})), (:(CountingMin{K}), :(TruncatedPoly{K,T,T})),

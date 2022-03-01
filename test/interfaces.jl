@@ -141,6 +141,11 @@ end
     res4b = solve(gp, ConfigsMax(1; bounded=true))[]
     @test res4 == res4b
     @test res4.c.data[] == res3.c.data
+
+    g = Graphs.smallgraph("petersen")
+    gp = IndependentSet(g; weights=fill(0.5, 10))
+    res5 = solve(gp, SizeMax(6))[]
+    @test res5.orders == [3.0,4,4,4,4,4] ./ 2
 end
 
 @testset "tree storage" begin
@@ -184,7 +189,7 @@ end
 @testset "memory estimation" begin
     gp = IndependentSet(smallgraph(:petersen))
     for property in [
-            SizeMax(), SizeMin(), CountingMax(), CountingMin(), CountingMax(2), CountingMin(2),
+            SizeMax(), SizeMin(), SizeMax(3), SizeMin(3), CountingMax(), CountingMin(), CountingMax(2), CountingMin(2),
             ConfigsMax(;bounded=true), ConfigsMin(;bounded=true), ConfigsMax(2;bounded=true), ConfigsMin(2;bounded=true), 
             ConfigsMax(;bounded=false), ConfigsMin(;bounded=false), ConfigsMax(2;bounded=false), ConfigsMin(2;bounded=false), SingleConfigMax(;bounded=false), SingleConfigMin(;bounded=false),
             CountingAll(), ConfigsAll(),

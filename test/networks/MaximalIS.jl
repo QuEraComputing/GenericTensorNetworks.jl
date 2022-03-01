@@ -23,9 +23,11 @@ end
 @testset "counting minimum maximal IS" begin
     g = smallgraph(:tutte)
     res = solve(MaximalIS(g), SizeMin())[]
+    res2 = solve(MaximalIS(g), SizeMin(10))[]
     poly = solve(MaximalIS(g), GraphPolynomial())[]
     @test poly == Polynomial([fill(0.0, 13)..., 2, 150, 7510, 71669, 66252, 14925, 571])
     @test res.n == 13
+    @test res2.orders == [13, 13, fill(14, 8)...]
     @test solve(MaximalIS(g), CountingMin())[].c == 2
     min2 = solve(MaximalIS(g), CountingMin(3))[]
     @test min2.maxorder == 15

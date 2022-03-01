@@ -34,6 +34,7 @@ end
                     (Max2Poly(1,2,3.0), Max2Poly(3,2,2.0), Max2Poly(4,7,1.0)),
                     (TruncatedPoly((1,2,3),3.0), TruncatedPoly((7,3,2),2.0), TruncatedPoly((1,4,7),1.0)),
                     (TropicalF64(5), TropicalF64(3), TropicalF64(-9)),
+                    (ExtendedTropical{2}([2.2,3.1]), ExtendedTropical{2}([-1.0, 4.0]), ExtendedTropical{2}([-Inf, 0.6])),
                     (CountingTropicalF64(5, 3), CountingTropicalF64(3, 9), CountingTropicalF64(-3, 2)),
                     (CountingTropical(5.0, ConfigSampler(StaticBitVector(rand(Bool, 10)))), CountingTropical(3.0, ConfigSampler(StaticBitVector(rand(Bool, 10)))), CountingTropical(-3.0, ConfigSampler(StaticBitVector(rand(Bool, 10))))),
                     (CountingTropical(5.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:3])), CountingTropical(3.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:4])), CountingTropical(-3.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:5]))),
@@ -97,6 +98,14 @@ end
     x = ConfigSampler(bv"00111")
     @test x ^ 0 == one(x)
     @test x ^ 2.0 == x
+
+    x = ExtendedTropical{3}([1.0, 2.0, 3.0])
+    @test x ^ 1 == x
+    @test x ^ 0 == one(x)
+    @test x ^ 1.0 == x
+    @test x ^ 0.0 == one(x)
+    @test x ^ 2 == ExtendedTropical{3}([2.0, 4.0, 6.0])
+    @test x ^ 2.0 == ExtendedTropical{3}([2.0, 4.0, 6.0])
 end
 
 @testset "push coverage" begin
@@ -113,4 +122,32 @@ end
     @test copy(y) !== y
     @test !iszero(y)
     println((x * x) * zero(x))
+end
+
+@testset "Truncated Tropical" begin
+    # +
+    a = ExtendedTropical{3}([1,2,3])
+    b = ExtendedTropical{3}([4,5,6])
+    c = ExtendedTropical{3}([0,1,2])
+    @test a + b == ExtendedTropical{3}([4,5,6])
+    @test b + a == ExtendedTropical{3}([4,5,6])
+    @test c + a == ExtendedTropical{3}([2,2,3])
+    @test a + c == ExtendedTropical{3}([2,2,3])
+
+    # *
+    function naive_mul(a, b)
+        K = length(a)
+        return sort!(vec([x+y for x in a, y in b]))[end-K+1:end]
+    end
+    d = ExtendedTropical{3}([0,1,20])
+    @test naive_mul(a.orders, b.orders) == (a * b).orders
+    @test naive_mul(b.orders, a.orders) == (b * a).orders
+    @test naive_mul(a.orders, d.orders) == (a * d).orders
+    @test naive_mul(d.orders, a.orders) == (d * a).orders
+    @test naive_mul(d.orders, d.orders) == (d * d).orders
+    for i=1:20
+        a = ExtendedTropical{100}(sort!(randn(100)))
+        b = ExtendedTropical{100}(sort!(randn(100)))
+        @test naive_mul(a.orders, b.orders) == (a * b).orders
+    end
 end

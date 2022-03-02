@@ -86,6 +86,7 @@ Polynomials.Polynomial
 TruncatedPoly
 Max2Poly
 ConfigEnumerator
+SumProductTree
 TreeConfigEnumerator
 ConfigSampler
 ```

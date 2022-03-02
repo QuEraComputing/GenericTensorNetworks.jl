@@ -610,6 +610,8 @@ Direct sampling configurations from a [`TreeConfigEnumerator`](@ref) instance.
 Example
 -----------------------------
 ```jldoctest; setup=:(using GraphTensorNetworks)
+julia> using Graphs
+
 julia> g= smallgraph(:petersen)
 {10, 15} undirected simple Int64 graph
 

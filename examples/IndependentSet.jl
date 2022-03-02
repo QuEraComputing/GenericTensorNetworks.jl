@@ -157,7 +157,7 @@ loaded_sets = load_configs(filename; format=:binary, bitlength=10)
 #     * [`ConfigsMin`](@ref) for enumerating minimum set size,
 
 
-# ## Weights and open vertices
+# ## Weighted Graphs
 # [`IndependentSet`](@ref) accepts weights as a key word argument.
 # The following code computes the weighted MIS problem.
 problem = IndependentSet(graph; weights=collect(1:10))
@@ -167,6 +167,13 @@ max_config_weighted = solve(problem, SingleConfigMax())[]
 show_graph(graph; locs=locations, vertex_colors=
           [iszero(max_config_weighted.c.data[i]) ? "white" : "red" for i=1:nv(graph)])
 
+# For weighted MIS problem, a property that many people care about is the "energy spectrum", or the largest weights.
+# One just feed a positional argument in the [`SizeMax`](@ref) constructor as the number of largest weights.
+spectrum = solve(problem, SizeMax(10))
+
+# It uses the [`ExtendedTropical`](@ref) as the tensor elements.
+
+# ## Open vertices and MIS tensor analysis
 # The following code computes the MIS tropical tensor (reference to be added) with open vertices 1, 2 and 3.
 problem = IndependentSet(graph; openvertices=[1,2,3])
 

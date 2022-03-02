@@ -88,6 +88,13 @@ The `TropicalGEMM` pirates the `LinearAlgebra.mul!` interface, hence it takes ef
 The GEMM routine can speed up the computation on CPU for one order, with multi-threading, it can be even faster.
 Benchmark shows the performance of `TropicalGEMM` is close to the theoretical optimal value.
 
+## Sum product representation for configurations
+[`TreeConfigEnumerator`](@ref) can save a lot memory for you to store exponential number of configurations in polynomial space.
+It is a sum-product expression tree to store [`ConfigEnumerator`](@ref) in a lazy style, configurations can be extracted by depth first searching the tree with the `Base.collect` method. Although it is space efficient, it is in general not easy to extract information from it.
+This tree structure supports directed sampling so that one can get some statistic properties from it with an intermediate effort.
+
+(To be written.)
+
 ## Make use of GPUs
 To upload the computing to GPU, you just add need to use CUDA, and offer a new key word argument.
 ```julia

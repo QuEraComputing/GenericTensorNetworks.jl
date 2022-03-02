@@ -176,6 +176,12 @@ end
 Extended Tropical numbers with largest `K` orders keeped,
 or the [`TruncatedPoly`](@ref) without coefficients,
 `TO` is the element type of orders.
+This algebra maps
+
+* `+` to finding largest `K` values of union of two sets.
+* `*` to finding largest `K` values of sum combination of two sets.
+* `0` to set [-Inf, -Inf, ..., -Inf, -Inf]
+* `1` to set [-Inf, -Inf, ..., -Inf, 0]
 
 Example
 ------------------------------

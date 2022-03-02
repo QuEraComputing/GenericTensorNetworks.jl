@@ -90,15 +90,30 @@ e.g. when the problem is [`MaximalIS`](@ref), it computes all maximal independen
 """
 all_solutions(gp::GraphProblem; T=Float64) = solutions(gp, Polynomial{T,:x}, all=true, usecuda=false, tree_storage=false)
 
-function _onehotv(::Type{Polynomial{BS,X}}, x, v) where {BS,X}
-    Polynomial{BS,X}([onehotv(BS, x, v)])
+# NOTE: do we have more efficient way to compute it?
+# NOTE: doing pair-wise Hamming distance might be biased?
+"""
+    hamming_distribution(S, T)
+
+Compute the distribution of pair-wise Hamming distances, which is defined as:
+```math
+c(k) := \\sum_{\\sigma\\in S, \\tau\\in T} \\delta({\\rm dist}(\\sigma, \\tau), k)
+```
+where ``\\delta`` is a function that returns 1 if two arguments are equivalent, 0 otherwise,
+``{\\rm dist}`` is the Hamming distance function.
+
+Returns the counting as a vector.
+"""
+function hamming_distribution(t1::ConfigEnumerator, t2::ConfigEnumerator)
+    return hamming_distribution(t1.data, t2.data)
 end
-function _onehotv(::Type{TruncatedPoly{K,BS,OS}}, x, v) where {K,BS,OS}
-    TruncatedPoly{K,BS,OS}(ntuple(i->i != K ? zero(BS) : onehotv(BS, x, v), K),zero(OS))
+function hamming_distribution(s1::AbstractVector{StaticElementVector{N,S,C}}, s2::AbstractVector{StaticElementVector{N,S,C}}) where {N,S,C}
+    return hamming_distribution!(zeros(Int, N+1), s1, s2)
 end
-function _onehotv(::Type{CountingTropical{TV,BS}}, x, v) where {TV,BS}
-    CountingTropical{TV,BS}(zero(TV), onehotv(BS, x, v))
-end
-function _onehotv(::Type{BS}, x, v) where {BS<:AbstractSetNumber}
-    onehotv(BS, x, v)
+function hamming_distribution!(out::AbstractVector, s1::AbstractVector{StaticElementVector{N,S,C}}, s2::AbstractVector{StaticElementVector{N,S,C}}) where {N,S,C}
+    @assert length(out) == N+1
+    @inbounds for a in s1, b in s2
+        out[count_ones(a ⊻ b)+1] += 1
+    end
+    return out
 end

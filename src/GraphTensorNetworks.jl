@@ -5,7 +5,7 @@ using Core: Argument
 using TropicalNumbers
 using OMEinsum
 using OMEinsum: timespace_complexity, getixsv
-using Graphs
+using Graphs, Random
 
 # OMEinsum
 export timespace_complexity, timespacereadwrite_complexity, @ein_str, getixsv, getiyv
@@ -19,6 +19,7 @@ export StaticBitVector, StaticElementVector, @bv_str
 export is_commutative_semiring
 export Max2Poly, TruncatedPoly, Polynomial, Tropical, CountingTropical, StaticElementVector, Mod, ConfigEnumerator, onehotv, ConfigSampler, TreeConfigEnumerator
 export CountingTropicalF64, CountingTropicalF32, TropicalF64, TropicalF32, ExtendedTropical
+export generate_samples
 
 # Lower level APIs
 export AllConfigs, SingleConfig
@@ -45,7 +46,7 @@ export is_dominating_set
 export solve, SizeMax, SizeMin, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin
 
 # Utilities
-export save_configs, load_configs
+export save_configs, load_configs, hamming_distribution
 
 # Visualization
 export show_graph, spring_layout

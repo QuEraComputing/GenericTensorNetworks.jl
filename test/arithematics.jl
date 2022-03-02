@@ -2,6 +2,7 @@ using GraphTensorNetworks, Test, OMEinsum, OMEinsumContractionOrders
 using Mods, Polynomials, TropicalNumbers
 using Graphs, Random
 using GraphTensorNetworks: StaticBitVector
+using LinearAlgebra
 
 @testset "truncated poly" begin
     p1 = TruncatedPoly((2,2,1), 2.0)
@@ -150,4 +151,23 @@ end
         b = ExtendedTropical{100}(sort!(randn(100)))
         @test naive_mul(a.orders, b.orders) == (a * b).orders
     end
+end
+
+# check the correctness of sampling
+@testset "generate samples" begin
+    Random.seed!(2)
+    g = smallgraph(:petersen)
+    gp = IndependentSet(g)
+    t = solve(gp, ConfigsAll(tree_storage=true))[]
+    cs = solve(gp, ConfigsAll())[]
+    @test length(t) == 76
+    samples = generate_samples(t, 10000)
+    counts = zeros(5)
+    for sample in samples
+        counts[count_ones(sample)+1] += 1
+    end
+    @test isapprox(counts, [1,10,30,30,5] .* 10000 ./ 76, rtol=0.05)
+    hd1 = hamming_distribution(samples, samples) |> normalize
+    hd2 = hamming_distribution(cs, cs) |> normalize
+    @test isapprox(hd1, hd2, atol=0.01)
 end

@@ -31,13 +31,10 @@ labels(gp::IndependentSet) = [1:gp.nv...]
 function generate_tensors(x::T, gp::IndependentSet) where T
     gp.nv == 0 && return []
     ixs = getixsv(gp.code)
-    return add_labels!(map(enumerate(ixs)) do (i, ix)
-        if i <= gp.nv
-            misv(Ref(x) .^ get_weights(gp, i))
-        else
-            misb(T, length(ix)) # if n!=2, it corresponds to set packing problem.
-        end
-    end, ixs, labels(gp))
+    # we only add labels at vertex tensors
+    return vcat(add_labels!([misv(Ref(x) .^ get_weights(gp, i)) for i=1:gp.nv], ixs[1:gp.nv], labels(gp)),
+            [misb(T, length(ix)) for ix in ixs[gp.nv+1:end]] # if n!=2, it corresponds to set packing problem.
+    )
 end
 
 function misb(::Type{T}, n::Integer=2) where T

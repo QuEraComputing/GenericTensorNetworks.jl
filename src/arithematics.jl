@@ -4,7 +4,7 @@ using Mods, Primes
 using Base.Cartesian
 import AbstractTrees: children, printnode, print_tree
 
-@enum TreeTag LEAF SUM PROD ZERO
+@enum TreeTag LEAF SUM PROD ZERO ONE
 
 # pirate
 Base.abs(x::Mod) = x
@@ -415,6 +415,7 @@ Base.one(::ConfigSampler{N,S,C}) where {N,S,C} = one(ConfigSampler{N,S,C})
 
 Configuration enumerator encoded in a tree, it is the most natural representation given by a sum-product network
 and is often more memory efficient than putting the configurations in a vector.
+One can use [`generate_samples`](@ref) to sample configurations from this tree structure efficiently.
 `N`, `S` and `C` are type parameters from the [`StaticElementVector`](@ref){N,S,C}.
 
 Fields
@@ -478,24 +479,26 @@ mutable struct TreeConfigEnumerator{N,S,C} <: AbstractSetNumber
         new{N,S,C}(LEAF, data)
     end
     function TreeConfigEnumerator{N,S,C}(tag::TreeTag) where {N,S,C}
-        @assert  tag === ZERO
+        @assert  tag === ZERO || tag === ONE
         return new{N,S,C}(tag)
     end
 end
 
 # AbstractTree APIs
 function children(t::TreeConfigEnumerator)
-    if t.tag == ZERO || t.tag == LEAF
+    if t.tag == ZERO || t.tag == LEAF || t.tag == ONE
         return typeof(t)[]
     else
         return [t.left, t.right]
     end
 end
-function printnode(io::IO, t::TreeConfigEnumerator)
+function printnode(io::IO, t::TreeConfigEnumerator{N,S,C}) where {N,S,C}
     if t.tag === LEAF
         print(io, t.data)
     elseif t.tag === ZERO
         print(io, "∅")
+    elseif t.tag === ONE
+        print(io, zero(StaticElementVector{N,S,C}))
     elseif t.tag === SUM
         print(io, "+")
     else  # PROD
@@ -503,16 +506,16 @@ function printnode(io::IO, t::TreeConfigEnumerator)
     end
 end
 
-Base.length(x::TreeConfigEnumerator) = _length(x, IdDict{typeof(x), Int}())
+Base.length(x::TreeConfigEnumerator) = _length!(x, IdDict{typeof(x), Int}())
 
-function _length(x, d)
+function _length!(x, d)
     haskey(d, x) && return d[x]
     if x.tag === SUM
-        l = _length(x.left, d) + _length(x.right, d)
+        l = _length!(x.left, d) + _length!(x.right, d)
         d[x] = l
         return l
     elseif x.tag === PROD
-        l = _length(x.left, d) * _length(x.right, d)
+        l = _length!(x.left, d) * _length!(x.right, d)
         d[x] = l
         return l
     elseif x.tag === ZERO
@@ -525,7 +528,7 @@ end
 num_nodes(x::TreeConfigEnumerator) = _num_nodes(x, IdDict{typeof(x), Int}())
 function _num_nodes(x, d)
     haskey(d, x) && return 0
-    if x.tag == ZERO
+    if x.tag == ZERO || x.tag == ONE
         res = 1
     elseif x.tag == LEAF
         res = 1
@@ -545,6 +548,8 @@ Base.show(io::IO, t::TreeConfigEnumerator) = print_tree(io, t)
 function Base.collect(x::TreeConfigEnumerator{N,S,C}) where {N,S,C}
     if x.tag == ZERO
         return StaticElementVector{N,S,C}[]
+    elseif x.tag == ONE
+        return StaticElementVector{N,S,C}[zero(StaticElementVector{N,S,C})]
     elseif x.tag == LEAF
         return StaticElementVector{N,S,C}[x.data]
     elseif x.tag == SUM
@@ -555,15 +560,33 @@ function Base.collect(x::TreeConfigEnumerator{N,S,C}) where {N,S,C}
 end
 
 function Base.:+(x::TreeConfigEnumerator{N,S,C}, y::TreeConfigEnumerator{N,S,C}) where {N,S,C}
-    TreeConfigEnumerator(SUM, x, y)
+    if x.tag == ZERO
+        return y
+    elseif y.tag == ZERO
+        return x
+    else
+        return TreeConfigEnumerator(SUM, x, y)
+    end
 end
 
 function Base.:*(x::TreeConfigEnumerator{L,S,C}, y::TreeConfigEnumerator{L,S,C}) where {L,S,C}
-    TreeConfigEnumerator(PROD, x, y)
+    if x.tag == ONE
+        return y
+    elseif y.tag == ONE
+        return x
+    elseif x.tag == ZERO
+        return x
+    elseif y.tag == ZERO
+        return y
+    elseif x.tag == LEAF && y.tag == LEAF
+        return TreeConfigEnumerator(x.data | y.data)
+    else
+        return TreeConfigEnumerator(PROD, x, y)
+    end
 end
 
 Base.zero(::Type{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = TreeConfigEnumerator{N,S,C}(ZERO)
-Base.one(::Type{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = TreeConfigEnumerator(zero(StaticElementVector{N,S,C}))
+Base.one(::Type{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = TreeConfigEnumerator{N,S,C}(ONE)
 Base.zero(::TreeConfigEnumerator{N,S,C}) where {N,S,C} = zero(TreeConfigEnumerator{N,S,C})
 Base.one(::TreeConfigEnumerator{N,S,C}) where {N,S,C} = one(TreeConfigEnumerator{N,S,C})
 # todo, check siblings too?
@@ -572,11 +595,64 @@ function Base.iszero(t::TreeConfigEnumerator)
         iszero(t.left) && iszero(t.right)
     elseif t.tag == ZERO
         true
-    elseif t.tag == LEAF
+    elseif t.tag == LEAF || t.tag == ONE
         false
     else
         iszero(t.left) || iszero(t.right)
     end
+end
+
+"""
+    generate_samples(t::TreeConfigEnumerator, nsamples::Int)
+
+Direct sampling configurations from a [`TreeConfigEnumerator`](@ref) instance.
+
+Example
+-----------------------------
+```jldoctest; setup=:(using GraphTensorNetworks)
+julia> g= smallgraph(:petersen)
+{10, 15} undirected simple Int64 graph
+
+julia> t = solve(IndependentSet(g), ConfigsAll(; tree_storage=true))[];
+
+julia> samples = generate_samples(t, 1000);
+
+julia> all(s->is_independent_set(g, s), samples)
+true
+```
+"""
+function generate_samples(t::TreeConfigEnumerator{N,S,C}, nsamples::Int) where {N,S,C}
+    # get length dict
+    res = fill(zero(StaticElementVector{N,S,C}), nsamples)
+    d = IdDict{typeof(t), Int}()
+    sample_descend!(res, t, d)
+    return res
+end
+
+function sample_descend!(res::AbstractVector, t::TreeConfigEnumerator, d::IdDict)
+    length(res) == 0 && return res
+    if t.tag == LEAF
+        res .|= Ref(t.data)
+    elseif t.tag == SUM
+        ratio = _length!(t.left, d)/_length!(t, d)
+        nleft = 0
+        for _ = 1:length(res)
+            if rand() < ratio
+                nleft += 1
+            end
+        end
+        shuffle!(res)  # shuffle the `res` to avoid biased sampling, very important.
+        sample_descend!(view(res,1:nleft), t.left, d)
+        sample_descend!(view(res,nleft+1:length(res)), t.right, d)
+    elseif t.tag == PROD
+        sample_descend!(res, t.right, d)
+        sample_descend!(res, t.left, d)
+    elseif t.tag == ZERO
+        error("Meet zero when descending.")
+    else
+        # pass for 1
+    end
+    return res
 end
 
 # A patch to make `Polynomial{ConfigEnumerator}` work
@@ -611,7 +687,8 @@ end
 
 # utilities for creating onehot vectors
 onehotv(::Type{ConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigEnumerator([onehotv(StaticElementVector{N,S,C}, i, v)])
-onehotv(::Type{TreeConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = TreeConfigEnumerator(onehotv(StaticElementVector{N,S,C}, i, v))
+# we treat `v == 0` specially because we want the final result not containing one leaves.
+onehotv(::Type{TreeConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = v == 0 ? one(TreeConfigEnumerator{N,S,C}) : TreeConfigEnumerator(onehotv(StaticElementVector{N,S,C}, i, v))
 onehotv(::Type{ConfigSampler{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigSampler(onehotv(StaticElementVector{N,S,C}, i, v))
 # just to make matrix transpose work
 Base.transpose(c::ConfigEnumerator) = c
@@ -620,7 +697,7 @@ Base.transpose(c::TreeConfigEnumerator) = c
 function Base.copy(c::TreeConfigEnumerator{N,S,C}) where {N,S,C}
     if c.tag == LEAF
         TreeConfigEnumerator(c.data)
-    elseif c.tag == ZERO
+    elseif c.tag == ZERO || c.tag == ONE
         TreeConfigEnumerator{N,S,C}(c.tag)
     else
         TreeConfigEnumerator(c.tag, c.left, c.right)
@@ -635,9 +712,9 @@ end
 
 # to handle power of polynomials
 function Base.:^(x::TreeConfigEnumerator, y::Real)
-    if y <= 0
+    if y == 0
         return one(x)
-    elseif x.tag == LEAF
+    elseif x.tag == LEAF || x.tag == ONE || x.tag == ZERO
         return x
     else
         error("pow of non-leaf nodes is forbidden!")
@@ -686,6 +763,19 @@ end
 function _x(::Type{T}; invert) where {T<:AbstractSetNumber}
     ret = one(T)
     invert ? pre_invert_exponent(ret) : ret
+end
+
+function _onehotv(::Type{Polynomial{BS,X}}, x, v) where {BS,X}
+    Polynomial{BS,X}([onehotv(BS, x, v)])
+end
+function _onehotv(::Type{TruncatedPoly{K,BS,OS}}, x, v) where {K,BS,OS}
+    TruncatedPoly{K,BS,OS}(ntuple(i->i != K ? zero(BS) : onehotv(BS, x, v), K),zero(OS))
+end
+function _onehotv(::Type{CountingTropical{TV,BS}}, x, v) where {TV,BS}
+    CountingTropical{TV,BS}(zero(TV), onehotv(BS, x, v))
+end
+function _onehotv(::Type{BS}, x, v) where {BS<:AbstractSetNumber}
+    onehotv(BS, x, v)
 end
 
 # negate the exponents before entering the solver

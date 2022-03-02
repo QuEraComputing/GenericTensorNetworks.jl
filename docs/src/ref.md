@@ -97,6 +97,9 @@ save_configs
 load_configs
 @bv_str
 onehotv
+
+generate_samples
+hamming_distribution
 ```
 
 ## Tensor Network

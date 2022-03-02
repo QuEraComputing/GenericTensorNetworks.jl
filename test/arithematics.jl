@@ -151,3 +151,18 @@ end
         @test naive_mul(a.orders, b.orders) == (a * b).orders
     end
 end
+
+# check the correctness of sampling
+@testset "generate samples" begin
+    Random.seed!(2)
+    g = smallgraph(:petersen)
+    gp = IndependentSet(g)
+    t = solve(gp, ConfigsAll(tree_storage=true))[]
+    @test length(t) == 76
+    samples = generate_samples(t, 10000)
+    counts = zeros(5)
+    for sample in samples
+        counts[count_ones(sample)+1] += 1
+    end
+    @test isapprox(counts, [1,10,30,30,5] .* 10000 ./ 76, rtol=0.05)
+end

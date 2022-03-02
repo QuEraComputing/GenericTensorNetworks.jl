@@ -17,6 +17,7 @@ OMEinsum = "ebe7aa44-baf0-506c-a96f-8464559b3922"
 OMEinsumContractionOrders = "6f22d1fd-8eed-4bb7-9776-e7d684900715"
 Polynomials = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
 Primes = "27ebfcd6-29c5-5fa9-bf4b-fb8fc14df3ae"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 SIMDTypes = "94e857df-77ce-4151-89e5-788b33177be4"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
@@ -44,8 +45,7 @@ julia = "1"
 
 [extras]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "Documenter", "Random"]
+test = ["Test", "Documenter"]

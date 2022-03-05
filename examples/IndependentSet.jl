@@ -92,7 +92,8 @@ independence_polynomial = solve(problem, GraphPolynomial(; method=:finitefield))
 # ### Configuration properties
 # ##### finding one maximum independent set (MIS)
 # One can use [`SingleConfigMax`](@ref) to find one of the solution with largest set size, and it has two implementations.
-# The unbounded (default) version uses [`ConfigSampler`](@ref) to sample one of the best solutions directly.
+# The unbounded (default) version uses a joint type of [`CountingTropical`](@ref) and [`ConfigSampler`](@ref) in computation,
+# where `CountingTropical` finds the maximum size and `ConfigSampler` samples one of the best solutions.
 # The bounded version uses the binary gradient back-propagation (see our paper) to compute the gradients.
 # It requires caching intermediate states, but is often faster (on CPU) because it can use [`TropicalGEMM`](https://github.com/TensorBFS/TropicalGEMM.jl) (see [Performance Tips](@ref)).
 max_config = solve(problem, SingleConfigMax(; bounded=false))[]
@@ -172,6 +173,18 @@ show_graph(graph; locs=locations, vertex_colors=
 spectrum = solve(problem, SizeMax(10))
 
 # It uses the [`ExtendedTropical`](@ref) as the tensor elements.
+# One can get sets with maximum `K` sizes, by combining [`ExtendedTropical`](@ref) and the algebra in the previous section for sampling one configuration.
+max5_configs = solve(problem, SingleConfigMax(5))[]
+
+imgs_max5 = ntuple(k->show_graph(graph;
+                    locs=locations, scale=0.25,
+                    vertex_colors=[iszero(max5_configs.orders[k].c.data[i]) ? "white" : "red"
+                    for i=1:nv(graph)]), 5);
+
+Compose.set_default_graphic_size(18cm, 4cm)
+
+Compose.compose(context(),
+     ntuple(k->(context((k-1)/5, 0.0, 1.2/5, 1.0), imgs_max5[k]), 5)...)
 
 # ## Open vertices and MIS tensor analysis
 # The following code computes the MIS tropical tensor (reference to be added) with open vertices 1, 2 and 3.

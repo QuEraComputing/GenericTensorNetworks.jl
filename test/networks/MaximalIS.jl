@@ -24,10 +24,12 @@ end
     g = smallgraph(:tutte)
     res = solve(MaximalIS(g), SizeMin())[]
     res2 = solve(MaximalIS(g), SizeMin(10))[]
+    res3 = solve(MaximalIS(g), SingleConfigMin(10))[]
     poly = solve(MaximalIS(g), GraphPolynomial())[]
     @test poly == Polynomial([fill(0.0, 13)..., 2, 150, 7510, 71669, 66252, 14925, 571])
     @test res.n == 13
-    @test res2.orders == [13, 13, fill(14, 8)...]
+    @test res2.orders == Tropical.([13, 13, fill(14, 8)...])
+    @test all(r->is_maximal_independent_set(g, r[2].c.data) && count_ones(r[2].c.data)==r[1].n, zip(res2.orders, res3.orders))
     @test solve(MaximalIS(g), CountingMin())[].c == 2
     min2 = solve(MaximalIS(g), CountingMin(3))[]
     @test min2.maxorder == 15

@@ -109,10 +109,10 @@ GraphPolynomial(; method::Symbol = :finitefield, kwargs...) = GraphPolynomial{me
 graph_polynomial_method(::GraphPolynomial{METHOD}) where METHOD = METHOD
 
 """
-    SingleConfigMax{BOUNDED} <: AbstractProperty
-    SingleConfigMax(; bounded=false)
+    SingleConfigMax{K, BOUNDED} <: AbstractProperty
+    SingleConfigMax(k::Int; bounded=false)
 
-Finding single best solution, e.g. for [`IndependentSet`](@ref) problem, it is one of the maximum independent sets.
+Finding single solution for largest-K sizes, e.g. for [`IndependentSet`](@ref) problem, it is one of the maximum independent sets.
 
 * The corresponding data type is [`CountingTropical{Float64,<:ConfigSampler}`](@ref) if `BOUNDED` is `false`, [`Tropical`](@ref) otherwise.
 * Weighted graph problems is supported.
@@ -122,14 +122,15 @@ Keyword Arguments
 ----------------------------
 * `bounded`, if it is true, use bounding trick (or boolean gradients) to reduce the working memory to store intermediate configurations.
 """
-struct SingleConfigMax{BOUNDED} <:AbstractProperty end
-SingleConfigMax(; bounded::Bool=false) = SingleConfigMax{bounded}()
+struct SingleConfigMax{K,BOUNDED} <:AbstractProperty end
+SingleConfigMax(k::Int=1; bounded::Bool=false) = SingleConfigMax{k, bounded}()
+max_k(::SingleConfigMax{K}) where K = K
 
 """
-    SingleConfigMin{BOUNDED} <: AbstractProperty
-    SingleConfigMin(; bounded=false)
+    SingleConfigMin{K, BOUNDED} <: AbstractProperty
+    SingleConfigMin(k::Int; bounded=false)
 
-Finding single "worst" solution.
+Finding single solution with smallest-K size.
 
 * The corresponding data type is inverted [`CountingTropical{Float64,<:ConfigSampler}`](@ref) if `BOUNDED` is `false`, inverted [`Tropical`](@ref) otherwise.
 * Weighted graph problems is supported.
@@ -139,8 +140,9 @@ Keyword Arguments
 ----------------------------
 * `bounded`, if it is true, use bounding trick (or boolean gradients) to reduce the working memory to store intermediate configurations.
 """
-struct SingleConfigMin{BOUNDED} <:AbstractProperty end
-SingleConfigMin(; bounded::Bool=false) = SingleConfigMin{bounded}()
+struct SingleConfigMin{K,BOUNDED} <:AbstractProperty end
+SingleConfigMin(k::Int=1; bounded::Bool=false) = SingleConfigMin{k,bounded}()
+min_k(::SingleConfigMin{K}) where K = K
 
 """
     ConfigsAll{TREESTORAGE} <:AbstractProperty
@@ -216,7 +218,7 @@ Positional Arguments
     * [`CountingAll`](@ref) for counting all configurations,
     * [`GraphPolynomial`](@ref) for evaluating the graph polynomial,
 
-    * [`SingleConfigMax`](@ref) for finding one maximum configuration,
+    * [`SingleConfigMax`](@ref) for finding one maximum configuration for each size,
     * [`ConfigsMax`](@ref) for enumerating configurations with largest-K sizes,
     * [`ConfigsMin`](@ref) for enumerating configurations with smallest-K sizes,
     * [`ConfigsAll`](@ref) for enumerating all configurations,
@@ -236,9 +238,9 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
     elseif property isa SizeMin{1}
         return post_invert_exponent.(contractx(gp, _x(Tropical{T}; invert=true); usecuda=usecuda))
     elseif property isa SizeMax
-        return contractx(gp, _x(ExtendedTropical{max_k(property), T}; invert=false); usecuda=usecuda)
+        return contractx(gp, _x(ExtendedTropical{max_k(property), Tropical{T}}; invert=false); usecuda=usecuda)
     elseif property isa SizeMin
-        return post_invert_exponent.(contractx(gp, _x(ExtendedTropical{max_k(property), T}; invert=true); usecuda=usecuda))
+        return post_invert_exponent.(contractx(gp, _x(ExtendedTropical{max_k(property), Tropical{T}}; invert=true); usecuda=usecuda))
     elseif property isa CountingAll
         return contractx(gp, one(T); usecuda=usecuda)
     elseif property isa CountingMax{1}
@@ -251,10 +253,14 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
         return post_invert_exponent.(contractx(gp, pre_invert_exponent(TruncatedPoly(ntuple(i->i == min_k(property) ? one(T) : zero(T), min_k(property)), one(T))); usecuda=usecuda))
     elseif property isa GraphPolynomial
         return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
-    elseif property isa SingleConfigMax{false}
-        return solutions(gp, CountingTropical{T,T}; all=false, usecuda=usecuda, )
-    elseif property isa SingleConfigMin{false}
+    elseif property isa SingleConfigMax{1,false}
+        return solutions(gp, CountingTropical{T,T}; all=false, usecuda=usecuda)
+    elseif property isa (SingleConfigMax{K,false} where K)
+        return solutions(gp, ExtendedTropical{max_k(property),CountingTropical{T,T}}; all=false, usecuda=usecuda)
+    elseif property isa SingleConfigMin{1,false}
         return solutions(gp, CountingTropical{T,T}; all=false, usecuda=usecuda, invert=true)
+    elseif property isa (SingleConfigMin{K,false} where K)
+        return solutions(gp, ExtendedTropical{min_k(property),CountingTropical{T,T}}; all=false, usecuda=usecuda, invert=true)
     elseif property isa ConfigsMax{1,false}
         return solutions(gp, CountingTropical{T,T}; all=true, usecuda=usecuda, tree_storage=tree_storage(property))
     elseif property isa ConfigsMin{1,false}
@@ -265,10 +271,16 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
         return solutions(gp, TruncatedPoly{min_k(property),T,T}; all=true, usecuda=usecuda, invert=true)
     elseif property isa ConfigsAll
         return solutions(gp, Real; all=true, usecuda=usecuda, tree_storage=tree_storage(property))
-    elseif property isa SingleConfigMax{true}
+    elseif property isa SingleConfigMax{1,true}
         return best_solutions(gp; all=false, usecuda=usecuda, T=T)
-    elseif property isa SingleConfigMin{true}
+    elseif property isa (SingleConfigMax{K,true} where K)
+        @warn "bounded `SingleConfigMax` property for `K != 1` is not implemented. Switching to the unbounded version."
+        return solve(gp, SingleConfigMax{max_k(property),false}(); T, usecuda)
+    elseif property isa SingleConfigMin{1,true}
         return best_solutions(gp; all=false, usecuda=usecuda, invert=true, T=T)
+    elseif property isa (SingleConfigMin{K,true} where K)
+        @warn "bounded `SingleConfigMin` property for `K != 1` is not implemented. Switching to the unbounded version."
+        return solve(gp, SingleConfigMin{min_k(property),false}(); T, usecuda)
     elseif property isa ConfigsMax{1,true}
         return best_solutions(gp; all=true, usecuda=usecuda, tree_storage=tree_storage(property), T=T)
     elseif property isa ConfigsMin{1,true}
@@ -396,10 +408,20 @@ Memory estimation in number of bytes to compute certain `property` of a `problem
 function estimate_memory(problem::GraphProblem, property::AbstractProperty; T=Float64)
     _estimate_memory(tensor_element_type(T, length(labels(problem)), nflavor(problem), property), problem)
 end
-function estimate_memory(problem::GraphProblem, ::Union{SingleConfigMax{true},SingleConfigMin{true}}; T=Float64)
+function estimate_memory(problem::GraphProblem, property::Union{SingleConfigMax{K,BOUNDED},SingleConfigMin{K,BOUNDED}}; T=Float64) where {K, BOUNDED}
     tc, sc, rw = timespacereadwrite_complexity(problem.code, _size_dict(problem))
     # caching all tensors is equivalent to counting the total number of writes
-    return ceil(Int, exp2(rw - 1)) * sizeof(Tropical{T})
+    if K == 1 && BOUNDED
+        return ceil(Int, exp2(rw - 1)) * sizeof(Tropical{T})
+    elseif K == 1 & !BOUNDED
+        n, nf = length(labels(problem)), nflavor(problem)
+        return peak_memory(problem.code, _size_dict(problem)) * (sizeof(tensor_element_type(T, n, nf, property)) * K)
+    else
+        # NOTE: the `K > 1` case does not respect bounding
+        n, nf = length(labels(problem)), nflavor(problem)
+        TT = tensor_element_type(T, n, nf, property)
+        return peak_memory(problem.code, _size_dict(problem)) * (sizeof(tensor_element_type(T, n, nf, SingleConfigMax{1,BOUNDED}())) * K + sizeof(TT))
+    end
 end
 function estimate_memory(problem::GraphProblem, ::GraphPolynomial{:polynomial}; T=Float64)
     # this is the upper bound
@@ -424,8 +446,7 @@ end
 
 for (PROP, ET) in [
         (:(SizeMax{1}), :(Tropical{T})), (:(SizeMin{1}), :(Tropical{T})),
-        (:(SizeMax{K}), :(ExtendedTropical{K,T})), (:(SizeMin{K}), :(ExtendedTropical{K,T})),
-        (:(SingleConfigMax{true}), :(Tropical{T})), (:(SingleConfigMin{true}), :(Tropical{T})),
+        (:(SizeMax{K}), :(ExtendedTropical{K,Tropical{T}})), (:(SizeMin{K}), :(ExtendedTropical{K,Tropical{T}})),
         (:(CountingAll), :T), (:(CountingMax{1}), :(CountingTropical{T,T})), (:(CountingMin{1}), :(CountingTropical{T,T})),
         (:(CountingMax{K}), :(TruncatedPoly{K,T,T})), (:(CountingMin{K}), :(TruncatedPoly{K,T,T})),
         (:(GraphPolynomial{:finitefield}), :(Mod{N,Int32} where N)), (:(GraphPolynomial{:fft}), :(Complex{T})), 
@@ -434,11 +455,17 @@ for (PROP, ET) in [
     @eval tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T,K} = $ET
 end
 
-for (PROP, ET) in [(:(SingleConfigMax{false}), :(CountingTropical{T,T})), (:(SingleConfigMin{false}), :(CountingTropical{T,T}))]
-    @eval function tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T}
-        sampler_type($ET, n, nflavor)
+function tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::PROP) where {T, K, BOUNDED, PROP<:Union{SingleConfigMax{K,BOUNDED},SingleConfigMin{K,BOUNDED}}}
+    if K == 1 && BOUNDED
+        return Tropical{T}
+    elseif K == 1 && !BOUNDED
+        return sampler_type(CountingTropical{T,T}, n, nflavor)
+    else
+        # NOTE: the `K > 1` case does not respect bounding
+        return sampler_type(ExtendedTropical{K,CountingTropical{T,T}}, n, nflavor)
     end
 end
+
 for (PROP, ET) in [
         (:(ConfigsMax{1}), :(CountingTropical{T,T})), (:(ConfigsMin{1}), :(CountingTropical{T,T})),
         (:(ConfigsMax{K}), :(TruncatedPoly{K,T,T})), (:(ConfigsMin{K}), :(TruncatedPoly{K,T,T})),

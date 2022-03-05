@@ -145,7 +145,7 @@ end
     g = Graphs.smallgraph("petersen")
     gp = IndependentSet(g; weights=fill(0.5, 10))
     res5 = solve(gp, SizeMax(6))[]
-    @test res5.orders == [3.0,4,4,4,4,4] ./ 2
+    @test res5.orders == Tropical.([3.0,4,4,4,4,4] ./ 2)
 end
 
 @testset "tree storage" begin

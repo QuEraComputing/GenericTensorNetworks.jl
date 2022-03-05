@@ -236,9 +236,9 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
     elseif property isa SizeMin{1}
         return post_invert_exponent.(contractx(gp, _x(Tropical{T}; invert=true); usecuda=usecuda))
     elseif property isa SizeMax
-        return contractx(gp, _x(ExtendedTropical{max_k(property), T}; invert=false); usecuda=usecuda)
+        return contractx(gp, _x(ExtendedTropical{max_k(property), Tropical{T}}; invert=false); usecuda=usecuda)
     elseif property isa SizeMin
-        return post_invert_exponent.(contractx(gp, _x(ExtendedTropical{max_k(property), T}; invert=true); usecuda=usecuda))
+        return post_invert_exponent.(contractx(gp, _x(ExtendedTropical{max_k(property), Tropical{T}}; invert=true); usecuda=usecuda))
     elseif property isa CountingAll
         return contractx(gp, one(T); usecuda=usecuda)
     elseif property isa CountingMax{1}
@@ -424,7 +424,7 @@ end
 
 for (PROP, ET) in [
         (:(SizeMax{1}), :(Tropical{T})), (:(SizeMin{1}), :(Tropical{T})),
-        (:(SizeMax{K}), :(ExtendedTropical{K,T})), (:(SizeMin{K}), :(ExtendedTropical{K,T})),
+        (:(SizeMax{K}), :(ExtendedTropical{K,Tropical{T}})), (:(SizeMin{K}), :(ExtendedTropical{K,Tropical{T}})),
         (:(SingleConfigMax{true}), :(Tropical{T})), (:(SingleConfigMin{true}), :(Tropical{T})),
         (:(CountingAll), :T), (:(CountingMax{1}), :(CountingTropical{T,T})), (:(CountingMin{1}), :(CountingTropical{T,T})),
         (:(CountingMax{K}), :(TruncatedPoly{K,T,T})), (:(CountingMin{K}), :(TruncatedPoly{K,T,T})),

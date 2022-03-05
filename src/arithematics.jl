@@ -703,6 +703,7 @@ for (F,TP) in [(:set_type, :ConfigEnumerator), (:sampler_type, :ConfigSampler), 
         end
     end
 end
+sampler_type(::Type{ExtendedTropical{K,T}}, n::Int, nflavor::Int) where {K,T} = ExtendedTropical{K, sampler_type(T, n, nflavor)}
 
 # utilities for creating onehot vectors
 onehotv(::Type{ConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigEnumerator([onehotv(StaticElementVector{N,S,C}, i, v)])
@@ -794,6 +795,9 @@ function _onehotv(::Type{CountingTropical{TV,BS}}, x, v) where {TV,BS}
 end
 function _onehotv(::Type{BS}, x, v) where {BS<:AbstractSetNumber}
     onehotv(BS, x, v)
+end
+function _onehotv(::Type{ExtendedTropical{K,TO}}, x, v) where {K,T,BS<:AbstractSetNumber,TO<:CountingTropical{T,BS}}
+    ExtendedTropical{K,TO}(map(i->i==K ? _onehotv(TO, x, v) : zero(TO), 1:K))
 end
 
 # negate the exponents before entering the solver

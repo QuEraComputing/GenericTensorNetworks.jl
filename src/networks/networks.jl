@@ -127,7 +127,7 @@ end
 add_labels!(tensors::AbstractVector{<:AbstractArray}, ixs, labels) = tensors
 
 const SetPolyNumbers{T} = Union{Polynomial{T}, TruncatedPoly{K,T} where K, CountingTropical{TV,T} where TV} where T<:AbstractSetNumber
-function add_labels!(tensors::AbstractVector{<:AbstractArray{T}}, ixs, labels) where T <: Union{AbstractSetNumber, SetPolyNumbers}
+function add_labels!(tensors::AbstractVector{<:AbstractArray{T}}, ixs, labels) where T <: Union{AbstractSetNumber, SetPolyNumbers, ExtendedTropical{K,T} where {K,T<:SetPolyNumbers}}
     for (t, ix) in zip(tensors, ixs)
         for (dim, l) in enumerate(ix)
             index = findfirst(==(l), labels)

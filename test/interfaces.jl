@@ -146,6 +146,11 @@ end
     gp = IndependentSet(g; weights=fill(0.5, 10))
     res5 = solve(gp, SizeMax(6))[]
     @test res5.orders == Tropical.([3.0,4,4,4,4,4] ./ 2)
+    res6 = solve(gp, SingleConfigMax(6))[]
+    @test all(enumerate(res6.orders)) do r
+        i, o = r
+        is_independent_set(g, o.c.data) && count_ones(o.c.data) == (i==1 ? 3 : 4)
+    end
 end
 
 @testset "tree storage" begin
@@ -192,7 +197,7 @@ end
             SizeMax(), SizeMin(), SizeMax(3), SizeMin(3), CountingMax(), CountingMin(), CountingMax(2), CountingMin(2),
             ConfigsMax(;bounded=true), ConfigsMin(;bounded=true), ConfigsMax(2;bounded=true), ConfigsMin(2;bounded=true), 
             ConfigsMax(;bounded=false), ConfigsMin(;bounded=false), ConfigsMax(2;bounded=false), ConfigsMin(2;bounded=false), SingleConfigMax(;bounded=false), SingleConfigMin(;bounded=false),
-            CountingAll(), ConfigsAll(),
+            CountingAll(), ConfigsAll(), SingleConfigMax(2), SingleConfigMin(2), SingleConfigMax(2; bounded=true), SingleConfigMin(2,bounded=true),
         ]
         @show property
         ET = GraphTensorNetworks.tensor_element_type(Float32, 10, 2, property)

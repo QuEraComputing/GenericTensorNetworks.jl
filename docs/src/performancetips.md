@@ -135,7 +135,44 @@ julia> lineplot(hamming_distribution(samples, samples))
           ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀80⠀ 
 ```
 
-(To be written.)
+## Multiprocessing
+Submodule `GraphTensorNetworks.SimpleMutiprocessing` provides a function [`multiprocess_run`](@ref) function for simple multi-processing jobs.
+Suppose we want to find the independence polynomial for multiple graphs with 4 processes.
+We can create a file, e.g. named `run.jl` with the following content
+
+```julia
+using Distributed, GraphTensorNetworks.SimpleMultiprocessing
+using Random, GraphTensorNetworks  # to avoid multi-precompiling
+@everywhere using Random, GraphTensorNetworks
+
+results = multiprocess_run(collect(1:10)) do seed
+    Random.seed!(seed)
+    n = 10
+    @info "Graph size $n x $n, seed= $seed"
+    g = random_diagonal_coupled_graph(n, n, 0.8)
+    gp = Independence(g; optimizer=TreeSA(), simplifier=MergeGreedy())
+    res = solve(gp, GraphPolynomial())[]
+    return res
+end
+
+println(results)
+```
+
+One can run this script file with the following command
+```bash
+$ julia -p4 run.jl
+      From worker 3:	[ Info: running argument 4 on device 3
+      From worker 4:	[ Info: running argument 2 on device 4
+      From worker 5:	[ Info: running argument 3 on device 5
+      From worker 2:	[ Info: running argument 1 on device 2
+      From worker 3:	[ Info: Graph size 10 x 10, seed= 4
+      From worker 4:	[ Info: Graph size 10 x 10, seed= 2
+      From worker 5:	[ Info: Graph size 10 x 10, seed= 3
+      From worker 2:	[ Info: Graph size 10 x 10, seed= 1
+      From worker 4:	[ Info: running argument 5 on device
+      ...
+```
+You will see a vector of polynomials printed out.
 
 ## Make use of GPUs
 To upload the computing to GPU, you just add need to use CUDA, and offer a new key word argument.

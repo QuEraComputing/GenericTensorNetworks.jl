@@ -65,6 +65,7 @@ include("bounding.jl")
 include("visualize.jl")
 include("interfaces.jl")
 include("deprecate.jl")
+include("multiprocessing.jl")
 
 using Requires
 function __init__()

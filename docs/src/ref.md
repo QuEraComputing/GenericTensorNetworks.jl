@@ -137,6 +137,11 @@ random_square_lattice_graph
 
 One can also use `random_regular_graph` and `smallgraph` in [Graphs](https://github.com/JuliaGraphs/Graphs.jl) to build special graphs.
 
+#### Multiprocessing
+```@docs
+GraphTensorNetworks.SimpleMultiprocessing.multiprocess_run
+```
+
 #### Shortcuts
 ```@docs
 max_size

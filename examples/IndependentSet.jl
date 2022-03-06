@@ -139,7 +139,7 @@ length(all_independent_sets_tree)
 
 collect(all_independent_sets_tree)
 
-# To save/read a set of configuration to disk, one can type the following
+# One can use [`save_configs`](@ref) and [`load_configs`](@ref) to save and read a set of configuration to disk.
 filename = tempname()
 
 save_configs(filename, all_independent_sets; format=:binary)
@@ -149,6 +149,21 @@ loaded_sets = load_configs(filename; format=:binary, bitlength=10)
 # !!! note
 #     When loading data, one needs to provide the `bitlength` if the data is saved in binary format.
 #     Because the bitstring length is not stored.
+
+# To loading configurations from file in the `:binary` format in python.
+# We suggest using the following script to unpack the data correctly.
+# ```python
+# import numpy as np
+#
+# def loadfile(filename:str, bitlength:int):
+#     C = int(np.ceil(bitlength / 64))
+#     arr = np.fromfile(filename, dtype="uint8")
+#     # Some axes should be transformed from big endian to little endian
+#     res = np.unpackbits(arr).reshape(-1, C, 8, 8)[:,::-1,::-1,:].reshape(-1, C*64)[:, :(64*C-bitlength)-1:-1]
+#     print("number of configurations = %d"%(len(res)))
+#     return res  # in big endian format
+#
+# res = loadfile(filename, 10)
 
 # !!! note
 #     Check section [Maximal independent set problem](@ref) for examples of finding graph properties related to minimum sizes:

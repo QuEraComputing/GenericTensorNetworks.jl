@@ -164,6 +164,7 @@ loaded_sets = load_configs(filename; format=:binary, bitlength=10)
 #     return res  # in big endian format
 #
 # res = loadfile(filename, 10)
+# ```
 
 # !!! note
 #     Check section [Maximal independent set problem](@ref) for examples of finding graph properties related to minimum sizes:

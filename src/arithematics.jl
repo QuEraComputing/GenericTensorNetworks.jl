@@ -105,6 +105,7 @@ struct TruncatedPoly{K,T,TO} <: Number
     coeffs::NTuple{K,T}
     maxorder::TO
 end
+Base.:(==)(t1::TruncatedPoly{K}, t2::TruncatedPoly{K}) where K = t1.maxorder == t2.maxorder && all(i->t1.coeffs[i] == t2.coeffs[i], 1:K)
 
 """
     Max2Poly{T,TO} = TruncatedPoly{2,T,TO}
@@ -171,7 +172,7 @@ end
 ############################ ExtendedTropical #####################
 """
     ExtendedTropical{K,TO} <: Number
-    ExtendedTropical(orders)
+    ExtendedTropical{K}(orders)
 
 Extended Tropical numbers with largest `K` orders keeped,
 or the [`TruncatedPoly`](@ref) without coefficients,

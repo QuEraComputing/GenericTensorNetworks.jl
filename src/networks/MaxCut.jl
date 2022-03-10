@@ -9,19 +9,19 @@ In the constructor, `weights` are the weights of edges.
 """
 struct MaxCut{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
     code::CT
-    nv::Int
+    graph::SimpleGraph{Int}
     weights::WT
 end
 function MaxCut(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
     @assert weights isa NoWeight || length(weights) == ne(g)
     rawcode = EinCode([[minmax(e.src,e.dst)...] for e in Graphs.edges(g)], collect(Int, openvertices))  # labels for edge tensors
-    MaxCut(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), nv(g), weights)
+    MaxCut(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), g, weights)
 end
 
 flavors(::Type{<:MaxCut}) = [0, 1]
 get_weights(gp::MaxCut, i::Int) = [0, gp.weights[i]]
 terms(gp::MaxCut) = getixsv(gp.code)
-labels(gp::MaxCut) = [1:gp.nv...]
+labels(gp::MaxCut) = [1:nv(gp.graph)...]
 
 function generate_tensors(x::T, gp::MaxCut) where T
     ixs = getixsv(gp.code)

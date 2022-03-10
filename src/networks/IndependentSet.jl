@@ -10,7 +10,7 @@ In the constructor, `weights` are the weights of vertices.
 """
 struct IndependentSet{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
     code::CT
-    nv::Int
+    graph::SimpleGraph{Int}
     weights::WT
 end
 
@@ -19,21 +19,21 @@ function IndependentSet(g::SimpleGraph; weights=NoWeight(), openvertices=(), opt
     rawcode = EinCode([[[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
                        [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...], collect(Int, openvertices))  # labels for edge tensors
     code = _optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier)
-    IndependentSet(code, nv(g), weights)
+    IndependentSet(code, g, weights)
 end
 
 flavors(::Type{<:IndependentSet}) = [0, 1]
 get_weights(gp::IndependentSet, i::Int) = [0, gp.weights[i]]
-terms(gp::IndependentSet) = getixsv(gp.code)[1:gp.nv]
-labels(gp::IndependentSet) = [1:gp.nv...]
+terms(gp::IndependentSet) = getixsv(gp.code)[1:nv(gp.graph)]
+labels(gp::IndependentSet) = [1:nv(gp.graph)...]
 
 # generate tensors
 function generate_tensors(x::T, gp::IndependentSet) where T
-    gp.nv == 0 && return []
+    nv(gp.graph) == 0 && return []
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors
-    return vcat(add_labels!([misv(Ref(x) .^ get_weights(gp, i)) for i=1:gp.nv], ixs[1:gp.nv], labels(gp)),
-            [misb(T, length(ix)) for ix in ixs[gp.nv+1:end]] # if n!=2, it corresponds to set packing problem.
+    return vcat(add_labels!([misv(Ref(x) .^ get_weights(gp, i)) for i=1:nv(gp.graph)], ixs[1:nv(gp.graph)], labels(gp)),
+            [misb(T, length(ix)) for ix in ixs[nv(gp.graph)+1:end]] # if n!=2, it corresponds to set packing problem.
     )
 end
 
@@ -70,7 +70,8 @@ julia> res = best_solutions(gp; all=true)[]
 function set_packing(sets; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
     n = length(sets)
     code = EinCode(vcat([[i] for i=1:n], [[i,j] for i=1:n,j=1:n if j>i && !isempty(sets[i] ∩ sets[j])]), collect(Int,openvertices))
-    IndependentSet(_optimize_code(code, uniformsize(code, 2), optimizer, simplifier), n, weights)
+    # NOTE: we use a dummy graph here, which should be a hypergraph!
+    IndependentSet(_optimize_code(code, uniformsize(code, 2), optimizer, simplifier), SimpleGraph(n), weights)
 end
 
 """

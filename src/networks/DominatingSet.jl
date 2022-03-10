@@ -9,13 +9,14 @@ In the constructor, `weights` are the weights of vertices.
 """
 struct DominatingSet{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
     code::CT
+    graph::SimpleGraph{Int}
     weights::WT
 end
 
 function DominatingSet(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
     @assert weights isa NoWeight || length(weights) == nv(g)
     rawcode = EinCode(([[Graphs.neighbors(g, v)..., v] for v in Graphs.vertices(g)]...,), collect(Int, openvertices))
-    DominatingSet(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), weights)
+    DominatingSet(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), g, weights)
 end
 
 flavors(::Type{<:DominatingSet}) = [0, 1]

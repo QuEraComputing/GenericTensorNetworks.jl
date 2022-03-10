@@ -7,26 +7,26 @@ The [Vertex Coloring](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorial
 """
 struct Coloring{K,CT<:AbstractEinsum} <: GraphProblem
     code::CT
-    nv::Int
+    graph::SimpleGraph{Int}
 end
-Coloring{K}(code::ET, nv::Int) where {K,ET<:AbstractEinsum} = Coloring{K,ET}(code, nv)
+Coloring{K}(code::ET, graph::SimpleGraph) where {K,ET<:AbstractEinsum} = Coloring{K,ET}(code, graph)
 # same network layout as independent set.
 function Coloring{K}(g::SimpleGraph; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing) where K
     rawcode = EinCode(([[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
                        [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...), collect(Int, openvertices))  # labels for edge tensors
     code = _optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier)
-    Coloring{K}(code, nv(g))
+    Coloring{K}(code, g)
 end
 
 flavors(::Type{<:Coloring{K}}) where K = collect(0:K-1)
 get_weights(::Coloring{K}, i::Int) where K = ones(Int, K)
-terms(gp::Coloring) = getixsv(gp.code)[1:gp.nv]
-labels(gp::Coloring) = [1:gp.nv...]
+terms(gp::Coloring) = getixsv(gp.code)[1:nv(gp.graph)]
+labels(gp::Coloring) = [1:nv(gp.graph)...]
 
 function generate_tensors(x::T, c::Coloring{K}) where {K,T}
     ixs = getixsv(c.code)
     return add_labels!(map(1:length(ixs)) do i
-        i <= c.nv ? coloringv(T, K) .^ get_weights(c, i) : coloringb(x, K)
+        i <= nv(c.graph) ? coloringv(T, K) .^ get_weights(c, i) : coloringb(x, K)
     end, ixs, labels(c))
 end
 

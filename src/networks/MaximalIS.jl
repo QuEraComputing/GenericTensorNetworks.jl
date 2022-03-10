@@ -8,13 +8,14 @@ The [maximal independent set](https://psychic-meme-f4d866f8.pages.github.io/dev/
 """
 struct MaximalIS{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
     code::CT
+    graph::SimpleGraph
     weights::WT
 end
 
 function MaximalIS(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
     @assert weights isa NoWeight || length(weights) == nv(g)
     rawcode = EinCode(([[Graphs.neighbors(g, v)..., v] for v in Graphs.vertices(g)]...,), collect(Int, openvertices))
-    MaximalIS(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), weights)
+    MaximalIS(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), g, weights)
 end
 
 flavors(::Type{<:MaximalIS}) = [0, 1]

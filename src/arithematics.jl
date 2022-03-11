@@ -224,12 +224,12 @@ end
 function sorted_sum_combination!(res::AbstractVector{TO}, A::AbstractVector{TO}, B::AbstractVector{TO}) where TO
     K = length(res)
     @assert length(B) == length(A) == K
-    maxval = A[K] * B[K]
+    @inbounds maxval = A[K] * B[K]
     ptr = K
-    res[ptr] = maxval
-    queue = [(K,K-1,A[K]*B[K-1]), (K-1,K,A[K-1]*B[K])]
+    @inbounds res[ptr] = maxval
+    @inbounds queue = [(K,K-1,A[K]*B[K-1]), (K-1,K,A[K-1]*B[K])]
     for k = 1:K-1
-        (i, j, res[K-k]) = _pop_max_sum!(queue)   # TODO: do not enumerate, use better data structures
+        @inbounds (i, j, res[K-k]) = _pop_max_sum!(queue)   # TODO: do not enumerate, use better data structures
         _push_if_not_exists!(queue, i, j-1, A, B)
         _push_if_not_exists!(queue, i-1, j, A, B)
     end

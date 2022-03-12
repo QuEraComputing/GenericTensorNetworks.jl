@@ -18,3 +18,11 @@ using Test, GraphTensorNetworks, Graphs
     @test is_good_vertex_coloring(g, c.c.data)
 end
 
+
+@testset "weighted coloring" begin
+    g = smallgraph(:petersen)
+    problem = Coloring{3}(g; weights=fill(2, 15))
+    @test solve(problem, SizeMax())[].n == 30
+    res = solve(problem, SingleConfigMax())[].c.data
+    @test is_good_vertex_coloring(g, res)
+end

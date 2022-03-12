@@ -23,7 +23,7 @@ using GraphTensorNetworks
     @test !satisfiable(cnf, Dict(:x=>false, :y=>true, :z=>true, :a=>false, :b=>false, :c=>true))
 end
 
-@testset "enumerating - max cut" begin
+@testset "enumeration - sat" begin
     @bools x y z a b c
     c1 = x ∨ ¬y
     c2 = c ∨ (¬a ∨ b)
@@ -33,6 +33,27 @@ end
     gp = Satisfiability(cnf)
 
     @test solve(gp, SizeMax())[].n == 4.0
+    res = best_solutions(gp; all=true)[].c.data
+    for i=0:1<<6-1
+        v = StaticBitVector(Bool[i>>(k-1) & 1 for k=1:6])
+        if v ∈ res
+            @test satisfiable(gp.cnf, Dict(zip(labels(gp), v)))
+        else
+            @test !satisfiable(gp.cnf, Dict(zip(labels(gp), v)))
+        end
+    end
+end
+
+@testset "weighted cnf" begin
+    @bools x y z a b c
+    c1 = x ∨ ¬y
+    c2 = c ∨ (¬a ∨ b)
+    c3 = (z ∨ ¬a) ∨ y
+    c4 = (c ∨ z) ∨ ¬b
+    cnf = (c1 ∧ c4) ∧ (c2 ∧ c3)
+    gp = Satisfiability(cnf; weights=fill(2, length(cnf)))
+
+    @test solve(gp, SizeMax())[].n == 8.0
     res = best_solutions(gp; all=true)[].c.data
     for i=0:1<<6-1
         v = StaticBitVector(Bool[i>>(k-1) & 1 for k=1:6])

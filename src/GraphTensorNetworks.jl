@@ -42,6 +42,7 @@ export mis_compactify!, cut_size, num_paint_shop_color_switch, paint_shop_colori
 export is_good_vertex_coloring
 export CNF, CNFClause, BoolVar, satisfiable, @bools, ∨, ¬, ∧
 export is_dominating_set
+export is_matching
 
 # Interfaces
 export solve, SizeMax, SizeMin, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin

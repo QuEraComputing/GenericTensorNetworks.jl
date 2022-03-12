@@ -47,6 +47,8 @@ paint_shop_coloring_from_config
 
 is_good_vertex_coloring
 
+is_matching
+
 CNF
 CNFClause
 BoolVar

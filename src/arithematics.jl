@@ -214,7 +214,7 @@ function Base.:*(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,
     return ExtendedTropical{K,TO}(sorted_sum_combination!(res, a.orders, b.orders))
 end
 
-using DataStructures: MutableBinaryHeap
+using DataStructures: PriorityQueue, enqueue!, dequeue!
 function sorted_sum_combination!(res::AbstractVector{TO}, A::AbstractVector{TO}, B::AbstractVector{TO}) where TO
     K = length(res)
     @assert length(B) == length(A) == K
@@ -222,45 +222,22 @@ function sorted_sum_combination!(res::AbstractVector{TO}, A::AbstractVector{TO},
     ptr = K
     res[ptr] = maxval
     #queue = [(A[K]+B[K-1],K,K-1), (A[K-1]+B[K],K-1,K)]
-    queue = MutableBinaryHeap(Base.Order.Reverse, [(A[K]+B[K-1],K,K-1), (A[K-1]+B[K],K-1,K)])
+    queue = PriorityQueue(Base.Order.Reverse, (K,K-1) => A[K]+B[K-1], (K-1,K)=>A[K-1]+B[K])
     for k = 1:K-1
-        (res[K-k], i, j) = pop!(queue)   # TODO: do not enumerate, use better data structures
+        (i, j) = dequeue!(queue)   # TODO: do not enumerate, use better data structures
         _push_if_not_exists!(queue, i, j-1, A, B)
         _push_if_not_exists!(queue, i-1, j, A, B)
     end
     return res
 end
 
-@inline function push_norepeat!(h::MutableBinaryHeap, v)
-    push!(h, v)
-    return h
-end
-
-function _push_if_not_exists!(queue::MutableBinaryHeap, i, j, A, B)
+@inline function _push_if_not_exists!(queue::PriorityQueue, i, j, A, B)
     @inbounds if j>=1 && i>=1
-        push_norepeat!(queue, (A[i] + B[j], i, j))
-    end
-end
-
-function _push_if_not_exists!(queue, i, j, A, B)
-    @inbounds if j>=1 && i>=1 && !any(x->x[1] >= i && x[2] >= j, queue)
-        push!(queue, (i, j, A[i] + B[j]))
-    end
-end
-
-function _pop_max_sum!(queue)
-    maxsum = first(queue)[3]
-    maxloc = 1
-    @inbounds for i=2:length(queue)
-        m = queue[i][3]
-        if m > maxsum
-            maxsum = m
-            maxloc = i
+        v = A[i] + B[j]
+        if !haskey(queue, (i, j))
+            enqueue!(queue, (i,j)=>v)
         end
     end
-    @inbounds data = queue[maxloc]
-    deleteat!(queue, maxloc)
-    return data
 end
 
 function Base.:+(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,TO}

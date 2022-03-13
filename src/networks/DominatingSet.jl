@@ -4,7 +4,7 @@
                  optimizer=GreedyMethod(), simplifier=nothing)
 
 The [dominating set](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/DominatingSet.html) problem.
-In the constructor, `weights` are the weights of vertices.
+In the constructor, `weights` are associated with vertices.
 `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
 """
 struct DominatingSet{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem

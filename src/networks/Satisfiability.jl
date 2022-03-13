@@ -57,6 +57,7 @@ function Base.show(io::IO, c::CNF)
     print(io, join(["($k)" for k in c.clauses], " ∧ "))
 end
 Base.:(==)(x::CNF, y::CNF) = x.clauses == y.clauses
+Base.length(x::CNF) = length(x.clauses)
 
 """
     ¬(var::BoolVar)
@@ -106,26 +107,28 @@ macro bools(syms::Symbol...)
 end
 
 """
-    Satisfiability{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    Satisfiability(cnf::CNF; openvertices=(),
+    Satisfiability{CT<:AbstractEinsum,T,WT<:Union{NoWeight, Vector}} <: GraphProblem
+    Satisfiability(cnf::CNF; weights=NoWeight(), openvertices=(),
                  optimizer=GreedyMethod(), simplifier=nothing)
 
 The [satisfiability](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/Satisfiability.html) problem.
 In the constructor, `cnf` is a logical expresion in conjunctive normal form ([`CNF`](@ref)) for the satisfiability problems.
+`weights` are associated with clauses.
 `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
 """
-struct Satisfiability{CT<:AbstractEinsum,T} <: GraphProblem
+struct Satisfiability{CT<:AbstractEinsum,T,WT<:Union{NoWeight, Vector}} <: GraphProblem
     code::CT
     cnf::CNF{T}
+    weights::WT
 end
 
-function Satisfiability(cnf::CNF{T}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing) where T
+function Satisfiability(cnf::CNF{T}; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing) where T
     rawcode = EinCode([[getfield.(c.vars, :name)...] for c in cnf.clauses], collect(T, openvertices))
-    Satisfiability(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), cnf)
+    Satisfiability(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), cnf, weights)
 end
 
 flavors(::Type{<:Satisfiability}) = [0, 1]  # false, true
-get_weights(::Satisfiability, sym) = [0, 1]
+get_weights(s::Satisfiability, i::Int) = [0, s.weights[i]]
 terms(gp::Satisfiability) = getixsv(gp.code)
 labels(gp::Satisfiability) = unique!(vcat(getixsv(gp.code)...))
 

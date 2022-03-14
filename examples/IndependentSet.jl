@@ -32,7 +32,7 @@ show_graph(graph; locs=locations)
 #     x_i^{w_i}
 # \end{matrix}\right),
 # ```
-# where ``W(x_i)_0=1`` is the first element associated with ``s_i=0`` and ``W(x_i)_1=x_i^{w_i}`` is the second element associated with ``s_i=1``, and `w_i` is the weight of vertex ``i``.
+# where ``W(x_i)_0=1`` is the first element associated with ``s_i=0`` and ``W(x_i)_1=x_i^{w_i}`` is the second element associated with ``s_i=1``, and ``w_i`` is the weight of vertex ``i``.
 # Similarly, on each edge ``(u, v)``, we define a matrix ``B`` indexed by ``s_u`` and ``s_v`` as
 # ```math
 # B = \left(\begin{matrix}

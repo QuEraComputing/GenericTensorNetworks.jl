@@ -221,41 +221,105 @@ function Base.:*(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,
     return ExtendedTropical{K,TO}(sorted_sum_combination!(res, a.orders, b.orders))
 end
 
+# 1. bisect over summed value and find the critical value `c`,
+# 2. collect the values with sum combination `≥ c`,
+# 3. sort the collected values
 function sorted_sum_combination!(res::AbstractVector{TO}, A::AbstractVector{TO}, B::AbstractVector{TO}) where TO
     K = length(res)
     @assert length(B) == length(A) == K
-    @inbounds maxval = A[K] * B[K]
-    ptr = K
-    @inbounds res[ptr] = maxval
-    @inbounds queue = [(K,K-1,A[K]*B[K-1]), (K-1,K,A[K-1]*B[K])]
-    for k = 1:K-1
-        @inbounds (i, j, res[K-k]) = _pop_max_sum!(queue)   # TODO: do not enumerate, use better data structures
-        _push_if_not_exists!(queue, i, j-1, A, B)
-        _push_if_not_exists!(queue, i-1, j, A, B)
+    @inbounds high = A[K] * B[K]
+
+    mA = findfirst(!iszero, A)
+    mB = findfirst(!iszero, B)
+    if mA === nothing || mB === nothing
+        res .= Ref(zero(TO))
+        return res
+    end
+    @inbounds low = A[mA] * B[mB]
+    # count number bigger than x
+    c, _ = count_geq(A, B, mB, low, true)
+    @inbounds if c <= K   # return
+        res[K-c+1:K] .= sort!(collect_geq!(view(res,1:c), A, B, mB, low))
+        if c < K
+            res[1:K-c] .= zero(TO)
+        end
+        return res
+    end
+    # calculate by bisection for at most 30 times.
+    @inbounds for _ = 1:30
+        mid = mid_point(high, low)
+        c, nB = count_geq(A, B, mB, mid, true)
+        if c > K
+            low = mid
+            mB = nB
+        elseif c == K  # return
+            # NOTE: this is the bottleneck
+            return sort!(collect_geq!(res, A, B, mB, mid))
+        else
+            high = mid
+        end
+    end
+    clow, _ = count_geq(A, B, mB, low, false)
+    @inbounds res .= sort!(collect_geq!(similar(res, clow), A, B, mB, low))[end-K+1:end]
+    return res
+end
+
+# count the number of sum-combinations with the sum >= low
+function count_geq(A, B, mB, low, earlybreak)
+    K = length(A)
+    k = 1   # TODO: we should tighten mA, mB later!
+    @inbounds Ak = A[K-k+1]
+    @inbounds Bq = B[K-mB+1]
+    c = 0
+    nB = mB
+    @inbounds for q = K-mB+1:-1:1
+        Bq = B[K-q+1]
+        while k < K && Ak * Bq >= low
+            k += 1
+            Ak = A[K-k+1]
+        end
+        if Ak * Bq >= low
+            c += k
+        else
+            c += (k-1)
+            if k==1
+                nB += 1
+            end
+        end
+        if earlybreak && c > K
+            return c, nB
+        end
+    end
+    return c, nB
+end
+
+function collect_geq!(res, A, B, mB, low)
+    K = length(A)
+    k = 1   # TODO: we should tighten mA, mB later!
+    Ak = A[K-k+1]
+    Bq = B[K-mB+1]
+    l = 0
+    for q = K-mB+1:-1:1
+        Bq = B[K-q+1]
+        while k < K && Ak * Bq >= low
+            k += 1
+            Ak = A[K-k+1]
+        end
+        # push data
+        ck = Ak * Bq >= low ? k : k-1
+        for j=1:ck
+            l += 1
+            res[l] = Bq * A[end-j+1]
+        end
     end
     return res
 end
 
-function _push_if_not_exists!(queue, i, j, A, B)
-    @inbounds if j>=1 && i>=1 && !any(x->x[1] >= i && x[2] >= j, queue)
-        push!(queue, (i, j, A[i]*B[j]))
-    end
-end
-
-function _pop_max_sum!(queue)
-    maxsum = first(queue)[3]
-    maxloc = 1
-    @inbounds for i=2:length(queue)
-        m = queue[i][3]
-        if m > maxsum
-            maxsum = m
-            maxloc = i
-        end
-    end
-    @inbounds data = queue[maxloc]
-    deleteat!(queue, maxloc)
-    return data
-end
+# for bisection
+mid_point(a::Tropical{T}, b::Tropical{T}) where T = Tropical{T}((a.n + b.n) / 2)
+mid_point(a::CountingTropical{T,CT}, b::CountingTropical{T,CT}) where {T,CT} = CountingTropical{T,CT}((a.n + b.n) / 2, a.c)
+mid_point(a::Tropical{T}, b::Tropical{T}) where T<:Integer = Tropical{T}((a.n + b.n) ÷ 2)
+mid_point(a::CountingTropical{T,CT}, b::CountingTropical{T,CT}) where {T<:Integer,CT} = CountingTropical{T,CT}((a.n + b.n) ÷ 2, a.c)
 
 function Base.:+(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,TO}
     res = Vector{TO}(undef, K)

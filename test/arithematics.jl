@@ -153,6 +153,17 @@ end
     end
 end
 
+@testset "count geq" begin
+    A = collect(1:10)
+    B = collect(2:2:20)
+    low = 20
+    c, _ = GraphTensorNetworks.count_geq(A, B, 1, low, false)
+    @test c == count(x->x>=low, vec([a*b for a in A, b in B]))
+    res = similar(A, c)
+    @test sort!(GraphTensorNetworks.collect_geq!(res, A, B, 1, low)) == sort!(filter(x->x>=low, vec([a*b for a in A, b in B])))
+end
+
+
 # check the correctness of sampling
 @testset "generate samples" begin
     Random.seed!(2)

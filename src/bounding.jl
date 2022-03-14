@@ -60,7 +60,7 @@ struct CacheTree{T}
 end
 function cached_einsum(se::SlicedEinsum, @nospecialize(xs), size_dict)
     if length(se.slicing) != 0
-        @warn "Slicing is not supported for caching! Fallback to `NestedEinsum`."
+        @warn "Slicing is not supported for caching, got nslices = $(length(se.slicing))! Fallback to `NestedEinsum`."
     end
     return cached_einsum(se.eins, xs, size_dict)
 end

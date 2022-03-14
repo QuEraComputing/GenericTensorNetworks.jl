@@ -224,6 +224,96 @@ end
 function sorted_sum_combination!(res::AbstractVector{TO}, A::AbstractVector{TO}, B::AbstractVector{TO}) where TO
     K = length(res)
     @assert length(B) == length(A) == K
+    @inbounds high = A[K] * B[K]
+
+    mA = findfirst(!iszero, A)
+    mB = findfirst(!iszero, B)
+    if mA === nothing || mB === nothing
+        res .= Ref(zero(TO))
+        return res
+    end
+    @inbounds low = A[mA] * B[mB]
+    # count number bigger than x
+    c = count_geq(A, B, mB, low)
+    @inbounds if c <= K   # return
+        res[K-c+1:K] .= sort!(collect_geq!(view(res,1:c), A, B, mB, low))
+        if c < K
+            res[1:K-c] .= zero(TO)
+        end
+        return res
+    end
+    # calculate by bisection for at most 30 times.
+    for _ = 1:30
+        mid = mid_point(high, low)
+        c = count_geq(A, B, mB, mid)
+        if c > K
+            low = mid
+        elseif c == K  # return
+            return sort!(collect_geq!(res, A, B, mB, mid))
+        else
+            high = mid
+        end
+    end
+    clow = count_geq(A, B, mB, low)
+    res .= sort!(collect_geq!(similar(res, clow), A, B, mB, low))[end-K+1:end]
+    return res
+end
+
+function count_geq(A, B, mB, low)
+    K = length(A)
+    k = 1   # TODO: we should tighten mA, mB later!
+    @inbounds Ak = A[K-k+1]
+    @inbounds Bq = B[K-mB+1]
+    c = 0
+    @inbounds for q = K-mB+1:-1:1
+        Bq = B[K-q+1]
+        while k < K && Ak * Bq >= low
+            k += 1
+            Ak = A[K-k+1]
+        end
+        if Ak * Bq >= low
+            c += k
+        else
+            c += (k-1)
+        end
+        #if c > K
+            #return c
+        #end
+    end
+    return c
+end
+
+function collect_geq!(res, A, B, mB, low)
+    K = length(A)
+    k = 1   # TODO: we should tighten mA, mB later!
+    @inbounds Ak = A[K-k+1]
+    @inbounds Bq = B[K-mB+1]
+    l = 0
+    @inbounds for q = K-mB+1:-1:1
+        Bq = B[K-q+1]
+        while k < K && Ak * Bq >= low
+            k += 1
+            Ak = A[K-k+1]
+        end
+        # push data
+        ck = Ak * Bq >= low ? k : k-1
+        for j=1:ck
+            l += 1
+            res[l] = Bq * A[end-j+1]
+        end
+    end
+    return res
+end
+
+# for bisection
+mid_point(a::Tropical{T}, b::Tropical{T}) where T = Tropical{T}((a.n + b.n) / 2)
+mid_point(a::CountingTropical{T,CT}, b::CountingTropical{T,CT}) where {T,CT} = CountingTropical{T,CT}((a.n + b.n) / 2, a.c)
+mid_point(a::Tropical{T}, b::Tropical{T}) where T<:Integer = Tropical{T}((a.n + b.n) ÷ 2)
+mid_point(a::CountingTropical{T,CT}, b::CountingTropical{T,CT}) where {T<:Integer,CT} = CountingTropical{T,CT}((a.n + b.n) ÷ 2, a.c)
+
+function sorted_sum_combination1!(res::AbstractVector{TO}, A::AbstractVector{TO}, B::AbstractVector{TO}) where TO
+    K = length(res)
+    @assert length(B) == length(A) == K
     @inbounds maxval = A[K] * B[K]
     ptr = K
     @inbounds res[ptr] = maxval

@@ -234,7 +234,7 @@ function sorted_sum_combination!(res::AbstractVector{TO}, A::AbstractVector{TO},
     end
     @inbounds low = A[mA] * B[mB]
     # count number bigger than x
-    c = count_geq(A, B, mB, low)
+    c, _ = count_geq(A, B, mB, low, true)
     @inbounds if c <= K   # return
         res[K-c+1:K] .= sort!(collect_geq!(view(res,1:c), A, B, mB, low))
         if c < K
@@ -243,28 +243,31 @@ function sorted_sum_combination!(res::AbstractVector{TO}, A::AbstractVector{TO},
         return res
     end
     # calculate by bisection for at most 30 times.
-    for _ = 1:30
+    @inbounds for _ = 1:30
         mid = mid_point(high, low)
-        c = count_geq(A, B, mB, mid)
+        c, nB = count_geq(A, B, mB, mid, true)
         if c > K
             low = mid
+            mB = nB
         elseif c == K  # return
+            # NOTE: this is the bottleneck
             return sort!(collect_geq!(res, A, B, mB, mid))
         else
             high = mid
         end
     end
-    clow = count_geq(A, B, mB, low)
-    res .= sort!(collect_geq!(similar(res, clow), A, B, mB, low))[end-K+1:end]
+    clow, _ = count_geq(A, B, mB, low, false)
+    @inbounds res .= sort!(collect_geq!(similar(res, clow), A, B, mB, low))[end-K+1:end]
     return res
 end
 
-function count_geq(A, B, mB, low)
+function count_geq(A, B, mB, low, earlybreak)
     K = length(A)
     k = 1   # TODO: we should tighten mA, mB later!
     @inbounds Ak = A[K-k+1]
     @inbounds Bq = B[K-mB+1]
     c = 0
+    nB = mB
     @inbounds for q = K-mB+1:-1:1
         Bq = B[K-q+1]
         while k < K && Ak * Bq >= low
@@ -275,21 +278,24 @@ function count_geq(A, B, mB, low)
             c += k
         else
             c += (k-1)
+            if k==1
+                nB += 1
+            end
         end
-        #if c > K
-            #return c
-        #end
+        if earlybreak && c > K
+            return c, nB
+        end
     end
-    return c
+    return c, nB
 end
 
 function collect_geq!(res, A, B, mB, low)
     K = length(A)
     k = 1   # TODO: we should tighten mA, mB later!
-    @inbounds Ak = A[K-k+1]
-    @inbounds Bq = B[K-mB+1]
+    Ak = A[K-k+1]
+    Bq = B[K-mB+1]
     l = 0
-    @inbounds for q = K-mB+1:-1:1
+    for q = K-mB+1:-1:1
         Bq = B[K-q+1]
         while k < K && Ak * Bq >= low
             k += 1
@@ -310,42 +316,6 @@ mid_point(a::Tropical{T}, b::Tropical{T}) where T = Tropical{T}((a.n + b.n) / 2)
 mid_point(a::CountingTropical{T,CT}, b::CountingTropical{T,CT}) where {T,CT} = CountingTropical{T,CT}((a.n + b.n) / 2, a.c)
 mid_point(a::Tropical{T}, b::Tropical{T}) where T<:Integer = Tropical{T}((a.n + b.n) ÷ 2)
 mid_point(a::CountingTropical{T,CT}, b::CountingTropical{T,CT}) where {T<:Integer,CT} = CountingTropical{T,CT}((a.n + b.n) ÷ 2, a.c)
-
-function sorted_sum_combination1!(res::AbstractVector{TO}, A::AbstractVector{TO}, B::AbstractVector{TO}) where TO
-    K = length(res)
-    @assert length(B) == length(A) == K
-    @inbounds maxval = A[K] * B[K]
-    ptr = K
-    @inbounds res[ptr] = maxval
-    @inbounds queue = [(K,K-1,A[K]*B[K-1]), (K-1,K,A[K-1]*B[K])]
-    for k = 1:K-1
-        @inbounds (i, j, res[K-k]) = _pop_max_sum!(queue)   # TODO: do not enumerate, use better data structures
-        _push_if_not_exists!(queue, i, j-1, A, B)
-        _push_if_not_exists!(queue, i-1, j, A, B)
-    end
-    return res
-end
-
-function _push_if_not_exists!(queue, i, j, A, B)
-    @inbounds if j>=1 && i>=1 && !any(x->x[1] >= i && x[2] >= j, queue)
-        push!(queue, (i, j, A[i]*B[j]))
-    end
-end
-
-function _pop_max_sum!(queue)
-    maxsum = first(queue)[3]
-    maxloc = 1
-    @inbounds for i=2:length(queue)
-        m = queue[i][3]
-        if m > maxsum
-            maxsum = m
-            maxloc = i
-        end
-    end
-    @inbounds data = queue[maxloc]
-    deleteat!(queue, maxloc)
-    return data
-end
 
 function Base.:+(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,TO}
     res = Vector{TO}(undef, K)

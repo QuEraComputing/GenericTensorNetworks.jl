@@ -221,6 +221,9 @@ function Base.:*(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,
     return ExtendedTropical{K,TO}(sorted_sum_combination!(res, a.orders, b.orders))
 end
 
+# 1. bisect over summed value and find the critical value `c`,
+# 2. collect the values with sum combination `≥ c`,
+# 3. sort the collected values
 function sorted_sum_combination!(res::AbstractVector{TO}, A::AbstractVector{TO}, B::AbstractVector{TO}) where TO
     K = length(res)
     @assert length(B) == length(A) == K
@@ -261,6 +264,7 @@ function sorted_sum_combination!(res::AbstractVector{TO}, A::AbstractVector{TO},
     return res
 end
 
+# count the number of sum-combinations with the sum >= low
 function count_geq(A, B, mB, low, earlybreak)
     K = length(A)
     k = 1   # TODO: we should tighten mA, mB later!

@@ -7,6 +7,7 @@
 #     * how to compute weighted graphs and handle open vertices.
 
 # ## Problem definition
+# In logic and computer science, the [boolean satisfiability problem](https://en.wikipedia.org/wiki/Boolean_satisfiability_problem) is the problem of determining if there exists an interpretation that satisfies a given boolean formula.
 # One can specify a satisfiable problem in the [conjuctive normal form](https://en.wikipedia.org/wiki/Conjunctive_normal_form).
 # In boolean logic, a formula is in conjunctive normal form (CNF) if it is a conjunction (∧) of one or more clauses,
 # where a clause is a disjunction (∨) of literals.

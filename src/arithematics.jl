@@ -484,7 +484,7 @@ Fields
 -----------------------
 * `tag` is one of `ZERO`, `ONE`, `LEAF`, `SUM`, `PROD`.
 * `data` is the element stored in a `LEAF` node.
-* `left` and `right` are two operands of a `SUM` or `PROD` node.
+* `siblings` are operands of a `SUM` or `PROD` node.
 
 Example
 ------------------------
@@ -534,13 +534,11 @@ julia> one(s)
 mutable struct SumProductTree{ET} <: AbstractSetNumber
     tag::TreeTag
     data::ET
-    left::SumProductTree{ET}
-    right::SumProductTree{ET}
+    siblings::Vector{SumProductTree{ET}}
     # zero(ET) can be undef
-    function SumProductTree(tag::TreeTag, left::SumProductTree{ET}, right::SumProductTree{ET}) where {ET}
+    function SumProductTree(tag::TreeTag, siblings::Vector{SumProductTree{ET}}) where {ET}
         res = new{ET}(tag)
-        res.left = left
-        res.right = right
+        res.siblings = siblings
         return res
     end
     function SumProductTree(data::ET) where ET
@@ -563,14 +561,14 @@ which is a useful element type for configuration enumeration.
 """
 const TreeConfigEnumerator{N,S,C} = SumProductTree{StaticElementVector{N,S,C}}
 TreeConfigEnumerator(data::StaticElementVector) = SumProductTree(data)
-TreeConfigEnumerator(tag::TreeTag, left::TreeConfigEnumerator{N,S,C}, right::TreeConfigEnumerator{N,S,C}) where {N,S,C} = SumProductTree(tag, left, right)
+TreeConfigEnumerator(tag::TreeTag, siblings::Vector{TreeConfigEnumerator{N,S,C}}) where {N,S,C} = SumProductTree(tag, siblings)
 
 # AbstractTree APIs
 function children(t::SumProductTree)
     if t.tag == ZERO || t.tag == LEAF || t.tag == ONE
         return typeof(t)[]
     else
-        return [t.left, t.right]
+        return t.siblings
     end
 end
 function printnode(io::IO, t::SumProductTree{ET}) where {ET}
@@ -593,11 +591,11 @@ Base.length(x::SumProductTree) = _length!(x, IdDict{typeof(x), Int}())
 function _length!(x, d)
     haskey(d, x) && return d[x]
     if x.tag === SUM
-        l = _length!(x.left, d) + _length!(x.right, d)
+        l = sum(s->_length!(s, d), x.siblings)
         d[x] = l
         return l
     elseif x.tag === PROD
-        l = _length!(x.left, d) * _length!(x.right, d)
+        l = prod(s->_length!(s, d), x.siblings)
         d[x] = l
         return l
     elseif x.tag === ZERO
@@ -615,7 +613,7 @@ function _num_nodes(x, d)
     elseif x.tag == LEAF
         res = 1
     else
-        res = _num_nodes(x.left, d) + _num_nodes(x.right, d) + 1
+        res = sum(a->_num_nodes(a, d), x.siblings) + 1
     end
     d[x] = res
     return res
@@ -635,35 +633,51 @@ function Base.collect(x::SumProductTree{ET}) where {ET}
     elseif x.tag == LEAF
         return [x.data]
     elseif x.tag == SUM
-        return vcat(collect(x.left), collect(x.right))
+        return vcat(collect.(x.siblings)...)
     else   # PROD
-        return vec([reduce(_data_mul, si) for si in Iterators.product(collect(x.left), collect(x.right))])
+        return vec([reduce(_data_mul, si) for si in Iterators.product(collect.(x.siblings)...)])
     end
 end
 
 function Base.:+(x::SumProductTree{ET}, y::SumProductTree{ET}) where {ET}
-    if x.tag == ZERO
+    if x.tag === ZERO
         return y
-    elseif y.tag == ZERO
+    elseif y.tag === ZERO
         return x
+    elseif x.tag === SUM
+        if y.tag === SUM
+            return SumProductTree(SUM, vcat(x.siblings, y.siblings))
+        else
+            return SumProductTree(SUM, [x.siblings..., y])
+        end
+    elseif y.tag === SUM
+        return SumProductTree(SUM, [x, y.siblings...])
     else
-        return SumProductTree(SUM, x, y)
+        return SumProductTree(SUM, [x, y])
     end
 end
 
 function Base.:*(x::SumProductTree{ET}, y::SumProductTree{ET}) where {ET}
-    if x.tag == ONE
+    if x.tag === ONE
         return y
-    elseif y.tag == ONE
+    elseif y.tag === ONE
         return x
-    elseif x.tag == ZERO
+    elseif x.tag === ZERO
         return x
-    elseif y.tag == ZERO
+    elseif y.tag === ZERO
         return y
-    elseif x.tag == LEAF && y.tag == LEAF
+    elseif x.tag === LEAF && y.tag === LEAF
         return SumProductTree(_data_mul(x.data, y.data))
+    elseif x.tag === PROD
+        if y.tag === PROD
+            return SumProductTree(PROD, vcat(x.siblings, y.siblings))
+        else
+            return SumProductTree(PROD, [x.siblings..., y])
+        end
+    elseif y.tag === PROD
+        return SumProductTree(PROD, [x, y.siblings...])
     else
-        return SumProductTree(PROD, x, y)
+        return SumProductTree(PROD, [x, y])
     end
 end
 
@@ -674,13 +688,13 @@ Base.one(::SumProductTree{ET}) where {ET} = one(SumProductTree{ET})
 # todo, check siblings too?
 function Base.iszero(t::SumProductTree)
     if t.tag == SUM
-        iszero(t.left) && iszero(t.right)
+        all(iszero, t.siblings)
     elseif t.tag == ZERO
         true
     elseif t.tag == LEAF || t.tag == ONE
         false
     else
-        iszero(t.left) || iszero(t.right)
+        any(iszero, t.siblings)
     end
 end
 
@@ -718,19 +732,18 @@ function sample_descend!(res::AbstractVector, t::SumProductTree, d::IdDict)
     if t.tag == LEAF
         res .|= Ref(t.data)
     elseif t.tag == SUM
-        ratio = _length!(t.left, d)/_length!(t, d)
-        nleft = 0
-        for _ = 1:length(res)
-            if rand() < ratio
-                nleft += 1
-            end
-        end
+        indices = StatsBase.sample(1:length(t.siblings), StatsBase.Weights(_length!.(t.siblings, Ref(d))), length(res))
         shuffle!(res)  # shuffle the `res` to avoid biased sampling, very important.
-        sample_descend!(view(res,1:nleft), t.left, d)
-        sample_descend!(view(res,nleft+1:length(res)), t.right, d)
+        k = 0
+        for i=1:length(t.siblings)
+            nseg = count(==(i), indices)
+            sample_descend!(view(res,k+1:k+nseg), t.siblings[i], d)
+            k += nseg
+        end
     elseif t.tag == PROD
-        sample_descend!(res, t.right, d)
-        sample_descend!(res, t.left, d)
+        for s in t.siblings
+            sample_descend!(res, s, d)
+        end
     elseif t.tag == ZERO
         error("Meet zero when descending.")
     else
@@ -785,7 +798,7 @@ function Base.copy(c::SumProductTree{ET}) where {ET}
     elseif c.tag == ZERO || c.tag == ONE
         SumProductTree{ET}(c.tag)
     else
-        SumProductTree(c.tag, c.left, c.right)
+        SumProductTree(c.tag, copy(c.siblings))
     end
 end
 

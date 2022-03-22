@@ -608,6 +608,71 @@ function _length!(x, d)
     end
 end
 
+# # loop version
+# function _length!(x, d)
+#     rootid = objectid(x)
+#     t_stack = [x]
+#     # update dict
+#     while !isempty(t_stack)
+#         x = t_stack[end]
+#         id = objectid(x)
+#         if haskey(d, id)
+#             pop!(t_stack)
+#         else
+#             if x.tag === SUM
+#                 idl = objectid(x.left)
+#                 if haskey(d, idl)
+#                     idr = objectid(x.right)
+#                     if haskey(d, idr)
+#                         @inbounds d[id] = d[idl] + d[idr]
+#                         pop!(t_stack)
+#                     else
+#                         push!(t_stack, x.right)
+#                     end
+#                 else
+#                     push!(t_stack, x.left)
+#                 end
+#             elseif x.tag === PROD
+#                 idl = objectid(x.left)
+#                 if haskey(d, idl)
+#                     idr = objectid(x.right)
+#                     if haskey(d, idr)
+#                         @inbounds d[id] = d[idl] * d[idr]
+#                         pop!(t_stack)
+#                     else
+#                         push!(t_stack, x.right)
+#                     end
+#                 else
+#                     push!(t_stack, x.left)
+#                 end
+#             elseif x.tag === ZERO
+#                 d[id] = 0.0
+#                 pop!(t_stack)
+#             else
+#                 d[id] = 1.0
+#                 pop!(t_stack)
+#             end
+#         end
+#     end
+#     return d[rootid]
+# end
+
+function _find_branch(x, d)
+    if x.tag === ZERO
+        return true, 0.0
+    elseif x.tag === ONE || x.tag === LEAF
+        return true, 1.0
+    else
+        idl = objectid(x.left)
+        if haskey(d, idl)
+            return true, d[idl]
+        else
+            return false, 0.0
+        end
+    end
+end
+
+
 num_nodes(x::SumProductTree) = _num_nodes(x, Dict{UInt, Int}())
 function _num_nodes(x, d)
     id = objectid(x)
@@ -716,27 +781,36 @@ function generate_samples(t::SumProductTree{ET}, nsamples::Int) where {ET}
 end
 
 function sample_descend!(res::AbstractVector, t::SumProductTree, d::Dict)
-    length(res) == 0 && return res
-    if t.tag == LEAF
-        res .|= Ref(t.data)
-    elseif t.tag == SUM
-        ratio = _length!(t.left, d)/_length!(t, d)
-        nleft = 0
-        for _ = 1:length(res)
-            if rand() < ratio
-                nleft += 1
+    res_stack = Any[res]
+    t_stack = [t]
+    while !isempty(t_stack) && !isempty(res_stack)
+        t = pop!(t_stack)
+        res = pop!(res_stack)
+        if t.tag == LEAF
+            res .|= Ref(t.data)
+        elseif t.tag == SUM
+            ratio = _length!(t.left, d)/_length!(t, d)
+            nleft = 0
+            for _ = 1:length(res)
+                if rand() < ratio
+                    nleft += 1
+                end
             end
+            shuffle!(res)  # shuffle the `res` to avoid biased sampling, very important.
+            push!(res_stack, view(res,1:nleft))
+            push!(res_stack, view(res,nleft+1:length(res)))
+            push!(t_stack, t.left)
+            push!(t_stack, t.right)
+        elseif t.tag == PROD
+            push!(res_stack, res)
+            push!(res_stack, res)
+            push!(t_stack, t.left)
+            push!(t_stack, t.right)
+        elseif t.tag == ZERO
+            error("Meet zero when descending.")
+        else
+            # pass for 1
         end
-        shuffle!(res)  # shuffle the `res` to avoid biased sampling, very important.
-        sample_descend!(view(res,1:nleft), t.left, d)
-        sample_descend!(view(res,nleft+1:length(res)), t.right, d)
-    elseif t.tag == PROD
-        sample_descend!(res, t.right, d)
-        sample_descend!(res, t.left, d)
-    elseif t.tag == ZERO
-        error("Meet zero when descending.")
-    else
-        # pass for 1
     end
     return res
 end

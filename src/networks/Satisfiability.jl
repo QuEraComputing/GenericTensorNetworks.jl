@@ -89,6 +89,15 @@ Returns a new [`CNF`](@ref).
 ∧(cs::CNF{T}, ds::CNF{T}) where T = CNF([cs.clauses..., ds.clauses...])
 
 """
+    random_ksat(k::Int, num_clauses::Int, num_vars::Int; bias::Float64=0.5)
+
+Return a random [`CNF`], in this CNF, each clause contains `k` variables (with `bias` portion of the problem being negative).
+"""
+function random_ksat(k::Int, num_clauses::Int, num_vars::Int; bias::Float64=0.5)
+    return CNF([CNFClause([BoolVar(rand(1:num_vars), rand() < bias) for i=1:k]) for j = 1:num_clauses])
+end
+
+"""
     @bools(syms::Symbol...)
 
 Create some boolean variables of type [`BoolVar`](@ref) in current scope that can be used in create a [`CNF`](@ref).

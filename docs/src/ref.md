@@ -137,6 +137,7 @@ line_graph
 
 random_diagonal_coupled_graph
 random_square_lattice_graph
+random_ksat
 ```
 
 One can also use `random_regular_graph` and `smallgraph` in [Graphs](https://github.com/JuliaGraphs/Graphs.jl) to build special graphs.

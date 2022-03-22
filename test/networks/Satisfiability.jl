@@ -1,7 +1,8 @@
 using Test
-using GraphTensorNetworks
+using GraphTensorNetworks, Random
 
 @testset "CNF" begin
+    Random.seed!(2)
     @bools x y z a b c
     println(x)
     @test x == BoolVar(:x, false)
@@ -21,6 +22,12 @@ using GraphTensorNetworks
     gp = Satisfiability(cnf)
     @test satisfiable(cnf, Dict(:x=>true, :y=>true, :z=>true, :a=>false, :b=>false, :c=>true))
     @test !satisfiable(cnf, Dict(:x=>false, :y=>true, :z=>true, :a=>false, :b=>false, :c=>true))
+
+    ksat = random_ksat(4, 10, 5; bias=0.2)
+    @test length(ksat.clauses) == 10
+    @test length(unique(vcat([getfield.(c.vars, :name) for c in ksat.clauses]...))) == 5
+    @test sum(vcat([getfield.(c.vars, :neg) for c in ksat.clauses]...)) < 40 * 0.4
+    @test all(c->length(c.vars) == 4, ksat.clauses)
 end
 
 @testset "enumeration - sat" begin

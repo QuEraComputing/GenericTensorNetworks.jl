@@ -797,10 +797,14 @@ function sample_descend!(res::AbstractVector, t::SumProductTree, d::Dict)
                 end
             end
             shuffle!(res)  # shuffle the `res` to avoid biased sampling, very important.
-            push!(res_stack, view(res,1:nleft))
-            push!(res_stack, view(res,nleft+1:length(res)))
-            push!(t_stack, t.left)
-            push!(t_stack, t.right)
+            if nleft >= 1
+                push!(res_stack, view(res,1:nleft))
+                push!(t_stack, t.left)
+            end
+            if length(res) > nleft
+                push!(res_stack, view(res,nleft+1:length(res)))
+                push!(t_stack, t.right)
+            end
         elseif t.tag == PROD
             push!(res_stack, res)
             push!(res_stack, res)

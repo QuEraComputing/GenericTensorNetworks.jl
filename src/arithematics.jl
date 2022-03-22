@@ -297,7 +297,6 @@ function collect_geq!(res, A, B, mB, low)
     K = length(A)
     k = 1   # TODO: we should tighten mA, mB later!
     Ak = A[K-k+1]
-    Bq = B[K-mB+1]
     l = 0
     for q = K-mB+1:-1:1
         Bq = B[K-q+1]
@@ -587,29 +586,32 @@ function printnode(io::IO, t::SumProductTree{ET}) where {ET}
     end
 end
 
-# it must be mutable, otherwise the `IdDict` trick for computing the length does not work.
-Base.length(x::SumProductTree) = _length!(x, IdDict{typeof(x), Int}())
+# it must be mutable, otherwise, objectid might be slow serialization might fail.
+# IdDict is much slower than Dict, it is useless.
+Base.length(x::SumProductTree) = _length!(x, Dict{UInt, Float64}())
 
 function _length!(x, d)
-    haskey(d, x) && return d[x]
+    id = objectid(x)
+    haskey(d, id) && return d[id]
     if x.tag === SUM
         l = _length!(x.left, d) + _length!(x.right, d)
-        d[x] = l
+        d[id] = l
         return l
     elseif x.tag === PROD
         l = _length!(x.left, d) * _length!(x.right, d)
-        d[x] = l
+        d[id] = l
         return l
     elseif x.tag === ZERO
-        return 0
+        return 0.0
     else
-        return 1
+        return 1.0
     end
 end
 
-num_nodes(x::SumProductTree) = _num_nodes(x, IdDict{typeof(x), Int}())
+num_nodes(x::SumProductTree) = _num_nodes(x, Dict{UInt, Int}())
 function _num_nodes(x, d)
-    haskey(d, x) && return 0
+    id = objectid(x)
+    haskey(d, id) && return 0
     if x.tag == ZERO || x.tag == ONE
         res = 1
     elseif x.tag == LEAF
@@ -617,7 +619,7 @@ function _num_nodes(x, d)
     else
         res = _num_nodes(x.left, d) + _num_nodes(x.right, d) + 1
     end
-    d[x] = res
+    d[id] = res
     return res
 end
 
@@ -708,12 +710,12 @@ true
 function generate_samples(t::SumProductTree{ET}, nsamples::Int) where {ET}
     # get length dict
     res = fill(_data_one(ET), nsamples)
-    d = IdDict{typeof(t), Int}()
+    d = Dict{UInt, Float64}()
     sample_descend!(res, t, d)
     return res
 end
 
-function sample_descend!(res::AbstractVector, t::SumProductTree, d::IdDict)
+function sample_descend!(res::AbstractVector, t::SumProductTree, d::Dict)
     length(res) == 0 && return res
     if t.tag == LEAF
         res .|= Ref(t.data)

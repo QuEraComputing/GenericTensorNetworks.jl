@@ -15,8 +15,8 @@ Key word argument `optimizer` decides the contraction order optimizer of the ten
 Here, we choose the `TreeSA` optimizer to optimize the tensor network contraciton tree, it is a local search based algorithm.
 It is one of the state of the art tensor network contraction order optimizers, one may check [arXiv: 2108.05665](https://arxiv.org/abs/2108.05665) to learn more about the algorithm.
 Other optimizers include
-* [`GreedyMethod`](@ref) (default, fastest in searching speed but worse in contraction order)
-* [`TreeSA`](@ref)
+* [`GreedyMethod`](@ref) (default, fastest in searching speed but worst in contraction complexity)
+* [`TreeSA`](@ref) (often best in contraction complexity, supports slicing)
 * [`KaHyParBipartite`](@ref)
 * [`SABipartite`](@ref)
 
@@ -32,8 +32,8 @@ julia> timespacereadwrite_complexity(problem)
 ```
 
 The return values are `log2` of the the number of iterations, the number elements in the largest tensor during contraction and the number of read-write operations to tensor elements.
-In this example, the number of `+` and `*` operations are both `\sim 2^{21.9}`
-and the number of read-write operations are `\sim 2^{20}`.
+In this example, the number of `+` and `*` operations are both ``\sim 2^{21.9}``
+and the number of read-write operations are ``\sim 2^{20}``.
 The largest tensor size is ``2^17``, one can check the element size by typing
 ```julia
 julia> sizeof(TropicalF64)

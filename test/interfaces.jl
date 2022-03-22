@@ -44,45 +44,6 @@ using Graphs, Test
     end
 end
 
-@testset "save load" begin
-    M = 10
-    m = ConfigEnumerator([StaticBitVector(rand(Bool, 300)) for i=1:M])
-    bm = GraphTensorNetworks.plain_matrix(m)
-    rm = GraphTensorNetworks.raw_matrix(m)
-    m1 = GraphTensorNetworks.from_raw_matrix(rm; bitlength=300, nflavors=2)
-    m2 = GraphTensorNetworks.from_plain_matrix(bm; nflavors=2)
-    @test m1 == m
-    @test m2 == m
-    save_configs("_test.bin", m; format=:binary)
-    @test_throws ErrorException load_configs("_test.bin"; format=:binary)
-    ma = load_configs("_test.bin"; format=:binary, bitlength=300, nflavors=2)
-    @test ma == m
-
-    save_configs("_test.txt", m; format=:text)
-    mb = load_configs("_test.txt"; format=:text, nflavors=2)
-    @test mb == m
-
-    M = 10
-    m = ConfigEnumerator([StaticElementVector(3, rand(0:2, 300)) for i=1:M])
-    bm = GraphTensorNetworks.plain_matrix(m)
-    rm = GraphTensorNetworks.raw_matrix(m)
-    m1 = GraphTensorNetworks.from_raw_matrix(rm; bitlength=300, nflavors=3)
-    m2 = GraphTensorNetworks.from_plain_matrix(bm; nflavors=3)
-    @test m1 == m
-    @test m2 == m
-    @test Matrix(m) == bm
-    @test Vector(m.data[1]) == bm[:,1]
-
-    save_configs("_test.bin", m; format=:binary)
-    @test_throws ErrorException load_configs("_test.bin"; format=:binary)
-    ma = load_configs("_test.bin"; format=:binary, bitlength=300, nflavors=3)
-    @test ma == m
-
-    save_configs("_test.txt", m; format=:text)
-    mb = load_configs("_test.txt"; format=:text, nflavors=3)
-    @test mb == m
-end
-
 @testset "slicing" begin
     g = Graphs.smallgraph("petersen")
     gp = IndependentSet(g; optimizer=TreeSA(nslices=5, ntrials=1))

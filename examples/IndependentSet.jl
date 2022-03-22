@@ -135,9 +135,11 @@ all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]
 # The results encode the configurations in the sum-product-tree format. One can count and enumerate them explicitly by typing
 length(all_independent_sets_tree)
 
-# 
+# Then one can use `Base.collect` function to create a [`ConfigEnumerator`](@ref) or use [`generate_samples`](@ref) to generate samples from it.
 
 collect(all_independent_sets_tree)
+
+generate_samples(all_independent_sets_tree, 10)
 
 # One can use [`save_configs`](@ref) and [`load_configs`](@ref) to save and read a set of configuration to disk.
 filename = tempname()

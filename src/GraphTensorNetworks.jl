@@ -6,6 +6,7 @@ using TropicalNumbers
 using OMEinsum
 using OMEinsum: timespace_complexity, getixsv
 using Graphs, Random
+using DelimitedFiles, Serialization
 
 # OMEinsum
 export timespace_complexity, timespacereadwrite_complexity, @ein_str, getixsv, getiyv
@@ -48,7 +49,7 @@ export is_matching
 export solve, SizeMax, SizeMin, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin
 
 # Utilities
-export save_configs, load_configs, hamming_distribution
+export save_configs, load_configs, hamming_distribution, save_sumproduct, load_sumproduct
 
 # Visualization
 export show_graph, spring_layout
@@ -64,6 +65,7 @@ include("configurations.jl")
 include("graphs.jl")
 include("bounding.jl")
 include("visualize.jl")
+include("fileio.jl")
 include("interfaces.jl")
 include("deprecate.jl")
 include("multiprocessing.jl")

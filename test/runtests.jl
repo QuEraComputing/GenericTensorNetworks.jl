@@ -37,6 +37,10 @@ end
     include("visualize.jl")
 end
 
+@testset "fileio" begin
+    include("fileio.jl")
+end
+
 @testset "multiprocessing" begin
     include("multiprocessing.jl")
 end

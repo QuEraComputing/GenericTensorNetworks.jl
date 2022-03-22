@@ -98,6 +98,8 @@ StaticBitVector
 StaticElementVector
 save_configs
 load_configs
+save_sumproduct
+load_sumproduct
 @bv_str
 onehotv
 

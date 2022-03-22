@@ -608,55 +608,6 @@ function _length!(x, d)
     end
 end
 
-# # loop version
-# function _length!(x, d)
-#     rootid = objectid(x)
-#     t_stack = [x]
-#     # update dict
-#     while !isempty(t_stack)
-#         x = t_stack[end]
-#         id = objectid(x)
-#         if haskey(d, id)
-#             pop!(t_stack)
-#         else
-#             if x.tag === SUM
-#                 idl = objectid(x.left)
-#                 if haskey(d, idl)
-#                     idr = objectid(x.right)
-#                     if haskey(d, idr)
-#                         @inbounds d[id] = d[idl] + d[idr]
-#                         pop!(t_stack)
-#                     else
-#                         push!(t_stack, x.right)
-#                     end
-#                 else
-#                     push!(t_stack, x.left)
-#                 end
-#             elseif x.tag === PROD
-#                 idl = objectid(x.left)
-#                 if haskey(d, idl)
-#                     idr = objectid(x.right)
-#                     if haskey(d, idr)
-#                         @inbounds d[id] = d[idl] * d[idr]
-#                         pop!(t_stack)
-#                     else
-#                         push!(t_stack, x.right)
-#                     end
-#                 else
-#                     push!(t_stack, x.left)
-#                 end
-#             elseif x.tag === ZERO
-#                 d[id] = 0.0
-#                 pop!(t_stack)
-#             else
-#                 d[id] = 1.0
-#                 pop!(t_stack)
-#             end
-#         end
-#     end
-#     return d[rootid]
-# end
-
 function _find_branch(x, d)
     if x.tag === ZERO
         return true, 0.0

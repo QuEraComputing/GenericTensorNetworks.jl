@@ -136,7 +136,7 @@ julia> lineplot(hamming_distribution(samples, samples))
 ```
 
 ## Multiprocessing
-Submodule `GraphTensorNetworks.SimpleMutiprocessing` provides a function [`multiprocess_run`](@ref) function for simple multi-processing jobs.
+Submodule `GraphTensorNetworks.SimpleMutiprocessing` provides a function [`GraphTensorNetworks.SimpleMultiprocessing.multiprocess_run`](@ref) function for simple multi-processing jobs.
 Suppose we want to find the independence polynomial for multiple graphs with 4 processes.
 We can create a file, e.g. named `run.jl` with the following content
 

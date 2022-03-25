@@ -497,17 +497,17 @@ julia> q = SumProductTree(bv"10000")
 
 
 julia> x = s + q
-+
++ (count = 2.0)
 ├─ 00111
 └─ 10000
 
 
 julia> y = x * x
-*
-├─ +
+* (count = 4.0)
+├─ + (count = 2.0)
 │  ├─ 00111
 │  └─ 10000
-└─ +
+└─ + (count = 2.0)
    ├─ 00111
    └─ 10000
 

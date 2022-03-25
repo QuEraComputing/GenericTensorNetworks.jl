@@ -532,22 +532,24 @@ julia> one(s)
 """
 mutable struct SumProductTree{ET} <: AbstractSetNumber
     tag::TreeTag
+    count::Float64
     data::ET
     left::SumProductTree{ET}
     right::SumProductTree{ET}
     # zero(ET) can be undef
     function SumProductTree(tag::TreeTag, left::SumProductTree{ET}, right::SumProductTree{ET}) where {ET}
-        res = new{ET}(tag)
+        @assert  tag === SUM || tag === PROD
+        res = new{ET}(tag, tag === SUM ? left.count + right.count : left.count * right.count)
         res.left = left
         res.right = right
         return res
     end
     function SumProductTree(data::ET) where ET
-        return new{ET}(LEAF, data)
+        return new{ET}(LEAF, 1.0, data)
     end
     function SumProductTree{ET}(tag::TreeTag) where {ET}
         @assert  tag === ZERO || tag === ONE
-        return new{ET}(tag)
+        return new{ET}(tag, tag === ZERO ? 0.0 : 1.0)
     end
 end
 # these two interfaces must be implemented in order to collect elements
@@ -588,49 +590,15 @@ function printnode(io::IO, t::SumProductTree{ET}) where {ET}
     elseif t.tag === ONE
         print(io, _data_one(ET))
     elseif t.tag === SUM
-        print(io, "+")
+        print(io, "+ (count = $(t.count))")
     else  # PROD
-        print(io, "*")
+        print(io, "* (count = $(t.count))")
     end
 end
 
 # it must be mutable, otherwise, objectid might be slow serialization might fail.
 # IdDict is much slower than Dict, it is useless.
-Base.length(x::SumProductTree) = _length!(x, Dict{UInt, Float64}())
-
-function _length!(x, d)
-    id = objectid(x)
-    haskey(d, id) && return d[id]
-    if x.tag === SUM
-        l = _length!(x.left, d) + _length!(x.right, d)
-        d[id] = l
-        return l
-    elseif x.tag === PROD
-        l = _length!(x.left, d) * _length!(x.right, d)
-        d[id] = l
-        return l
-    elseif x.tag === ZERO
-        return 0.0
-    else
-        return 1.0
-    end
-end
-
-function _find_branch(x, d)
-    if x.tag === ZERO
-        return true, 0.0
-    elseif x.tag === ONE || x.tag === LEAF
-        return true, 1.0
-    else
-        idl = objectid(x.left)
-        if haskey(d, idl)
-            return true, d[idl]
-        else
-            return false, 0.0
-        end
-    end
-end
-
+Base.length(x::SumProductTree) = x.count
 
 num_nodes(x::SumProductTree) = _num_nodes(x, Dict{UInt, Int}())
 function _num_nodes(x, d)
@@ -739,11 +707,11 @@ function generate_samples(t::SumProductTree{ET}, nsamples::Int) where {ET}
     # get length dict
     res = fill(_data_one(ET), nsamples)
     d = Dict{UInt, Float64}()
-    sample_descend!(res, t, d)
+    sample_descend!(res, t)
     return res
 end
 
-function sample_descend!(res::AbstractVector{T}, t::SumProductTree, d::Dict) where T
+function sample_descend!(res::AbstractVector{T}, t::SumProductTree) where T
     res_stack = Any[res]
     t_stack = [t]
     while !isempty(t_stack) && !isempty(res_stack)
@@ -752,7 +720,7 @@ function sample_descend!(res::AbstractVector{T}, t::SumProductTree, d::Dict) whe
         if t.tag == LEAF
             res .= _data_mul.(res, Ref(convert(T, t.data)))
         elseif t.tag == SUM
-            ratio = _length!(t.left, d)/_length!(t, d)
+            ratio = length(t.left)/length(t)
             nleft = 0
             for _ = 1:length(res)
                 if rand() < ratio

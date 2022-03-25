@@ -40,17 +40,21 @@ end
                     (CountingTropical(5.0, ConfigSampler(StaticBitVector(rand(Bool, 10)))), CountingTropical(3.0, ConfigSampler(StaticBitVector(rand(Bool, 10)))), CountingTropical(-3.0, ConfigSampler(StaticBitVector(rand(Bool, 10))))),
                     (CountingTropical(5.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:3])), CountingTropical(3.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:4])), CountingTropical(-3.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:5]))),
                     (ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:3]), ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:4]), ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:5])),
-                    (TreeConfigEnumerator(GraphTensorNetworks.SUM, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
-                        TreeConfigEnumerator(GraphTensorNetworks.SUM, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
-                        TreeConfigEnumerator(GraphTensorNetworks.SUM, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...)
+                    (SumProductTree(GraphTensorNetworks.SUM, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        SumProductTree(GraphTensorNetworks.SUM, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        SumProductTree(GraphTensorNetworks.SUM, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...)
                         ),
-                    (TreeConfigEnumerator(GraphTensorNetworks.PROD, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
-                        TreeConfigEnumerator(GraphTensorNetworks.PROD, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
-                        TreeConfigEnumerator(GraphTensorNetworks.PROD, [TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))) for j=1:2]...)
+                    (SumProductTree(GraphTensorNetworks.PROD, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        SumProductTree(GraphTensorNetworks.PROD, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        SumProductTree(GraphTensorNetworks.PROD, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...)
                         ),
-                    (TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))),
-                        TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))),
-                        TreeConfigEnumerator(StaticBitVector(rand(Bool, 10))),
+                    (SumProductTree(GraphTensorNetworks.PROD, [SumProductTree(OnehotVec{10, 2}(rand(1:10), 1)) for j=1:2]...),
+                        SumProductTree(GraphTensorNetworks.PROD, [SumProductTree(OnehotVec{10, 2}(rand(1:10), 1)) for j=1:2]...),
+                        SumProductTree(GraphTensorNetworks.PROD, [SumProductTree(OnehotVec{10, 2}(rand(1:10), 1)) for j=1:2]...)
+                        ),
+                    (SumProductTree(StaticBitVector(rand(Bool, 10))),
+                        SumProductTree(StaticBitVector(rand(Bool, 10))),
+                        SumProductTree(StaticBitVector(rand(Bool, 10))),
                         ),
                     ]
         @test is_commutative_semiring(a, b, c)
@@ -69,7 +73,7 @@ end
     @test map(x->length(x), a) == [10, 10, 10]
 
     # the following tests are for Polynomial + ConfigEnumerator
-    a = TreeConfigEnumerator(StaticBitVector(trues(10)))
+    a = SumProductTree(StaticBitVector(trues(10)))
     @test 1 * a == a
     @test 0 * a == zero(a)
     @test copy(a) == a
@@ -93,7 +97,7 @@ end
     x = ConfigEnumerator([bv"00111"])
     @test x ^ 0 == one(x)
     @test x ^ 2.0 == x
-    x = TreeConfigEnumerator(bv"00111")
+    x = SumProductTree(bv"00111")
     @test x ^ 0 == one(x)
     @test x ^ 2.0 == x
     x = ConfigSampler(bv"00111")
@@ -112,9 +116,10 @@ end
 @testset "push coverage" begin
     @test abs(Mod{5}(2)) == Mod{5}(2)
     @test one(ConfigSampler(bv"11100")) == ConfigSampler(bv"00000")
-    @test one(TreeConfigEnumerator{5,1,1}(GraphTensorNetworks.ZERO)) == TreeConfigEnumerator(bv"00000")
-    @test iszero(copy(TreeConfigEnumerator{5,1,1}(GraphTensorNetworks.ZERO)))
-    x = TreeConfigEnumerator(bv"00111")
+    T = SumProductTree{OnehotVec{5,2}}
+    @test collect(one(T(GraphTensorNetworks.ZERO))) == collect(SumProductTree(bv"00000"))
+    @test iszero(copy(T(GraphTensorNetworks.ZERO)))
+    x = SumProductTree(bv"00111")
     @test copy(x) == x
     @test copy(x) !== x
     @test !iszero(x)

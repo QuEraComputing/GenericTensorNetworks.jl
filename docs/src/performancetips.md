@@ -89,7 +89,7 @@ The GEMM routine can speed up the computation on CPU for one order, with multi-t
 Benchmark shows the performance of `TropicalGEMM` is close to the theoretical optimal value.
 
 ## Sum product representation for configurations
-[`TreeConfigEnumerator`](@ref) (an alias of [`SumProductTree`](@ref) with [`StaticElementVector`](@ref) as its data type) can save a lot memory for you to store exponential number of configurations in polynomial space.
+[`SumProductTree`](@ref) (an alias of [`SumProductTree`](@ref) with [`StaticElementVector`](@ref) as its data type) can save a lot memory for you to store exponential number of configurations in polynomial space.
 It is a sum-product expression tree to store [`ConfigEnumerator`](@ref) in a lazy style, configurations can be extracted by depth first searching the tree with the `Base.collect` method. Although it is space efficient, it is in general not easy to extract information from it.
 This tree structure supports directed sampling so that one can get some statistic properties from it with an intermediate effort.
 

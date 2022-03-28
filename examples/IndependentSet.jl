@@ -129,7 +129,7 @@ Compose.compose(context(),
 all_independent_sets = solve(problem, ConfigsAll())[]
 
 # It is often difficult to store all configurations in a vector.
-# A more clever way to store the data is using the [`TreeConfigEnumerator`](@ref) format.
+# A more clever way to store the data is using the [`SumProductTree`](@ref) format.
 all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]
 
 # The results encode the configurations in the sum-product-tree format. One can count and enumerate them explicitly by typing

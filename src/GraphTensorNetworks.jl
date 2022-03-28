@@ -19,9 +19,9 @@ export estimate_memory
 export StaticBitVector, StaticElementVector, @bv_str
 export is_commutative_semiring
 export Max2Poly, TruncatedPoly, Polynomial, Tropical, CountingTropical, StaticElementVector, Mod
-export ConfigEnumerator, onehotv, ConfigSampler, SumProductTree, TreeConfigEnumerator
+export ConfigEnumerator, onehotv, ConfigSampler, SumProductTree
 export CountingTropicalF64, CountingTropicalF32, TropicalF64, TropicalF32, ExtendedTropical
-export generate_samples
+export generate_samples, OnehotVec
 
 # Lower level APIs
 export AllConfigs, SingleConfig

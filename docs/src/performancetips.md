@@ -58,12 +58,12 @@ julia> estimate_memory(problem, GraphPolynomial(; method=:polynomial))
 71427840
 ```
 It means one only needs 298 KB memory to find the graph polynomial with the finite field approach,
-but needs 71 MB memory to find the graph polynomial using the [`Polynomial`](@ref) type.
+but needs 71 MB memory to find the graph polynomial using the [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2) type.
 
 !!! note
     * The actual run time memory can be several times larger than the size of the maximum tensor.
     There is no constant bound for the factor, an empirical value for it is 3x.
-    * For mutable types like [`Polynomial`](@ref) and [`ConfigEnumerator`](@ref), the `sizeof` function does not measure the actual element size.
+    * For mutable types like [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2) and [`ConfigEnumerator`](@ref), the `sizeof` function does not measure the actual element size.
 
 ## GEMM for Tropical numbers
 You can speed up the Tropical number matrix multiplication when computing `SizeMax()` by using the Tropical GEMM routines implemented in package [`TropicalGEMM.jl`](https://github.com/TensorBFS/TropicalGEMM.jl/).

@@ -4,8 +4,14 @@ CurrentModule = GraphTensorNetworks
 
 # GraphTensorNetworks
 
-This package uses generic tensor network to compute properties of combinatorial problems defined on graph.
-The properties includes the size of the maximum/minimum set size, the number of sets of a given size and the enumeration of configurations of a given set size.
+This package implements generic tensor networks to compute *solution space properties* of a class of hard combinatorial problems.
+The *solution space properties* include
+* The maximum/minimum solution sizes,
+* The number of solutions at certain sizes,
+* The enumeration of solutions at certian sizes.
+* The direct sampling of solutions at certian sizes.
+
+The solvable problems include [Independent set problem](@ref), [Maximal independent set problem](@ref), [Cutting problem (Spin-glass problem)](@ref), [Vertex matching problem](@ref), [Binary paint shop problem](@ref), [Coloring problem](@ref) and [Dominating set problem](@ref).
 
 ## Background knowledge
 
@@ -14,6 +20,42 @@ If you find our paper or software useful in your work, we would be grateful if y
 
 ## Quick start
 
-You can find a good installation guide and a quick start in our [README](https://github.com/QuEraComputing/GraphTensorNetworks.jl).
+You can find a set up guide in our [README](https://github.com/QuEraComputing/GraphTensorNetworks.jl).
+To get started, open a Julia REPL and type the following code.
 
-A good example to start with is the [Independent set problem](@ref).
+```julia
+julia> using GraphTensorNetworks, Graphs
+
+julia> # using CUDA
+
+julia> solve(
+           IndependentSet(
+               Graphs.random_regular_graph(20, 3);
+               optimizer = TreeSA(),
+               weights = NoWeight(),  # the default value
+               openvertices = ()      # the default value
+           ),
+           GraphPolynomial();
+           usecuda=false              # the default value
+       )
+0-dimensional Array{Polynomial{BigInt, :x}, 0}:
+Polynomial(1 + 20*x + 160*x^2 + 659*x^3 + 1500*x^4 + 1883*x^5 + 1223*x^6 + 347*x^7 + 25*x^8)
+```
+
+Here the main function [`solve`](@ref) takes three input arguments, the problem instance of type [`IndependentSet`](@ref), the property instance of type [`GraphPolynomial`](@ref) and an optional key word argument `usecuda` to decide use GPU or not.
+If one wants to use GPU to accelerate the computation, the `using CUDA` statement must uncommented.
+
+The problem instance takes four arguments to initialize, the only positional argument is the graph instance that one wants to solve, the key word argument `optimizer` is for specifying the tensor network optimization algorithm, the key word argument `weights` is for specifying the weights of vertices as either a vector or `NoWeight()` and the keyword argument `openvertices` is for specifying the degrees of freedom not summed over.
+Here, we use [`TreeSA`](@ref) method as the tensor network optimizer, and leave `weights` and `openvertices` the default values.
+The [`TreeSA`](@ref) method finds the best contraction order in most of our applications, while the default [`GreedyMethod`](@ref) runs the fastest.
+
+The first execution of this function will be a bit slow due to Julia's just in time compiling.
+The subsequent runs will be fast.
+The following diagram lists possible combinations of input arguments, where functions in the `Graph` are mainly defined in the package [Graphs](https://github.com/JuliaGraphs/Graphs.jl), and the rest can be found in this package.
+```@raw html
+<div align=center>
+<img src="assets/fig7.png" width="75%"/>
+</div>
+```⠀
+You can find many examples in this documentation, a good one to start with is [solving the independent set problem](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/IndependentSet/).
+

@@ -33,7 +33,7 @@ makedocs(;
             "Independent set problem" => "tutorials/IndependentSet.md",
             "Maximal independent set problem" => "tutorials/MaximalIS.md",
             "Cutting problem" => "tutorials/MaxCut.md",
-            "Matching problem" => "tutorials/Matching.md",
+            "Vertex Matching problem" => "tutorials/Matching.md",
             "Binary paint shop problem" => "tutorials/PaintShop.md",
             "Coloring problem" => "tutorials/Coloring.md",
             "Dominating set problem" => "tutorials/DominatingSet.md",

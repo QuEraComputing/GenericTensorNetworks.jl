@@ -29,7 +29,7 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
-        "Tutorials" => [
+        "Problems" => [
             "Independent set problem" => "tutorials/IndependentSet.md",
             "Maximal independent set problem" => "tutorials/MaximalIS.md",
             "Cutting problem" => "tutorials/MaxCut.md",
@@ -39,6 +39,11 @@ makedocs(;
             "Dominating set problem" => "tutorials/DominatingSet.md",
             "Satisfiability problem" => "tutorials/Satisfiability.md",
             "Other problems" => "tutorials/Others.md",
+        ],
+        "Topics" => [
+            "Save and load solutions" => "tutorials/saveload.md"
+            "Weighted problems" => "tutorials/weighted.md"
+            "Open degree of freedoms" => "tutorials/open.md"
         ],
         "Performance Tips" => "performancetips.md",
         "References" => "ref.md",

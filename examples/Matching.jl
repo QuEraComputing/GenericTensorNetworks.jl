@@ -1,10 +1,7 @@
 # # Vertex matching problem
 
 # !!! note
-#     It is recommended to read the [Independent set problem](@ref) tutorial first to know more about
-#     * how to optimize the tensor network contraction order,
-#     * what graph properties are available and how to select correct method to compute graph properties,
-#     * how to compute weighted graphs and handle open vertices.
+#     It is highly recommended to read the [Independent set problem](@ref) chapter before reading this one.
 
 # ## Problem definition
 # A ``k``-matching in a graph ``G`` is a set of k edges, no two of which have a vertex in common.
@@ -22,7 +19,11 @@ locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.6, i) for i=0:4]..
 
 show_graph(graph; locs=locations)
 
-# ## Tensor network representation
+# ## Generic tensor network representation
+# We construct the tensor network for the matching problem by typing
+problem = Matching(graph);
+# ### Theory (can skip)
+#
 # Type [`Matching`](@ref) can be used for constructing the tensor network with optimized contraction order for a matching problem.
 # We map an edge ``(u, v) \in E`` to a label ``\langle u, v\rangle \in \{0, 1\}`` in a tensor network,
 # where 1 means two vertices of an edge are matched, 0 means otherwise.
@@ -42,8 +43,6 @@ show_graph(graph; locs=locations)
 # ```
 # where label ``\langle v, w \rangle`` is equivalent to ``\langle w,v\rangle``.
 #
-# We construct the tensor network for the matching problem by typing
-problem = Matching(graph);
 
 # ## Solving properties
 # ### Maximum matching

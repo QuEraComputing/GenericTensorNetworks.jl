@@ -1,10 +1,7 @@
 # # Dominating set problem
 
 # !!! note
-#     It is recommended to read the [Independent set problem](@ref) tutorial first to know more about
-#     * how to optimize the tensor network contraction order,
-#     * what graph properties are available and how to select correct method to compute graph properties,
-#     * how to compute weighted graphs and handle open vertices.
+#     It is highly recommended to read the [Independent set problem](@ref) chapter before reading this one.
 
 # ## Problem definition
 
@@ -24,7 +21,11 @@ locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.6, i) for i=0:4]..
 
 show_graph(graph; locs=locations)
 
-# ## Tensor network representation
+# ## Generic tensor network representation
+# We can use [`DominatingSet`](@ref) to construct the tensor network for solving the dominating set problem as
+problem = DominatingSet(graph; optimizer=TreeSA());
+
+# ### Theory (can skip)
 # Let ``G=(V,E)`` be the target graph that we want to solve.
 # The tensor network representation map a vertex ``v\in V`` to a boolean degree of freedom ``s_v\in\{0, 1\}``.
 # We defined the restriction on a vertex and its neighbouring vertices ``N(v)``:
@@ -39,9 +40,6 @@ show_graph(graph; locs=locations)
 # This tensor means if both ``v`` and its neighbouring vertices are not in ``D``, i.e., ``s_1=s_2=\ldots=s_{|N(v)|}=s_v=0``,
 # this configuration is forbidden because ``v`` is not adjacent to any member in the set.
 # otherwise, if ``v`` is in ``D``, it has a contribution ``x_v^{w_v}`` to the final result.
-# We can use [`DominatingSet`](@ref) to construct the tensor network for solving the dominating set problem as
-problem = DominatingSet(graph; optimizer=TreeSA());
-
 # One can check the contraction time space complexity of a [`DominatingSet`](@ref) instance by typing:
 
 timespacereadwrite_complexity(problem)

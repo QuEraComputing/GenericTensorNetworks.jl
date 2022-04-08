@@ -1,10 +1,7 @@
 # # Cutting problem (Spin-glass problem)
 
 # !!! note
-#     It is recommended to read the [Independent set problem](@ref) tutorial first to know more about
-#     * how to optimize the tensor network contraction order,
-#     * what graph properties are available and how to select correct method to compute graph properties,
-#     * how to compute weighted graphs and handle open vertices.
+#     It is highly recommended to read the [Independent set problem](@ref) chapter before reading this one.
 
 # ## Problem definition
 # In graph theory, a [cut](https://en.wikipedia.org/wiki/Cut_(graph_theory)) is a partition of the vertices of a graph into two disjoint subsets.
@@ -25,7 +22,12 @@ locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.6, i) for i=0:4]..
 
 show_graph(graph; locs=locations)
 
-# ## Tensor network representation
+# ## Generic tensor network representation
+# We define the cutting problem as
+problem = MaxCut(graph);
+
+# ### Theory (can skip)
+#
 # For a vertex ``v\in V``, we define a boolean degree of freedom ``s_v\in\{0, 1\}``.
 # Then the maximum cutting problem can be encoded to tensor networks by mapping an edge ``(i,j)\in E`` to an edge matrix labelled by ``s_is_j``
 # ```math
@@ -39,8 +41,6 @@ show_graph(graph; locs=locations)
 # where ``w_{\langle i,j\rangle}`` is the weight of this edge.
 # Similar to other problems, we can define a polynomial about edges variables by setting ``x_{\langle i, j\rangle} = x``,
 # where its k-th coefficient is two times the number of configurations of cut size k.
-# We define the cutting problem as
-problem = MaxCut(graph);
 
 # Its contraction time space complexity is ``2^{{\rm tw}(G)}``, where ``{\rm tw(G)}`` is the [tree-width](https://en.wikipedia.org/wiki/Treewidth) of ``G``.
 

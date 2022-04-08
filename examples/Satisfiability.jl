@@ -1,10 +1,7 @@
 # # Satisfiability problem
 
 # !!! note
-#     It is recommended to read the [Independent set problem](@ref) tutorial first to know more about
-#     * how to optimize the tensor network contraction order,
-#     * what graph properties are available and how to select correct method to compute graph properties,
-#     * how to compute weighted graphs and handle open vertices.
+#     It is highly recommended to read the [Independent set problem](@ref) chapter before reading this one.
 
 # ## Problem definition
 # In logic and computer science, the [boolean satisfiability problem](https://en.wikipedia.org/wiki/Boolean_satisfiability_problem) is the problem of determining if there exists an interpretation that satisfies a given boolean formula.
@@ -23,7 +20,12 @@ assignment = Dict([:a=>true, :b=>false, :c=>false, :d=>true, :e=>false, :f=>fals
 
 satisfiable(cnf, assignment)
 
-# ## Tensor network representation
+# ## Generic tensor network representation
+# If we contract this tensor network, we will get a multiplicative factor ``x`` whenever there is a clause satisfied.
+
+problem = Satisfiability(cnf);
+
+# ### Theory (can skip)
 # We can contruct a [`Satisfiability`](@ref) problem to solve the above problem.
 # To generate a tensor network, we map a boolean variable ``x`` and its negation ``\neg x`` to a degree of freedom (label) ``s_x \in \{0, 1\}``,
 # where 0 stands for variable ``x`` having value `false` while 1 stands for having value `true`.
@@ -41,9 +43,6 @@ satisfiable(cnf, assignment)
 # \end{matrix}\right).
 # ```
 # There is only one entry ``(s_x, s_y, s_z) = (1, 0, 1)`` that makes this clause unsatisfied.
-# If we contract this tensor network, we will get a multiplicative factor ``x`` whenever there is a clause satisfied.
-
-problem = Satisfiability(cnf);
 
 # ## Solving properties
 # #### Satisfiability and its counting

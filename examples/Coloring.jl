@@ -1,10 +1,7 @@
 # # Coloring problem
 
 # !!! note
-#     It is recommended to read the [Independent set problem](@ref) tutorial first to know more about
-#     * how to optimize the tensor network contraction order,
-#     * what graph properties are available and how to select correct method to compute graph properties,
-#     * how to compute weighted graphs and handle open vertices.
+#     It is highly recommended to read the [Independent set problem](@ref) chapter before reading this one.
 
 # ## Problem definition
 # A [vertex coloring](https://en.wikipedia.org/wiki/Graph_coloring) is an assignment of labels or colors to each vertex of a graph such that no edge connects two identically colored vertices. 
@@ -21,7 +18,12 @@ locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.6, i) for i=0:4]..
 
 show_graph(graph; locs=locations)
 
-# ## Tensor network representation
+# ## Generic tensor network representation
+#
+# We construct the tensor network for the 3-coloring problem as
+problem = Coloring{3}(graph);
+
+# ### Theory (can skip)
 # Type [`Coloring`](@ref) can be used for constructing the tensor network with optimized contraction order for a coloring problem.
 # Let us use 3-colouring problem defined on vertices as an example.
 # For a vertex ``v``, we define the degree of freedoms ``c_v\in\{1,2,3\}`` and a vertex tensor labelled by it as
@@ -41,9 +43,6 @@ show_graph(graph; locs=locations)
 # \end{matrix}\right).
 # ```
 # The number of possible colouring can be obtained by contracting this tensor network by setting vertex tensor elements ``r_v, g_v`` and ``b_v`` to 1.
-#
-# We construct the tensor network for the 3-coloring problem as
-problem = Coloring{3}(graph);
 
 # ## Solving properties
 # ##### counting all possible coloring

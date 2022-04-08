@@ -23,6 +23,12 @@ show_graph(graph; locs=locations)
 # * or a [Pluto](https://github.com/fonsp/Pluto.jl) notebook,
 
 # ## Generic tensor network representation
+# The generic tensor network representation of the independent set problem can be constructed with [`IndependentSet`](@ref).
+problem = IndependentSet(graph; optimizer=TreeSA());
+
+# Here, the key word argument `optimizer` specifies the tensor network contraction order optimizer as a local search based optimizer [`TreeSA`](@ref).
+# The resulting contraction order optimized tensor network is contained in the `code` field of `problem`.
+#
 # ### Theory (can skip)
 #
 # To reduce the independent set problem on ``G=(V, E)`` to a tensor network contraction, we first map a vertex ``v\in V`` to a label ``s_v \in \{0, 1\}`` of dimension ``2``, where we use ``0`` (``1``) to denote a vertex absent (present) in the set.
@@ -41,13 +47,6 @@ show_graph(graph; locs=locations)
 # 1 & 0
 # \end{matrix}\right).
 # ```
-
-# ### Define a problem instance
-# The generic tensor network representation of the independent set problem can be constructed with [`IndependentSet`](@ref).
-problem = IndependentSet(graph; optimizer=TreeSA());
-
-# Here, the key word argument `optimizer` specifies the tensor network contraction order optimizer as a local search based optimizer [`TreeSA`](@ref).
-# The resulting contraction order optimized tensor network is contained in the `code` field of `problem`.
 # Ideally, an optimal contraction order has a space complexity ``2^{{\rm tw}(G)}``,
 # where ``{\rm tw(G)}`` is the [tree-width](https://en.wikipedia.org/wiki/Treewidth) of ``G`` (or `graph` in the code).
 # We can check the time, space and read-write complexities by typing
@@ -57,7 +56,7 @@ timespacereadwrite_complexity(problem)
 # The three return values are `log2` values of the the number of element-wise multiplication operations, the number elements in the largest tensor during contraction and the number of tensor element read-write operations.
 # For more information about how to improve the contraction order, please check the [Performance Tips](@ref).
 
-# ## Solving properties
+# ## Solution space properties
 
 # ### Maximum independent set size ``\alpha(G)``
 # We can compute solution space properties with the [`solve`](@ref) function, which takes two positional arguments, the problem instance and the wanted property.
@@ -160,95 +159,3 @@ length(all_independent_sets_tree)
 collect(all_independent_sets_tree)
 
 generate_samples(all_independent_sets_tree, 10)
-
-# ## Save and load configurations
-# We can use [`save_configs`](@ref) and [`load_configs`](@ref) to save and read a [`ConfigEnumerator`](@ref) instance to the disk.
-filename = tempname()
-
-save_configs(filename, all_independent_sets; format=:binary)
-
-loaded_sets = load_configs(filename; format=:binary, bitlength=10)
-
-# !!! note
-#     When loading data, one needs to provide the `bitlength` if the data is saved in binary format.
-#     Because the bitstring length is not stored.
-#
-# For the [`SumProductTree`](@ref) type, one can use [`save_sumproduct`](@ref) and [`load_sumproduct`](@ref) to save and load serialized data.
-
-save_sumproduct(filename, all_independent_sets_tree)
-
-loaded_sets_tree = load_sumproduct(filename)
-
-# ##### Loading configurations from python
-# To loading configurations from file in the `:binary` format in python.
-# We suggest using the following script to unpack the data correctly.
-# ```python
-# import numpy as np
-#
-# def loadfile(filename:str, bitlength:int):
-#     C = int(np.ceil(bitlength / 64))
-#     arr = np.fromfile(filename, dtype="uint8")
-#     # Some axes should be transformed from big endian to little endian
-#     res = np.unpackbits(arr).reshape(-1, C, 8, 8)[:,::-1,::-1,:]
-#     res = res.reshape(-1, C*64)[:, :(64*C-bitlength)-1:-1]
-#     print("number of configurations = %d"%(len(res)))
-#     return res  # in big endian format
-#
-# res = loadfile(filename, 10)
-# ```
-
-# !!! note
-#     Check section [Maximal independent set problem](@ref) for solution space properties related the maximal independent sets. That example also contains using cases of finding solution space properties related to minimum sizes:
-#     * [`SizeMin`](@ref) for finding minimum several set sizes,
-#     * [`CountingMin`](@ref) for counting minimum several set sizes,
-#     * [`SingleConfigMin`](@ref) for finding one solution with minimum several sizes,
-#     * [`ConfigsMin`](@ref) for enumerating solutions with minimum several sizes,
-
-
-# ## Weighted Graphs
-# [`IndependentSet`](@ref) accepts `weights` as a key word argument.
-# The following code computes the weighted MIS problem.
-problem = IndependentSet(graph; weights=collect(1:10))
-
-max_config_weighted = solve(problem, SingleConfigMax())[]
-
-show_graph(graph; locs=locations, vertex_colors=
-          [iszero(max_config_weighted.c.data[i]) ? "white" : "red" for i=1:nv(graph)])
-
-# For weighted MIS problem, a property that many people care about is the "energy spectrum", or the largest weights.
-# We just feed a positional argument in the [`SizeMax`](@ref) constructor as the number of largest weights.
-spectrum = solve(problem, SizeMax(10))[]
-
-# The return value has type [`ExtendedTropical`](@ref), which contains one field `orders`. The `orders` is a vector of [`Tropical`](@ref) numbers.
-spectrum.orders
-
-# We can get weighted independent sets with maximum 5 sizes.
-max5_configs = solve(problem, SingleConfigMax(5))[]
-
-# The return value also has type [`ExtendedTropical`](@ref), but this time the element type of `orders` has been changed to [`CountingTropical`](@ref)`{Float64,`[`ConfigSampler`](@ref)`}`.
-max5_configs.orders
-
-# Let us visually check these graphs
-imgs_max5 = ntuple(k->show_graph(graph;
-                    locs=locations, scale=0.25,
-                    vertex_colors=[iszero(max5_configs.orders[k].c.data[i]) ? "white" : "red"
-                    for i=1:nv(graph)]), 5);
-
-Compose.set_default_graphic_size(18cm, 4cm)
-
-Compose.compose(context(),
-     ntuple(k->(context((k-1)/5, 0.0, 1.2/5, 1.0), imgs_max5[k]), 5)...)
-
-# ## Open vertices and MIS tensor analysis
-# The following code computes the MIS tropical tensor (reference to be added) with open vertices 1, 2 and 3.
-problem = IndependentSet(graph; openvertices=[1,2,3])
-
-mis_tropical_tensor = solve(problem, SizeMax())
-
-# The MIS tropical tensor shows the MIS size under different configuration of open vertices.
-# It is useful in MIS tropical tensor analysis.
-# We can compatify (reference to be added) this MIS-Tropical tensor by typing
-
-mis_compactify!(mis_tropical_tensor)
-
-# It will eliminate some entries having no contribution to the MIS size when embeding this local graph into a larger one.

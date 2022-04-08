@@ -1,10 +1,7 @@
 # # Maximal independent set problem
 
 # !!! note
-#     It is recommended to read the [Independent set problem](@ref) tutorial first to know more about
-#     * how to optimize the tensor network contraction order,
-#     * what graph properties are available and how to select correct method to compute graph properties,
-#     * how to compute weighted graphs and handle open vertices.
+#     It is highly recommended to read the [Independent set problem](@ref) chapter before reading this one.
 
 # ## Problem definition
 
@@ -23,7 +20,11 @@ locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.6, i) for i=0:4]..
 
 show_graph(graph; locs=locations)
 
-# ## Tensor network representation
+# ## Generic tensor network representation
+# We can use [`MaximalIS`](@ref) to construct the tensor network for solving the maximal independent set problem as
+problem = MaximalIS(graph; optimizer=TreeSA());
+
+# ### Theory (can skip)
 # Let ``G=(V,E)`` be the target graph that we want to solve.
 # The tensor network representation map a vertex ``v\in V`` to a boolean degree of freedom ``s_v\in\{0, 1\}``.
 # We defined the restriction on its neighbourhood ``N(v)``:
@@ -36,8 +37,6 @@ show_graph(graph; locs=locations)
 # The first case corresponds to all the neighbourhood vertices of ``v`` are not in ``I_{m}``, then ``v`` must be in ``I_{m}`` and contribute a factor ``x_{v}^{w_v}``,
 # where ``w_v`` is the weight of vertex ``v``.
 # Otherwise, if any of the neighbouring vertices of ``v`` is in ``I_{m}``, ``v`` must not be in ``I_{m}`` by the independence requirement.
-# We can use [`MaximalIS`](@ref) to construct the tensor network for solving the maximal independent set problem as
-problem = MaximalIS(graph; optimizer=TreeSA());
 
 # Its contraction time space complexity of a [`MaximalIS`](@ref) instance is no longer determined by the tree-width of the original graph ``G``.
 # It is often harder to contract this tensor network than to contract the one for regular independent set problem.

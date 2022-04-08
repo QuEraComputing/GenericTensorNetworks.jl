@@ -84,13 +84,14 @@ TropicalNumbers.Tropical
 TropicalNumbers.CountingTropical
 ExtendedTropical
 Mods.Mod
-Polynomials.Polynomial
 TruncatedPoly
 Max2Poly
 ConfigEnumerator
 SumProductTree
 ConfigSampler
 ```
+
+`GraphTensorNetworks` also exports the [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2) type defined in package `Polynomials`.
 
 ```@docs
 StaticBitVector

@@ -1,10 +1,7 @@
 # # Binary paint shop problem
 
 # !!! note
-#     It is recommended to read the [Independent set problem](@ref) tutorial first to know more about
-#     * how to optimize the tensor network contraction order,
-#     * what graph properties are available and how to select correct method to compute graph properties,
-#     * how to compute weighted graphs and handle open vertices.
+#     It is highly recommended to read the [Independent set problem](@ref) chapter before reading this one.
 
 # ## Problme Definition
 # The [binary paint shop problem](http://m-hikari.com/ams/ams-2012/ams-93-96-2012/popovAMS93-96-2012-2.pdf) is defined as follows:
@@ -36,7 +33,11 @@ show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=
 # Vertices connected by blue edges must have different colors,
 # and the goal becomes a min-cut problem defined on black edges.
 
-# ## Tensor network representation
+# ## Generic tensor network representation
+# Let us contruct the problem instance as bellow.
+problem = PaintShop(sequence);
+
+# ### Theory (can skip)
 # Type [`PaintShop`](@ref) can be used for constructing the tensor network with optimized contraction order for solving a binary paint shop problem.
 # To obtain its tensor network representation, we associating car ``c_i`` (the ``i``-th character in our example) with a degree of freedom ``s_{c_i} \in \{0, 1\}``,
 # where we use ``0`` to denote the first appearance of a car is colored red and ``1`` to denote the first appearance of a car is colored blue.
@@ -59,9 +60,6 @@ show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=
 # It can be understood as, when both cars are their first appearance,
 # they tend to have the same configuration so that the color is not changed.
 # Otherwise, they tend to have different configuration to keep the color unchanged.
-
-# Let us contruct the problem instance as bellow.
-problem = PaintShop(sequence);
 
 # ### Counting properties
 # ##### graph polynomial

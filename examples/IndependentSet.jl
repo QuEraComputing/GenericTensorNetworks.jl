@@ -67,6 +67,7 @@ maximum_independent_set_size = solve(problem, SizeMax())[]
 maximum_independent_set_size.n
 
 # ### Counting properties
+# ##### Count all solutions and best several solutions
 # We can count all independent sets with the [`CountingAll`](@ref) property.
 count_all_independent_sets = solve(problem, CountingAll())[]
 
@@ -88,7 +89,7 @@ count_max2_independent_sets = solve(problem, CountingMax(2))[]
 
 count_max2_independent_sets.coeffs
 
-# ##### graph polynomial
+# ##### Find the graph polynomial
 # We can count the number of independent sets at any size, which is equivalent to finding the coefficients of an independence polynomial that defined as
 # ```math
 # I(G, x) = \sum_{k=0}^{\alpha(G)} a_k x^k,
@@ -104,6 +105,7 @@ independence_polynomial = solve(problem, GraphPolynomial(; method=:finitefield))
 independence_polynomial.coeffs
 
 # ### Configuration properties
+# ##### Find one best solution
 # We can use the bounded or unbounded [`SingleConfigMax`](@ref) to find one of the solutions with largest size.
 # The unbounded (default) version uses a joint type of [`CountingTropical`](@ref) and [`ConfigSampler`](@ref) in computation,
 # where `CountingTropical` finds the maximum size and `ConfigSampler` samples one of the best solutions.
@@ -119,6 +121,7 @@ single_solution = max_config.c.data
 show_graph(graph; locs=locations, vertex_colors=
     [iszero(single_solution[i]) ? "white" : "red" for i=1:nv(graph)])
 
+# ##### Enumerate all solutions best several solutions
 # We can use bounded or unbounded [`ConfigsMax`](@ref) to find all solutions with largest-K set sizes.
 # In most cases, the bounded (default) version is prefered because it can reduce the memory usage significantly.
 all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]
@@ -147,6 +150,7 @@ all_independent_sets = solve(problem, ConfigsAll())[]
 
 # The return value has type [`ConfigEnumerator`](@ref).
 
+# ##### Sample solutions
 # It is often difficult to store all configurations in a vector.
 # A more clever way to store the data is using the sum product tree format.
 all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]

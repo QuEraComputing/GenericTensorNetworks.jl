@@ -131,19 +131,7 @@ all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]
 all_max_configs.c.data
 
 # Let us visualize the solutions with the visualization package [`Compose`](https://github.com/GiovineItalia/Compose.jl).
-using Compose
-
-m = length(all_max_configs.c)
-
-imgs = ntuple(k->show_graph(graph;
-                    locs=locations, scale=0.25,
-                    vertex_colors=[iszero(all_max_configs.c[k][i]) ? "white" : "red"
-                    for i=1:nv(graph)]), m);
-
-Compose.set_default_graphic_size(18cm, 4cm)
-
-Compose.compose(context(),
-     ntuple(k->(context((k-1)/m, 0.0, 1.2/m, 1.0), imgs[k]), m)...)
+show_gallery(graph, (1, length(all_max_configs.c)); locs=locations, vertex_configs=all_max_configs.c);
 
 # We can use [`ConfigsAll`](@ref) to enumerate all sets satisfying the independence constraint.
 all_independent_sets = solve(problem, ConfigsAll())[]

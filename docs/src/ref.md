@@ -129,6 +129,7 @@ MergeGreedy
 #### Graph
 ```@docs
 show_graph
+show_gallery
 spring_layout
 
 diagonal_coupled_graph

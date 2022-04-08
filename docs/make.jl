@@ -18,7 +18,7 @@ indigo = DocThemeIndigo.install(GraphTensorNetworks)
 DocMeta.setdocmeta!(GraphTensorNetworks, :DocTestSetup, :(using GraphTensorNetworks); recursive=true)
 
 makedocs(;
-    modules=[GraphTensorNetworks, TropicalNumbers, Polynomials, Mods, OMEinsum, OMEinsumContractionOrders],
+    modules=[GraphTensorNetworks, TropicalNumbers, Mods, OMEinsum, OMEinsumContractionOrders],
     authors="Jinguo Liu",
     repo="https://github.com/QuEraComputing/GraphTensorNetworks.jl/blob/{commit}{path}#{line}",
     sitename="GraphTensorNetworks.jl",

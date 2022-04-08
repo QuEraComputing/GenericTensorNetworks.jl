@@ -24,7 +24,8 @@ end
 """
     random_diagonal_coupled_graph(m::Int, n::Int, ρ::Real)
 
-Create a random masked diagonal coupled square lattice graph, with number of vertices fixed to ``\\lfloor mn\\rho \\rceil``.
+Create a ``m\\times n`` random masked diagonal coupled square lattice graph, 
+with number of vertices equal to ``\\lfloor m \\times n\\times \\rho \\rceil``.
 """
 function random_diagonal_coupled_graph(m::Int, n::Int, ρ::Real)
     @assert ρ >=0 && ρ <= 1

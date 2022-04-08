@@ -57,41 +57,52 @@ default_text_style(scale, color) = Viznet.textstyle(:default, fontsize(4pt*scale
 default_edge_style(scale, color) = Viznet.bondstyle(:default, Compose.stroke(color), linewidth(0.3mm*scale))
 
 """
-    show_graph(locations, edges;
+    show_graph(graph;
+        locs=spring_layout(graph),
         vertex_colors=["black", "black", ...],
         edge_colors=["black", "black", ...],
         texts=["1", "2", ...],
         format=SVG,
-        edge_color="black",
+        io=nothing,
         kwargs...
         )
-    show_graph(graph::SimpleGraph; locs=spring_layout(graph), kwargs...)
 
-Plots vertices at `locations` with vertex colors specified by `vertex_colors` and texts specified by `texts`.
-You will need a `VSCode`, `Pluto` notebook or `Jupyter` notebook to show the image.
-If you want to write this image to the disk without displaying it in a frontend, please try
+Show a graph featured with vertex and edge information.
 
-```julia
-julia> open("test.png", "w") do f
-            viz_atoms(f, generate_sites(SquareLattice(), 5, 5))
-       end
-```
+Positional arguments
+-----------------------------
+* `graph` is a graph instance.
 
-The `format` keyword argument can be `Compose.SVG` or `Compose.PDF`.
+Keyword arguments
+-----------------------------
+* `locs` is a vector of tuples for specifying the vertex locations.
+* `vertex_colors` is a vector of color strings for specifying vertex configurations, e.g. a [`ConfigEnumerator`](@ref) instance.
+* `edge_colors` is a vector of color strings for specifying edge configurations.
+* `texts` is a vector of strings for labeling vertices.
+* `format` is the output format, which can be `Compose.SVG`, `Compose.PNG`, `Compose.PDF` et al. Check the [Compose documentation](http://giovineitalia.github.io/Compose.jl/latest/) for details.
+* `io` can be `nothing` for the direct output, or a filename to saving to a file. For direct output, you will need a VSCode editor, an Atom editor, a Pluto notebook or a Jupyter notebook to display the image.
 
-Other keyword arguments
+Extra keyword arguments
 -------------------------------
 * line, vertex and text
-    * scale::Float64 = 1.0
-    * pad::Float64 = 1.5
+    * `scale::Float64` = 1.0
+    * `pad::Float64` = 1.5
 * vertex
-    * vertex\\_text\\_color::String = "black"
-    * vertex\\_stroke\\_color = "black"
-    * vertex\\_fill\\_color = "white"
+    * `vertex_text_color::String` = "black"
+    * `vertex_stroke_color` = "black"
+    * `vertex_fill_color` = "white"
 * edge
-    * edge_color::String = "black"
+    * `edge_color::String` = "black"
 * image size in `cm`
-    * image_size::Float64 = 12
+    * `image_size::Float64` = 12
+
+Example
+------------------------------
+```jldoctest
+julia> using Graphs, GraphTensorNetworks, Compose
+
+julia> show_graph(smallgraph(:petersen); format=Compose.SVG, io=tempname(), vertex_colors=rand(["blue", "red"], 10));
+```
 """
 function show_graph(locations, edges;
         vertex_colors=nothing,
@@ -103,7 +114,7 @@ function show_graph(locations, edges;
         dx, dy = 12cm, 12cm
         img = Compose.compose(Compose.context())
     else
-        img, (dx, dy) = viz_atoms(locations, edges; vertex_colors=vertex_colors, edge_colors=edge_colors, texts=texts, config=GraphDisplayConfig(; config_plotting(locations)..., kwargs...))
+        img, (dx, dy) = viz_graph(locations, edges; vertex_colors=vertex_colors, edge_colors=edge_colors, texts=texts, config=GraphDisplayConfig(; config_plotting(locations)..., kwargs...))
     end
     if io === nothing
         Compose.set_default_graphic_size(dx, dy)
@@ -128,7 +139,7 @@ function fit_image(rescaler::Rescaler, image_size, imgs...)
 end
 
 # Returns a 2-tuple of (image::Context, size)
-function viz_atoms(locs, edges; vertex_colors, edge_colors, texts, config)
+function viz_graph(locs, edges; vertex_colors, edge_colors, texts, config)
     rescaler = get_rescaler(locs, config.pad)
     img = _viz_atoms(rescaler.(locs), edges, vertex_colors, edge_colors, texts, config, getscale(rescaler))
     return fit_image(rescaler, config.image_size, img)
@@ -257,4 +268,104 @@ function spring_layout(g::AbstractGraph,
     map!(z -> scaler(z, min_y, max_y), locs_y, locs_y)
 
     return collect(zip(locs_x, locs_y))
+end
+
+"""
+    show_gallery(graph::SimpleGraph, grid::Tuple{Int,Int};
+        locs=spring_layout(graph), 
+        vertex_configs=nothing,
+        edge_configs=nothing,
+        texts=["1", "2", ...],
+        format=SVG,
+        io=nothing,
+        kwargs...)
+
+Show a gallery of graphs for multiple vertex configurations or edge configurations.
+
+Positional arguments
+-----------------------------
+* `graph` is a graph instance.
+* `grid` is the grid layout of the gallery, e.g. input value `(2, 3)` means a grid layout with 2 rows and 3 columns.
+
+Keyword arguments
+-----------------------------
+* `locs` is a vector of tuples for specifying the vertex locations.
+* `vertex_configs` is an iterator of bit strings for specifying vertex configurations, e.g. a [`ConfigEnumerator`](@ref) instance.
+* `edge_configs` is an iterator of bit strings for specifying edge configurations.
+* `texts` is a vector of strings for labeling vertices.
+* `format` is the output format, which can be `Compose.SVG`, `Compose.PNG`, `Compose.PDF` et al. Check the [Compose documentation](http://giovineitalia.github.io/Compose.jl/latest/) for details.
+* `io` can be `nothing` for the direct output, or a filename to saving to a file. For direct output, you will need a VSCode editor, an Atom editor, a Pluto notebook or a Jupyter notebook to display the image.
+
+Extra keyword arguments
+-------------------------------
+* line, vertex and text
+    * `scale::Float64` = 1.0
+    * `pad::Float64` = 1.5
+* vertex
+    * `vertex_text_color::String` = "black"
+    * `vertex_stroke_color` = "black"
+    * `vertex_fill_color` = "white"
+* edge
+    * `edge_color::String` = "black"
+* image size in `cm`
+    * `image_size::Float64` = 12
+
+Example
+-------------------------------
+```jldoctest
+julia> using Graphs, GraphTensorNetworks, Compose
+
+julia> show_gallery(smallgraph(:petersen), (2, 3); format=Compose.SVG, io=tempname(), vertex_configs=[rand(Bool, 10) for k=1:6]);
+```
+"""
+function show_gallery(graph::SimpleGraph, grid::Tuple{Int,Int}; locs=spring_layout(graph), kwargs...)
+    show_gallery(locs, [(e.src, e.dst) for e in edges(graph)], grid; kwargs...)
+end
+function show_gallery(locs, edges, grid::Tuple{Int,Int};
+        vertex_configs=nothing,
+        edge_configs=nothing,
+        texts=nothing,
+        format=SVG, io=nothing,
+        image_size = 12/max(grid...),
+        scale=0.7, kwargs...)
+    m, n = grid
+    nv, ne = length(locs), length(edges)
+    imgs = Compose.Context[]
+    display_config = GraphDisplayConfig(; config_plotting(locs)..., image_size, scale, kwargs...)
+    for i=1:m
+        for j=1:n
+            # set colors
+            k = (i-1) * n + j
+            vertex_colors = if vertex_configs isa Nothing
+                fill("white", nv)
+            else
+                k > length(vertex_configs) && break
+                [iszero(vertex_configs[k][i]) ? display_config.vertex_fill_color : "red" for i=1:nv]
+            end
+            edge_colors = if edge_configs isa Nothing
+                fill("black", ne)
+            else
+                k > length(edge_configs) && break
+                [iszero(edge_configs[k][i]) ? display_config.edge_color : "red" for i=1:ne]
+            end
+            
+            img, (dx, dy) = viz_graph(locs, edges; vertex_colors, edge_colors, texts, config=display_config)
+            push!(imgs, img)
+        end
+    end
+    return tile_images(imgs, grid; image_size=(display_config.image_size, display_config.image_size), io, format)
+end
+
+function tile_images(imgs, grid; image_size=(3.0, 3.0), format=SVG, io=nothing)
+    m, n = grid
+    dx, dy = (image_size[1]*n)*cm, (image_size[2]*m)*cm
+    img = Compose.compose(context(),
+        ntuple(k->(context((mod1(k,n)-1)/n, ((k-1)÷n)/m, 1.0/n, 1.0/m), imgs[k]), m*n)...)
+
+    if io === nothing
+        Compose.set_default_graphic_size(dx, dy)
+        return img
+    else
+        return format(io, dx, dy)(img)
+    end
 end

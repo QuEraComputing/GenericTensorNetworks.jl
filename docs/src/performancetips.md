@@ -1,6 +1,6 @@
 # Performance Tips
 
-## Optimize tensor network contraction order
+## Optimize tensor network contraction orders
 ```julia
 julia> using GraphTensorNetworks, Graphs, Random
 
@@ -64,6 +64,33 @@ but needs 71 MB memory to find the graph polynomial using the [`Polynomial`](htt
     * The actual run time memory can be several times larger than the size of the maximum tensor.
     There is no constant bound for the factor, an empirical value for it is 3x.
     * For mutable types like [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2) and [`ConfigEnumerator`](@ref), the `sizeof` function does not measure the actual element size.
+
+## Slicing
+
+For large scale applications, it is also possible to slice over certain degrees of freedom to reduce the space complexity, i.e.
+loop and accumulate over certain degrees of freedom so that one can have a smaller tensor network inside the loop due to the removal of these degrees of freedom.
+In the [`TreeSA`](@ref) optimizer, one can set `nslices` to a value larger than zero to turn on this feature.
+
+```julia
+julia> using GraphTensorNetworks, Graphs, Random
+
+julia> graph = random_regular_graph(120, 3)
+{120, 180} undirected simple Int64 graph
+
+julia> problem = IndependentSet(graph; optimizer=TreeSA(βs=0.01:0.1:25.0, ntrials=10, niters=10));
+
+julia> timespacereadwrite_complexity(problem)
+(20.856518235241687, 16.0, 18.88208476145812)
+
+julia> problem = IndependentSet(graph; optimizer=TreeSA(βs=0.01:0.1:25.0, ntrials=10, niters=10, nslices=5));
+
+julia> timespacereadwrite_complexity(problem)
+(21.134967710592804, 11.0, 19.84529401927876)
+```
+
+In the second `IndependentSet` constructor, we slice over 5 degrees of freedom, which can reduce the space complexity by at most 5.
+In this application, the slicing achieves the largest possible space complexity reduction 5, while the time and read-write complexity are only increased by less than 1,
+i.e. the peak memory usage is reduced by a factor ``32``, while the (theoretical) computing time is increased by at a factor ``< 2``.
 
 ## GEMM for Tropical numbers
 You can speed up the Tropical number matrix multiplication when computing `SizeMax()` by using the Tropical GEMM routines implemented in package [`TropicalGEMM.jl`](https://github.com/TensorBFS/TropicalGEMM.jl/).

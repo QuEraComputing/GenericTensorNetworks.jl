@@ -20,11 +20,11 @@ DocMeta.setdocmeta!(GraphTensorNetworks, :DocTestSetup, :(using GraphTensorNetwo
 makedocs(;
     modules=[GraphTensorNetworks, TropicalNumbers, Polynomials, Mods, OMEinsum, OMEinsumContractionOrders],
     authors="Jinguo Liu",
-    repo="https://github.com/Happy-Diode/GraphTensorNetworks.jl/blob/{commit}{path}#{line}",
+    repo="https://github.com/QuEraComputing/GraphTensorNetworks.jl/blob/{commit}{path}#{line}",
     sitename="GraphTensorNetworks.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://Happy-Diode.github.io/GraphTensorNetworks.jl",
+        canonical="https://QuEraComputing.github.io/GraphTensorNetworks.jl",
         assets=String[indigo],
     ),
     pages=[
@@ -47,5 +47,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/Happy-Diode/GraphTensorNetworks.jl",
+    repo="github.com/QuEraComputing/GraphTensorNetworks.jl",
 )

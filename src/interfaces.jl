@@ -210,18 +210,19 @@ Positional Arguments
 * `problem` is the graph problem with tensor network information,
 * `property` is string specifying the task. Using the maximum independent set problem as an example, it can be one of
 
-    * [`SizeMax`](@ref) for finding maximum set size,
-    * [`SizeMin`](@ref) for finding minimum set size,
+    * [`SizeMax`](@ref)`(k=1)` for finding ``k`` maximum set size,
+    * [`SizeMin`](@ref)`(k=1)` for finding ``k`` minimum set size,
 
-    * [`CountingMax`](@ref) for counting configurations with largest-K sizes,
-    * [`CountingMin`](@ref) for counting configurations with smallest-K sizes,
-    * [`CountingAll`](@ref) for counting all configurations,
-    * [`GraphPolynomial`](@ref) for evaluating the graph polynomial,
+    * [`CountingMax`](@ref)`(k=1)` for counting configurations with maximum-``k`` sizes,
+    * [`CountingMin`](@ref)`(k=1)` for counting configurations with minimum-``k`` sizes,
+    * [`CountingAll`](@ref)`()` for counting all configurations,
+    * [`GraphPolynomial`](@ref)`(; method=:finitefield, kwargs...)` for evaluating the graph polynomial,
 
-    * [`SingleConfigMax`](@ref) for finding one maximum configuration for each size,
-    * [`ConfigsMax`](@ref) for enumerating configurations with largest-K sizes,
-    * [`ConfigsMin`](@ref) for enumerating configurations with smallest-K sizes,
-    * [`ConfigsAll`](@ref) for enumerating all configurations,
+    * [`SingleConfigMax`](@ref)`(k=1; bounded=false)` for finding one maximum-``k`` configuration for each size,
+    * [`SingleConfigMin`](@ref)`(k=1; bounded=false)` for finding one minimum-``k`` configuration for each size,
+    * [`ConfigsMax`](@ref)`(k=1; bounded=true, tree_storage=false)` for enumerating configurations with maximum-``k`` sizes,
+    * [`ConfigsMin`](@ref)`(k=1; bounded=true, tree_storage=false)` for enumerating configurations with minimum-``k`` sizes,
+    * [`ConfigsAll`](@ref)`(; tree_storage=false)` for enumerating all configurations,
 
 
 Keyword arguments

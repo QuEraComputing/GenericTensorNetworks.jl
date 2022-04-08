@@ -10,10 +10,10 @@ The properties includes the size of the maximum/minimum set size, the number of 
 ## Background knowledge
 
 Please check our paper ["Computing properties of independent sets by generic programming tensor networks"]().
-If you find our paper or software useful in your work, we would be grateful if you could cite our work. The [CITATION.bib](https://github.com/Happy-Diode/GraphTensorNetworks.jl/blob/master/CITATION.bib) file in the root of this repository lists the relevant papers.
+If you find our paper or software useful in your work, we would be grateful if you could cite our work. The [CITATION.bib](https://github.com/QuEraComputing/GraphTensorNetworks.jl/blob/master/CITATION.bib) file in the root of this repository lists the relevant papers.
 
 ## Quick start
 
-You can find a good installation guide and a quick start in our [README](https://github.com/Happy-Diode/GraphTensorNetworks.jl).
+You can find a good installation guide and a quick start in our [README](https://github.com/QuEraComputing/GraphTensorNetworks.jl).
 
 A good example to start with is the [Independent set problem](@ref).

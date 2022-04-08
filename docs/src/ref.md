@@ -89,13 +89,13 @@ TruncatedPoly
 Max2Poly
 ConfigEnumerator
 SumProductTree
-TreeConfigEnumerator
 ConfigSampler
 ```
 
 ```@docs
 StaticBitVector
 StaticElementVector
+OnehotVec
 save_configs
 load_configs
 save_sumproduct

@@ -18,7 +18,7 @@ Find optimal solutions with bounding.
 * When `all` is true, the program will use set for enumerate all possible solutions, otherwise, it will return one solution for each size.
 * `usecuda` can not be true if you want to use set to enumerate all possible solutions.
 * If `invert` is true, find the minimum.
-* If `tree_storage` is true, use [`TreeConfigEnumerator`](@ref) as the storage of solutions.
+* If `tree_storage` is true, use [`SumProductTree`](@ref) as the storage of solutions.
 """
 function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false, tree_storage::Bool=false, T=Float64)
     if all && usecuda
@@ -55,7 +55,7 @@ General routine to find solutions without bounding,
     * `Max2Poly{Float64,Float64}` for optimal and suboptimal solutions.
 * When `all` is true, the program will use set for enumerate all possible solutions, otherwise, it will return one solution for each size.
 * `usecuda` can not be true if you want to use set to enumerate all possible solutions.
-* If `tree_storage` is true, use [`TreeConfigEnumerator`](@ref) as the storage of solutions.
+* If `tree_storage` is true, use [`SumProductTree`](@ref) as the storage of solutions.
 """
 function solutions(gp::GraphProblem, ::Type{BT}; all::Bool, usecuda::Bool=false, invert::Bool=false, tree_storage::Bool=false) where BT
     if all && usecuda

@@ -497,17 +497,17 @@ julia> q = SumProductTree(bv"10000")
 
 
 julia> x = s + q
-+
++ (count = 2.0)
 ├─ 00111
 └─ 10000
 
 
 julia> y = x * x
-*
-├─ +
+* (count = 4.0)
+├─ + (count = 2.0)
 │  ├─ 00111
 │  └─ 10000
-└─ +
+└─ + (count = 2.0)
    ├─ 00111
    └─ 10000
 
@@ -532,22 +532,24 @@ julia> one(s)
 """
 mutable struct SumProductTree{ET} <: AbstractSetNumber
     tag::TreeTag
+    count::Float64
     data::ET
     left::SumProductTree{ET}
     right::SumProductTree{ET}
     # zero(ET) can be undef
     function SumProductTree(tag::TreeTag, left::SumProductTree{ET}, right::SumProductTree{ET}) where {ET}
-        res = new{ET}(tag)
+        @assert  tag === SUM || tag === PROD
+        res = new{ET}(tag, tag === SUM ? left.count + right.count : left.count * right.count)
         res.left = left
         res.right = right
         return res
     end
     function SumProductTree(data::ET) where ET
-        return new{ET}(LEAF, data)
+        return new{ET}(LEAF, 1.0, data)
     end
     function SumProductTree{ET}(tag::TreeTag) where {ET}
         @assert  tag === ZERO || tag === ONE
-        return new{ET}(tag)
+        return new{ET}(tag, tag === ZERO ? 0.0 : 1.0)
     end
 end
 # these two interfaces must be implemented in order to collect elements
@@ -555,14 +557,22 @@ _data_mul(x::StaticElementVector, y::StaticElementVector) = x | y
 _data_one(::Type{T}) where T<:StaticElementVector = zero(T)  # NOTE: might be optional
 
 """
-    TreeConfigEnumerator{N,S,C}
-    
-An alias for [`SumProductTree`](@ref)`{StaticElementVector{N, S, C}}`,
-which is a useful element type for configuration enumeration.
+    OnehotVec{N,NF}
+    OnehotVec{N,NF}(loc, val)
+
+Onehot vector type, `N` is the number of vector length, `NF` is the number of flavors.
 """
-const TreeConfigEnumerator{N,S,C} = SumProductTree{StaticElementVector{N,S,C}}
-TreeConfigEnumerator(data::StaticElementVector) = SumProductTree(data)
-TreeConfigEnumerator(tag::TreeTag, left::TreeConfigEnumerator{N,S,C}, right::TreeConfigEnumerator{N,S,C}) where {N,S,C} = SumProductTree(tag, left, right)
+struct OnehotVec{N,NF}
+    loc::Int32
+    val::Int32
+end
+_data_one(::Type{T}) where T<:OnehotVec =  _data_one(convert_ev(T)) # NOTE: might be optional
+Base.convert(::Type{ET}, v::OnehotVec{N,NF}) where {N,NF,S,C,ET<:StaticElementVector{N,S,C}} = onehotv(ET, v.loc, v.val)
+function convert_ev(::Type{OnehotVec{N,NF}}) where {N,NF}
+    s = ceil(Int, log2(NF))
+    c = _nints(N,s)
+    return StaticElementVector{N,s,c}
+end
 
 # AbstractTree APIs
 function children(t::SumProductTree)
@@ -580,49 +590,15 @@ function printnode(io::IO, t::SumProductTree{ET}) where {ET}
     elseif t.tag === ONE
         print(io, _data_one(ET))
     elseif t.tag === SUM
-        print(io, "+")
+        print(io, "+ (count = $(t.count))")
     else  # PROD
-        print(io, "*")
+        print(io, "* (count = $(t.count))")
     end
 end
 
 # it must be mutable, otherwise, objectid might be slow serialization might fail.
 # IdDict is much slower than Dict, it is useless.
-Base.length(x::SumProductTree) = _length!(x, Dict{UInt, Float64}())
-
-function _length!(x, d)
-    id = objectid(x)
-    haskey(d, id) && return d[id]
-    if x.tag === SUM
-        l = _length!(x.left, d) + _length!(x.right, d)
-        d[id] = l
-        return l
-    elseif x.tag === PROD
-        l = _length!(x.left, d) * _length!(x.right, d)
-        d[id] = l
-        return l
-    elseif x.tag === ZERO
-        return 0.0
-    else
-        return 1.0
-    end
-end
-
-function _find_branch(x, d)
-    if x.tag === ZERO
-        return true, 0.0
-    elseif x.tag === ONE || x.tag === LEAF
-        return true, 1.0
-    else
-        idl = objectid(x.left)
-        if haskey(d, idl)
-            return true, d[idl]
-        else
-            return false, 0.0
-        end
-    end
-end
-
+Base.length(x::SumProductTree) = x.count
 
 num_nodes(x::SumProductTree) = _num_nodes(x, Dict{UInt, Int}())
 function _num_nodes(x, d)
@@ -645,17 +621,23 @@ end
 
 Base.show(io::IO, t::SumProductTree) = print_tree(io, t)
 
-function Base.collect(x::SumProductTree{ET}) where {ET}
+Base.collect(x::SumProductTree{ET}) where ET = collect(ET, x)
+function Base.collect(x::SumProductTree{OnehotVec{N,NF}}) where {N,NF}
+    s = ceil(Int, log2(NF))
+    c = _nints(N,s)
+    return collect(StaticElementVector{N,s,c}, x)
+end
+function Base.collect(::Type{T}, x::SumProductTree{ET}) where {T, ET}
     if x.tag == ZERO
-        return ET[]
+        return T[]
     elseif x.tag == ONE
-        return [_data_one(ET)]
+        return [_data_one(T)]
     elseif x.tag == LEAF
-        return [x.data]
+        return [convert(T, x.data)]
     elseif x.tag == SUM
-        return vcat(collect(x.left), collect(x.right))
+        return vcat(collect(T, x.left), collect(T, x.right))
     else   # PROD
-        return vec([reduce(_data_mul, si) for si in Iterators.product(collect(x.left), collect(x.right))])
+        return vec([reduce(_data_mul, si) for si in Iterators.product(collect(T, x.left), collect(T, x.right))])
     end
 end
 
@@ -678,8 +660,6 @@ function Base.:*(x::SumProductTree{ET}, y::SumProductTree{ET}) where {ET}
         return x
     elseif y.tag == ZERO
         return y
-    elseif x.tag == LEAF && y.tag == LEAF
-        return SumProductTree(_data_mul(x.data, y.data))
     else
         return SumProductTree(PROD, x, y)
     end
@@ -727,20 +707,20 @@ function generate_samples(t::SumProductTree{ET}, nsamples::Int) where {ET}
     # get length dict
     res = fill(_data_one(ET), nsamples)
     d = Dict{UInt, Float64}()
-    sample_descend!(res, t, d)
+    sample_descend!(res, t)
     return res
 end
 
-function sample_descend!(res::AbstractVector, t::SumProductTree, d::Dict)
+function sample_descend!(res::AbstractVector{T}, t::SumProductTree) where T
     res_stack = Any[res]
     t_stack = [t]
     while !isempty(t_stack) && !isempty(res_stack)
         t = pop!(t_stack)
         res = pop!(res_stack)
         if t.tag == LEAF
-            res .|= Ref(t.data)
+            res .= _data_mul.(res, Ref(convert(T, t.data)))
         elseif t.tag == SUM
-            ratio = _length!(t.left, d)/_length!(t, d)
+            ratio = length(t.left)/length(t)
             nleft = 0
             for _ = 1:length(res)
                 if rand() < ratio
@@ -778,7 +758,7 @@ function Base.:*(a::Int, y::AbstractSetNumber)
 end
 
 # convert from counting type to bitstring type
-for (F,TP) in [(:set_type, :ConfigEnumerator), (:sampler_type, :ConfigSampler), (:treeset_type, :TreeConfigEnumerator)]
+for F in [:set_type, :sampler_type, :treeset_type]
     @eval begin
         function $F(::Type{T}, n::Int, nflavor::Int) where {OT, K, T<:TruncatedPoly{K,C,OT} where C}
             TruncatedPoly{K, $F(n,nflavor),OT}
@@ -792,19 +772,24 @@ for (F,TP) in [(:set_type, :ConfigEnumerator), (:sampler_type, :ConfigSampler), 
         function $F(::Type{Real}, n::Int, nflavor::Int) where {TV}
             $F(n, nflavor)
         end
-        function $F(n::Integer, nflavor::Integer)
-            s = ceil(Int, log2(nflavor))
-            c = _nints(n,s)
-            return $TP{n,s,c}
-        end
     end
+end
+for (F,TP) in [(:set_type, :ConfigEnumerator), (:sampler_type, :ConfigSampler)]
+    @eval function $F(n::Integer, nflavor::Integer)
+        s = ceil(Int, log2(nflavor))
+        c = _nints(n,s)
+        return $TP{n,s,c}
+    end
+end
+function treeset_type(n::Integer, nflavor::Integer)
+    return SumProductTree{OnehotVec{n, nflavor}}
 end
 sampler_type(::Type{ExtendedTropical{K,T}}, n::Int, nflavor::Int) where {K,T} = ExtendedTropical{K, sampler_type(T, n, nflavor)}
 
 # utilities for creating onehot vectors
 onehotv(::Type{ConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigEnumerator([onehotv(StaticElementVector{N,S,C}, i, v)])
 # we treat `v == 0` specially because we want the final result not containing one leaves.
-onehotv(::Type{TreeConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = v == 0 ? one(TreeConfigEnumerator{N,S,C}) : TreeConfigEnumerator(onehotv(StaticElementVector{N,S,C}, i, v))
+onehotv(::Type{SumProductTree{OnehotVec{N,F}}}, i::Integer, v) where {N,F} = v == 0 ? one(SumProductTree{OnehotVec{N,F}}) : SumProductTree(OnehotVec{N,F}(i, v))
 onehotv(::Type{ConfigSampler{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigSampler(onehotv(StaticElementVector{N,S,C}, i, v))
 # just to make matrix transpose work
 Base.transpose(c::ConfigEnumerator) = c

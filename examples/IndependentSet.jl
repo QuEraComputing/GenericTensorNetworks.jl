@@ -30,8 +30,8 @@ problem = IndependentSet(graph; optimizer=TreeSA());
 # The resulting contraction order optimized tensor network is contained in the `code` field of `problem`.
 #
 # ### Theory (can skip)
-#
-# To reduce the independent set problem on ``G=(V, E)`` to a tensor network contraction, we first map a vertex ``v\in V`` to a label ``s_v \in \{0, 1\}`` of dimension ``2``, where we use ``0`` (``1``) to denote a vertex absent (present) in the set.
+# Let ``G=(V, E)`` be a graph with each vertex $v\in V$ associated with a weight ``w_v``.
+# To reduce the independent set problem on it to a tensor network contraction, we first map a vertex ``v\in V`` to a label ``s_v \in \{0, 1\}`` of dimension ``2``, where we use ``0`` (``1``) to denote a vertex absent (present) in the set.
 # For each vertex ``v``, we defined a parameterized rank-one tensor indexed by ``s_v`` as
 # ```math
 # W(x_v^{w_v}) = \left(\begin{matrix}

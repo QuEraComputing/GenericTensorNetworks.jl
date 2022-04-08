@@ -47,33 +47,6 @@ function misb(::Type{T}, n::Integer=2) where T
 end
 misv(vals) = vals
 
-############### set packing #####################
-"""
-set_packing(sets; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
-
-Set packing is a generalization of independent set problem to hypergraphs.
-Calling this function will return you an `IndependentSet` instance.
-`sets` are a vector of vectors, each element being a vertex in the independent set problem.
-`optimizer` and `simplifier` are for tensor network optimization, check `optimize_code` for details.
-
-Example
------------------------------------
-```julia
-julia> sets = [[1, 2, 5], [1, 3], [2, 4], [3, 6], [2, 3, 6]];  # each set is a vertex
-
-julia> gp = set_packing(sets);
-
-julia> res = best_solutions(gp; all=true)[]
-(2, {10010, 00110, 01100})ₜ
-```
-"""
-function set_packing(sets; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
-    n = length(sets)
-    code = EinCode(vcat([[i] for i=1:n], [[i,j] for i=1:n,j=1:n if j>i && !isempty(sets[i] ∩ sets[j])]), collect(Int,openvertices))
-    # NOTE: we use a dummy graph here, which should be a hypergraph!
-    IndependentSet(_optimize_code(code, uniformsize(code, 2), optimizer, simplifier), SimpleGraph(n), weights)
-end
-
 """
     mis_compactify!(tropicaltensor)
 

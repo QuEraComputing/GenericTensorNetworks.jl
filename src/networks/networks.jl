@@ -107,6 +107,8 @@ include("Coloring.jl")
 include("PaintShop.jl")
 include("Satisfiability.jl")
 include("DominatingSet.jl")
+include("SetPacking.jl")
+include("SetCover.jl")
 
 # forward the time, space and readwrite complexity
 OMEinsum.timespacereadwrite_complexity(gp::GraphProblem) = timespacereadwrite_complexity(gp.code, uniformsize(gp.code, nflavor(gp)))

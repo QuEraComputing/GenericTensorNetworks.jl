@@ -38,7 +38,7 @@ makedocs(;
             "Coloring problem" => "tutorials/Coloring.md",
             "Dominating set problem" => "tutorials/DominatingSet.md",
             "Satisfiability problem" => "tutorials/Satisfiability.md",
-            "Other problems" => "tutorials/Others.md",
+            #"Other problems" => "tutorials/Others.md",
         ],
         "Topics" => [
             "Save and load solutions" => "tutorials/saveload.md"

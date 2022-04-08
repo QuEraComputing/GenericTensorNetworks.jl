@@ -24,6 +24,7 @@ Base.length(::StaticElementVector{N,S,C}) where {N,S,C} = N
 Base.:(==)(x::StaticElementVector, y::AbstractVector) = [x...] == [y...]
 Base.:(==)(x::AbstractVector, y::StaticElementVector) = [x...] == [y...]
 Base.:(==)(x::StaticElementVector{N,S,C}, y::StaticElementVector{N,S,C}) where {N,S,C} = x.data == y.data
+Base.eltype(::Type{<:StaticElementVector}) = UInt64
 @inline function Base.getindex(x::StaticElementVector{N,S,C}, i::Integer) where {N,S,C}
     @boundscheck i <= N || throw(BoundsError(x, i))
     i1 = (i-1)*S+1  # start point

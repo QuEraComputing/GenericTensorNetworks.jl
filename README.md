@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/QuEraComputing/GraphTensorNetworks.jl/workflows/CI/badge.svg)](https://github.com/QuEraComputing/GraphTensorNetworks.jl/actions)
 [![Coverage Status](https://coveralls.io/repos/github/QuEraComputing/GraphTensorNetworks.jl/badge.svg?branch=master&t=rIJIK2)](https://coveralls.io/github/QuEraComputing/GraphTensorNetworks.jl?branch=master)
-[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://psychic-meme-f4d866f8.pages.github.io/dev/)
+[![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://queracomputing.github.io/GraphTensorNetworks.jl/dev/)
 
 ## Installation
 <p>

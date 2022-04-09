@@ -38,6 +38,8 @@ makedocs(;
             "Coloring problem" => "tutorials/Coloring.md",
             "Dominating set problem" => "tutorials/DominatingSet.md",
             "Satisfiability problem" => "tutorials/Satisfiability.md",
+            "Set cover problem" => "tutorials/SetCover.md",
+            "Set packing problem" => "tutorials/SetPacking.md",
             #"Other problems" => "tutorials/Others.md",
         ],
         "Topics" => [

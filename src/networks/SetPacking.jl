@@ -18,13 +18,13 @@ Keyword arguments
 
 Example
 -----------------------------------
-```julia
+```jldoctest; setup=:(using GraphTensorNetworks, Random; Random.seed!(2))
 julia> sets = [[1, 2, 5], [1, 3], [2, 4], [3, 6], [2, 3, 6]];  # each set is a vertex
 
 julia> gp = SetPacking(sets);
 
-julia> res = best_solutions(gp; all=true)[]
-(2, {10010, 00110, 01100})ₜ
+julia> res = solve(gp, ConfigsMax())[]
+(2.0, {00110, 10010, 01100})ₜ
 ```
 """
 struct SetPacking{ET, CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
@@ -34,8 +34,9 @@ struct SetPacking{ET, CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphPr
 end
 
 function SetPacking(sets; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
-    n = length(sets)
-    code = EinCode(vcat([[i] for i=1:n], [[i,j] for i=1:n,j=1:n if j>i && !isempty(sets[i] ∩ sets[j])]), collect(Int,openvertices))
+    nsets = length(sets)
+    @assert weights isa NoWeight || length(weights) == nsets
+    code = EinCode(vcat([[i] for i=1:nsets], [[i,j] for i=1:nsets,j=1:nsets if j>i && !isempty(sets[i] ∩ sets[j])]), collect(Int,openvertices))
     SetPacking(_optimize_code(code, uniformsize(code, 2), optimizer, simplifier), sets, weights)
 end
 

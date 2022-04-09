@@ -17,13 +17,13 @@ Keyword arguments
 
 Example
 -----------------------------------
-```julia
+```jldoctest; setup=:(using GraphTensorNetworks)
 julia> sets = [[1, 2, 5], [1, 3], [2, 4], [3, 6], [2, 3, 6]];  # each set is a vertex
 
 julia> gp = SetCover(sets);
 
-julia> res = best_solutions(gp; all=true)[]
-(2, {10010, 00110, 01100})ₜ
+julia> res = solve(gp, ConfigsMin())[]
+(3.0, {10110, 10101})ₜ
 ```
 """
 struct SetCover{ET, CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
@@ -34,6 +34,7 @@ end
 
 function SetCover(sets; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing) where ET
     nsets = length(sets)
+    @assert weights isa NoWeight || length(weights) == nsets
     # get constraints
     elements, count = cover_count(sets)
 
@@ -71,11 +72,12 @@ labels(gp::SetCover) = [1:length(gp.sets)...]
 
 # generate tensors
 function generate_tensors(x::T, gp::SetCover) where T
-    length(gp.sets) == 0 && return []
+    nsets = length(gp.sets)
+    nsets == 0 && return []
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors
-    return vcat(add_labels!([misv(Ref(x) .^ get_weights(gp, i)) for i=1:length(gp.sets)], ixs[1:length(gp.sets)], labels(gp)),
-            [cover_tensor(T, length(ix)) for ix in ixs[length(gp.sets)+1:end]]
+    return vcat(add_labels!([misv(Ref(x) .^ get_weights(gp, i)) for i=1:nsets], ixs[1:nsets], labels(gp)),
+            [cover_tensor(T, ix) for ix in ixs[nsets+1:end]]
     )
 end
 
@@ -84,7 +86,7 @@ end
 
 Return true if `config` (a vector of boolean numbers as the mask of sets) is a set cover of `sets`.
 """
-function is_set_cover(sets::AbstractVector{ST}, config) where ST
-    count = cover_count(sets[(!iszero).(config)])
-    return all(isone, values(d))
+function is_set_cover(sets::AbstractVector, config)
+    insets = sets[(!iszero).(config)]
+    return length(unique!(vcat(insets...))) == length(unique!(vcat(sets...)))
 end

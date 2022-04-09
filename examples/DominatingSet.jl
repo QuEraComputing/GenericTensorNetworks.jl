@@ -44,10 +44,6 @@ problem = DominatingSet(graph; optimizer=TreeSA());
 
 timespacereadwrite_complexity(problem)
 
-# Results are `log2` values of time (number of iterations),
-# space (number of items in the largest tensor)
-# and read-write (number of read-write of operations to elements).
-
 # ## Solving properties
 
 # ### Counting properties
@@ -68,13 +64,13 @@ domination_number = solve(problem, SizeMin())[]
 counting_min_dominating_set = solve(problem, CountingMin())[]
 
 # ### Configuration properties
-# ##### finding all dominating set
+# ##### finding minimum dominating set
 # One can enumerate all minimum dominating sets with the [`ConfigsMin`](@ref) property in the program.
 min_configs = solve(problem, ConfigsMin())[].c
 
 all(c->is_dominating_set(graph, c), min_configs)
 
-# ##### finding minimum dominating set
+#
 
 imgs = ntuple(k->show_graph(graph;
                 locs=locations, scale=0.25,

@@ -51,7 +51,7 @@ num_of_coloring = solve(problem, CountingMax())[]
 # ##### finding one best coloring
 single_solution = solve(problem, SingleConfigMax())[]
 
-is_good_vertex_coloring(graph, single_solution.c.data)
+is_vertex_coloring(graph, single_solution.c.data)
 
 vertex_color_map = Dict(0=>"red", 1=>"green", 2=>"blue")
 

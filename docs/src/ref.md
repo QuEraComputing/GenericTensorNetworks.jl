@@ -11,10 +11,8 @@ DominatingSet
 MaxCut
 PaintShop
 Satisfiability
-```
-
-```@docs
-set_packing
+SetCovering
+SetPacking
 ```
 
 #### Graph Problem Interfaces
@@ -26,6 +24,7 @@ Interfaces [`GraphTensorNetworks.generate_tensors`](@ref), [`labels`](@ref), [`f
 ```@docs
 GraphTensorNetworks.generate_tensors
 labels
+terms
 flavors
 get_weights
 nflavor
@@ -34,20 +33,17 @@ nflavor
 #### Graph Problem Utilities
 ```@docs
 is_independent_set
-mis_compactify!
-
 is_maximal_independent_set
-
 is_dominating_set
+is_vertex_coloring
+is_matching
+is_set_covering
+is_set_packing
 
 cut_size
-
 num_paint_shop_color_switch
 paint_shop_coloring_from_config
-
-is_good_vertex_coloring
-
-is_matching
+mis_compactify!
 
 CNF
 CNFClause
@@ -146,10 +142,4 @@ One can also use `random_regular_graph` and `smallgraph` in [Graphs](https://git
 #### Multiprocessing
 ```@docs
 GraphTensorNetworks.SimpleMultiprocessing.multiprocess_run
-```
-
-#### Shortcuts
-```@docs
-max_size
-max_size_count
 ```

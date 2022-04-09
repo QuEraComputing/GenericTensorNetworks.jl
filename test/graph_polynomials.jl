@@ -1,7 +1,7 @@
 using GraphTensorNetworks, Test, OMEinsum, OMEinsumContractionOrders
 using Mods, Polynomials, TropicalNumbers
 using Graphs, Random
-using GraphTensorNetworks: StaticBitVector
+using GraphTensorNetworks: StaticBitVector, graph_polynomial
 
 @testset "bond and vertex tensor" begin
     @test GraphTensorNetworks.misb(TropicalF64) == [TropicalF64(0) TropicalF64(0); TropicalF64(0) TropicalF64(-Inf)]

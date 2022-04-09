@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Binary paint shop problem · GraphTensorNetworks.jl</title><script data-outdated-warner src="../../assets/warner.js"></script><link rel="canonical" href="https://QuEraComputing.github.io/GraphTensorNetworks.jl/tutorials/PaintShop/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GraphTensorNetworks.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Problems</span><ul><li><a class="tocitem" href="../IndependentSet/">Independent set problem</a></li><li><a class="tocitem" href="../MaximalIS/">Maximal independent set problem</a></li><li><a class="tocitem" href="../MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../Matching/">Vertex Matching problem</a></li><li class="is-active"><a class="tocitem" href>Binary paint shop problem</a><ul class="internal"><li><a class="tocitem" href="#Problme-Definition"><span>Problme Definition</span></a></li><li><a class="tocitem" href="#Generic-tensor-network-representation"><span>Generic tensor network representation</span></a></li></ul></li><li><a class="tocitem" href="../Coloring/">Coloring problem</a></li><li><a class="tocitem" href="../DominatingSet/">Dominating set problem</a></li><li><a class="tocitem" href="../Satisfiability/">Satisfiability problem</a></li><li><a class="tocitem" href="../Others/">Other problems</a></li></ul></li><li><span class="tocitem">Topics</span><ul><li><a class="tocitem" href="../saveload/">Save and load solutions</a></li><li><a class="tocitem" href="../weighted/">Weighted problems</a></li><li><a class="tocitem" href="../open/">Open degree of freedoms</a></li></ul></li><li><a class="tocitem" href="../../performancetips/">Performance Tips</a></li><li><a class="tocitem" href="../../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Problems</a></li><li class="is-active"><a href>Binary paint shop problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Binary paint shop problem</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/QuEraComputing/GraphTensorNetworks.jl/blob/master/examples/PaintShop.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Binary-paint-shop-problem"><a class="docs-heading-anchor" href="#Binary-paint-shop-problem">Binary paint shop problem</a><a id="Binary-paint-shop-problem-1"></a><a class="docs-heading-anchor-permalink" href="#Binary-paint-shop-problem" title="Permalink"></a></h1><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>It is highly recommended to read the <a href="../IndependentSet/#Independent-set-problem">Independent set problem</a> chapter before reading this one.</p></div></div><h2 id="Problme-Definition"><a class="docs-heading-anchor" href="#Problme-Definition">Problme Definition</a><a id="Problme-Definition-1"></a><a class="docs-heading-anchor-permalink" href="#Problme-Definition" title="Permalink"></a></h2><p>The <a href="http://m-hikari.com/ams/ams-2012/ams-93-96-2012/popovAMS93-96-2012-2.pdf">binary paint shop problem</a> is defined as follows: we are given a <span>$2m$</span> length sequence containing <span>$m$</span> cars, where each car appears twice. Each car need to be colored red in one occurrence, and blue in the other. We need to choose which occurrence for each car to color with which color — the goal is to minimize the number of times we need to change the current color.</p><p>In the following, we use a character to represent a car, and defined a binary paint shop problem as a string that each character appear exactly twice.</p><pre><code class="language-julia hljs">using GraphTensorNetworks, Graphs
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Binary paint shop problem · GraphTensorNetworks.jl</title><script data-outdated-warner src="../../assets/warner.js"></script><link rel="canonical" href="https://QuEraComputing.github.io/GraphTensorNetworks.jl/tutorials/PaintShop/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GraphTensorNetworks.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Problems</span><ul><li><a class="tocitem" href="../IndependentSet/">Independent set problem</a></li><li><a class="tocitem" href="../MaximalIS/">Maximal independent set problem</a></li><li><a class="tocitem" href="../MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../Matching/">Vertex Matching problem</a></li><li class="is-active"><a class="tocitem" href>Binary paint shop problem</a><ul class="internal"><li><a class="tocitem" href="#Problme-Definition"><span>Problme Definition</span></a></li><li><a class="tocitem" href="#Generic-tensor-network-representation"><span>Generic tensor network representation</span></a></li></ul></li><li><a class="tocitem" href="../Coloring/">Coloring problem</a></li><li><a class="tocitem" href="../DominatingSet/">Dominating set problem</a></li><li><a class="tocitem" href="../Satisfiability/">Satisfiability problem</a></li><li><a class="tocitem" href="../SetCovering/">Set covering problem</a></li><li><a class="tocitem" href="../SetPacking/">Set packing problem</a></li></ul></li><li><span class="tocitem">Topics</span><ul><li><a class="tocitem" href="../saveload/">Save and load solutions</a></li><li><a class="tocitem" href="../weighted/">Weighted problems</a></li><li><a class="tocitem" href="../open/">Open degree of freedoms</a></li></ul></li><li><a class="tocitem" href="../../performancetips/">Performance Tips</a></li><li><a class="tocitem" href="../../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Problems</a></li><li class="is-active"><a href>Binary paint shop problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Binary paint shop problem</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/QuEraComputing/GraphTensorNetworks.jl/blob/master/examples/PaintShop.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Binary-paint-shop-problem"><a class="docs-heading-anchor" href="#Binary-paint-shop-problem">Binary paint shop problem</a><a id="Binary-paint-shop-problem-1"></a><a class="docs-heading-anchor-permalink" href="#Binary-paint-shop-problem" title="Permalink"></a></h1><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>It is highly recommended to read the <a href="../IndependentSet/#Independent-set-problem">Independent set problem</a> chapter before reading this one.</p></div></div><h2 id="Problme-Definition"><a class="docs-heading-anchor" href="#Problme-Definition">Problme Definition</a><a id="Problme-Definition-1"></a><a class="docs-heading-anchor-permalink" href="#Problme-Definition" title="Permalink"></a></h2><p>The <a href="http://m-hikari.com/ams/ams-2012/ams-93-96-2012/popovAMS93-96-2012-2.pdf">binary paint shop problem</a> is defined as follows: we are given a <span>$2m$</span> length sequence containing <span>$m$</span> cars, where each car appears twice. Each car need to be colored red in one occurrence, and blue in the other. We need to choose which occurrence for each car to color with which color — the goal is to minimize the number of times we need to change the current color.</p><p>In the following, we use a character to represent a car, and defined a binary paint shop problem as a string that each character appear exactly twice.</p><pre><code class="language-julia hljs">using GraphTensorNetworks, Graphs
 
 sequence = collect(&quot;iadgbeadfcchghebif&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">18-element Vector{Char}:
  &#39;i&#39;: ASCII/Unicode U+0069 (category Ll: Letter, lowercase)
@@ -40,138 +40,138 @@ show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-292aa4d8">
+     id="img-2c8313a2">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-1">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-1">
   <g transform="translate(91.24,28.04)">
     <path fill="none" d="M2.37,4.11 L-2.37,-4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-2">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-2">
   <g transform="translate(94.84,36.74)">
     <path fill="none" d="M1.23,4.59 L-1.23,-4.59 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-3">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-3">
   <g transform="translate(96.07,46.08)">
     <path fill="none" d="M0,4.75 L0,-4.75 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-4">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-4">
   <g transform="translate(94.84,55.41)">
     <path fill="none" d="M-1.23,4.59 L1.23,-4.59 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-5">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-5">
   <g transform="translate(91.24,64.11)">
     <path fill="none" d="M-2.37,4.11 L2.37,-4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-292aa4d8-6">
+<g stroke-width="0.46" stroke="#0000FF" id="img-2c8313a2-6">
   <g transform="translate(87.88,67.47)">
     <path fill="none" d="M-5.73,7.47 L5.73,-7.47 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-7">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-7">
   <g transform="translate(85.51,71.58)">
     <path fill="none" d="M-3.36,3.36 L3.36,-3.36 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-8">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-8">
   <g transform="translate(78.04,77.32)">
     <path fill="none" d="M-4.11,2.37 L4.11,-2.37 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-292aa4d8-9">
+<g stroke-width="0.46" stroke="#0000FF" id="img-2c8313a2-9">
   <g transform="translate(69.34,80.92)">
     <path fill="none" d="M-4.59,1.23 L4.59,-1.23 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-292aa4d8-10">
+<g stroke-width="0.46" stroke="#0000FF" id="img-2c8313a2-10">
   <g transform="translate(72.06,53.04)">
     <path fill="none" d="M-16.81,29.11 L16.81,-29.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-11">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-11">
   <g transform="translate(60,82.15)">
     <path fill="none" d="M-4.75,0 L4.75,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-12">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-12">
   <g transform="translate(50.66,80.92)">
     <path fill="none" d="M-4.59,-1.23 L4.59,1.23 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-13">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-13">
   <g transform="translate(41.96,77.32)">
     <path fill="none" d="M-4.11,-2.37 L4.11,2.37 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-292aa4d8-14">
+<g stroke-width="0.46" stroke="#0000FF" id="img-2c8313a2-14">
   <g transform="translate(63.6,59.53)">
     <path fill="none" d="M-32.47,8.7 L32.47,-8.7 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-15">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-15">
   <g transform="translate(34.49,71.58)">
     <path fill="none" d="M-3.36,-3.36 L3.36,3.36 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-292aa4d8-16">
+<g stroke-width="0.46" stroke="#0000FF" id="img-2c8313a2-16">
   <g transform="translate(61.23,50.66)">
     <path fill="none" d="M-34.84,9.34 L34.84,-9.34 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-17">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-17">
   <g transform="translate(28.76,64.11)">
     <path fill="none" d="M-2.37,-4.11 L2.37,4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-292aa4d8-18">
+<g stroke-width="0.46" stroke="#0000FF" id="img-2c8313a2-18">
   <g transform="translate(56.4,59.53)">
     <path fill="none" d="M-32.47,-8.7 L32.47,8.7 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-19">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-19">
   <g transform="translate(25.16,55.41)">
     <path fill="none" d="M-1.23,-4.59 L1.23,4.59 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-292aa4d8-20">
+<g stroke-width="0.46" stroke="#0000FF" id="img-2c8313a2-20">
   <g transform="translate(35,60.51)">
     <path fill="none" d="M-11.07,-19.18 L11.07,19.18 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-21">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-21">
   <g transform="translate(23.93,46.08)">
     <path fill="none" d="M0,-4.75 L0,4.75 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-292aa4d8-22">
+<g stroke-width="0.46" stroke="#0000FF" id="img-2c8313a2-22">
   <g transform="translate(32.12,53.55)">
     <path fill="none" d="M-5.73,-21.39 L5.73,21.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-23">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-23">
   <g transform="translate(25.16,36.74)">
     <path fill="none" d="M1.23,-4.59 L-1.23,4.59 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-292aa4d8-24">
+<g stroke-width="0.46" stroke="#0000FF" id="img-2c8313a2-24">
   <g transform="translate(62.37,28.04)">
     <path fill="none" d="M-31.24,-4.11 L31.24,4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-292aa4d8-25">
+<g stroke-width="0.46" stroke="#000000" id="img-2c8313a2-25">
   <g transform="translate(28.76,28.04)">
     <path fill="none" d="M2.37,-4.11 L-2.37,4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#FFFFFF" stroke="#000000" id="img-292aa4d8-26">
+<g stroke-width="0.46" fill="#FFFFFF" stroke="#000000" id="img-2c8313a2-26">
   <g transform="translate(31.13,23.93)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
@@ -227,7 +227,7 @@ show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="2.14" id="img-292aa4d8-27">
+<g fill="#000000" font-size="2.14" id="img-2c8313a2-27">
   <g transform="translate(31.13,23.93)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">i</text>
@@ -486,228 +486,228 @@ show_graph(graph; locs=locations, texts=string.(sequence),
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-77333af2">
+     id="img-c77ad1fe">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-1">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-1">
   <g transform="translate(91.24,28.04)">
     <path fill="none" d="M2.37,4.11 L-2.37,-4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-2">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-2">
   <g transform="translate(94.84,36.74)">
     <path fill="none" d="M1.23,4.59 L-1.23,-4.59 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-3">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-3">
   <g transform="translate(96.07,46.08)">
     <path fill="none" d="M0,4.75 L0,-4.75 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-4">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-4">
   <g transform="translate(94.84,55.41)">
     <path fill="none" d="M-1.23,4.59 L1.23,-4.59 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-5">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-5">
   <g transform="translate(91.24,64.11)">
     <path fill="none" d="M-2.37,4.11 L2.37,-4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-77333af2-6">
+<g stroke-width="0.46" stroke="#0000FF" id="img-c77ad1fe-6">
   <g transform="translate(87.88,67.47)">
     <path fill="none" d="M-5.73,7.47 L5.73,-7.47 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-7">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-7">
   <g transform="translate(85.51,71.58)">
     <path fill="none" d="M-3.36,3.36 L3.36,-3.36 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-8">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-8">
   <g transform="translate(78.04,77.32)">
     <path fill="none" d="M-4.11,2.37 L4.11,-2.37 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-77333af2-9">
+<g stroke-width="0.46" stroke="#0000FF" id="img-c77ad1fe-9">
   <g transform="translate(69.34,80.92)">
     <path fill="none" d="M-4.59,1.23 L4.59,-1.23 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-77333af2-10">
+<g stroke-width="0.46" stroke="#0000FF" id="img-c77ad1fe-10">
   <g transform="translate(72.06,53.04)">
     <path fill="none" d="M-16.81,29.11 L16.81,-29.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-11">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-11">
   <g transform="translate(60,82.15)">
     <path fill="none" d="M-4.75,0 L4.75,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-12">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-12">
   <g transform="translate(50.66,80.92)">
     <path fill="none" d="M-4.59,-1.23 L4.59,1.23 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-13">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-13">
   <g transform="translate(41.96,77.32)">
     <path fill="none" d="M-4.11,-2.37 L4.11,2.37 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-77333af2-14">
+<g stroke-width="0.46" stroke="#0000FF" id="img-c77ad1fe-14">
   <g transform="translate(63.6,59.53)">
     <path fill="none" d="M-32.47,8.7 L32.47,-8.7 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-15">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-15">
   <g transform="translate(34.49,71.58)">
     <path fill="none" d="M-3.36,-3.36 L3.36,3.36 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-77333af2-16">
+<g stroke-width="0.46" stroke="#0000FF" id="img-c77ad1fe-16">
   <g transform="translate(61.23,50.66)">
     <path fill="none" d="M-34.84,9.34 L34.84,-9.34 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-17">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-17">
   <g transform="translate(28.76,64.11)">
     <path fill="none" d="M-2.37,-4.11 L2.37,4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-77333af2-18">
+<g stroke-width="0.46" stroke="#0000FF" id="img-c77ad1fe-18">
   <g transform="translate(56.4,59.53)">
     <path fill="none" d="M-32.47,-8.7 L32.47,8.7 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-19">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-19">
   <g transform="translate(25.16,55.41)">
     <path fill="none" d="M-1.23,-4.59 L1.23,4.59 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-77333af2-20">
+<g stroke-width="0.46" stroke="#0000FF" id="img-c77ad1fe-20">
   <g transform="translate(35,60.51)">
     <path fill="none" d="M-11.07,-19.18 L11.07,19.18 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-21">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-21">
   <g transform="translate(23.93,46.08)">
     <path fill="none" d="M0,-4.75 L0,4.75 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-77333af2-22">
+<g stroke-width="0.46" stroke="#0000FF" id="img-c77ad1fe-22">
   <g transform="translate(32.12,53.55)">
     <path fill="none" d="M-5.73,-21.39 L5.73,21.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-23">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-23">
   <g transform="translate(25.16,36.74)">
     <path fill="none" d="M1.23,-4.59 L-1.23,4.59 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#0000FF" id="img-77333af2-24">
+<g stroke-width="0.46" stroke="#0000FF" id="img-c77ad1fe-24">
   <g transform="translate(62.37,28.04)">
     <path fill="none" d="M-31.24,-4.11 L31.24,4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" stroke="#000000" id="img-77333af2-25">
+<g stroke-width="0.46" stroke="#000000" id="img-c77ad1fe-25">
   <g transform="translate(28.76,28.04)">
     <path fill="none" d="M2.37,-4.11 L-2.37,4.11 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-77333af2-26">
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-c77ad1fe-26">
   <g transform="translate(88.87,23.93)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-77333af2-27">
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-c77ad1fe-27">
   <g transform="translate(93.61,32.15)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-77333af2-28">
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-c77ad1fe-28">
   <g transform="translate(96.07,41.33)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-77333af2-29">
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-c77ad1fe-29">
   <g transform="translate(96.07,50.83)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-77333af2-30">
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-c77ad1fe-30">
   <g transform="translate(93.61,60)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-77333af2-31">
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-c77ad1fe-31">
   <g transform="translate(88.87,68.23)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-77333af2-32">
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-c77ad1fe-32">
   <g transform="translate(82.15,74.94)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-77333af2-33">
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-c77ad1fe-33">
   <g transform="translate(73.92,79.69)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-77333af2-34">
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-c77ad1fe-34">
   <g transform="translate(64.75,82.15)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-77333af2-35">
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-c77ad1fe-35">
   <g transform="translate(55.25,82.15)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-77333af2-36">
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-c77ad1fe-36">
   <g transform="translate(46.08,79.69)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-77333af2-37">
+<g stroke-width="0.46" fill="#FF0000" stroke="#000000" id="img-c77ad1fe-37">
   <g transform="translate(37.85,74.94)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-77333af2-38">
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-c77ad1fe-38">
   <g transform="translate(31.13,68.23)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-77333af2-39">
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-c77ad1fe-39">
   <g transform="translate(26.39,60)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-77333af2-40">
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-c77ad1fe-40">
   <g transform="translate(23.93,50.83)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-77333af2-41">
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-c77ad1fe-41">
   <g transform="translate(23.93,41.33)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-77333af2-42">
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-c77ad1fe-42">
   <g transform="translate(26.39,32.15)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-77333af2-43">
+<g stroke-width="0.46" fill="#000000" stroke="#000000" id="img-c77ad1fe-43">
   <g transform="translate(31.13,23.93)">
     <circle cx="0" cy="0" r="2.28" class="primitive"/>
   </g>
 </g>
-<g fill="#FFFFFF" font-size="2.14" id="img-77333af2-44">
+<g fill="#FFFFFF" font-size="2.14" id="img-c77ad1fe-44">
   <g transform="translate(31.13,23.93)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">i</text>
@@ -946,4 +946,4 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 
 ]]> </script>
 </svg>
-<p>Since we have different choices of initial color, the number of best solution is 2.</p><p>The following function will check the solution and return you the number of color switchs</p><pre><code class="language-julia hljs">num_paint_shop_color_switch(sequence, painting1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Matching/">« Vertex Matching problem</a><a class="docs-footer-nextpage" href="../Coloring/">Coloring problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.15 on <span class="colophon-date" title="Friday 8 April 2022 21:54">Friday 8 April 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<p>Since we have different choices of initial color, the number of best solution is 2.</p><p>The following function will check the solution and return you the number of color switchs</p><pre><code class="language-julia hljs">num_paint_shop_color_switch(sequence, painting1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Matching/">« Vertex Matching problem</a><a class="docs-footer-nextpage" href="../Coloring/">Coloring problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.15 on <span class="colophon-date" title="Saturday 9 April 2022 04:02">Saturday 9 April 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

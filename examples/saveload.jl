@@ -28,8 +28,7 @@ save_sumproduct(filename, all_independent_sets_tree)
 loaded_sets_tree = load_sumproduct(filename)
 
 # ## Loading solutions to python
-# To loading solutions from file in the `:binary` format in python.
-# We suggest using the following script to unpack the data correctly.
+# The following python script loads and unpacks the solutions as an array from a `:binary` formated file.
 # ```python
 # import numpy as np
 #

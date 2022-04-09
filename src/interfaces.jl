@@ -85,7 +85,7 @@ Method Argument
     * GPU is supported,
     * It accepts keyword arguments `maxorder` (optional, e.g. the MIS size in the [`IndependentSet`](@ref) problem).
 * `:polynomial`, use polynomial numbers to solve the polynomial directly.
-    * The corresponding tensor element type is [`Polynomials.Polynomial`](@ref).
+    * The corresponding tensor element type is [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2).
     * It might have small round-off error depending on the data type for storing the counting.
     * It has memory overhead that linear to the graph size.
 * `:fft`, use fast fourier transformation to fit the polynomial.

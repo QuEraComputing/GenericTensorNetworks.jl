@@ -15,7 +15,7 @@ using Test, GraphTensorNetworks, Graphs
 
     c = solve(code, SingleConfigMax())[]
     @test c.c.data ∈ res.c.data
-    @test is_good_vertex_coloring(g, c.c.data)
+    @test is_vertex_coloring(g, c.c.data)
 end
 
 
@@ -24,5 +24,5 @@ end
     problem = Coloring{3}(g; weights=fill(2, 15))
     @test solve(problem, SizeMax())[].n == 30
     res = solve(problem, SingleConfigMax())[].c.data
-    @test is_good_vertex_coloring(g, res)
+    @test is_vertex_coloring(g, res)
 end

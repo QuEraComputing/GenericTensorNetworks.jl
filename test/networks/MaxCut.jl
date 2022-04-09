@@ -1,4 +1,5 @@
 using GraphTensorNetworks, Test, Graphs
+using GraphTensorNetworks: max_size
 
 @testset "graph utils" begin
     g2 = SimpleGraph(3)

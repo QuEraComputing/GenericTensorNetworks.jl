@@ -23,27 +23,24 @@ export ConfigEnumerator, onehotv, ConfigSampler, SumProductTree
 export CountingTropicalF64, CountingTropicalF32, TropicalF64, TropicalF32, ExtendedTropical
 export generate_samples, OnehotVec
 
-# Lower level APIs
-export AllConfigs, SingleConfig
-export best_solutions, best2_solutions, solutions, all_solutions
-export bestk_solutions
-export contractx, graph_polynomial, max_size, max_size_count
-
 # Graphs
-export random_regular_graph, diagonal_coupled_graph, is_independent_set, is_maximal_independent_set
+export random_regular_graph, diagonal_coupled_graph
 export square_lattice_graph, unit_disk_graph, random_diagonal_coupled_graph, random_square_lattice_graph
 export line_graph
 
 # Tensor Networks (Graph problems)
-export GraphProblem, IndependentSet, MaximalIS, Matching, 
-    Coloring, optimize_code, set_packing, MaxCut, PaintShop, DominatingSet,
-    paintshop_from_pairs, NoWeight, Satisfiability
+export GraphProblem, optimize_code, NoWeight
 export flavors, labels, terms, nflavor, get_weights
-export mis_compactify!, cut_size, num_paint_shop_color_switch, paint_shop_coloring_from_config
-export is_good_vertex_coloring
-export CNF, CNFClause, BoolVar, satisfiable, @bools, ∨, ¬, ∧
-export is_dominating_set
-export is_matching
+export IndependentSet, mis_compactify!, is_independent_set
+export MaximalIS, is_maximal_independent_set
+export MaxCut, cut_size
+export PaintShop, paintshop_from_pairs, num_paint_shop_color_switch, paint_shop_coloring_from_config
+export Coloring, is_vertex_coloring
+export Satisfiability, CNF, CNFClause, BoolVar, satisfiable, @bools, ∨, ¬, ∧
+export DominatingSet, is_dominating_set
+export Matching, is_matching
+export SetPacking, is_set_packing
+export SetCovering, is_set_covering
 
 # Interfaces
 export solve, SizeMax, SizeMin, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin

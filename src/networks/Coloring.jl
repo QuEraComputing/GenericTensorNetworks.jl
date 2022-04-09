@@ -44,11 +44,11 @@ coloringv(::Type{T}, k::Int) where T = fill(one(T), k)
 
 # utilities
 """
-    is_good_vertex_coloring(graph::SimpleGraph, config)
+    is_vertex_coloring(graph::SimpleGraph, config)
 
 Returns true if the coloring specified by config is a valid one, i.e. does not violate the contraints of vertices of an edges having different colors.
 """
-function is_good_vertex_coloring(graph::SimpleGraph, config)
+function is_vertex_coloring(graph::SimpleGraph, config)
     for e in edges(graph)
         config[e.src] == config[e.dst] && return false
     end

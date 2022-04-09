@@ -48,7 +48,7 @@ timespacereadwrite_complexity(problem)
 # ## Solving properties
 
 # ### Counting properties
-# ##### The ``graph'' polynomial
+# ##### The "graph" polynomial
 # The graph polynomial for the set packing problem is defined as
 # ```math
 # P(S, x) = \sum_{k=0}^{\alpha(S)} c_k x^k,

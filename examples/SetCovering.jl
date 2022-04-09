@@ -47,7 +47,7 @@ timespacereadwrite_complexity(problem)
 # ## Solving properties
 
 # ### Counting properties
-# ##### The ``graph'' polynomial
+# ##### The "graph" polynomial
 # The graph polynomial for the set covering problem is defined as
 # ```math
 # P(S, x) = \sum_{k=0}^{|S|} c_k x^k,

@@ -33,17 +33,6 @@ max5_configs = solve(problem, SingleConfigMax(5))[]
 # The return value also has type [`ExtendedTropical`](@ref), but this time the element type of `orders` has been changed to [`CountingTropical`](@ref)`{Float64,`[`ConfigSampler`](@ref)`}`.
 max5_configs.orders
 
-# Let us visually check these graphs
-using Compose
-
-imgs_max5 = ntuple(k->show_graph(graph;
-                    locs=locations, scale=0.25,
-                    vertex_colors=[iszero(max5_configs.orders[k].c.data[i]) ? "white" : "red"
-                    for i=1:nv(graph)]), 5);
-
-Compose.set_default_graphic_size(18cm, 4cm)
-
-Compose.compose(context(),
-     ntuple(k->(context((k-1)/5, 0.0, 1.2/5, 1.0), imgs_max5[k]), 5)...)
-
+# Let us visually check these configurations
+show_gallery(graph, (1, 5); locs=locations, vertex_configs=[max5_configs.orders[k].c.data for k=1:5])
 

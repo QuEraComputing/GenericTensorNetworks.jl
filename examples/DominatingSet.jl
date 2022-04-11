@@ -10,7 +10,7 @@
 # The decision version of finding the minimum dominating set is an NP-complete.
 # In the following, we are going to solve the dominating set problem on the Petersen graph.
 
-using GenericTensorNetworks, Graphs, Compose
+using GenericTensorNetworks, Graphs
 
 graph = Graphs.smallgraph(:petersen)
 
@@ -72,13 +72,7 @@ all(c->is_dominating_set(graph, c), min_configs)
 
 #
 
-imgs = ntuple(k->show_graph(graph;
-                locs=locations, scale=0.25,
-                vertex_colors=[iszero(min_configs[k][i]) ? "white" : "red"
-                for i=1:nv(graph)]), length(min_configs));
-
-Compose.set_default_graphic_size(18cm, 8cm); Compose.compose(context(),
-     ntuple(k->(context((mod1(k,5)-1)/5, ((k-1)÷5)/2, 1.2/5, 1.0/2), imgs[k]), 10)...)
+show_gallery(graph, (2, 5); locs=locations, vertex_configs=min_configs)
 
 # Similarly, if one is only interested in computing one of the minimum dominating sets,
 # one can use the graph property [`SingleConfigMin`](@ref).

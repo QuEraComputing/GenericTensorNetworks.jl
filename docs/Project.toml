@@ -1,5 +1,4 @@
 [deps]
-Compose = "a81c6b42-2e10-5240-aca2-a61377ecd94b"
 DocThemeIndigo = "8bac0ac5-51bf-41f9-885e-2bf1ac2bec5f"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 GenericTensorNetworks = "3521c873-ad32-4bb4-b63d-f4f178f42b49"

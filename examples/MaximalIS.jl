@@ -9,7 +9,7 @@
 # It is different from maximum independent set because it does not require the set to have the max size.
 # In the following, we are going to solve the maximal independent set problem on the Petersen graph.
 
-using GenericTensorNetworks, Graphs, Compose
+using GenericTensorNetworks, Graphs
 
 graph = Graphs.smallgraph(:petersen)
 
@@ -73,13 +73,7 @@ all(c->is_maximal_independent_set(graph, c), maximal_configs)
 
 #
 
-imgs = ntuple(k->show_graph(graph;
-                locs=locations, scale=0.25,
-                vertex_colors=[iszero(maximal_configs[k][i]) ? "white" : "red"
-                for i=1:nv(graph)]), length(maximal_configs));
-
-Compose.set_default_graphic_size(18cm, 12cm); Compose.compose(context(),
-     ntuple(k->(context((mod1(k,5)-1)/5, ((k-1)÷5)/3, 1.2/5, 1.0/3), imgs[k]), 15)...)
+show_gallery(graph, (3, 5); locs=locations, vertex_configs=maximal_configs)
 
 # This result should be consistent with that given by the [Bron Kerbosch algorithm](https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm) on the complement of Petersen graph.
 cliques = maximal_cliques(complement(graph))
@@ -90,13 +84,7 @@ cliques = maximal_cliques(complement(graph))
 # It is the [`ConfigsMin`](@ref) property in the program.
 minimum_maximal_configs = solve(problem, ConfigsMin())[].c
 
-imgs2 = ntuple(k->show_graph(graph;
-                locs=locations, scale=0.25,
-                vertex_colors=[iszero(minimum_maximal_configs[k][i]) ? "white" : "red"
-                for i=1:nv(graph)]), length(minimum_maximal_configs));
-
-Compose.set_default_graphic_size(15cm, 12cm); Compose.compose(context(),
-     ntuple(k->(context((mod1(k,4)-1)/4, ((k-1)÷5)/3, 1.2/4, 1.0/3), imgs2[k]), 10)...)
+show_gallery(graph, (2, 5); locs=locations, vertex_configs=minimum_maximal_configs)
 
 # Similarly, if one is only interested in computing one of the minimum sets,
 # one can use the graph property [`SingleConfigMin`](@ref).

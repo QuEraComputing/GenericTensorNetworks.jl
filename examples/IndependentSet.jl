@@ -130,7 +130,7 @@ all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]
 
 all_max_configs.c.data
 
-# Let us visualize the solutions with the visualization package [`Compose`](https://github.com/GiovineItalia/Compose.jl).
+# These solutions can be visualized with the [`show_gallery`](@ref) function.
 show_gallery(graph, (1, length(all_max_configs.c)); locs=locations, vertex_configs=all_max_configs.c);
 
 # We can use [`ConfigsAll`](@ref) to enumerate all sets satisfying the independence constraint.

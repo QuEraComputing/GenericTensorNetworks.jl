@@ -1,6 +1,8 @@
 # Performance Tips
 
 ## Optimize tensor network contraction orders
+
+Let us use the independent set problem on 3-regular graphs as an example.
 ```julia
 julia> using GraphTensorNetworks, Graphs, Random
 
@@ -11,17 +13,20 @@ julia> problem = IndependentSet(graph; optimizer=TreeSA(
     sc_target=20, sc_weight=1.0, rw_weight=3.0, ntrials=10, βs=0.01:0.1:15.0, niters=20), simplifier=MergeGreedy());
 ```
 
-Key word argument `optimizer` decides the contraction order optimizer of the tensor network.
-Here, we choose the `TreeSA` optimizer to optimize the tensor network contraciton tree, it is a local search based algorithm.
-It is one of the state of the art tensor network contraction order optimizers, one may check [arXiv: 2108.05665](https://arxiv.org/abs/2108.05665) to learn more about the algorithm.
-Other optimizers include
+The [`IndependentSet`](@ref) constructor maps a independent set problem to a tensor network with optimized contraction order.
+The key word argument `optimizer` specifies the contraction order optimizer of the tensor network.
+Here, we choose the local search based [`TreeSA`](@ref) algorithm,
+which is one of the state of the art contraction order optimizer detailed in [arXiv: 2108.05665](https://arxiv.org/abs/2108.05665).
+One can type `?TreeSA` in a Julia REPL for more information about how to configure the hyper-parameters of the `TreeSA` method.
+Alternative tensor network contraction orders optimizers include
 * [`GreedyMethod`](@ref) (default, fastest in searching speed but worst in contraction complexity)
 * [`TreeSA`](@ref) (often best in contraction complexity, supports slicing)
 * [`KaHyParBipartite`](@ref)
 * [`SABipartite`](@ref)
 
-One can type `?TreeSA` in a Julia REPL for more information about how to configure the hyper-parameters of `TreeSA` method.
-`simplifier` keyword argument is not so important, it is a preprocessing routine to improve the searching speed of the `optimizer`.
+The keyword argument `simplifier` is for preprocessing sub-routine to improve the searching speed of the contraction order finding.
+For example, the `MergeGreedy()` here "contracts" tensors greedily whenever the contraction result has a smaller space complexity.
+It can remove all vertex tensors (vectors) before entering the contraction order optimization algorithm.
 
 The returned instance `problem` contains a field `code` that specifies the tensor network contraction order. For an independent set problem, its contraction time space complexity is ``2^{{\rm tw}(G)}``, where ``{\rm tw(G)}`` is the [tree-width](https://en.wikipedia.org/wiki/Treewidth) of ``G``.
 One can check the time, space and read-write complexity with the following function.
@@ -34,7 +39,7 @@ julia> timespacereadwrite_complexity(problem)
 The return values are `log2` of the the number of iterations, the number elements in the largest tensor during contraction and the number of read-write operations to tensor elements.
 In this example, the number of `+` and `*` operations are both ``\sim 2^{21.9}``
 and the number of read-write operations are ``\sim 2^{20}``.
-The largest tensor size is ``2^17``, one can check the element size by typing
+The largest tensor size is ``2^{17}``, one can check the element size by typing
 ```julia
 julia> sizeof(TropicalF64)
 8
@@ -213,8 +218,8 @@ julia> solve(problem, SizeMax(), usecuda=true)
 ```
 
 CUDA backended properties are
-* [`SizeMax`](@ref)
+* [`SizeMax`](@ref) and [`SizeMin`](@ref)
 * [`CountingAll`](@ref)
-* [`CountingMax`](@ref)
+* [`CountingMax`](@ref) and [`CountingMin`](@ref)
 * [`GraphPolynomial`](@ref)
-* [`SingleConfigMax`](@ref)
+* [`SingleConfigMax`](@ref) and [`SingleConfigMin`](@ref)

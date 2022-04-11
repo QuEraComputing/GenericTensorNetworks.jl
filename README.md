@@ -1,23 +1,23 @@
-# GraphTensorNetworks
+# GenericTensorNetworks
 
-[![Build Status](https://github.com/QuEraComputing/GraphTensorNetworks.jl/workflows/CI/badge.svg)](https://github.com/QuEraComputing/GraphTensorNetworks.jl/actions)
-[![Coverage Status](https://coveralls.io/repos/github/QuEraComputing/GraphTensorNetworks.jl/badge.svg?branch=master&t=rIJIK2)](https://coveralls.io/github/QuEraComputing/GraphTensorNetworks.jl?branch=master)
-[![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://queracomputing.github.io/GraphTensorNetworks.jl/dev/)
+[![Build Status](https://github.com/QuEraComputing/GenericTensorNetworks.jl/workflows/CI/badge.svg)](https://github.com/QuEraComputing/GenericTensorNetworks.jl/actions)
+[![Coverage Status](https://coveralls.io/repos/github/QuEraComputing/GenericTensorNetworks.jl/badge.svg?branch=master&t=rIJIK2)](https://coveralls.io/github/QuEraComputing/GenericTensorNetworks.jl?branch=master)
+[![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/)
 
 ## Installation
 <p>
-GraphTensorNetworks is a &nbsp;
+GenericTensorNetworks is a &nbsp;
     <a href="https://julialang.org">
         <img src="https://raw.githubusercontent.com/JuliaLang/julia-logo-graphics/master/images/julia.ico" width="16em">
         Julia Language
     </a>
-    &nbsp; package. To install GraphTensorNetworks,
+    &nbsp; package. To install GenericTensorNetworks,
     please <a href="https://docs.julialang.org/en/v1/manual/getting-started/">open
     Julia's interactive session (known as REPL)</a> and press <kbd>]</kbd> key in the REPL to use the package mode, then type
 </p>
 
 ```julia
-pkg> add GraphTensorNetworks
+pkg> add GenericTensorNetworks
 ```
 
 To update, just type `up` in the package mode.
@@ -43,11 +43,11 @@ Much of the software in this ecosystem was developed as part of academic researc
 If you would like to help support it, please star the repository as such metrics may help us secure funding in the future.
 If you use our software as part of your research, teaching, or other activities, we would be grateful if you could cite our work.
 The
-[CITATION.bib](https://github.com/QuEraComputing/GraphTensorNetworks.jl/blob/master/CITATION.bib) file in the root of this repository lists the relevant papers.
+[CITATION.bib](https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/CITATION.bib) file in the root of this repository lists the relevant papers.
 
 ## Questions and Contributions
 
 You can
 * Post a question on [Julia Discourse forum](https://discourse.julialang.org/), pin the package maintainer wih `@1115`.
 * Discuss in the `#graphs` channel of the [Julia Slack](https://julialang.org/community/), ping the package maintainer with `@JinGuo Liu`.
-* Open an [issue](https://github.com/QuEraComputing/GraphTensorNetworks.jl/issues) if you encounter any problems, or have any feature request.
+* Open an [issue](https://github.com/QuEraComputing/GenericTensorNetworks.jl/issues) if you encounter any problems, or have any feature request.

@@ -1,4 +1,4 @@
-using GraphTensorNetworks
+using GenericTensorNetworks
 using Graphs, Test
 
 @testset "independent set problem" begin
@@ -161,16 +161,16 @@ end
             CountingAll(), ConfigsAll(), SingleConfigMax(2), SingleConfigMin(2), SingleConfigMax(2; bounded=true), SingleConfigMin(2,bounded=true),
         ]
         @show property
-        ET = GraphTensorNetworks.tensor_element_type(Float32, 10, 2, property)
+        ET = GenericTensorNetworks.tensor_element_type(Float32, 10, 2, property)
         @test eltype(solve(gp, property, T=Float32)) <: ET
         @test estimate_memory(gp, property) isa Integer
     end
-    @test GraphTensorNetworks.tensor_element_type(Float32, 10, 2, GraphPolynomial(method=:polynomial)) == Polynomial{Float32, :x}
-    @test sizeof(GraphTensorNetworks.tensor_element_type(Float32, 10, 2, GraphPolynomial(method=:fitting))) == 4
-    @test sizeof(GraphTensorNetworks.tensor_element_type(Float32, 10, 2, GraphPolynomial(method=:fft))) == 8
-    @test sizeof(GraphTensorNetworks.tensor_element_type(Float64, 10, 2, GraphPolynomial(method=:finitefield))) == 4
-    @test GraphTensorNetworks.tensor_element_type(Float32, 10, 2, SingleConfigMax(;bounded=true)) == Tropical{Float32}
-    @test GraphTensorNetworks.tensor_element_type(Float32, 10, 2, SingleConfigMin(;bounded=true)) == Tropical{Float32}
+    @test GenericTensorNetworks.tensor_element_type(Float32, 10, 2, GraphPolynomial(method=:polynomial)) == Polynomial{Float32, :x}
+    @test sizeof(GenericTensorNetworks.tensor_element_type(Float32, 10, 2, GraphPolynomial(method=:fitting))) == 4
+    @test sizeof(GenericTensorNetworks.tensor_element_type(Float32, 10, 2, GraphPolynomial(method=:fft))) == 8
+    @test sizeof(GenericTensorNetworks.tensor_element_type(Float64, 10, 2, GraphPolynomial(method=:finitefield))) == 4
+    @test GenericTensorNetworks.tensor_element_type(Float32, 10, 2, SingleConfigMax(;bounded=true)) == Tropical{Float32}
+    @test GenericTensorNetworks.tensor_element_type(Float32, 10, 2, SingleConfigMin(;bounded=true)) == Tropical{Float32}
 
     @test estimate_memory(gp, SizeMax()) * 2 == estimate_memory(gp, CountingMax())
     @test estimate_memory(gp, SingleConfigMax(bounded=true)) > estimate_memory(gp, SingleConfigMax(bounded=false))

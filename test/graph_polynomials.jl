@@ -1,11 +1,11 @@
-using GraphTensorNetworks, Test, OMEinsum, OMEinsumContractionOrders
+using GenericTensorNetworks, Test, OMEinsum, OMEinsumContractionOrders
 using Mods, Polynomials, TropicalNumbers
 using Graphs, Random
-using GraphTensorNetworks: StaticBitVector, graph_polynomial
+using GenericTensorNetworks: StaticBitVector, graph_polynomial
 
 @testset "bond and vertex tensor" begin
-    @test GraphTensorNetworks.misb(TropicalF64) == [TropicalF64(0) TropicalF64(0); TropicalF64(0) TropicalF64(-Inf)]
-    @test GraphTensorNetworks.misv([one(TropicalF64), TropicalF64(2.0)]) == [TropicalF64(0), TropicalF64(2.0)]
+    @test GenericTensorNetworks.misb(TropicalF64) == [TropicalF64(0) TropicalF64(0); TropicalF64(0) TropicalF64(-Inf)]
+    @test GenericTensorNetworks.misv([one(TropicalF64), TropicalF64(2.0)]) == [TropicalF64(0), TropicalF64(2.0)]
 end
 
 @testset "graph generator" begin
@@ -13,7 +13,7 @@ end
     @test ne(g) == 20
     g = diagonal_coupled_graph((x = trues(3, 3); x[2,2]=0; x))
     @test ne(g) == 12
-    @test length(GraphTensorNetworks.labels(IndependentSet(g).code)) == 8
+    @test length(GenericTensorNetworks.labels(IndependentSet(g).code)) == 8
 end
 
 @testset "independence_polynomial" begin

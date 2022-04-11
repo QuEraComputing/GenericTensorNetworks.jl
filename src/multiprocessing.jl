@@ -20,7 +20,7 @@ Example
 ---------------------------
 Suppose we have a file `run.jl` with the following contents
 ```julia
-using GraphTensorNetworks.SimpleMultiprocessing
+using GenericTensorNetworks.SimpleMultiprocessing
 
 results = multiprocess_run(x->x^2, randn(8))
 ```

@@ -1,30 +1,30 @@
 using Pkg
-using GraphTensorNetworks
-using GraphTensorNetworks: TropicalNumbers, Polynomials, Mods, OMEinsum, OMEinsumContractionOrders
+using GenericTensorNetworks
+using GenericTensorNetworks: TropicalNumbers, Polynomials, Mods, OMEinsum, OMEinsumContractionOrders
 using Documenter
 using DocThemeIndigo
 using Literate
 
-for each in readdir(pkgdir(GraphTensorNetworks, "examples"))
-    input_file = pkgdir(GraphTensorNetworks, "examples", each)
+for each in readdir(pkgdir(GenericTensorNetworks, "examples"))
+    input_file = pkgdir(GenericTensorNetworks, "examples", each)
     endswith(input_file, ".jl") || continue
     @info "building" input_file
-    output_dir = pkgdir(GraphTensorNetworks, "docs", "src", "tutorials")
+    output_dir = pkgdir(GenericTensorNetworks, "docs", "src", "tutorials")
     @info "executing" input_file
     Literate.markdown(input_file, output_dir; name=each[1:end-3], execute=false)
 end
 
-indigo = DocThemeIndigo.install(GraphTensorNetworks)
-DocMeta.setdocmeta!(GraphTensorNetworks, :DocTestSetup, :(using GraphTensorNetworks); recursive=true)
+indigo = DocThemeIndigo.install(GenericTensorNetworks)
+DocMeta.setdocmeta!(GenericTensorNetworks, :DocTestSetup, :(using GenericTensorNetworks); recursive=true)
 
 makedocs(;
-    modules=[GraphTensorNetworks, TropicalNumbers, Mods, OMEinsum, OMEinsumContractionOrders],
+    modules=[GenericTensorNetworks, TropicalNumbers, Mods, OMEinsum, OMEinsumContractionOrders],
     authors="Jinguo Liu",
-    repo="https://github.com/QuEraComputing/GraphTensorNetworks.jl/blob/{commit}{path}#{line}",
-    sitename="GraphTensorNetworks.jl",
+    repo="https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/{commit}{path}#{line}",
+    sitename="GenericTensorNetworks.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://QuEraComputing.github.io/GraphTensorNetworks.jl",
+        canonical="https://QuEraComputing.github.io/GenericTensorNetworks.jl",
         assets=String[indigo],
     ),
     pages=[
@@ -54,5 +54,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/QuEraComputing/GraphTensorNetworks.jl",
+    repo="github.com/QuEraComputing/GenericTensorNetworks.jl",
 )

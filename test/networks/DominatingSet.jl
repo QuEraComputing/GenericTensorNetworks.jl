@@ -1,4 +1,4 @@
-using GraphTensorNetworks, Test, Graphs
+using GenericTensorNetworks, Test, Graphs
 
 @testset "dominating set basic" begin
     g = smallgraph(:petersen)
@@ -8,8 +8,8 @@ using GraphTensorNetworks, Test, Graphs
     mask[1] = false
     @test !is_dominating_set(g, mask)
 
-    @test GraphTensorNetworks.dominating_set_tensor(TropicalF64(0), TropicalF64(1), 3)[:,:,1] == TropicalF64[-Inf 0.0; 0 0]
-    @test GraphTensorNetworks.dominating_set_tensor(TropicalF64(0), TropicalF64(1), 3)[:,:,2] == TropicalF64[1.0 1.0; 1.0 1.0]
+    @test GenericTensorNetworks.dominating_set_tensor(TropicalF64(0), TropicalF64(1), 3)[:,:,1] == TropicalF64[-Inf 0.0; 0 0]
+    @test GenericTensorNetworks.dominating_set_tensor(TropicalF64(0), TropicalF64(1), 3)[:,:,2] == TropicalF64[1.0 1.0; 1.0 1.0]
 end
 
 @testset "dominating set v.s. maximal IS" begin

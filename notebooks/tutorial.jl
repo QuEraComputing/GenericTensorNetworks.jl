@@ -8,7 +8,7 @@ using InteractiveUtils
 begin
 	using Pkg
 	Pkg.activate(dirname(pwd()))
-	using Revise, GraphTensorNetworks
+	using Revise, GenericTensorNetworks
 end
 
 # ╔═╡ 6c7f88d2-2491-4272-b0b6-83fe7778f81a

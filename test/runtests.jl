@@ -1,4 +1,4 @@
-using GraphTensorNetworks
+using GenericTensorNetworks
 using Test, Documenter
 
 @testset "bitvector" begin
@@ -48,4 +48,4 @@ end
 # --------------
 # doctests
 # --------------
-doctest(GraphTensorNetworks)
+doctest(GenericTensorNetworks)

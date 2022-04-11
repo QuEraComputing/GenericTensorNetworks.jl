@@ -10,7 +10,7 @@ Example
 -----------------------------------------
 One can encode the paint shop problem `abaccb` as the following
 
-```jldoctest; setup=:(using GraphTensorNetworks)
+```jldoctest; setup=:(using GenericTensorNetworks)
 julia> syms = collect("abaccb");
 
 julia> pb = PaintShop(syms);

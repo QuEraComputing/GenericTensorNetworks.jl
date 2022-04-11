@@ -1,4 +1,4 @@
-using GraphTensorNetworks, Test, Graphs
+using GenericTensorNetworks, Test, Graphs
 
 @testset "counting maximal IS" begin
     g = random_regular_graph(20, 3)

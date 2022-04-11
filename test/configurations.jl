@@ -1,8 +1,8 @@
-using GraphTensorNetworks, Test, Graphs
+using GenericTensorNetworks, Test, Graphs
 using OMEinsum
 using TropicalNumbers: CountingTropicalF64
 using OMEinsumContractionOrders: uniformsize
-using GraphTensorNetworks: _onehotv, _x, sampler_type, set_type, best_solutions, best2_solutions, solutions, all_solutions, bestk_solutions, AllConfigs, SingleConfig, max_size, max_size_count
+using GenericTensorNetworks: _onehotv, _x, sampler_type, set_type, best_solutions, best2_solutions, solutions, all_solutions, bestk_solutions, AllConfigs, SingleConfig, max_size, max_size_count
 
 @testset "Config types" begin
     T = sampler_type(CountingTropical{Float32}, 5, 2)

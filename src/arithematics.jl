@@ -90,7 +90,7 @@ Polynomial truncated to largest `K` orders. `T` is the coefficients type and `TO
 
 Example
 ------------------------
-```jldoctest; setup=(using GraphTensorNetworks)
+```jldoctest; setup=(using GenericTensorNetworks)
 julia> TruncatedPoly((1,2,3), 6)
 x^4 + 2*x^5 + 3*x^6
 
@@ -186,7 +186,7 @@ This algebra maps
 
 Example
 ------------------------------
-```jldoctest; setup=(using GraphTensorNetworks)
+```jldoctest; setup=(using GenericTensorNetworks)
 julia> x = ExtendedTropical{3}(Tropical.([1.0, 2, 3]))
 ExtendedTropical{3, TropicalF64}(TropicalF64[1.0ₜ, 2.0ₜ, 3.0ₜ])
 
@@ -368,7 +368,7 @@ Set algebra for enumerating configurations, where `N` is the length of configura
 
 Example
 ----------------------
-```jldoctest; setup=:(using GraphTensorNetworks)
+```jldoctest; setup=:(using GenericTensorNetworks)
 julia> a = ConfigEnumerator([StaticBitVector([1,1,1,0,0]), StaticBitVector([1,0,0,0,1])])
 {11100, 10001}
 
@@ -433,7 +433,7 @@ The algebra for sampling one configuration, where `N` is the length of configura
 
 Example
 ----------------------
-```jldoctest; setup=:(using GraphTensorNetworks, Random; Random.seed!(2))
+```jldoctest; setup=:(using GenericTensorNetworks, Random; Random.seed!(2))
 julia> ConfigSampler(StaticBitVector([1,1,1,0,0]))
 ConfigSampler{5, 1, 1}(11100)
 
@@ -487,7 +487,7 @@ Fields
 
 Example
 ------------------------
-```jldoctest; setup=:(using GraphTensorNetworks)
+```jldoctest; setup=:(using GenericTensorNetworks)
 julia> s = SumProductTree(bv"00111")
 00111
 
@@ -689,7 +689,7 @@ Direct sampling configurations from a [`SumProductTree`](@ref) instance.
 
 Example
 -----------------------------
-```jldoctest; setup=:(using GraphTensorNetworks)
+```jldoctest; setup=:(using GenericTensorNetworks)
 julia> using Graphs
 
 julia> g= smallgraph(:petersen)

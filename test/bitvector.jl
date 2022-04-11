@@ -1,5 +1,5 @@
-using Test, GraphTensorNetworks
-using GraphTensorNetworks: statictrues, staticfalses, StaticBitVector, onehotv
+using Test, GenericTensorNetworks
+using GenericTensorNetworks: statictrues, staticfalses, StaticBitVector, onehotv
 
 @testset "static bit vector" begin
     @test statictrues(StaticBitVector{3,1}) == trues(3)

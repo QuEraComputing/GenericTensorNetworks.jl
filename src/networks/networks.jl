@@ -63,7 +63,7 @@ Example
 --------------------------
 The following code gives your the maximum independent set size
 ```jldoctest
-julia> using Graphs, GraphTensorNetworks
+julia> using Graphs, GenericTensorNetworks
 
 julia> gp = IndependentSet(smallgraph(:petersen));
 
@@ -90,7 +90,7 @@ julia> getixsv(gp.code)
  [7, 10]
  [8, 10]
 
-julia> gp.code(GraphTensorNetworks.generate_tensors(Tropical(1.0), gp)...)
+julia> gp.code(GenericTensorNetworks.generate_tensors(Tropical(1.0), gp)...)
 0-dimensional Array{TropicalF64, 0}:
 4.0ₜ
 ```

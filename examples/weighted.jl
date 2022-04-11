@@ -1,7 +1,7 @@
 # # Weighted problems
 # Let us use the maximum independent set problem on Petersen graph as an example.
 
-using GraphTensorNetworks, Graphs
+using GenericTensorNetworks, Graphs
 
 graph = Graphs.smallgraph(:petersen)
 

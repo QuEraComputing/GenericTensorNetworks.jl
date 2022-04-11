@@ -5,7 +5,7 @@
 #
 # In the following, we are going to solve the solution space properties of the independent set problem on the Petersen graph. To start, let us define a Petersen graph instance.
 
-using GraphTensorNetworks, Graphs
+using GenericTensorNetworks, Graphs
 
 graph = Graphs.smallgraph(:petersen)
 

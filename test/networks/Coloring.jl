@@ -1,4 +1,4 @@
-using Test, GraphTensorNetworks, Graphs
+using Test, GenericTensorNetworks, Graphs
 
 @testset "enumerating - coloring" begin
     g = SimpleGraph(5)

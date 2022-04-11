@@ -10,7 +10,7 @@
 # The decision version of finding the minimum dominating set is an NP-complete.
 # In the following, we are going to solve the dominating set problem on the Petersen graph.
 
-using GraphTensorNetworks, Graphs, Compose
+using GenericTensorNetworks, Graphs, Compose
 
 graph = Graphs.smallgraph(:petersen)
 

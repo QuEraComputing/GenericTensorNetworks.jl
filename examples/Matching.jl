@@ -6,7 +6,7 @@
 # ## Problem definition
 # A ``k``-matching in a graph ``G`` is a set of k edges, no two of which have a vertex in common.
 
-using GraphTensorNetworks, Graphs
+using GenericTensorNetworks, Graphs
 
 # In the following, we are going to defined a matching problem for the Petersen graph.
 

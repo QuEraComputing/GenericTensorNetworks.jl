@@ -8,7 +8,7 @@
 # The [set covering problem](https://en.wikipedia.org/wiki/Set_cover_problem) is a significant NP-hard problem in combinatorial optimization. Given a collection of elements, the set covering problem aims to find the minimum number of sets that incorporate (cover) all of these elements.
 # In the following, we will find the solution space properties for the camera location and stadium area example in the [Cornell University Computational Optimization Open Textbook](https://optimization.cbe.cornell.edu/index.php?title=Set_covering_problem).
 
-using GraphTensorNetworks, Graphs
+using GenericTensorNetworks, Graphs
 
 # The covering stadium areas of cameras are represented as the following sets.
 

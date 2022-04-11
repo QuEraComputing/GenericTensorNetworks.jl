@@ -8,7 +8,7 @@
 # One can specify a satisfiable problem in the [conjuctive normal form](https://en.wikipedia.org/wiki/Conjunctive_normal_form).
 # In boolean logic, a formula is in conjunctive normal form (CNF) if it is a conjunction (∧) of one or more clauses,
 # where a clause is a disjunction (∨) of literals.
-using GraphTensorNetworks
+using GenericTensorNetworks
 
 @bools a b c d e f g
 

@@ -18,11 +18,11 @@ SetPacking
 #### Graph Problem Interfaces
 
 To subtype [`GraphProblem`](@ref), a new type must contain a `code` field to represent the (optimized) tensor network.
-Interfaces [`GraphTensorNetworks.generate_tensors`](@ref), [`labels`](@ref), [`flavors`](@ref) and [`get_weights`](@ref) are required.
+Interfaces [`GenericTensorNetworks.generate_tensors`](@ref), [`labels`](@ref), [`flavors`](@ref) and [`get_weights`](@ref) are required.
 [`nflavor`](@ref) is optional.
 
 ```@docs
-GraphTensorNetworks.generate_tensors
+GenericTensorNetworks.generate_tensors
 labels
 terms
 flavors
@@ -87,7 +87,7 @@ SumProductTree
 ConfigSampler
 ```
 
-`GraphTensorNetworks` also exports the [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2) type defined in package `Polynomials`.
+`GenericTensorNetworks` also exports the [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2) type defined in package `Polynomials`.
 
 ```@docs
 StaticBitVector
@@ -141,5 +141,5 @@ One can also use `random_regular_graph` and `smallgraph` in [Graphs](https://git
 
 #### Multiprocessing
 ```@docs
-GraphTensorNetworks.SimpleMultiprocessing.multiprocess_run
+GenericTensorNetworks.SimpleMultiprocessing.multiprocess_run
 ```

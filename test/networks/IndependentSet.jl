@@ -1,4 +1,4 @@
-using GraphTensorNetworks, Test, Graphs
+using GenericTensorNetworks, Test, Graphs
 
 @testset "mis compactify" begin
     g = SimpleGraph(6)

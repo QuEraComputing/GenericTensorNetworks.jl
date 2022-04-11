@@ -1,13 +1,13 @@
-using GraphTensorNetworks, Graphs, Test
+using GenericTensorNetworks, Graphs, Test
 
 @testset "save load" begin
     M = 10
     fname = tempname()
     m = ConfigEnumerator([StaticBitVector(rand(Bool, 300)) for i=1:M])
-    bm = GraphTensorNetworks.plain_matrix(m)
-    rm = GraphTensorNetworks.raw_matrix(m)
-    m1 = GraphTensorNetworks.from_raw_matrix(rm; bitlength=300, nflavors=2)
-    m2 = GraphTensorNetworks.from_plain_matrix(bm; nflavors=2)
+    bm = GenericTensorNetworks.plain_matrix(m)
+    rm = GenericTensorNetworks.raw_matrix(m)
+    m1 = GenericTensorNetworks.from_raw_matrix(rm; bitlength=300, nflavors=2)
+    m2 = GenericTensorNetworks.from_plain_matrix(bm; nflavors=2)
     @test m1 == m
     @test m2 == m
     save_configs(fname, m; format=:binary)
@@ -22,10 +22,10 @@ using GraphTensorNetworks, Graphs, Test
 
     M = 10
     m = ConfigEnumerator([StaticElementVector(3, rand(0:2, 300)) for i=1:M])
-    bm = GraphTensorNetworks.plain_matrix(m)
-    rm = GraphTensorNetworks.raw_matrix(m)
-    m1 = GraphTensorNetworks.from_raw_matrix(rm; bitlength=300, nflavors=3)
-    m2 = GraphTensorNetworks.from_plain_matrix(bm; nflavors=3)
+    bm = GenericTensorNetworks.plain_matrix(m)
+    rm = GenericTensorNetworks.raw_matrix(m)
+    m1 = GenericTensorNetworks.from_raw_matrix(rm; bitlength=300, nflavors=3)
+    m2 = GenericTensorNetworks.from_plain_matrix(bm; nflavors=3)
     @test m1 == m
     @test m2 == m
     @test Matrix(m) == bm

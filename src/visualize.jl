@@ -99,7 +99,7 @@ Extra keyword arguments
 Example
 ------------------------------
 ```jldoctest
-julia> using Graphs, GraphTensorNetworks, Compose
+julia> using Graphs, GenericTensorNetworks, Compose
 
 julia> show_graph(smallgraph(:petersen); format=Compose.SVG, io=tempname(), vertex_colors=rand(["blue", "red"], 10));
 ```
@@ -313,7 +313,7 @@ Extra keyword arguments
 Example
 -------------------------------
 ```jldoctest
-julia> using Graphs, GraphTensorNetworks, Compose
+julia> using Graphs, GenericTensorNetworks, Compose
 
 julia> show_gallery(smallgraph(:petersen), (2, 3); format=Compose.SVG, io=tempname(), vertex_configs=[rand(Bool, 10) for k=1:6]);
 ```

@@ -1,6 +1,6 @@
 using CUDA, Random
 using LinearAlgebra: mul!
-using GraphTensorNetworks, Test
+using GenericTensorNetworks, Test
 
 @testset "cuda patch" begin
     for T in [Tropical{Float64}, CountingTropical{Float64,Float64}]

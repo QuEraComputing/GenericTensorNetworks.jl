@@ -1,5 +1,5 @@
-name = "GraphTensorNetworks"
-uuid = "0978c8c2-34f6-49c7-9826-ea2cc20dabd2"
+name = "GenericTensorNetworks"
+uuid = "3521c873-ad32-4bb4-b63d-f4f178f42b49"
 authors = ["GiggleLiu <cacate0129@gmail.com> and contributors"]
 version = "0.2.9"
 

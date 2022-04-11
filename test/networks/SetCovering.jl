@@ -1,4 +1,4 @@
-using GraphTensorNetworks, Test, Graphs
+using GenericTensorNetworks, Test, Graphs
 
 @testset "set covering" begin
     sets = [[1, 2, 5], [1, 3], [2, 4], [3, 6], [2, 3, 6]]  # each set is a vertex

@@ -1,4 +1,4 @@
-using GraphTensorNetworks.SimpleMultiprocessing, Test
+using GenericTensorNetworks.SimpleMultiprocessing, Test
 
 @testset "multiprocessing" begin
     results = multiprocess_run(x->x^2, collect(1:5))

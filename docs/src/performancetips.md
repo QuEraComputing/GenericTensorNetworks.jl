@@ -4,7 +4,7 @@
 
 Let us use the independent set problem on 3-regular graphs as an example.
 ```julia
-julia> using GraphTensorNetworks, Graphs, Random
+julia> using GenericTensorNetworks, Graphs, Random
 
 julia> graph = random_regular_graph(120, 3)
 {120, 180} undirected simple Int64 graph
@@ -77,7 +77,7 @@ loop and accumulate over certain degrees of freedom so that one can have a small
 In the [`TreeSA`](@ref) optimizer, one can set `nslices` to a value larger than zero to turn on this feature.
 
 ```julia
-julia> using GraphTensorNetworks, Graphs, Random
+julia> using GenericTensorNetworks, Graphs, Random
 
 julia> graph = random_regular_graph(120, 3)
 {120, 180} undirected simple Int64 graph
@@ -168,14 +168,14 @@ julia> lineplot(hamming_distribution(samples, samples))
 ```
 
 ## Multiprocessing
-Submodule `GraphTensorNetworks.SimpleMutiprocessing` provides a function [`GraphTensorNetworks.SimpleMultiprocessing.multiprocess_run`](@ref) function for simple multi-processing jobs.
+Submodule `GenericTensorNetworks.SimpleMutiprocessing` provides a function [`GenericTensorNetworks.SimpleMultiprocessing.multiprocess_run`](@ref) function for simple multi-processing jobs.
 Suppose we want to find the independence polynomial for multiple graphs with 4 processes.
 We can create a file, e.g. named `run.jl` with the following content
 
 ```julia
-using Distributed, GraphTensorNetworks.SimpleMultiprocessing
-using Random, GraphTensorNetworks  # to avoid multi-precompiling
-@everywhere using Random, GraphTensorNetworks
+using Distributed, GenericTensorNetworks.SimpleMultiprocessing
+using Random, GenericTensorNetworks  # to avoid multi-precompiling
+@everywhere using Random, GenericTensorNetworks
 
 results = multiprocess_run(collect(1:10)) do seed
     Random.seed!(seed)

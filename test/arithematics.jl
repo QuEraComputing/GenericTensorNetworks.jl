@@ -1,7 +1,7 @@
-using GraphTensorNetworks, Test, OMEinsum, OMEinsumContractionOrders
+using GenericTensorNetworks, Test, OMEinsum, OMEinsumContractionOrders
 using Mods, Polynomials, TropicalNumbers
 using Graphs, Random
-using GraphTensorNetworks: StaticBitVector
+using GenericTensorNetworks: StaticBitVector
 using LinearAlgebra
 
 @testset "truncated poly" begin
@@ -40,17 +40,17 @@ end
                     (CountingTropical(5.0, ConfigSampler(StaticBitVector(rand(Bool, 10)))), CountingTropical(3.0, ConfigSampler(StaticBitVector(rand(Bool, 10)))), CountingTropical(-3.0, ConfigSampler(StaticBitVector(rand(Bool, 10))))),
                     (CountingTropical(5.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:3])), CountingTropical(3.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:4])), CountingTropical(-3.0, ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:5]))),
                     (ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:3]), ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:4]), ConfigEnumerator([StaticBitVector(rand(Bool, 10)) for j=1:5])),
-                    (SumProductTree(GraphTensorNetworks.SUM, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
-                        SumProductTree(GraphTensorNetworks.SUM, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
-                        SumProductTree(GraphTensorNetworks.SUM, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...)
+                    (SumProductTree(GenericTensorNetworks.SUM, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        SumProductTree(GenericTensorNetworks.SUM, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        SumProductTree(GenericTensorNetworks.SUM, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...)
                         ),
-                    (SumProductTree(GraphTensorNetworks.PROD, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
-                        SumProductTree(GraphTensorNetworks.PROD, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
-                        SumProductTree(GraphTensorNetworks.PROD, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...)
+                    (SumProductTree(GenericTensorNetworks.PROD, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        SumProductTree(GenericTensorNetworks.PROD, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...),
+                        SumProductTree(GenericTensorNetworks.PROD, [SumProductTree(StaticBitVector(rand(Bool, 10))) for j=1:2]...)
                         ),
-                    (SumProductTree(GraphTensorNetworks.PROD, [SumProductTree(OnehotVec{10, 2}(rand(1:10), 1)) for j=1:2]...),
-                        SumProductTree(GraphTensorNetworks.PROD, [SumProductTree(OnehotVec{10, 2}(rand(1:10), 1)) for j=1:2]...),
-                        SumProductTree(GraphTensorNetworks.PROD, [SumProductTree(OnehotVec{10, 2}(rand(1:10), 1)) for j=1:2]...)
+                    (SumProductTree(GenericTensorNetworks.PROD, [SumProductTree(OnehotVec{10, 2}(rand(1:10), 1)) for j=1:2]...),
+                        SumProductTree(GenericTensorNetworks.PROD, [SumProductTree(OnehotVec{10, 2}(rand(1:10), 1)) for j=1:2]...),
+                        SumProductTree(GenericTensorNetworks.PROD, [SumProductTree(OnehotVec{10, 2}(rand(1:10), 1)) for j=1:2]...)
                         ),
                     (SumProductTree(StaticBitVector(rand(Bool, 10))),
                         SumProductTree(StaticBitVector(rand(Bool, 10))),
@@ -82,7 +82,7 @@ end
     @test length(a * a) == 1
     print((a+a) * a)
     b = a + a
-    @test GraphTensorNetworks.num_nodes(b * b) == 3
+    @test GenericTensorNetworks.num_nodes(b * b) == 3
  
     a = ConfigSampler(StaticBitVector(rand(Bool, 10)))
     @test 1 * a == a
@@ -117,8 +117,8 @@ end
     @test abs(Mod{5}(2)) == Mod{5}(2)
     @test one(ConfigSampler(bv"11100")) == ConfigSampler(bv"00000")
     T = SumProductTree{OnehotVec{5,2}}
-    @test collect(one(T(GraphTensorNetworks.ZERO))) == collect(SumProductTree(bv"00000"))
-    @test iszero(copy(T(GraphTensorNetworks.ZERO)))
+    @test collect(one(T(GenericTensorNetworks.ZERO))) == collect(SumProductTree(bv"00000"))
+    @test iszero(copy(T(GenericTensorNetworks.ZERO)))
     x = SumProductTree(bv"00111")
     @test copy(x) == x
     @test copy(x) !== x
@@ -162,10 +162,10 @@ end
     A = collect(1:10)
     B = collect(2:2:20)
     low = 20
-    c, _ = GraphTensorNetworks.count_geq(A, B, 1, low, false)
+    c, _ = GenericTensorNetworks.count_geq(A, B, 1, low, false)
     @test c == count(x->x>=low, vec([a*b for a in A, b in B]))
     res = similar(A, c)
-    @test sort!(GraphTensorNetworks.collect_geq!(res, A, B, 1, low)) == sort!(filter(x->x>=low, vec([a*b for a in A, b in B])))
+    @test sort!(GenericTensorNetworks.collect_geq!(res, A, B, 1, low)) == sort!(filter(x->x>=low, vec([a*b for a in A, b in B])))
 end
 
 

@@ -9,7 +9,7 @@
 # Suppose one has a finite set ``S`` and a list of subsets of ``S``. Then, the set packing problem asks if some ``k`` subsets in the list are pairwise disjoint.
 # In the following, we will find the solution space properties for the set in the [Set covering problem](@ref).
 
-using GraphTensorNetworks, Graphs
+using GenericTensorNetworks, Graphs
 
 # The packing stadium areas of cameras are represented as the following sets.
 

@@ -7,7 +7,7 @@
 # A [vertex coloring](https://en.wikipedia.org/wiki/Graph_coloring) is an assignment of labels or colors to each vertex of a graph such that no edge connects two identically colored vertices. 
 # In the following, we are going to defined a 3-coloring problem for the Petersen graph.
 
-using GraphTensorNetworks, Graphs
+using GenericTensorNetworks, Graphs
 
 graph = Graphs.smallgraph(:petersen)
 

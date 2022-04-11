@@ -1,4 +1,4 @@
-using GraphTensorNetworks, Test, Graphs
+using GenericTensorNetworks, Test, Graphs
 
 @testset "special graphs" begin
     g = random_square_lattice_graph(10, 10, 0.5)

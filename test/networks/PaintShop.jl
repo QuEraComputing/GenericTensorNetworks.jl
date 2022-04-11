@@ -1,4 +1,4 @@
-using GraphTensorNetworks, Test
+using GenericTensorNetworks, Test
 
 @testset "paint shop" begin
     syms = collect("abaccb")

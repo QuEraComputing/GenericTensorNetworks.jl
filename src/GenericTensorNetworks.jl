@@ -1,4 +1,4 @@
-module GraphTensorNetworks
+module GenericTensorNetworks
 
 using OMEinsumContractionOrders: SlicedEinsum
 using Core: Argument

@@ -37,7 +37,7 @@ Boolean expression in [conjunctive normal form](https://en.wikipedia.org/wiki/Co
 
 Example
 ------------------------
-```jldoctest; setup=:(using GraphTensorNetworks)
+```jldoctest; setup=:(using GenericTensorNetworks)
 julia> @bools x y z
 
 julia> cnf = (x ∨ y) ∧ (¬y ∨ z)
@@ -95,7 +95,7 @@ Create some boolean variables of type [`BoolVar`](@ref) in current scope that ca
 
 Example
 ------------------------
-```jldoctest; setup=:(using GraphTensorNetworks)
+```jldoctest; setup=:(using GenericTensorNetworks)
 julia> @bools x y z
 
 julia> (x ∨ y) ∧ (¬y ∨ z)

@@ -1,8 +1,8 @@
 ```@meta
-CurrentModule = GraphTensorNetworks
+CurrentModule = GenericTensorNetworks
 ```
 
-# GraphTensorNetworks
+# GenericTensorNetworks
 
 This package implements generic tensor networks to compute *solution space properties* of a class of hard combinatorial problems.
 The *solution space properties* include
@@ -16,15 +16,15 @@ The solvable problems include [Independent set problem](@ref), [Maximal independ
 ## Background knowledge
 
 Please check our paper ["Computing properties of independent sets by generic programming tensor networks"]().
-If you find our paper or software useful in your work, we would be grateful if you could cite our work. The [CITATION.bib](https://github.com/QuEraComputing/GraphTensorNetworks.jl/blob/master/CITATION.bib) file in the root of this repository lists the relevant papers.
+If you find our paper or software useful in your work, we would be grateful if you could cite our work. The [CITATION.bib](https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/CITATION.bib) file in the root of this repository lists the relevant papers.
 
 ## Quick start
 
-You can find a set up guide in our [README](https://github.com/QuEraComputing/GraphTensorNetworks.jl).
+You can find a set up guide in our [README](https://github.com/QuEraComputing/GenericTensorNetworks.jl).
 To get started, open a Julia REPL and type the following code.
 
 ```julia
-julia> using GraphTensorNetworks, Graphs
+julia> using GenericTensorNetworks, Graphs
 
 julia> # using CUDA
 

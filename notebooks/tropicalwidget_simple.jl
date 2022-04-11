@@ -21,7 +21,7 @@ begin
 	using Graphs # graph support
 	using PlutoUI
 	using Viznet, Compose
-	using TropicalNumbers, OMEinsum, GraphTensorNetworks#, TropicalGEMM
+	using TropicalNumbers, OMEinsum, GenericTensorNetworks#, TropicalGEMM
 end
 
 # ╔═╡ 100e3eb1-9d5c-4ae0-9a1b-d279927443fc

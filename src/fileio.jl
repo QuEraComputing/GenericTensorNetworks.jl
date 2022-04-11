@@ -99,7 +99,7 @@ load_sumproduct(filename::String) = dict_deserialize_tree(deserialize(filename).
 function dict_serialize_tree!(t::SumProductTree, d::Dict)
     id = objectid(t)
     if !haskey(d, id)
-        if t.tag === GraphTensorNetworks.LEAF || t.tag === GraphTensorNetworks.ZERO || t.tag == GraphTensorNetworks.ONE
+        if t.tag === GenericTensorNetworks.LEAF || t.tag === GenericTensorNetworks.ZERO || t.tag == GenericTensorNetworks.ONE
             d[id] = t
         else
             d[id] = (t.tag, objectid(t.left), objectid(t.right))

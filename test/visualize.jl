@@ -1,4 +1,4 @@
-using GraphTensorNetworks, Test, Graphs
+using GenericTensorNetworks, Test, Graphs
 
 @testset "visualize" begin
     locations = [(1.0, 2.0), (2.0, 3.0)]

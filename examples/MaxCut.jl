@@ -9,7 +9,7 @@
 # Finding the maximum cut is NP-Hard, where a maximum cut is a cut whose size is at least the size of any other cut,
 # where the size of a cut is the number of edges (or the sum of weights on edges) crossing the cut.
 
-using GraphTensorNetworks, Graphs
+using GenericTensorNetworks, Graphs
 
 # In the following, we are going to defined an cutting problem for the Petersen graph.
 

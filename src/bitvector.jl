@@ -8,7 +8,7 @@ When the number of flavors is 2, it is a `StaticBitVector`.
 
 Example
 -------------------------------
-```jldoctest; setup=:(using GraphTensorNetworks)
+```jldoctest; setup=:(using GenericTensorNetworks)
 julia> ev = StaticElementVector(3, [1,2,0,1,2])
 12012
 
@@ -88,7 +88,7 @@ end
 
 Example
 -------------------------------
-```jldoctest; setup=:(using GraphTensorNetworks)
+```jldoctest; setup=:(using GenericTensorNetworks)
 julia> sb = StaticBitVector([1,0,0,1,1])
 10011
 

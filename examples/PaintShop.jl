@@ -12,7 +12,7 @@
 # In the following, we use a character to represent a car,
 # and defined a binary paint shop problem as a string that each character appear exactly twice.
 
-using GraphTensorNetworks, Graphs
+using GenericTensorNetworks, Graphs
 
 sequence = collect("iadgbeadfcchghebif")
 

@@ -1,5 +1,5 @@
-using GraphTensorNetworks, Test, Graphs
-using GraphTensorNetworks: max_size
+using GenericTensorNetworks, Test, Graphs
+using GenericTensorNetworks: max_size
 
 @testset "graph utils" begin
     g2 = SimpleGraph(3)

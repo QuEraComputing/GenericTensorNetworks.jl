@@ -9,7 +9,7 @@
 # It is different from maximum independent set because it does not require the set to have the max size.
 # In the following, we are going to solve the maximal independent set problem on the Petersen graph.
 
-using GraphTensorNetworks, Graphs, Compose
+using GenericTensorNetworks, Graphs, Compose
 
 graph = Graphs.smallgraph(:petersen)
 

@@ -2,7 +2,7 @@
 # Let us use the maximum independent set problem on Petersen graph as an example.
 # The following code enumerates all independent sets.
 
-using GraphTensorNetworks, Graphs
+using GenericTensorNetworks, Graphs
 
 problem = IndependentSet(Graphs.smallgraph(:petersen))
 

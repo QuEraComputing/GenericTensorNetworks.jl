@@ -1,5 +1,5 @@
 using Test
-using GraphTensorNetworks
+using GenericTensorNetworks
 
 @testset "CNF" begin
     @bools x y z a b c

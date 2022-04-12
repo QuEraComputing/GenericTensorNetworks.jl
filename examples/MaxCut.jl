@@ -71,4 +71,4 @@ max_cut_size_verify = cut_size(graph, max_vertex_config)
 show_graph(graph; locs=locations, vertex_colors=[
         iszero(max_vertex_config[i]) ? "white" : "red" for i=1:nv(graph)])
 
-# where red vertices and white vertices are seperated by the cut.
+# where red vertices and white vertices are separated by the cut.

@@ -8,8 +8,8 @@ This package implements generic tensor networks to compute *solution space prope
 The *solution space properties* include
 * The maximum/minimum solution sizes,
 * The number of solutions at certain sizes,
-* The enumeration of solutions at certian sizes.
-* The direct sampling of solutions at certian sizes.
+* The enumeration of solutions at certain sizes.
+* The direct sampling of solutions at certain sizes.
 
 The solvable problems include [Independent set problem](@ref), [Maximal independent set problem](@ref), [Cutting problem (Spin-glass problem)](@ref), [Vertex matching problem](@ref), [Binary paint shop problem](@ref), [Coloring problem](@ref), [Dominating set problem](@ref), [Set packing problem](@ref) and [Set covering problem](@ref).
 

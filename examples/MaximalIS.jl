@@ -27,16 +27,16 @@ problem = MaximalIS(graph; optimizer=TreeSA());
 # ### Theory (can skip)
 # Let ``G=(V,E)`` be the target graph that we want to solve.
 # The tensor network representation map a vertex ``v\in V`` to a boolean degree of freedom ``s_v\in\{0, 1\}``.
-# We defined the restriction on its neighbourhood ``N(v)``:
+# We defined the restriction on its neighborhood ``N(v)``:
 # ```math
 # T(x_v)_{s_1,s_2,\ldots,s_{|N(v)|},s_v} = \begin{cases}
 #     s_vx_v^{w_v} & s_1=s_2=\ldots=s_{|N(v)|}=0,\\
 #     1-s_v& \text{otherwise}.
 # \end{cases}
 # ```
-# The first case corresponds to all the neighbourhood vertices of ``v`` are not in ``I_{m}``, then ``v`` must be in ``I_{m}`` and contribute a factor ``x_{v}^{w_v}``,
+# The first case corresponds to all the neighborhood vertices of ``v`` are not in ``I_{m}``, then ``v`` must be in ``I_{m}`` and contribute a factor ``x_{v}^{w_v}``,
 # where ``w_v`` is the weight of vertex ``v``.
-# Otherwise, if any of the neighbouring vertices of ``v`` is in ``I_{m}``, ``v`` must not be in ``I_{m}`` by the independence requirement.
+# Otherwise, if any of the neighboring vertices of ``v`` is in ``I_{m}``, ``v`` must not be in ``I_{m}`` by the independence requirement.
 
 # Its contraction time space complexity of a [`MaximalIS`](@ref) instance is no longer determined by the tree-width of the original graph ``G``.
 # It is often harder to contract this tensor network than to contract the one for regular independent set problem.

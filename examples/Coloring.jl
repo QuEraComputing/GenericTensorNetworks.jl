@@ -25,7 +25,7 @@ problem = Coloring{3}(graph);
 
 # ### Theory (can skip)
 # Type [`Coloring`](@ref) can be used for constructing the tensor network with optimized contraction order for a coloring problem.
-# Let us use 3-colouring problem defined on vertices as an example.
+# Let us use 3-coloring problem defined on vertices as an example.
 # For a vertex ``v``, we define the degree of freedoms ``c_v\in\{1,2,3\}`` and a vertex tensor labelled by it as
 # ```math
 # W(v) = \left(\begin{matrix}
@@ -42,7 +42,7 @@ problem = Coloring{3}(graph);
 #     x & x & 1
 # \end{matrix}\right).
 # ```
-# The number of possible colouring can be obtained by contracting this tensor network by setting vertex tensor elements ``r_v, g_v`` and ``b_v`` to 1.
+# The number of possible coloring can be obtained by contracting this tensor network by setting vertex tensor elements ``r_v, g_v`` and ``b_v`` to 1.
 
 # ## Solving properties
 # ##### counting all possible coloring

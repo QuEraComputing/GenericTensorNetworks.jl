@@ -1,4 +1,6 @@
-# # Open degree of freedoms
+# # Open degrees of freedom
+# Open degrees of freedom is useful when the graph under consideration is an induced subgraph of another graph.
+# The vertices connected to the rest part of the parent graph can not be summed over directly, which can be specified with the `openvertices` keyword argument in the graph problem constructor.
 # Let us use the maximum independent set problem on Petersen graph as an example.
 #
 using GenericTensorNetworks, Graphs
@@ -10,10 +12,5 @@ problem = IndependentSet(graph; openvertices=[1,2,3])
 
 mis_tropical_tensor = solve(problem, SizeMax())
 
-# The MIS tropical tensor shows the MIS size under different configuration of open vertices.
-# It is useful in MIS tropical tensor analysis.
-# We can compatify (reference to be added) this MIS-Tropical tensor by typing
-
-mis_compactify!(mis_tropical_tensor)
-
-# It will eliminate some entries having no contribution to the MIS size when embeding this local graph into a larger one.
+# The return value is a rank-3 tensor, with its elements being the MIS sizes under different configuration of open vertices.
+# For the maximum independent set problem, this tensor is also called the MIS tropical tensor, which can be useful in the MIS tropical tensor analysis (reference to be added).

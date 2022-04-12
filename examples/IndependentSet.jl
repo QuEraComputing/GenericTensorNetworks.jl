@@ -123,7 +123,7 @@ show_graph(graph; locs=locations, vertex_colors=
 
 # ##### Enumerate all solutions best several solutions
 # We can use bounded or unbounded [`ConfigsMax`](@ref) to find all solutions with largest-K set sizes.
-# In most cases, the bounded (default) version is prefered because it can reduce the memory usage significantly.
+# In most cases, the bounded (default) version is preferred because it can reduce the memory usage significantly.
 all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]
 
 # The return value has type [`CountingTropical`](@ref), while its counting field having type [`ConfigEnumerator`](@ref). The `data` field of a [`ConfigEnumerator`](@ref) instance contains a vector of bit strings.

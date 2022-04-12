@@ -5,7 +5,7 @@
 
 # ## Problem definition
 # In logic and computer science, the [boolean satisfiability problem](https://en.wikipedia.org/wiki/Boolean_satisfiability_problem) is the problem of determining if there exists an interpretation that satisfies a given boolean formula.
-# One can specify a satisfiable problem in the [conjuctive normal form](https://en.wikipedia.org/wiki/Conjunctive_normal_form).
+# One can specify a satisfiable problem in the [conjunctive normal form](https://en.wikipedia.org/wiki/Conjunctive_normal_form).
 # In boolean logic, a formula is in conjunctive normal form (CNF) if it is a conjunction (∧) of one or more clauses,
 # where a clause is a disjunction (∨) of literals.
 using GenericTensorNetworks
@@ -26,7 +26,7 @@ satisfiable(cnf, assignment)
 problem = Satisfiability(cnf);
 
 # ### Theory (can skip)
-# We can contruct a [`Satisfiability`](@ref) problem to solve the above problem.
+# We can construct a [`Satisfiability`](@ref) problem to solve the above problem.
 # To generate a tensor network, we map a boolean variable ``x`` and its negation ``\neg x`` to a degree of freedom (label) ``s_x \in \{0, 1\}``,
 # where 0 stands for variable ``x`` having value `false` while 1 stands for having value `true`.
 # Then we map a clause to a tensor. For example, a clause ``¬x ∨ y ∨ ¬z`` can be mapped to a tensor labeled by ``(s_x, s_y, s_z)``.

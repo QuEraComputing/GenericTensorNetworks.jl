@@ -3,7 +3,7 @@
 # !!! note
 #     It is highly recommended to read the [Independent set problem](@ref) chapter before reading this one.
 
-# ## Problme Definition
+# ## Problem Definition
 # The [binary paint shop problem](http://m-hikari.com/ams/ams-2012/ams-93-96-2012/popovAMS93-96-2012-2.pdf) is defined as follows:
 # we are given a ``2m`` length sequence containing ``m`` cars, where each car appears twice.
 # Each car need to be colored red in one occurrence, and blue in the other.

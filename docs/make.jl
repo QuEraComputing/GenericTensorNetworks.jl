@@ -44,6 +44,7 @@ makedocs(;
         ],
         "Topics" => [
             "Save and load solutions" => "tutorials/saveload.md"
+            "Sum product tree representation" => "sumproduct.md"
             "Weighted problems" => "tutorials/weighted.md"
             "Open degree of freedoms" => "tutorials/open.md"
         ],

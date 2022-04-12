@@ -28,7 +28,7 @@ problem = DominatingSet(graph; optimizer=TreeSA());
 # ### Theory (can skip)
 # Let ``G=(V,E)`` be the target graph that we want to solve.
 # The tensor network representation map a vertex ``v\in V`` to a boolean degree of freedom ``s_v\in\{0, 1\}``.
-# We defined the restriction on a vertex and its neighbouring vertices ``N(v)``:
+# We defined the restriction on a vertex and its neighboring vertices ``N(v)``:
 # ```math
 # T(x_v)_{s_1,s_2,\ldots,s_{|N(v)|},s_v} = \begin{cases}
 #     0 & s_1=s_2=\ldots=s_{|N(v)|}=s_v=0,\\
@@ -37,7 +37,7 @@ problem = DominatingSet(graph; optimizer=TreeSA());
 # \end{cases}
 # ```
 # where ``w_v`` is the weight of vertex ``v``.
-# This tensor means if both ``v`` and its neighbouring vertices are not in ``D``, i.e., ``s_1=s_2=\ldots=s_{|N(v)|}=s_v=0``,
+# This tensor means if both ``v`` and its neighboring vertices are not in ``D``, i.e., ``s_1=s_2=\ldots=s_{|N(v)|}=s_v=0``,
 # this configuration is forbidden because ``v`` is not adjacent to any member in the set.
 # otherwise, if ``v`` is in ``D``, it has a contribution ``x_v^{w_v}`` to the final result.
 # One can check the contraction time space complexity of a [`DominatingSet`](@ref) instance by typing:

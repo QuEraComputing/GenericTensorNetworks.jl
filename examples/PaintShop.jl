@@ -3,7 +3,7 @@
 # !!! note
 #     It is highly recommended to read the [Independent set problem](@ref) chapter before reading this one.
 
-# ## Problme Definition
+# ## Problem Definition
 # The [binary paint shop problem](http://m-hikari.com/ams/ams-2012/ams-93-96-2012/popovAMS93-96-2012-2.pdf) is defined as follows:
 # we are given a ``2m`` length sequence containing ``m`` cars, where each car appears twice.
 # Each car need to be colored red in one occurrence, and blue in the other.
@@ -34,14 +34,14 @@ show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=
 # and the goal becomes a min-cut problem defined on black edges.
 
 # ## Generic tensor network representation
-# Let us contruct the problem instance as bellow.
+# Let us construct the problem instance as bellow.
 problem = PaintShop(sequence);
 
 # ### Theory (can skip)
 # Type [`PaintShop`](@ref) can be used for constructing the tensor network with optimized contraction order for solving a binary paint shop problem.
 # To obtain its tensor network representation, we associating car ``c_i`` (the ``i``-th character in our example) with a degree of freedom ``s_{c_i} \in \{0, 1\}``,
 # where we use ``0`` to denote the first appearance of a car is colored red and ``1`` to denote the first appearance of a car is colored blue.
-# For each black edges ``(i, i+1)``, we define an edge tensor labeld by ``(s_{c_i}, s_{c_{i+1}})`` as follows:
+# For each black edges ``(i, i+1)``, we define an edge tensor labeled by ``(s_{c_i}, s_{c_{i+1}})`` as follows:
 # If both cars on this edge are their first or second appearance
 # ```math
 # B^{\rm parallel} = \left(\begin{matrix}
@@ -75,7 +75,7 @@ max_config = solve(problem, GraphPolynomial())[]
 
 # ### Counting properties
 # ##### graph polynomial
-# The graph polynomial of the binary paint shop problem in our convension is defined as
+# The graph polynomial of the binary paint shop problem in our convention is defined as
 # ```math
 # P(G, x) = \sum_{k=0}^{\delta(G)} p_k x^k 
 # ```
@@ -96,5 +96,5 @@ show_graph(graph; locs=locations, texts=string.(sequence),
 
 # Since we have different choices of initial color, the number of best solution is 2.
 
-# The following function will check the solution and return you the number of color switchs
+# The following function will check the solution and return you the number of color switches
 num_paint_shop_color_switch(sequence, painting1)

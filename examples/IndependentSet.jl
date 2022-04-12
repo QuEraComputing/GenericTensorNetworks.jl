@@ -121,7 +121,7 @@ single_solution = max_config.c.data
 show_graph(graph; locs=locations, vertex_colors=
     [iszero(single_solution[i]) ? "white" : "red" for i=1:nv(graph)])
 
-# ##### Enumerate all solutions best several solutions
+# ##### Enumerate all solutions and best several solutions
 # We can use bounded or unbounded [`ConfigsMax`](@ref) to find all solutions with largest-K set sizes.
 # In most cases, the bounded (default) version is preferred because it can reduce the memory usage significantly.
 all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]

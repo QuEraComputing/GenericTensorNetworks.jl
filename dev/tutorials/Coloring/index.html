@@ -15,13 +15,13 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-426657a3">
+     id="img-b567c54d">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-426657a3-1">
+<g stroke-width="0.67" stroke="#000000" id="img-b567c54d-1">
   <g transform="translate(76.48,39.02)">
     <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
   </g>
@@ -68,7 +68,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-426657a3-2">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-b567c54d-2">
   <g transform="translate(60,27.04)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
@@ -100,7 +100,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-426657a3-3">
+<g fill="#000000" font-size="3.13" id="img-b567c54d-3">
   <g transform="translate(60,27.04)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -299,7 +299,7 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 
 ]]> </script>
 </svg>
-<h2 id="Generic-tensor-network-representation"><a class="docs-heading-anchor" href="#Generic-tensor-network-representation">Generic tensor network representation</a><a id="Generic-tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Generic-tensor-network-representation" title="Permalink"></a></h2><p>We construct the tensor network for the 3-coloring problem as</p><pre><code class="language-julia hljs">problem = Coloring{3}(graph);</code></pre><h3 id="Theory-(can-skip)"><a class="docs-heading-anchor" href="#Theory-(can-skip)">Theory (can skip)</a><a id="Theory-(can-skip)-1"></a><a class="docs-heading-anchor-permalink" href="#Theory-(can-skip)" title="Permalink"></a></h3><p>Type <a href="../../ref/#GenericTensorNetworks.Coloring"><code>Coloring</code></a> can be used for constructing the tensor network with optimized contraction order for a coloring problem. Let us use 3-colouring problem defined on vertices as an example. For a vertex <span>$v$</span>, we define the degree of freedoms <span>$c_v\in\{1,2,3\}$</span> and a vertex tensor labelled by it as</p><p class="math-container">\[W(v) = \left(\begin{matrix}
+<h2 id="Generic-tensor-network-representation"><a class="docs-heading-anchor" href="#Generic-tensor-network-representation">Generic tensor network representation</a><a id="Generic-tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Generic-tensor-network-representation" title="Permalink"></a></h2><p>We construct the tensor network for the 3-coloring problem as</p><pre><code class="language-julia hljs">problem = Coloring{3}(graph);</code></pre><h3 id="Theory-(can-skip)"><a class="docs-heading-anchor" href="#Theory-(can-skip)">Theory (can skip)</a><a id="Theory-(can-skip)-1"></a><a class="docs-heading-anchor-permalink" href="#Theory-(can-skip)" title="Permalink"></a></h3><p>Type <a href="../../ref/#GenericTensorNetworks.Coloring"><code>Coloring</code></a> can be used for constructing the tensor network with optimized contraction order for a coloring problem. Let us use 3-coloring problem defined on vertices as an example. For a vertex <span>$v$</span>, we define the degree of freedoms <span>$c_v\in\{1,2,3\}$</span> and a vertex tensor labelled by it as</p><p class="math-container">\[W(v) = \left(\begin{matrix}
     1\\
     1\\
     1
@@ -307,7 +307,7 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
     1 &amp; x &amp; x\\
     x &amp; 1 &amp; x\\
     x &amp; x &amp; 1
-\end{matrix}\right).\]</p><p>The number of possible colouring can be obtained by contracting this tensor network by setting vertex tensor elements <span>$r_v, g_v$</span> and <span>$b_v$</span> to 1.</p><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><h5 id="counting-all-possible-coloring"><a class="docs-heading-anchor" href="#counting-all-possible-coloring">counting all possible coloring</a><a id="counting-all-possible-coloring-1"></a><a class="docs-heading-anchor-permalink" href="#counting-all-possible-coloring" title="Permalink"></a></h5><pre><code class="language-julia hljs">num_of_coloring = solve(problem, CountingMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(15.0, 120.0)ₜ</code></pre><h5 id="finding-one-best-coloring"><a class="docs-heading-anchor" href="#finding-one-best-coloring">finding one best coloring</a><a id="finding-one-best-coloring-1"></a><a class="docs-heading-anchor-permalink" href="#finding-one-best-coloring" title="Permalink"></a></h5><pre><code class="language-julia hljs">single_solution = solve(problem, SingleConfigMax())[]
+\end{matrix}\right).\]</p><p>The number of possible coloring can be obtained by contracting this tensor network by setting vertex tensor elements <span>$r_v, g_v$</span> and <span>$b_v$</span> to 1.</p><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><h5 id="counting-all-possible-coloring"><a class="docs-heading-anchor" href="#counting-all-possible-coloring">counting all possible coloring</a><a id="counting-all-possible-coloring-1"></a><a class="docs-heading-anchor-permalink" href="#counting-all-possible-coloring" title="Permalink"></a></h5><pre><code class="language-julia hljs">num_of_coloring = solve(problem, CountingMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(15.0, 120.0)ₜ</code></pre><h5 id="finding-one-best-coloring"><a class="docs-heading-anchor" href="#finding-one-best-coloring">finding one best coloring</a><a id="finding-one-best-coloring-1"></a><a class="docs-heading-anchor-permalink" href="#finding-one-best-coloring" title="Permalink"></a></h5><pre><code class="language-julia hljs">single_solution = solve(problem, SingleConfigMax())[]
 
 is_vertex_coloring(graph, single_solution.c.data)
 
@@ -324,13 +324,13 @@ show_graph(graph; locs=locations, vertex_colors=[vertex_color_map[Int(c)]
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-fa7f6d4c">
+     id="img-0c1531d4">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-fa7f6d4c-1">
+<g stroke-width="0.67" stroke="#000000" id="img-0c1531d4-1">
   <g transform="translate(76.48,39.02)">
     <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
   </g>
@@ -377,57 +377,57 @@ show_graph(graph; locs=locations, vertex_colors=[vertex_color_map[Int(c)]
     <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#008000" stroke="#000000" id="img-fa7f6d4c-2">
+<g stroke-width="0.67" fill="#008000" stroke="#000000" id="img-0c1531d4-2">
   <g transform="translate(40.23,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#0000FF" stroke="#000000" id="img-fa7f6d4c-3">
+<g stroke-width="0.67" fill="#0000FF" stroke="#000000" id="img-0c1531d4-3">
   <g transform="translate(47.78,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#0000FF" stroke="#000000" id="img-fa7f6d4c-4">
+<g stroke-width="0.67" fill="#0000FF" stroke="#000000" id="img-0c1531d4-4">
   <g transform="translate(72.22,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-fa7f6d4c-5">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-0c1531d4-5">
   <g transform="translate(79.77,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#008000" stroke="#000000" id="img-fa7f6d4c-6">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-0c1531d4-6">
   <g transform="translate(60,40.9)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#0000FF" stroke="#000000" id="img-fa7f6d4c-7">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-0c1531d4-7">
   <g transform="translate(27.04,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#008000" stroke="#000000" id="img-fa7f6d4c-8">
+<g stroke-width="0.67" fill="#008000" stroke="#000000" id="img-0c1531d4-8">
   <g transform="translate(39.63,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-fa7f6d4c-9">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-0c1531d4-9">
   <g transform="translate(80.37,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#0000FF" stroke="#000000" id="img-fa7f6d4c-10">
+<g stroke-width="0.67" fill="#008000" stroke="#000000" id="img-0c1531d4-10">
   <g transform="translate(92.96,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-fa7f6d4c-11">
+<g stroke-width="0.67" fill="#0000FF" stroke="#000000" id="img-0c1531d4-11">
   <g transform="translate(60,27.04)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-fa7f6d4c-12">
+<g fill="#000000" font-size="3.13" id="img-0c1531d4-12">
   <g transform="translate(60,27.04)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -639,13 +639,13 @@ show_graph(linegraph; locs=[0.5 .* (locations[e.src] .+ locations[e.dst])
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-a4fc165b">
+     id="img-f9bf2b2e">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.47" stroke="#000000" id="img-a4fc165b-1">
+<g stroke-width="0.47" stroke="#000000" id="img-f9bf2b2e-1">
   <g transform="translate(79.66,30.59)">
     <path fill="none" d="M0,0 L0,0 " class="primitive"/>
   </g>
@@ -782,7 +782,7 @@ show_graph(linegraph; locs=[0.5 .* (locations[e.src] .+ locations[e.dst])
     <path fill="none" d="M0,0 L0,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.47" fill="#FFFFFF" stroke="#000000" id="img-a4fc165b-2">
+<g stroke-width="0.47" fill="#FFFFFF" stroke="#000000" id="img-f9bf2b2e-2">
   <g transform="translate(79.66,30.59)">
     <circle cx="0" cy="0" r="2.33" class="primitive"/>
   </g>
@@ -829,7 +829,7 @@ show_graph(linegraph; locs=[0.5 .* (locations[e.src] .+ locations[e.dst])
     <circle cx="0" cy="0" r="2.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="2.2" id="img-a4fc165b-3">
+<g fill="#000000" font-size="2.2" id="img-f9bf2b2e-3">
   <g transform="translate(79.66,30.59)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -1055,4 +1055,4 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 </svg>
 <p>Let us construct the tensor network and see if there are solutions.</p><pre><code class="language-julia hljs">lineproblem = Coloring{3}(linegraph);
 
-num_of_coloring = solve(lineproblem, CountingMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(28.0, 1800.0)ₜ</code></pre><p>You will see the maximum size 28 is smaller than the number of edges in the <code>linegraph</code>, meaning no solution for the 3-coloring on edges of a Petersen graph.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../PaintShop/">« Binary paint shop problem</a><a class="docs-footer-nextpage" href="../DominatingSet/">Dominating set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.15 on <span class="colophon-date" title="Monday 11 April 2022 03:14">Monday 11 April 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+num_of_coloring = solve(lineproblem, CountingMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(28.0, 1800.0)ₜ</code></pre><p>You will see the maximum size 28 is smaller than the number of edges in the <code>linegraph</code>, meaning no solution for the 3-coloring on edges of a Petersen graph.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../PaintShop/">« Binary paint shop problem</a><a class="docs-footer-nextpage" href="../DominatingSet/">Dominating set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.15 on <span class="colophon-date" title="Tuesday 12 April 2022 07:47">Tuesday 12 April 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

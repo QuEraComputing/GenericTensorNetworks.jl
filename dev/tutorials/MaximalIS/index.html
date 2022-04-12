@@ -15,13 +15,13 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-d1e19547">
+     id="img-9e4c7d51">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-d1e19547-1">
+<g stroke-width="0.67" stroke="#000000" id="img-9e4c7d51-1">
   <g transform="translate(76.48,39.02)">
     <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
   </g>
@@ -68,7 +68,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-d1e19547-2">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9e4c7d51-2">
   <g transform="translate(60,27.04)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
@@ -100,7 +100,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-d1e19547-3">
+<g fill="#000000" font-size="3.13" id="img-9e4c7d51-3">
   <g transform="translate(60,27.04)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -299,10 +299,10 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 
 ]]> </script>
 </svg>
-<h2 id="Generic-tensor-network-representation"><a class="docs-heading-anchor" href="#Generic-tensor-network-representation">Generic tensor network representation</a><a id="Generic-tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Generic-tensor-network-representation" title="Permalink"></a></h2><p>We can use <a href="../../ref/#GenericTensorNetworks.MaximalIS"><code>MaximalIS</code></a> to construct the tensor network for solving the maximal independent set problem as</p><pre><code class="language-julia hljs">problem = MaximalIS(graph; optimizer=TreeSA());</code></pre><h3 id="Theory-(can-skip)"><a class="docs-heading-anchor" href="#Theory-(can-skip)">Theory (can skip)</a><a id="Theory-(can-skip)-1"></a><a class="docs-heading-anchor-permalink" href="#Theory-(can-skip)" title="Permalink"></a></h3><p>Let <span>$G=(V,E)$</span> be the target graph that we want to solve. The tensor network representation map a vertex <span>$v\in V$</span> to a boolean degree of freedom <span>$s_v\in\{0, 1\}$</span>. We defined the restriction on its neighbourhood <span>$N(v)$</span>:</p><p class="math-container">\[T(x_v)_{s_1,s_2,\ldots,s_{|N(v)|},s_v} = \begin{cases}
+<h2 id="Generic-tensor-network-representation"><a class="docs-heading-anchor" href="#Generic-tensor-network-representation">Generic tensor network representation</a><a id="Generic-tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Generic-tensor-network-representation" title="Permalink"></a></h2><p>We can use <a href="../../ref/#GenericTensorNetworks.MaximalIS"><code>MaximalIS</code></a> to construct the tensor network for solving the maximal independent set problem as</p><pre><code class="language-julia hljs">problem = MaximalIS(graph; optimizer=TreeSA());</code></pre><h3 id="Theory-(can-skip)"><a class="docs-heading-anchor" href="#Theory-(can-skip)">Theory (can skip)</a><a id="Theory-(can-skip)-1"></a><a class="docs-heading-anchor-permalink" href="#Theory-(can-skip)" title="Permalink"></a></h3><p>Let <span>$G=(V,E)$</span> be the target graph that we want to solve. The tensor network representation map a vertex <span>$v\in V$</span> to a boolean degree of freedom <span>$s_v\in\{0, 1\}$</span>. We defined the restriction on its neighborhood <span>$N(v)$</span>:</p><p class="math-container">\[T(x_v)_{s_1,s_2,\ldots,s_{|N(v)|},s_v} = \begin{cases}
     s_vx_v^{w_v} &amp; s_1=s_2=\ldots=s_{|N(v)|}=0,\\
     1-s_v&amp; \text{otherwise}.
-\end{cases}\]</p><p>The first case corresponds to all the neighbourhood vertices of <span>$v$</span> are not in <span>$I_{m}$</span>, then <span>$v$</span> must be in <span>$I_{m}$</span> and contribute a factor <span>$x_{v}^{w_v}$</span>, where <span>$w_v$</span> is the weight of vertex <span>$v$</span>. Otherwise, if any of the neighbouring vertices of <span>$v$</span> is in <span>$I_{m}$</span>, <span>$v$</span> must not be in <span>$I_{m}$</span> by the independence requirement.</p><p>Its contraction time space complexity of a <a href="../../ref/#GenericTensorNetworks.MaximalIS"><code>MaximalIS</code></a> instance is no longer determined by the tree-width of the original graph <span>$G$</span>. It is often harder to contract this tensor network than to contract the one for regular independent set problem.</p><pre><code class="language-julia hljs">timespacereadwrite_complexity(problem)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(11.011227255423254, 8.0, 11.129926933510392)</code></pre><p>Results are <code>log2</code> values.</p><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="maximal-independence-polynomial"><a class="docs-heading-anchor" href="#maximal-independence-polynomial">maximal independence polynomial</a><a id="maximal-independence-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#maximal-independence-polynomial" title="Permalink"></a></h5><p>The graph polynomial defined for the maximal independent set problem is</p><p class="math-container">\[I_{\rm max}(G, x) = \sum_{k=0}^{\alpha(G)} b_k x^k,\]</p><p>where <span>$b_k$</span> is the number of maximal independent sets of size <span>$k$</span> in graph <span>$G=(V, E)$</span>.</p><pre><code class="language-julia hljs">maximal_indenpendence_polynomial = solve(problem, GraphPolynomial())[]</code></pre>10&#8729;x<sup>3</sup> &#43; 5&#8729;x<sup>4</sup><p>One can see the first several coefficients are 0, because it only counts the maximal independent sets, The minimum maximal independent set size is also known as the independent domination number. It can be computed with the <a href="../../ref/#GenericTensorNetworks.SizeMin"><code>SizeMin</code></a> property:</p><pre><code class="language-julia hljs">independent_domination_number = solve(problem, SizeMin())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3.0ₜ</code></pre><p>Similarly, we have its counting <a href="../../ref/#GenericTensorNetworks.CountingMin"><code>CountingMin</code></a>:</p><pre><code class="language-julia hljs">counting_min_maximal_independent_set = solve(problem, CountingMin())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(3.0, 10.0)ₜ</code></pre><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="finding-all-maximal-independent-set"><a class="docs-heading-anchor" href="#finding-all-maximal-independent-set">finding all maximal independent set</a><a id="finding-all-maximal-independent-set-1"></a><a class="docs-heading-anchor-permalink" href="#finding-all-maximal-independent-set" title="Permalink"></a></h5><pre><code class="language-julia hljs">maximal_configs = solve(problem, ConfigsAll())[]
+\end{cases}\]</p><p>The first case corresponds to all the neighborhood vertices of <span>$v$</span> are not in <span>$I_{m}$</span>, then <span>$v$</span> must be in <span>$I_{m}$</span> and contribute a factor <span>$x_{v}^{w_v}$</span>, where <span>$w_v$</span> is the weight of vertex <span>$v$</span>. Otherwise, if any of the neighboring vertices of <span>$v$</span> is in <span>$I_{m}$</span>, <span>$v$</span> must not be in <span>$I_{m}$</span> by the independence requirement.</p><p>Its contraction time space complexity of a <a href="../../ref/#GenericTensorNetworks.MaximalIS"><code>MaximalIS</code></a> instance is no longer determined by the tree-width of the original graph <span>$G$</span>. It is often harder to contract this tensor network than to contract the one for regular independent set problem.</p><pre><code class="language-julia hljs">timespacereadwrite_complexity(problem)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(11.011227255423254, 8.0, 11.129926933510392)</code></pre><p>Results are <code>log2</code> values.</p><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="maximal-independence-polynomial"><a class="docs-heading-anchor" href="#maximal-independence-polynomial">maximal independence polynomial</a><a id="maximal-independence-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#maximal-independence-polynomial" title="Permalink"></a></h5><p>The graph polynomial defined for the maximal independent set problem is</p><p class="math-container">\[I_{\rm max}(G, x) = \sum_{k=0}^{\alpha(G)} b_k x^k,\]</p><p>where <span>$b_k$</span> is the number of maximal independent sets of size <span>$k$</span> in graph <span>$G=(V, E)$</span>.</p><pre><code class="language-julia hljs">maximal_indenpendence_polynomial = solve(problem, GraphPolynomial())[]</code></pre>10&#8729;x<sup>3</sup> &#43; 5&#8729;x<sup>4</sup><p>One can see the first several coefficients are 0, because it only counts the maximal independent sets, The minimum maximal independent set size is also known as the independent domination number. It can be computed with the <a href="../../ref/#GenericTensorNetworks.SizeMin"><code>SizeMin</code></a> property:</p><pre><code class="language-julia hljs">independent_domination_number = solve(problem, SizeMin())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3.0ₜ</code></pre><p>Similarly, we have its counting <a href="../../ref/#GenericTensorNetworks.CountingMin"><code>CountingMin</code></a>:</p><pre><code class="language-julia hljs">counting_min_maximal_independent_set = solve(problem, CountingMin())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(3.0, 10.0)ₜ</code></pre><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="finding-all-maximal-independent-set"><a class="docs-heading-anchor" href="#finding-all-maximal-independent-set">finding all maximal independent set</a><a id="finding-all-maximal-independent-set-1"></a><a class="docs-heading-anchor-permalink" href="#finding-all-maximal-independent-set" title="Permalink"></a></h5><pre><code class="language-julia hljs">maximal_configs = solve(problem, ConfigsAll())[]
 
 all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">true</code></pre><pre><code class="language-julia hljs">show_gallery(graph, (3, 5); locs=locations, vertex_configs=maximal_configs)</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
@@ -314,138 +314,138 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-a6e12eed">
+     id="img-ef704bc3">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-1">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-1">
   <g transform="translate(107.24,61.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-2">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-2">
   <g transform="translate(108,59.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-3">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-3">
   <g transform="translate(108.76,61.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-4">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-4">
   <g transform="translate(106.78,60.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-5">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-5">
   <g transform="translate(109.22,60.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-6">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-6">
   <g transform="translate(102.73,58.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-7">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-7">
   <g transform="translate(104.74,65.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-8">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-8">
   <g transform="translate(102.67,62.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-9">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-9">
   <g transform="translate(111.26,65.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-10">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-10">
   <g transform="translate(108,66.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-11">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-11">
   <g transform="translate(113.27,58.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-12">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-12">
   <g transform="translate(113.33,62.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-13">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-13">
   <g transform="translate(108,54.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-14">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-14">
   <g transform="translate(104.7,56.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-15">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-15">
   <g transform="translate(111.3,56.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-16">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-16">
   <g transform="translate(104.05,59.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-17">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-17">
   <g transform="translate(105.56,64.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-18">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-18">
   <g transform="translate(110.44,64.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-19">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-19">
   <g transform="translate(111.95,59.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-20">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-20">
   <g transform="translate(108,56.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-21">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-21">
   <g transform="translate(101.41,58.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-22">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-22">
   <g transform="translate(103.93,66.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-23">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-23">
   <g transform="translate(112.07,66.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-24">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-24">
   <g transform="translate(114.59,58.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-25">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-25">
   <g transform="translate(108,53.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-a6e12eed-26">
+<g fill="#000000" font-size="1.1" id="img-ef704bc3-26">
   <g transform="translate(108,53.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -497,132 +497,132 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-27">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-27">
   <g transform="translate(83.24,61.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-28">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-28">
   <g transform="translate(84,59.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-29">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-29">
   <g transform="translate(84.76,61.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-30">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-30">
   <g transform="translate(82.78,60.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-31">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-31">
   <g transform="translate(85.22,60.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-32">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-32">
   <g transform="translate(78.73,58.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-33">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-33">
   <g transform="translate(80.74,65.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-34">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-34">
   <g transform="translate(78.67,62.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-35">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-35">
   <g transform="translate(87.26,65.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-36">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-36">
   <g transform="translate(84,66.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-37">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-37">
   <g transform="translate(89.27,58.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-38">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-38">
   <g transform="translate(89.33,62.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-39">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-39">
   <g transform="translate(84,54.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-40">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-40">
   <g transform="translate(80.7,56.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-41">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-41">
   <g transform="translate(87.3,56.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-42">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-42">
   <g transform="translate(80.05,59.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-43">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-43">
   <g transform="translate(81.56,64.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-44">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-44">
   <g transform="translate(86.44,64.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-45">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-45">
   <g transform="translate(87.95,59.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-46">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-46">
   <g transform="translate(84,56.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-47">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-47">
   <g transform="translate(77.41,58.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-48">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-48">
   <g transform="translate(79.93,66.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-49">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-49">
   <g transform="translate(88.07,66.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-50">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-50">
   <g transform="translate(90.59,58.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-51">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-51">
   <g transform="translate(84,53.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-a6e12eed-52">
+<g fill="#000000" font-size="1.1" id="img-ef704bc3-52">
   <g transform="translate(84,53.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -674,132 +674,132 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-53">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-53">
   <g transform="translate(59.24,61.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-54">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-54">
   <g transform="translate(60,59.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-55">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-55">
   <g transform="translate(60.76,61.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-56">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-56">
   <g transform="translate(58.78,60.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-57">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-57">
   <g transform="translate(61.22,60.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-58">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-58">
   <g transform="translate(54.73,58.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-59">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-59">
   <g transform="translate(56.74,65.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-60">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-60">
   <g transform="translate(54.67,62.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-61">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-61">
   <g transform="translate(63.26,65.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-62">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-62">
   <g transform="translate(60,66.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-63">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-63">
   <g transform="translate(65.27,58.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-64">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-64">
   <g transform="translate(65.33,62.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-65">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-65">
   <g transform="translate(60,54.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-66">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-66">
   <g transform="translate(56.7,56.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-67">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-67">
   <g transform="translate(63.3,56.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-68">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-68">
   <g transform="translate(56.05,59.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-69">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-69">
   <g transform="translate(57.56,64.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-70">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-70">
   <g transform="translate(62.44,64.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-71">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-71">
   <g transform="translate(63.95,59.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-72">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-72">
   <g transform="translate(60,56.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-73">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-73">
   <g transform="translate(53.41,58.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-74">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-74">
   <g transform="translate(55.93,66.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-75">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-75">
   <g transform="translate(64.07,66.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-76">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-76">
   <g transform="translate(66.59,58.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-77">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-77">
   <g transform="translate(60,53.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-a6e12eed-78">
+<g fill="#000000" font-size="1.1" id="img-ef704bc3-78">
   <g transform="translate(60,53.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -851,132 +851,132 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-79">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-79">
   <g transform="translate(35.24,61.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-80">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-80">
   <g transform="translate(36,59.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-81">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-81">
   <g transform="translate(36.76,61.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-82">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-82">
   <g transform="translate(34.78,60.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-83">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-83">
   <g transform="translate(37.22,60.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-84">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-84">
   <g transform="translate(30.73,58.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-85">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-85">
   <g transform="translate(32.74,65.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-86">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-86">
   <g transform="translate(30.67,62.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-87">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-87">
   <g transform="translate(39.26,65.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-88">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-88">
   <g transform="translate(36,66.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-89">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-89">
   <g transform="translate(41.27,58.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-90">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-90">
   <g transform="translate(41.33,62.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-91">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-91">
   <g transform="translate(36,54.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-92">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-92">
   <g transform="translate(32.7,56.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-93">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-93">
   <g transform="translate(39.3,56.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-94">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-94">
   <g transform="translate(32.05,59.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-95">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-95">
   <g transform="translate(33.56,64.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-96">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-96">
   <g transform="translate(38.44,64.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-97">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-97">
   <g transform="translate(39.95,59.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-98">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-98">
   <g transform="translate(36,56.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-99">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-99">
   <g transform="translate(29.41,58.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-100">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-100">
   <g transform="translate(31.93,66.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-101">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-101">
   <g transform="translate(40.07,66.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-102">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-102">
   <g transform="translate(42.59,58.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-103">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-103">
   <g transform="translate(36,53.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-a6e12eed-104">
+<g fill="#000000" font-size="1.1" id="img-ef704bc3-104">
   <g transform="translate(36,53.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -1028,132 +1028,132 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-105">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-105">
   <g transform="translate(11.24,61.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-106">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-106">
   <g transform="translate(12,59.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-107">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-107">
   <g transform="translate(12.76,61.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-108">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-108">
   <g transform="translate(10.78,60.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-109">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-109">
   <g transform="translate(13.22,60.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-110">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-110">
   <g transform="translate(6.73,58.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-111">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-111">
   <g transform="translate(8.74,65.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-112">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-112">
   <g transform="translate(6.67,62.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-113">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-113">
   <g transform="translate(15.26,65.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-114">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-114">
   <g transform="translate(12,66.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-115">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-115">
   <g transform="translate(17.27,58.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-116">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-116">
   <g transform="translate(17.33,62.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-117">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-117">
   <g transform="translate(12,54.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-118">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-118">
   <g transform="translate(8.7,56.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-119">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-119">
   <g transform="translate(15.3,56.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-120">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-120">
   <g transform="translate(8.05,59.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-121">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-121">
   <g transform="translate(9.56,64.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-122">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-122">
   <g transform="translate(14.44,64.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-123">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-123">
   <g transform="translate(15.95,59.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-124">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-124">
   <g transform="translate(12,56.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-125">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-125">
   <g transform="translate(5.41,58.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-126">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-126">
   <g transform="translate(7.93,66.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-127">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-127">
   <g transform="translate(16.07,66.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-128">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-128">
   <g transform="translate(18.59,58.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-129">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-129">
   <g transform="translate(12,53.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-a6e12eed-130">
+<g fill="#000000" font-size="1.1" id="img-ef704bc3-130">
   <g transform="translate(12,53.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -1205,132 +1205,132 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-131">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-131">
   <g transform="translate(107.24,37.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-132">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-132">
   <g transform="translate(108,35.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-133">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-133">
   <g transform="translate(108.76,37.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-134">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-134">
   <g transform="translate(106.78,36.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-135">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-135">
   <g transform="translate(109.22,36.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-136">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-136">
   <g transform="translate(102.73,34.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-137">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-137">
   <g transform="translate(104.74,41.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-138">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-138">
   <g transform="translate(102.67,38.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-139">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-139">
   <g transform="translate(111.26,41.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-140">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-140">
   <g transform="translate(108,42.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-141">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-141">
   <g transform="translate(113.27,34.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-142">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-142">
   <g transform="translate(113.33,38.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-143">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-143">
   <g transform="translate(108,30.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-144">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-144">
   <g transform="translate(104.7,32.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-145">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-145">
   <g transform="translate(111.3,32.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-146">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-146">
   <g transform="translate(104.05,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-147">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-147">
   <g transform="translate(105.56,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-148">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-148">
   <g transform="translate(110.44,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-149">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-149">
   <g transform="translate(111.95,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-150">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-150">
   <g transform="translate(108,32.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-151">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-151">
   <g transform="translate(101.41,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-152">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-152">
   <g transform="translate(103.93,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-153">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-153">
   <g transform="translate(112.07,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-154">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-154">
   <g transform="translate(114.59,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-155">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-155">
   <g transform="translate(108,29.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-a6e12eed-156">
+<g fill="#000000" font-size="1.1" id="img-ef704bc3-156">
   <g transform="translate(108,29.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -1382,132 +1382,132 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-157">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-157">
   <g transform="translate(83.24,37.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-158">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-158">
   <g transform="translate(84,35.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-159">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-159">
   <g transform="translate(84.76,37.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-160">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-160">
   <g transform="translate(82.78,36.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-161">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-161">
   <g transform="translate(85.22,36.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-162">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-162">
   <g transform="translate(78.73,34.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-163">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-163">
   <g transform="translate(80.74,41.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-164">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-164">
   <g transform="translate(78.67,38.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-165">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-165">
   <g transform="translate(87.26,41.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-166">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-166">
   <g transform="translate(84,42.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-167">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-167">
   <g transform="translate(89.27,34.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-168">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-168">
   <g transform="translate(89.33,38.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-169">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-169">
   <g transform="translate(84,30.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-170">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-170">
   <g transform="translate(80.7,32.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-171">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-171">
   <g transform="translate(87.3,32.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-172">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-172">
   <g transform="translate(80.05,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-173">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-173">
   <g transform="translate(81.56,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-174">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-174">
   <g transform="translate(86.44,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-175">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-175">
   <g transform="translate(87.95,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-176">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-176">
   <g transform="translate(84,32.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-177">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-177">
   <g transform="translate(77.41,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-178">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-178">
   <g transform="translate(79.93,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-179">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-179">
   <g transform="translate(88.07,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-180">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-180">
   <g transform="translate(90.59,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-181">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-181">
   <g transform="translate(84,29.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-a6e12eed-182">
+<g fill="#000000" font-size="1.1" id="img-ef704bc3-182">
   <g transform="translate(84,29.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -1559,132 +1559,132 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-183">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-183">
   <g transform="translate(59.24,37.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-184">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-184">
   <g transform="translate(60,35.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-185">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-185">
   <g transform="translate(60.76,37.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-186">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-186">
   <g transform="translate(58.78,36.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-187">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-187">
   <g transform="translate(61.22,36.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-188">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-188">
   <g transform="translate(54.73,34.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-189">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-189">
   <g transform="translate(56.74,41.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-190">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-190">
   <g transform="translate(54.67,38.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-191">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-191">
   <g transform="translate(63.26,41.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-192">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-192">
   <g transform="translate(60,42.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-193">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-193">
   <g transform="translate(65.27,34.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-194">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-194">
   <g transform="translate(65.33,38.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-195">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-195">
   <g transform="translate(60,30.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-196">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-196">
   <g transform="translate(56.7,32.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-197">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-197">
   <g transform="translate(63.3,32.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-198">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-198">
   <g transform="translate(56.05,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-199">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-199">
   <g transform="translate(57.56,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-200">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-200">
   <g transform="translate(62.44,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-201">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-201">
   <g transform="translate(63.95,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-202">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-202">
   <g transform="translate(60,32.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-203">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-203">
   <g transform="translate(53.41,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-204">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-204">
   <g transform="translate(55.93,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-205">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-205">
   <g transform="translate(64.07,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-206">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-206">
   <g transform="translate(66.59,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-207">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-207">
   <g transform="translate(60,29.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-a6e12eed-208">
+<g fill="#000000" font-size="1.1" id="img-ef704bc3-208">
   <g transform="translate(60,29.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -1736,132 +1736,132 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-209">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-209">
   <g transform="translate(35.24,37.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-210">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-210">
   <g transform="translate(36,35.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-211">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-211">
   <g transform="translate(36.76,37.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-212">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-212">
   <g transform="translate(34.78,36.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-213">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-213">
   <g transform="translate(37.22,36.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-214">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-214">
   <g transform="translate(30.73,34.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-215">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-215">
   <g transform="translate(32.74,41.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-216">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-216">
   <g transform="translate(30.67,38.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-217">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-217">
   <g transform="translate(39.26,41.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-218">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-218">
   <g transform="translate(36,42.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-219">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-219">
   <g transform="translate(41.27,34.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-220">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-220">
   <g transform="translate(41.33,38.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-221">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-221">
   <g transform="translate(36,30.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-222">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-222">
   <g transform="translate(32.7,32.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-223">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-223">
   <g transform="translate(39.3,32.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-224">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-224">
   <g transform="translate(32.05,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-225">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-225">
   <g transform="translate(33.56,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-226">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-226">
   <g transform="translate(38.44,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-227">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-227">
   <g transform="translate(39.95,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-228">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-228">
   <g transform="translate(36,32.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-229">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-229">
   <g transform="translate(29.41,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-230">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-230">
   <g transform="translate(31.93,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-231">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-231">
   <g transform="translate(40.07,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-232">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-232">
   <g transform="translate(42.59,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-233">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-233">
   <g transform="translate(36,29.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-a6e12eed-234">
+<g fill="#000000" font-size="1.1" id="img-ef704bc3-234">
   <g transform="translate(36,29.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -1913,132 +1913,132 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-235">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-235">
   <g transform="translate(11.24,37.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-236">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-236">
   <g transform="translate(12,35.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-237">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-237">
   <g transform="translate(12.76,37.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-238">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-238">
   <g transform="translate(10.78,36.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-239">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-239">
   <g transform="translate(13.22,36.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-240">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-240">
   <g transform="translate(6.73,34.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-241">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-241">
   <g transform="translate(8.74,41.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-242">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-242">
   <g transform="translate(6.67,38.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-243">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-243">
   <g transform="translate(15.26,41.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-244">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-244">
   <g transform="translate(12,42.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-245">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-245">
   <g transform="translate(17.27,34.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-246">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-246">
   <g transform="translate(17.33,38.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-247">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-247">
   <g transform="translate(12,30.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-248">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-248">
   <g transform="translate(8.7,32.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-249">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-249">
   <g transform="translate(15.3,32.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-250">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-250">
   <g transform="translate(8.05,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-251">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-251">
   <g transform="translate(9.56,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-252">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-252">
   <g transform="translate(14.44,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-253">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-253">
   <g transform="translate(15.95,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-254">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-254">
   <g transform="translate(12,32.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-255">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-255">
   <g transform="translate(5.41,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-256">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-256">
   <g transform="translate(7.93,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-257">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-257">
   <g transform="translate(16.07,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-258">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-258">
   <g transform="translate(18.59,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-259">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-259">
   <g transform="translate(12,29.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-a6e12eed-260">
+<g fill="#000000" font-size="1.1" id="img-ef704bc3-260">
   <g transform="translate(12,29.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -2090,132 +2090,132 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-261">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-261">
   <g transform="translate(107.24,13.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-262">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-262">
   <g transform="translate(108,11.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-263">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-263">
   <g transform="translate(108.76,13.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-264">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-264">
   <g transform="translate(106.78,12.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-265">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-265">
   <g transform="translate(109.22,12.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-266">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-266">
   <g transform="translate(102.73,10.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-267">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-267">
   <g transform="translate(104.74,17.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-268">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-268">
   <g transform="translate(102.67,14.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-269">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-269">
   <g transform="translate(111.26,17.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-270">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-270">
   <g transform="translate(108,18.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-271">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-271">
   <g transform="translate(113.27,10.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-272">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-272">
   <g transform="translate(113.33,14.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-273">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-273">
   <g transform="translate(108,6.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-274">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-274">
   <g transform="translate(104.7,8.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-275">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-275">
   <g transform="translate(111.3,8.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-276">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-276">
   <g transform="translate(104.05,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-277">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-277">
   <g transform="translate(105.56,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-278">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-278">
   <g transform="translate(110.44,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-279">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-279">
   <g transform="translate(111.95,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-280">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-280">
   <g transform="translate(108,8.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-281">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-281">
   <g transform="translate(101.41,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-282">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-282">
   <g transform="translate(103.93,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-283">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-283">
   <g transform="translate(112.07,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-284">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-284">
   <g transform="translate(114.59,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-285">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-285">
   <g transform="translate(108,5.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-a6e12eed-286">
+<g fill="#000000" font-size="1.1" id="img-ef704bc3-286">
   <g transform="translate(108,5.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -2267,132 +2267,132 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-287">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-287">
   <g transform="translate(83.24,13.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-288">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-288">
   <g transform="translate(84,11.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-289">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-289">
   <g transform="translate(84.76,13.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-290">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-290">
   <g transform="translate(82.78,12.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-291">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-291">
   <g transform="translate(85.22,12.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-292">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-292">
   <g transform="translate(78.73,10.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-293">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-293">
   <g transform="translate(80.74,17.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-294">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-294">
   <g transform="translate(78.67,14.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-295">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-295">
   <g transform="translate(87.26,17.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-296">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-296">
   <g transform="translate(84,18.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-297">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-297">
   <g transform="translate(89.27,10.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-298">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-298">
   <g transform="translate(89.33,14.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-299">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-299">
   <g transform="translate(84,6.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-300">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-300">
   <g transform="translate(80.7,8.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-301">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-301">
   <g transform="translate(87.3,8.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-302">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-302">
   <g transform="translate(80.05,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-303">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-303">
   <g transform="translate(81.56,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-304">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-304">
   <g transform="translate(86.44,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-305">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-305">
   <g transform="translate(87.95,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-306">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-306">
   <g transform="translate(84,8.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-307">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-307">
   <g transform="translate(77.41,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-308">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-308">
   <g transform="translate(79.93,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-309">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-309">
   <g transform="translate(88.07,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-310">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-310">
   <g transform="translate(90.59,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-311">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-311">
   <g transform="translate(84,5.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-a6e12eed-312">
+<g fill="#000000" font-size="1.1" id="img-ef704bc3-312">
   <g transform="translate(84,5.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -2444,132 +2444,132 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-313">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-313">
   <g transform="translate(59.24,13.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-314">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-314">
   <g transform="translate(60,11.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-315">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-315">
   <g transform="translate(60.76,13.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-316">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-316">
   <g transform="translate(58.78,12.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-317">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-317">
   <g transform="translate(61.22,12.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-318">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-318">
   <g transform="translate(54.73,10.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-319">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-319">
   <g transform="translate(56.74,17.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-320">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-320">
   <g transform="translate(54.67,14.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-321">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-321">
   <g transform="translate(63.26,17.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-322">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-322">
   <g transform="translate(60,18.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-323">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-323">
   <g transform="translate(65.27,10.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-324">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-324">
   <g transform="translate(65.33,14.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-325">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-325">
   <g transform="translate(60,6.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-326">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-326">
   <g transform="translate(56.7,8.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-327">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-327">
   <g transform="translate(63.3,8.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-328">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-328">
   <g transform="translate(56.05,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-329">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-329">
   <g transform="translate(57.56,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-330">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-330">
   <g transform="translate(62.44,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-331">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-331">
   <g transform="translate(63.95,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-332">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-332">
   <g transform="translate(60,8.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-333">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-333">
   <g transform="translate(53.41,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-334">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-334">
   <g transform="translate(55.93,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-335">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-335">
   <g transform="translate(64.07,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-336">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-336">
   <g transform="translate(66.59,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-337">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-337">
   <g transform="translate(60,5.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-a6e12eed-338">
+<g fill="#000000" font-size="1.1" id="img-ef704bc3-338">
   <g transform="translate(60,5.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -2621,132 +2621,132 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-339">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-339">
   <g transform="translate(35.24,13.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-340">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-340">
   <g transform="translate(36,11.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-341">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-341">
   <g transform="translate(36.76,13.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-342">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-342">
   <g transform="translate(34.78,12.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-343">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-343">
   <g transform="translate(37.22,12.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-344">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-344">
   <g transform="translate(30.73,10.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-345">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-345">
   <g transform="translate(32.74,17.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-346">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-346">
   <g transform="translate(30.67,14.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-347">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-347">
   <g transform="translate(39.26,17.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-348">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-348">
   <g transform="translate(36,18.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-349">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-349">
   <g transform="translate(41.27,10.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-350">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-350">
   <g transform="translate(41.33,14.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-351">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-351">
   <g transform="translate(36,6.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-352">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-352">
   <g transform="translate(32.7,8.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-353">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-353">
   <g transform="translate(39.3,8.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-354">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-354">
   <g transform="translate(32.05,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-355">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-355">
   <g transform="translate(33.56,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-356">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-356">
   <g transform="translate(38.44,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-357">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-357">
   <g transform="translate(39.95,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-358">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-358">
   <g transform="translate(36,8.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-359">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-359">
   <g transform="translate(29.41,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-360">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-360">
   <g transform="translate(31.93,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-361">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-361">
   <g transform="translate(40.07,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-362">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-362">
   <g transform="translate(42.59,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-363">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-363">
   <g transform="translate(36,5.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-a6e12eed-364">
+<g fill="#000000" font-size="1.1" id="img-ef704bc3-364">
   <g transform="translate(36,5.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -2798,132 +2798,132 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-365">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-365">
   <g transform="translate(11.24,13.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-366">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-366">
   <g transform="translate(12,11.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-367">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-367">
   <g transform="translate(12.76,13.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-368">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-368">
   <g transform="translate(10.78,12.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-369">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-369">
   <g transform="translate(13.22,12.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-370">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-370">
   <g transform="translate(6.73,10.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-371">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-371">
   <g transform="translate(8.74,17.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-372">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-372">
   <g transform="translate(6.67,14.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-373">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-373">
   <g transform="translate(15.26,17.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-374">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-374">
   <g transform="translate(12,18.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-375">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-375">
   <g transform="translate(17.27,10.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-376">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-376">
   <g transform="translate(17.33,14.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-377">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-377">
   <g transform="translate(12,6.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-378">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-378">
   <g transform="translate(8.7,8.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-a6e12eed-379">
+<g stroke-width="0.23" stroke="#000000" id="img-ef704bc3-379">
   <g transform="translate(15.3,8.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-380">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-380">
   <g transform="translate(8.05,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-381">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-381">
   <g transform="translate(9.56,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-382">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-382">
   <g transform="translate(14.44,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-383">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-383">
   <g transform="translate(15.95,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-384">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-384">
   <g transform="translate(12,8.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-385">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-385">
   <g transform="translate(5.41,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-386">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-386">
   <g transform="translate(7.93,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-387">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-387">
   <g transform="translate(16.07,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-a6e12eed-388">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-ef704bc3-388">
   <g transform="translate(18.59,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-a6e12eed-389">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-ef704bc3-389">
   <g transform="translate(12,5.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-a6e12eed-390">
+<g fill="#000000" font-size="1.1" id="img-ef704bc3-390">
   <g transform="translate(12,5.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -3149,138 +3149,138 @@ show_gallery(graph, (2, 5); locs=locations, vertex_configs=minimum_maximal_confi
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-b4baf397">
+     id="img-0b486795">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-1">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-1">
   <g transform="translate(107.24,37.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-2">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-2">
   <g transform="translate(108,35.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-3">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-3">
   <g transform="translate(108.76,37.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-4">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-4">
   <g transform="translate(106.78,36.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-5">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-5">
   <g transform="translate(109.22,36.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-6">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-6">
   <g transform="translate(102.73,34.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-7">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-7">
   <g transform="translate(104.74,41.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-8">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-8">
   <g transform="translate(102.67,38.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-9">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-9">
   <g transform="translate(111.26,41.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-10">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-10">
   <g transform="translate(108,42.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-11">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-11">
   <g transform="translate(113.27,34.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-12">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-12">
   <g transform="translate(113.33,38.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-13">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-13">
   <g transform="translate(108,30.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-14">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-14">
   <g transform="translate(104.7,32.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-15">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-15">
   <g transform="translate(111.3,32.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-16">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-16">
   <g transform="translate(104.05,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-17">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-17">
   <g transform="translate(105.56,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-18">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-18">
   <g transform="translate(110.44,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-19">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-19">
   <g transform="translate(111.95,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-20">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-20">
   <g transform="translate(108,32.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-21">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-21">
   <g transform="translate(101.41,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-22">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-22">
   <g transform="translate(103.93,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-23">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-23">
   <g transform="translate(112.07,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-24">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-24">
   <g transform="translate(114.59,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-25">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-25">
   <g transform="translate(108,29.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-b4baf397-26">
+<g fill="#000000" font-size="1.1" id="img-0b486795-26">
   <g transform="translate(108,29.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -3332,132 +3332,132 @@ show_gallery(graph, (2, 5); locs=locations, vertex_configs=minimum_maximal_confi
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-27">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-27">
   <g transform="translate(83.24,37.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-28">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-28">
   <g transform="translate(84,35.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-29">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-29">
   <g transform="translate(84.76,37.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-30">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-30">
   <g transform="translate(82.78,36.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-31">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-31">
   <g transform="translate(85.22,36.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-32">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-32">
   <g transform="translate(78.73,34.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-33">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-33">
   <g transform="translate(80.74,41.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-34">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-34">
   <g transform="translate(78.67,38.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-35">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-35">
   <g transform="translate(87.26,41.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-36">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-36">
   <g transform="translate(84,42.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-37">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-37">
   <g transform="translate(89.27,34.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-38">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-38">
   <g transform="translate(89.33,38.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-39">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-39">
   <g transform="translate(84,30.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-40">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-40">
   <g transform="translate(80.7,32.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-41">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-41">
   <g transform="translate(87.3,32.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-42">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-42">
   <g transform="translate(80.05,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-43">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-43">
   <g transform="translate(81.56,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-44">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-44">
   <g transform="translate(86.44,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-45">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-45">
   <g transform="translate(87.95,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-46">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-46">
   <g transform="translate(84,32.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-47">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-47">
   <g transform="translate(77.41,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-48">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-48">
   <g transform="translate(79.93,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-49">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-49">
   <g transform="translate(88.07,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-50">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-50">
   <g transform="translate(90.59,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-51">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-51">
   <g transform="translate(84,29.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-b4baf397-52">
+<g fill="#000000" font-size="1.1" id="img-0b486795-52">
   <g transform="translate(84,29.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -3509,132 +3509,132 @@ show_gallery(graph, (2, 5); locs=locations, vertex_configs=minimum_maximal_confi
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-53">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-53">
   <g transform="translate(59.24,37.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-54">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-54">
   <g transform="translate(60,35.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-55">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-55">
   <g transform="translate(60.76,37.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-56">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-56">
   <g transform="translate(58.78,36.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-57">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-57">
   <g transform="translate(61.22,36.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-58">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-58">
   <g transform="translate(54.73,34.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-59">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-59">
   <g transform="translate(56.74,41.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-60">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-60">
   <g transform="translate(54.67,38.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-61">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-61">
   <g transform="translate(63.26,41.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-62">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-62">
   <g transform="translate(60,42.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-63">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-63">
   <g transform="translate(65.27,34.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-64">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-64">
   <g transform="translate(65.33,38.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-65">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-65">
   <g transform="translate(60,30.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-66">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-66">
   <g transform="translate(56.7,32.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-67">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-67">
   <g transform="translate(63.3,32.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-68">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-68">
   <g transform="translate(56.05,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-69">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-69">
   <g transform="translate(57.56,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-70">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-70">
   <g transform="translate(62.44,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-71">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-71">
   <g transform="translate(63.95,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-72">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-72">
   <g transform="translate(60,32.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-73">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-73">
   <g transform="translate(53.41,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-74">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-74">
   <g transform="translate(55.93,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-75">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-75">
   <g transform="translate(64.07,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-76">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-76">
   <g transform="translate(66.59,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-77">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-77">
   <g transform="translate(60,29.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-b4baf397-78">
+<g fill="#000000" font-size="1.1" id="img-0b486795-78">
   <g transform="translate(60,29.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -3686,132 +3686,132 @@ show_gallery(graph, (2, 5); locs=locations, vertex_configs=minimum_maximal_confi
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-79">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-79">
   <g transform="translate(35.24,37.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-80">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-80">
   <g transform="translate(36,35.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-81">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-81">
   <g transform="translate(36.76,37.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-82">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-82">
   <g transform="translate(34.78,36.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-83">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-83">
   <g transform="translate(37.22,36.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-84">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-84">
   <g transform="translate(30.73,34.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-85">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-85">
   <g transform="translate(32.74,41.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-86">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-86">
   <g transform="translate(30.67,38.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-87">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-87">
   <g transform="translate(39.26,41.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-88">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-88">
   <g transform="translate(36,42.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-89">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-89">
   <g transform="translate(41.27,34.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-90">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-90">
   <g transform="translate(41.33,38.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-91">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-91">
   <g transform="translate(36,30.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-92">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-92">
   <g transform="translate(32.7,32.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-93">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-93">
   <g transform="translate(39.3,32.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-94">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-94">
   <g transform="translate(32.05,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-95">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-95">
   <g transform="translate(33.56,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-96">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-96">
   <g transform="translate(38.44,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-97">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-97">
   <g transform="translate(39.95,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-98">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-98">
   <g transform="translate(36,32.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-99">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-99">
   <g transform="translate(29.41,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-100">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-100">
   <g transform="translate(31.93,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-101">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-101">
   <g transform="translate(40.07,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-102">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-102">
   <g transform="translate(42.59,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-103">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-103">
   <g transform="translate(36,29.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-b4baf397-104">
+<g fill="#000000" font-size="1.1" id="img-0b486795-104">
   <g transform="translate(36,29.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -3863,132 +3863,132 @@ show_gallery(graph, (2, 5); locs=locations, vertex_configs=minimum_maximal_confi
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-105">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-105">
   <g transform="translate(11.24,37.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-106">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-106">
   <g transform="translate(12,35.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-107">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-107">
   <g transform="translate(12.76,37.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-108">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-108">
   <g transform="translate(10.78,36.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-109">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-109">
   <g transform="translate(13.22,36.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-110">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-110">
   <g transform="translate(6.73,34.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-111">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-111">
   <g transform="translate(8.74,41.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-112">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-112">
   <g transform="translate(6.67,38.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-113">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-113">
   <g transform="translate(15.26,41.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-114">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-114">
   <g transform="translate(12,42.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-115">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-115">
   <g transform="translate(17.27,34.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-116">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-116">
   <g transform="translate(17.33,38.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-117">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-117">
   <g transform="translate(12,30.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-118">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-118">
   <g transform="translate(8.7,32.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-119">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-119">
   <g transform="translate(15.3,32.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-120">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-120">
   <g transform="translate(8.05,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-121">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-121">
   <g transform="translate(9.56,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-122">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-122">
   <g transform="translate(14.44,40.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-123">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-123">
   <g transform="translate(15.95,35.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-124">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-124">
   <g transform="translate(12,32.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-125">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-125">
   <g transform="translate(5.41,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-126">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-126">
   <g transform="translate(7.93,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-127">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-127">
   <g transform="translate(16.07,42.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-128">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-128">
   <g transform="translate(18.59,34.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-129">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-129">
   <g transform="translate(12,29.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-b4baf397-130">
+<g fill="#000000" font-size="1.1" id="img-0b486795-130">
   <g transform="translate(12,29.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -4040,132 +4040,132 @@ show_gallery(graph, (2, 5); locs=locations, vertex_configs=minimum_maximal_confi
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-131">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-131">
   <g transform="translate(107.24,13.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-132">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-132">
   <g transform="translate(108,11.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-133">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-133">
   <g transform="translate(108.76,13.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-134">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-134">
   <g transform="translate(106.78,12.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-135">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-135">
   <g transform="translate(109.22,12.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-136">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-136">
   <g transform="translate(102.73,10.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-137">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-137">
   <g transform="translate(104.74,17.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-138">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-138">
   <g transform="translate(102.67,14.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-139">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-139">
   <g transform="translate(111.26,17.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-140">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-140">
   <g transform="translate(108,18.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-141">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-141">
   <g transform="translate(113.27,10.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-142">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-142">
   <g transform="translate(113.33,14.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-143">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-143">
   <g transform="translate(108,6.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-144">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-144">
   <g transform="translate(104.7,8.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-145">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-145">
   <g transform="translate(111.3,8.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-146">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-146">
   <g transform="translate(104.05,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-147">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-147">
   <g transform="translate(105.56,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-148">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-148">
   <g transform="translate(110.44,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-149">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-149">
   <g transform="translate(111.95,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-150">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-150">
   <g transform="translate(108,8.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-151">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-151">
   <g transform="translate(101.41,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-152">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-152">
   <g transform="translate(103.93,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-153">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-153">
   <g transform="translate(112.07,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-154">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-154">
   <g transform="translate(114.59,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-155">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-155">
   <g transform="translate(108,5.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-b4baf397-156">
+<g fill="#000000" font-size="1.1" id="img-0b486795-156">
   <g transform="translate(108,5.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -4217,132 +4217,132 @@ show_gallery(graph, (2, 5); locs=locations, vertex_configs=minimum_maximal_confi
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-157">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-157">
   <g transform="translate(83.24,13.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-158">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-158">
   <g transform="translate(84,11.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-159">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-159">
   <g transform="translate(84.76,13.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-160">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-160">
   <g transform="translate(82.78,12.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-161">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-161">
   <g transform="translate(85.22,12.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-162">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-162">
   <g transform="translate(78.73,10.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-163">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-163">
   <g transform="translate(80.74,17.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-164">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-164">
   <g transform="translate(78.67,14.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-165">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-165">
   <g transform="translate(87.26,17.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-166">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-166">
   <g transform="translate(84,18.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-167">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-167">
   <g transform="translate(89.27,10.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-168">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-168">
   <g transform="translate(89.33,14.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-169">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-169">
   <g transform="translate(84,6.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-170">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-170">
   <g transform="translate(80.7,8.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-171">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-171">
   <g transform="translate(87.3,8.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-172">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-172">
   <g transform="translate(80.05,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-173">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-173">
   <g transform="translate(81.56,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-174">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-174">
   <g transform="translate(86.44,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-175">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-175">
   <g transform="translate(87.95,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-176">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-176">
   <g transform="translate(84,8.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-177">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-177">
   <g transform="translate(77.41,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-178">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-178">
   <g transform="translate(79.93,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-179">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-179">
   <g transform="translate(88.07,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-180">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-180">
   <g transform="translate(90.59,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-181">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-181">
   <g transform="translate(84,5.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-b4baf397-182">
+<g fill="#000000" font-size="1.1" id="img-0b486795-182">
   <g transform="translate(84,5.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -4394,132 +4394,132 @@ show_gallery(graph, (2, 5); locs=locations, vertex_configs=minimum_maximal_confi
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-183">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-183">
   <g transform="translate(59.24,13.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-184">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-184">
   <g transform="translate(60,11.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-185">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-185">
   <g transform="translate(60.76,13.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-186">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-186">
   <g transform="translate(58.78,12.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-187">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-187">
   <g transform="translate(61.22,12.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-188">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-188">
   <g transform="translate(54.73,10.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-189">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-189">
   <g transform="translate(56.74,17.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-190">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-190">
   <g transform="translate(54.67,14.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-191">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-191">
   <g transform="translate(63.26,17.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-192">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-192">
   <g transform="translate(60,18.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-193">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-193">
   <g transform="translate(65.27,10.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-194">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-194">
   <g transform="translate(65.33,14.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-195">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-195">
   <g transform="translate(60,6.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-196">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-196">
   <g transform="translate(56.7,8.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-197">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-197">
   <g transform="translate(63.3,8.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-198">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-198">
   <g transform="translate(56.05,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-199">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-199">
   <g transform="translate(57.56,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-200">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-200">
   <g transform="translate(62.44,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-201">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-201">
   <g transform="translate(63.95,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-202">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-202">
   <g transform="translate(60,8.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-203">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-203">
   <g transform="translate(53.41,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-204">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-204">
   <g transform="translate(55.93,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-205">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-205">
   <g transform="translate(64.07,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-206">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-206">
   <g transform="translate(66.59,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-207">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-207">
   <g transform="translate(60,5.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-b4baf397-208">
+<g fill="#000000" font-size="1.1" id="img-0b486795-208">
   <g transform="translate(60,5.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -4571,132 +4571,132 @@ show_gallery(graph, (2, 5); locs=locations, vertex_configs=minimum_maximal_confi
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-209">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-209">
   <g transform="translate(35.24,13.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-210">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-210">
   <g transform="translate(36,11.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-211">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-211">
   <g transform="translate(36.76,13.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-212">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-212">
   <g transform="translate(34.78,12.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-213">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-213">
   <g transform="translate(37.22,12.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-214">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-214">
   <g transform="translate(30.73,10.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-215">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-215">
   <g transform="translate(32.74,17.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-216">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-216">
   <g transform="translate(30.67,14.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-217">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-217">
   <g transform="translate(39.26,17.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-218">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-218">
   <g transform="translate(36,18.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-219">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-219">
   <g transform="translate(41.27,10.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-220">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-220">
   <g transform="translate(41.33,14.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-221">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-221">
   <g transform="translate(36,6.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-222">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-222">
   <g transform="translate(32.7,8.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-223">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-223">
   <g transform="translate(39.3,8.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-224">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-224">
   <g transform="translate(32.05,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-225">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-225">
   <g transform="translate(33.56,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-226">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-226">
   <g transform="translate(38.44,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-227">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-227">
   <g transform="translate(39.95,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-228">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-228">
   <g transform="translate(36,8.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-229">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-229">
   <g transform="translate(29.41,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-230">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-230">
   <g transform="translate(31.93,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-231">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-231">
   <g transform="translate(40.07,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-232">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-232">
   <g transform="translate(42.59,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-233">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-233">
   <g transform="translate(36,5.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-b4baf397-234">
+<g fill="#000000" font-size="1.1" id="img-0b486795-234">
   <g transform="translate(36,5.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -4748,132 +4748,132 @@ show_gallery(graph, (2, 5); locs=locations, vertex_configs=minimum_maximal_confi
     </g>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-235">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-235">
   <g transform="translate(11.24,13.75)">
     <path fill="none" d="M3.2,2.39 L-3.2,-2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-236">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-236">
   <g transform="translate(12,11.36)">
     <path fill="none" d="M3.95,0 L-3.95,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-237">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-237">
   <g transform="translate(12.76,13.75)">
     <path fill="none" d="M3.2,-2.39 L-3.2,2.39 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-238">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-238">
   <g transform="translate(10.78,12.27)">
     <path fill="none" d="M1.22,-3.87 L-1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-239">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-239">
   <g transform="translate(13.22,12.27)">
     <path fill="none" d="M-1.22,-3.87 L1.22,3.87 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-240">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-240">
   <g transform="translate(6.73,10.92)">
     <path fill="none" d="M-1.32,-0.44 L1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-241">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-241">
   <g transform="translate(8.74,17.29)">
     <path fill="none" d="M-0.81,1.15 L0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-242">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-242">
   <g transform="translate(6.67,14.46)">
     <path fill="none" d="M1.26,3.98 L-1.26,-3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-243">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-243">
   <g transform="translate(15.26,17.29)">
     <path fill="none" d="M0.81,1.15 L-0.81,-1.15 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-244">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-244">
   <g transform="translate(12,18.44)">
     <path fill="none" d="M4.07,0 L-4.07,0 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-245">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-245">
   <g transform="translate(17.27,10.92)">
     <path fill="none" d="M1.32,-0.44 L-1.32,0.44 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-246">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-246">
   <g transform="translate(17.33,14.46)">
     <path fill="none" d="M1.26,-3.98 L-1.26,3.98 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-247">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-247">
   <g transform="translate(12,6.98)">
     <path fill="none" d="M0,-1.42 L0,1.42 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-248">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-248">
   <g transform="translate(8.7,8.02)">
     <path fill="none" d="M3.3,-2.46 L-3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" stroke="#000000" id="img-b4baf397-249">
+<g stroke-width="0.23" stroke="#000000" id="img-0b486795-249">
   <g transform="translate(15.3,8.02)">
     <path fill="none" d="M-3.3,-2.46 L3.3,2.46 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-250">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-250">
   <g transform="translate(8.05,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-251">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-251">
   <g transform="translate(9.56,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-252">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-252">
   <g transform="translate(14.44,16.14)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-253">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-253">
   <g transform="translate(15.95,11.36)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-254">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-254">
   <g transform="translate(12,8.41)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-255">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-255">
   <g transform="translate(5.41,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-256">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-256">
   <g transform="translate(7.93,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-257">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-257">
   <g transform="translate(16.07,18.44)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-b4baf397-258">
+<g stroke-width="0.23" fill="#FF0000" stroke="#000000" id="img-0b486795-258">
   <g transform="translate(18.59,10.48)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-b4baf397-259">
+<g stroke-width="0.23" fill="#FFFFFF" stroke="#000000" id="img-0b486795-259">
   <g transform="translate(12,5.56)">
     <circle cx="0" cy="0" r="1.16" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="1.1" id="img-b4baf397-260">
+<g fill="#000000" font-size="1.1" id="img-0b486795-260">
   <g transform="translate(12,5.56)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -5072,4 +5072,4 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 
 ]]> </script>
 </svg>
-<p>Similarly, if one is only interested in computing one of the minimum sets, one can use the graph property <a href="../../ref/#GenericTensorNetworks.SingleConfigMin"><code>SingleConfigMin</code></a>.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../IndependentSet/">« Independent set problem</a><a class="docs-footer-nextpage" href="../MaxCut/">Cutting problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.15 on <span class="colophon-date" title="Monday 11 April 2022 03:14">Monday 11 April 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+<p>Similarly, if one is only interested in computing one of the minimum sets, one can use the graph property <a href="../../ref/#GenericTensorNetworks.SingleConfigMin"><code>SingleConfigMin</code></a>.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../IndependentSet/">« Independent set problem</a><a class="docs-footer-nextpage" href="../MaxCut/">Cutting problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.15 on <span class="colophon-date" title="Tuesday 12 April 2022 07:47">Tuesday 12 April 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

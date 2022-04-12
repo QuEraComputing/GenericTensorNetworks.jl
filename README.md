@@ -1,7 +1,7 @@
 # GenericTensorNetworks
 
 [![Build Status](https://github.com/QuEraComputing/GenericTensorNetworks.jl/workflows/CI/badge.svg)](https://github.com/QuEraComputing/GenericTensorNetworks.jl/actions)
-[![codecov](https://codecov.io/gh/QuEraComputing/GenericTensorNetworks.jl/branch/main/graph/badge.svg?token=vwWQntOxvG)](https://codecov.io/gh/QuEraComputing/GenericTensorNetworks.jl)
+[![codecov](https://codecov.io/gh/QuEraComputing/GenericTensorNetworks.jl/branch/master/graph/badge.svg?token=vwWQntOxvG)](https://codecov.io/gh/QuEraComputing/GenericTensorNetworks.jl)
 [![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/)
 
 ## Installation

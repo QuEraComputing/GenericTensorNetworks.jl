@@ -54,7 +54,7 @@ The subsequent runs will be fast.
 The following diagram lists possible combinations of input arguments, where functions in the `Graph` are mainly defined in the package [Graphs](https://github.com/JuliaGraphs/Graphs.jl), and the rest can be found in this package.
 ```@raw html
 <div align=center>
-<img src="assets/fig7.png" width="75%"/>
+<img src="assets/fig7.svg" width="75%"/>
 </div>
 ```⠀
 You can find many examples in this documentation, a good one to start with is [solving the independent set problem](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/IndependentSet/).

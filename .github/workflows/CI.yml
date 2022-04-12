@@ -57,9 +57,6 @@ jobs:
       - uses: codecov/codecov-action@v1
         with:
           file: lcov.info
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          flag-name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
-          parallel: false
 
   finish:
       needs: [pre_job, test]

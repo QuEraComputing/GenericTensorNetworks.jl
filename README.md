@@ -4,6 +4,16 @@
 [![codecov](https://codecov.io/gh/QuEraComputing/GenericTensorNetworks.jl/branch/master/graph/badge.svg?token=vwWQntOxvG)](https://codecov.io/gh/QuEraComputing/GenericTensorNetworks.jl)
 [![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/)
 
+
+This package implements generic tensor networks to compute *solution space properties* of a class of hard combinatorial problems.
+The *solution space properties* include
+* The maximum/minimum solution sizes,
+* The number of solutions at certain sizes,
+* The enumeration of solutions at certain sizes.
+* The direct sampling of solutions at certain sizes.
+
+The solvable problems include [Independent set problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/tutorials/IndependentSet/), [Maximal independent set problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/tutorials/MaximalIS/), [Cutting problem (Spin-glass problem)](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/tutorials/MaxCut/), [Vertex matching problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/tutorials/Matching/), [Binary paint shop problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/tutorials/PaintShop/), [Coloring problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/tutorials/Coloring/), [Dominating set problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/tutorials/DominatingSet/), [Set packing problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/tutorials/SetPacking/), [Satisfiability problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/tutorials/Satisfiability/) and [Set covering problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/tutorials/SetCovering/).
+
 ## Installation
 <p>
 GenericTensorNetworks is a &nbsp;

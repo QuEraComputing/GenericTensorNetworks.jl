@@ -36,3 +36,13 @@ end
     p7 = graph_polynomial(gp, Val(:finitefield))[]
     @test p6 ≈ p7
 end
+
+@testset "open indices" begin
+    g = SimpleGraph(3)
+    for (i,j) in [(1,2), (2,3)]
+        add_edge!(g, i, j)
+    end
+    m1 = solve(IndependentSet(g; openvertices=(1,3)), GraphPolynomial())
+    m2 = solve(IndependentSet(g; openvertices=(1,3)), GraphPolynomial(;method=:polynomial))
+    @test m1 == m2
+end

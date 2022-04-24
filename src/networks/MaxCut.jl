@@ -11,26 +11,37 @@ struct MaxCut{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
     code::CT
     graph::SimpleGraph{Int}
     weights::WT
+    fix_config
 end
-function MaxCut(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+function MaxCut(g::SimpleGraph; weights=NoWeight(), openvertices=(), fix_config=Dict(), optimizer=GreedyMethod(), simplifier=nothing)
     @assert weights isa NoWeight || length(weights) == ne(g)
     rawcode = EinCode([[minmax(e.src,e.dst)...] for e in Graphs.edges(g)], collect(Int, openvertices))  # labels for edge tensors
-    MaxCut(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), g, weights)
+    size_dict = uniformsize(rawcode, 2)
+    for key in keys(fix_config)
+        size_dict[key] = 1
+    end
+    MaxCut(_optimize_code(rawcode, size_dict, optimizer, simplifier), g, weights, fix_config)
 end
 
 flavors(::Type{<:MaxCut}) = [0, 1]
 get_weights(gp::MaxCut, i::Int) = [0, gp.weights[i]]
 terms(gp::MaxCut) = getixsv(gp.code)
 labels(gp::MaxCut) = [1:nv(gp.graph)...]
+select_dims(gp::MaxCut, ix) = (ix[1] ∉ keys(gp.fix_config) ? (1:2) : (gp.fix_config[ix[1]]+1:gp.fix_config[ix[1]]+1), ix[2] ∉ keys(gp.fix_config) ? (1:2) : (gp.fix_config[ix[2]]+1:gp.fix_config[ix[2]]+1))
 
 function generate_tensors(x::T, gp::MaxCut) where T
     ixs = getixsv(gp.code)
-    return add_labels!(map(enumerate(ixs)) do (i, ix)
-        maxcutb((Ref(x) .^ get_weights(gp, i)) ...)
-    end, ixs, labels(gp))
+    tensors = map(enumerate(ixs)) do (i, ix)
+        maxcutb((Ref(x) .^ get_weights(gp, i), select_dims(gp, ix)) ...)
+    end
+    return add_labels!(tensors, ixs, labels(gp), gp.fix_config)
 end
-function maxcutb(a, b)
-    return [a b; b a]
+
+function maxcutb(x, select_dims=(1:2,1:2))
+    a, b = x
+    m = [a b; b a]
+    m = m[select_dims[1], select_dims[2]]
+    return m
 end
 
 """

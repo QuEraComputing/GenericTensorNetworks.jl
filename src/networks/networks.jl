@@ -129,11 +129,12 @@ end
 add_labels!(tensors::AbstractVector{<:AbstractArray}, ixs, labels) = tensors
 
 const SetPolyNumbers{T} = Union{Polynomial{T}, TruncatedPoly{K,T} where K, CountingTropical{TV,T} where TV} where T<:AbstractSetNumber
-function add_labels!(tensors::AbstractVector{<:AbstractArray{T}}, ixs, labels) where T <: Union{AbstractSetNumber, SetPolyNumbers, ExtendedTropical{K,T} where {K,T<:SetPolyNumbers}}
+function add_labels!(tensors::AbstractVector{<:AbstractArray{T}}, ixs, labels, fix_config=Dict()) where T <: Union{AbstractSetNumber, SetPolyNumbers, ExtendedTropical{K,T} where {K,T<:SetPolyNumbers}}
     for (t, ix) in zip(tensors, ixs)
         for (dim, l) in enumerate(ix)
             index = findfirst(==(l), labels)
-            v = [_onehotv(T, index, k-1) for k=1:size(t, dim)]
+            config = l ∈ keys(fix_config) ? (fix_config[l]+1:fix_config[l]+1) : (1:size(t, dim))
+            v = [_onehotv(T, index, k-1) for k=config]#1:size(t, dim)]
             t .*= reshape(v, ntuple(j->dim==j ? length(v) : 1, ndims(t)))
         end
     end

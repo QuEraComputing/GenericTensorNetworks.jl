@@ -32,7 +32,7 @@ end
 
 @testset "enumerating" begin
     rawcode = IndependentSet(smallgraph(:petersen); optimizer=nothing)
-    optcode = IndependentSet(optimize_code(rawcode.code, uniformsize(rawcode.code, 2), GreedyMethod()), smallgraph(:petersen), NoWeight())
+    optcode = IndependentSet(optimize_code(rawcode.code, uniformsize(rawcode.code, 2), GreedyMethod()), smallgraph(:petersen), NoWeight(), Dict{Int,Int}())
     for code in [rawcode, optcode]
         res0 = max_size(code)
         _, res1 = max_size_count(code)

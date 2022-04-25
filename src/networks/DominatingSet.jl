@@ -11,25 +11,27 @@ struct DominatingSet{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphPro
     code::CT
     graph::SimpleGraph{Int}
     weights::WT
+    fixedvertices::Dict{Int,Int}
 end
 
-function DominatingSet(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+function DominatingSet(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
     @assert weights isa NoWeight || length(weights) == nv(g)
     rawcode = EinCode(([[Graphs.neighbors(g, v)..., v] for v in Graphs.vertices(g)]...,), collect(Int, openvertices))
-    DominatingSet(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), g, weights)
+    DominatingSet(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), g, weights, fixedvertices)
 end
 
 flavors(::Type{<:DominatingSet}) = [0, 1]
 get_weights(gp::DominatingSet, i::Int) = [0, gp.weights[i]]
 terms(gp::DominatingSet) = getixsv(gp.code)
 labels(gp::DominatingSet) = [1:length(getixsv(gp.code))...]
+fixedvertices(gp::DominatingSet) = gp.fixedvertices
 
 function generate_tensors(x::T, mi::DominatingSet) where T
     ixs = getixsv(mi.code)
     isempty(ixs) && return []
-	return add_labels!(map(enumerate(ixs)) do (i, ix)
+	return select_dims(add_labels!(map(enumerate(ixs)) do (i, ix)
         dominating_set_tensor((Ref(x) .^ get_weights(mi, i))..., length(ix))
-    end, ixs, labels(mi))
+    end, ixs, labels(mi)), ixs, fixedvertices(mi))
 end
 function dominating_set_tensor(a::T, b::T, d::Int) where T
     t = zeros(T, fill(2, d)...)

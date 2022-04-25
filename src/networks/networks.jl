@@ -11,7 +11,7 @@ Base.eltype(::NoWeight) = Int
 
 ######## Interfaces for graph problems ##########
 """
-    get_weights(problem::GraphProblem, sym)
+    get_weights(problem::GraphProblem, sym) -> Vector
 
 The weights for the degree of freedom specified by `sym` of the graph problem, where `sym` is a symbol.
 In graph polynomial, integer weights are the orders of `x`.
@@ -19,7 +19,7 @@ In graph polynomial, integer weights are the orders of `x`.
 function get_weights end
 
 """
-    labels(problem::GraphProblem)
+    labels(problem::GraphProblem) -> Vector
 
 The labels of a graph problem is defined as the degrees of freedoms in the graph problem.
 e.g. for the maximum independent set problems, they are the indices of vertices: 1, 2, 3...,
@@ -28,7 +28,7 @@ while for the max cut problem, they are the edges.
 function labels end
 
 """
-    terms(problem::GraphProblem)
+    terms(problem::GraphProblem) -> Vector
 
 The terms of a graph problem is defined as the tensor labels that defining local energies (or weights) in the graph problem.
 e.g. for the maximum independent set problems, they are the vertex-tensor labels: [1], [2], [3]...
@@ -37,7 +37,15 @@ The weight of a term is same as the power of `x` in the graph polynomial.
 function terms end
 
 """
-    flavors(::Type{<:GraphProblem})
+    fixedvertices(problem::GraphProblem) -> Dict
+
+Fix degree of freedoms in a graph problem to a certain value using a dict, where the key is a label, and the value should be in, e.g. [0, 1] in the indepenent set problem.
+When a degree of freedom is fixed, its size is 1. The optimal tensor network contraction order is then different from the default case.
+"""
+function fixedvertices end
+
+"""
+    flavors(::Type{<:GraphProblem}) -> Vector
 
 It returns a vector of integers as the flavors of a degree of freedom.
 Its size is the same as the degree of freedom on a single vertex/edge.
@@ -45,7 +53,7 @@ Its size is the same as the degree of freedom on a single vertex/edge.
 flavors(::GT) where GT<:GraphProblem = flavors(GT)
 
 """
-    nflavor(::Type{<:GraphProblem})
+    nflavor(::Type{<:GraphProblem}) -> Int
 
 Bond size is equal to the number of flavors.
 """
@@ -125,20 +133,40 @@ function contractx(gp::GraphProblem, x; usecuda=false)
     end
 end
 
+function uniformsize_fix(code, dim, fixedvertices)
+    size_dict = uniformsize(code, dim)
+    for key in keys(fixedvertices)
+        size_dict[key] = 1
+    end
+    return size_dict
+end
+
 # multiply labels vectors to the generate tensor.
 add_labels!(tensors::AbstractVector{<:AbstractArray}, ixs, labels) = tensors
 
 const SetPolyNumbers{T} = Union{Polynomial{T}, TruncatedPoly{K,T} where K, CountingTropical{TV,T} where TV} where T<:AbstractSetNumber
-function add_labels!(tensors::AbstractVector{<:AbstractArray{T}}, ixs, labels, fix_config=Dict()) where T <: Union{AbstractSetNumber, SetPolyNumbers, ExtendedTropical{K,T} where {K,T<:SetPolyNumbers}}
+function add_labels!(tensors::AbstractVector{<:AbstractArray{T}}, ixs, labels) where T <: Union{AbstractSetNumber, SetPolyNumbers, ExtendedTropical{K,T} where {K,T<:SetPolyNumbers}}
     for (t, ix) in zip(tensors, ixs)
         for (dim, l) in enumerate(ix)
             index = findfirst(==(l), labels)
-            config = l ∈ keys(fix_config) ? (fix_config[l]+1:fix_config[l]+1) : (1:size(t, dim))
-            v = [_onehotv(T, index, k-1) for k=config]#1:size(t, dim)]
+            # config = l ∈ keys(fix_config) ? (fix_config[l]+1:fix_config[l]+1) : (1:size(t, dim))
+            v = [_onehotv(T, index, k-1) for k=1:size(t, dim)]
             t .*= reshape(v, ntuple(j->dim==j ? length(v) : 1, ndims(t)))
         end
     end
     return tensors
+end
+
+# select dimensions from tensors
+# `tensors` is a vector of tensors,
+# `ixs` is the tensor labels for `tensors`.
+# `fixedvertices` is a dictionary specifying the fixed dimensions, check [`fixedvertices`](@ref)
+function select_dims(tensors::AbstractVector{<:AbstractArray{T}}, ixs, fixedvertices::AbstractDict) where T
+    isempty(fixedvertices) && return tensors
+    map(tensors, ixs) do t, ix
+        dims = map(ixi->ixi ∉ keys(fixedvertices) ? Colon() : (fixedvertices[ixi]+1:fixedvertices[ixi]+1), ix)
+        t[dims...]
+    end
 end
 
 # TODOs:

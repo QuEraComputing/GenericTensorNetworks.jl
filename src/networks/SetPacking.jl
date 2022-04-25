@@ -31,27 +31,29 @@ struct SetPacking{ET, CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphPr
     code::CT
     sets::Vector{Vector{ET}}
     weights::WT
+    fixedvertices::Dict{ET,Int}
 end
 
-function SetPacking(sets; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+function SetPacking(sets::AbstractVector{Vector{ET}}; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{ET,Int}()) where ET
     nsets = length(sets)
     @assert weights isa NoWeight || length(weights) == nsets
     code = EinCode(vcat([[i] for i=1:nsets], [[i,j] for i=1:nsets,j=1:nsets if j>i && !isempty(sets[i] ∩ sets[j])]), collect(Int,openvertices))
-    SetPacking(_optimize_code(code, uniformsize(code, 2), optimizer, simplifier), sets, weights)
+    SetPacking(_optimize_code(code, uniformsize_fix(code, 2, openvertices), optimizer, simplifier), sets, weights, fixedvertices)
 end
 
 flavors(::Type{<:SetPacking}) = [0, 1]
 get_weights(gp::SetPacking, i::Int) = [0, gp.weights[i]]
 terms(gp::SetPacking) = getixsv(gp.code)[1:length(gp.sets)]
 labels(gp::SetPacking) = [1:length(gp.sets)...]
+fixedvertices(gp::SetPacking) = gp.fixedvertices
 
 # generate tensors
 function generate_tensors(x::T, gp::SetPacking) where T
     length(gp.sets) == 0 && return []
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors
-    return vcat(add_labels!([misv(Ref(x) .^ get_weights(gp, i)) for i=1:length(gp.sets)], ixs[1:length(gp.sets)], labels(gp)),
-            [misb(T, length(ix)) for ix in ixs[length(gp.sets)+1:end]]
+    return select_dims(vcat(add_labels!([misv(Ref(x) .^ get_weights(gp, i)) for i=1:length(gp.sets)], ixs[1:length(gp.sets)], labels(gp)),
+            [misb(T, length(ix)) for ix in ixs[length(gp.sets)+1:end]]), ixs, fixedvertices(gp),
     )
 end
 

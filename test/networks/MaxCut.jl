@@ -40,3 +40,14 @@ end
     @test cut_size(g, res.c.data[1]) == 5
 end
 
+@testset "fix vertices - max vut" begin
+    g = SimpleGraph(5)
+    for (i,j) in [(1,2),(2,3),(3,4),(4,1),(1,5),(2,4)]
+        add_edge!(g, i, j)
+    end
+    fixedvertices = Dict(1=>1, 4=>0)
+    problem = MaxCut(g, fixedvertices=fixedvertices)
+    optimal_config = solve(problem, ConfigsMax())[].c
+    @test length(optimal_config) == 1
+    @test optimal_config[1] == StaticBitVector(Array{Bool, 1}([1, 0, 1, 0, 0]))
+end

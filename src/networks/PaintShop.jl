@@ -31,18 +31,19 @@ struct PaintShop{CT<:AbstractEinsum,LT} <: GraphProblem
     code::CT
     sequence::Vector{LT}
     isfirst::Vector{Bool}
+    fixedvertices::Dict{LT,Int}
 end
 
-function paintshop_from_pairs(pairs::AbstractVector{Tuple{Int,Int}}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+function paintshop_from_pairs(pairs::AbstractVector{Tuple{Int,Int}}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{LT,Int}())
     n = length(pairs)
     @assert sort!(vcat(collect.(pairs)...)) == collect(1:2n)
     sequence = zeros(Int, 2*n)
     @inbounds for i=1:n
         sequence[pairs[i]] .= i
     end
-    return PaintShop(pairs; openvertices, optimizer, simplifier)
+    return PaintShop(pairs; openvertices, optimizer, simplifier, fixedvertices)
 end
-function PaintShop(sequence::AbstractVector{T}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing) where T
+function PaintShop(sequence::AbstractVector{T}; openvertices=(), fixedvertices=Dict{T,Int}(), optimizer=GreedyMethod(), simplifier=nothing) where T
     @assert all(l->count(==(l), sequence)==2, sequence)
     n = length(sequence)
     isfirst = [findfirst(==(sequence[i]), sequence) == i for i=1:n]
@@ -50,18 +51,19 @@ function PaintShop(sequence::AbstractVector{T}; openvertices=(), optimizer=Greed
                 [[sequence[i], sequence[i+1]] for i=1:n-1], # labels for edge tensors
                 ),
                 collect(T, openvertices))
-    PaintShop(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), sequence, isfirst)
+    PaintShop(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), sequence, isfirst, fixedvertices)
 end
 
 flavors(::Type{<:PaintShop}) = [0, 1]
 get_weights(::PaintShop, i::Int) = [0, 1]
 terms(gp::PaintShop) = getixsv(gp.code)
 labels(gp::PaintShop) = unique(gp.sequence)
+fixedvertices(gp::PaintShop) = gp.fixedvertices
 
 function generate_tensors(x::T, c::PaintShop) where T
     ixs = getixsv(c.code)
     tensors = [paintshop_bond_tensor((Ref(x) .^ get_weights(c, i))...) for i=1:length(ixs)]
-    return add_labels!([flip_labels(tensors[i], c.isfirst[i], c.isfirst[i+1]) for i=1:length(ixs)], ixs, labels(c))
+    return select_dims(add_labels!([flip_labels(tensors[i], c.isfirst[i], c.isfirst[i+1]) for i=1:length(ixs)], ixs, labels(c)), ixs, fixedvertices(c))
 end
 
 function paintshop_bond_tensor(a::T, b::T) where T

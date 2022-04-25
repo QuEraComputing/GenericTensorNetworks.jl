@@ -28,6 +28,7 @@ terms
 flavors
 get_weights
 nflavor
+fixedvertices
 ```
 
 #### Graph Problem Utilities

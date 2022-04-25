@@ -10,21 +10,23 @@ struct Matching{CT<:AbstractEinsum, WT<:Union{NoWeight,Vector}} <: GraphProblem
     code::CT
     graph::SimpleGraph{Int}
     weights::WT
+    fixedvertices::Dict{Int,Int}
 end
 
-function Matching(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+function Matching(g::SimpleGraph; weights=NoWeight(), openvertices=(),fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
     @assert weights isa NoWeight || length(weights) == ne(g)
     edges = [minmax(e.src,e.dst) for e in Graphs.edges(g)]
     rawcode = EinCode(vcat([[s] for s in edges], # labels for edge tensors
                 [[minmax(i,j) for j in neighbors(g, i)] for i in Graphs.vertices(g)]),
                 collect(Tuple{Int,Int}, openvertices))
-    Matching(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), g, weights)
+    Matching(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), g, weights, fixedvertices)
 end
 
 flavors(::Type{<:Matching}) = [0, 1]
 get_weights(m::Matching, i::Int) = [0, m.weights[i]]
 terms(gp::Matching) = getixsv(gp.code)[1:ne(gp.graph)]
 labels(gp::Matching) = getindex.(terms(gp))
+fixedvertices(gp::Matching) = gp.fixedvertices
 
 function generate_tensors(x::T, m::Matching) where T
     ne(m.graph) == 0 && return []
@@ -40,7 +42,7 @@ function generate_tensors(x::T, m::Matching) where T
         end
         push!(tensors, t)
     end
-    return add_labels!(tensors, ixs, labels(m))
+    return select_dims(add_labels!(tensors, ixs, labels(m)), ixs, fixedvertices(m))
 end
 
 function match_tensor(::Type{T}, n::Int) where T

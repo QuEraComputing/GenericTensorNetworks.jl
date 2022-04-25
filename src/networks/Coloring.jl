@@ -10,25 +10,29 @@ struct Coloring{K,CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProble
     code::CT
     graph::SimpleGraph{Int}
     weights::WT
+    fixedvertices::Dict{Int,Int}
 end
-Coloring{K}(code::ET, graph::SimpleGraph, weights::Union{NoWeight, Vector}) where {K,ET<:AbstractEinsum} = Coloring{K,ET,typeof(weights)}(code, graph, weights)
+Coloring{K}(code::ET, graph::SimpleGraph, weights::Union{NoWeight, Vector}, fixedvertices::Dict{Int,Int}) where {K,ET<:AbstractEinsum} = Coloring{K,ET,typeof(weights)}(code, graph, weights, fixedvertices)
 # same network layout as independent set.
-function Coloring{K}(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing) where K
+function Coloring{K}(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing) where K
     @assert weights isa NoWeight || length(weights) == ne(g)
     rawcode = EinCode(([[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
                        [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...), collect(Int, openvertices))  # labels for edge tensors
-    code = _optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier)
-    Coloring{K}(code, g, weights)
+    code = _optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier)
+    Coloring{K}(code, g, weights, fixedvertices)
 end
 
 flavors(::Type{<:Coloring{K}}) where K = collect(0:K-1)
 get_weights(c::Coloring{K}, i::Int) where K = fill(c.weights[i], K)
 terms(gp::Coloring) = getixsv(gp.code)[1:nv(gp.graph)]
 labels(gp::Coloring) = [1:nv(gp.graph)...]
+fixedvertices(gp::Coloring) = gp.fixedvertices
 
 function generate_tensors(x::T, c::Coloring{K}) where {K,T}
     ixs = getixsv(c.code)
-    return vcat(add_labels!([coloringv(T, K) for i=1:nv(c.graph)], ixs[1:nv(c.graph)], labels(c)), [coloringb(x, K) .^ get_weights(c, i) for i=1:ne(c.graph)])
+    return select_dims(vcat(
+        add_labels!([coloringv(T, K) for i=1:nv(c.graph)], ixs[1:nv(c.graph)], labels(c)), [coloringb(x, K) .^ get_weights(c, i) for i=1:ne(c.graph)]
+    ), ixs, fixedvertices(c))
 end
 
 # coloring bond tensor

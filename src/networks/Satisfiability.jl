@@ -120,17 +120,19 @@ struct Satisfiability{CT<:AbstractEinsum,T,WT<:Union{NoWeight, Vector}} <: Graph
     code::CT
     cnf::CNF{T}
     weights::WT
+    fixedvertices::Dict{T,Int}
 end
 
-function Satisfiability(cnf::CNF{T}; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing) where T
+function Satisfiability(cnf::CNF{T}; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{T,Int}()) where T
     rawcode = EinCode([[getfield.(c.vars, :name)...] for c in cnf.clauses], collect(T, openvertices))
-    Satisfiability(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), cnf, weights)
+    Satisfiability(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), cnf, weights, fixedvertices)
 end
 
 flavors(::Type{<:Satisfiability}) = [0, 1]  # false, true
 get_weights(s::Satisfiability, i::Int) = [0, s.weights[i]]
 terms(gp::Satisfiability) = getixsv(gp.code)
 labels(gp::Satisfiability) = unique!(vcat(getixsv(gp.code)...))
+fixedvertices(gp::Satisfiability) = gp.fixedvertices
 
 """
     satisfiable(cnf::CNF, config::AbstractDict)
@@ -152,9 +154,14 @@ function generate_tensors(x::VT, sa::Satisfiability{CT,T}) where {CT,T,VT}
     cnf = sa.cnf
     ixs = getixsv(sa.code)
     isempty(cnf.clauses) && return []
-	return add_labels!(map(1:length(cnf.clauses)) do i
-        tensor_for_clause(cnf.clauses[i], (Ref(x) .^ get_weights(sa, i))...)
-    end, ixs, labels(sa))
+	return select_dims(
+        add_labels!(
+            map(1:length(cnf.clauses)) do i
+                tensor_for_clause(cnf.clauses[i], (Ref(x) .^ get_weights(sa, i))...)
+            end,
+            ixs, labels(sa))
+        , ixs, fixedvertices(sa)
+    )
 end
 
 function tensor_for_clause(c::CNFClause{T}, a, b) where T

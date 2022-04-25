@@ -12,29 +12,31 @@ struct IndependentSet{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphPr
     code::CT
     graph::SimpleGraph{Int}
     weights::WT
+    fixedvertices::Dict{Int,Int}
 end
 
-function IndependentSet(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+function IndependentSet(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
     @assert weights isa NoWeight || length(weights) == nv(g)
     rawcode = EinCode([[[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
                        [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...], collect(Int, openvertices))  # labels for edge tensors
-    code = _optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier)
-    IndependentSet(code, g, weights)
+    code = _optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier)
+    IndependentSet(code, g, weights, fixedvertices)
 end
 
 flavors(::Type{<:IndependentSet}) = [0, 1]
 get_weights(gp::IndependentSet, i::Int) = [0, gp.weights[i]]
 terms(gp::IndependentSet) = getixsv(gp.code)[1:nv(gp.graph)]
 labels(gp::IndependentSet) = [1:nv(gp.graph)...]
+fixedvertices(gp::IndependentSet) = gp.fixedvertices
 
 # generate tensors
 function generate_tensors(x::T, gp::IndependentSet) where T
     nv(gp.graph) == 0 && return []
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors
-    return vcat(add_labels!([misv(Ref(x) .^ get_weights(gp, i)) for i=1:nv(gp.graph)], ixs[1:nv(gp.graph)], labels(gp)),
+    return select_dims(vcat(add_labels!([misv(Ref(x) .^ get_weights(gp, i)) for i=1:nv(gp.graph)], ixs[1:nv(gp.graph)], labels(gp)),
             [misb(T, length(ix)) for ix in ixs[nv(gp.graph)+1:end]] # if n!=2, it corresponds to set packing problem.
-    )
+    ), ixs, fixedvertices(gp))
 end
 
 function misb(::Type{T}, n::Integer=2) where T

@@ -10,25 +10,27 @@ struct MaximalIS{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
     code::CT
     graph::SimpleGraph
     weights::WT
+    fixedvertices::Dict{Int,Int}
 end
 
-function MaximalIS(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+function MaximalIS(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{Int,Int}())
     @assert weights isa NoWeight || length(weights) == nv(g)
     rawcode = EinCode(([[Graphs.neighbors(g, v)..., v] for v in Graphs.vertices(g)]...,), collect(Int, openvertices))
-    MaximalIS(_optimize_code(rawcode, uniformsize(rawcode, 2), optimizer, simplifier), g, weights)
+    MaximalIS(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), g, weights, fixedvertices)
 end
 
 flavors(::Type{<:MaximalIS}) = [0, 1]
 get_weights(gp::MaximalIS, i::Int) = [0, gp.weights[i]]
 terms(gp::MaximalIS) = getixsv(gp.code)
 labels(gp::MaximalIS) = [1:length(getixsv(gp.code))...]
+fixedvertices(gp::MaximalIS) = gp.fixedvertices
 
 function generate_tensors(x::T, mi::MaximalIS) where T
     ixs = getixsv(mi.code)
     isempty(ixs) && return []
-	return add_labels!(map(enumerate(ixs)) do (i, ix)
+	return select_dims(add_labels!(map(enumerate(ixs)) do (i, ix)
         maximal_independent_set_tensor((Ref(x) .^ get_weights(mi, i))..., length(ix))
-    end, ixs, labels(mi))
+    end, ixs, labels(mi)), ixs, fixedvertices(mi))
 end
 function maximal_independent_set_tensor(a::T, b::T, d::Int) where T
     t = zeros(T, fill(2, d)...)

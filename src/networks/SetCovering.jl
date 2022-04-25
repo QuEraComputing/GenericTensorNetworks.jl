@@ -30,9 +30,10 @@ struct SetCovering{ET, CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphP
     code::CT
     sets::Vector{Vector{ET}}
     weights::WT
+    fixedvertices::Dict{ET,Int}
 end
 
-function SetCovering(sets; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing) where ET
+function SetCovering(sets::AbstractVector{Vector{ET}}; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{ET,Int}()) where ET
     nsets = length(sets)
     @assert weights isa NoWeight || length(weights) == nsets
     # get constraints
@@ -40,7 +41,7 @@ function SetCovering(sets; weights=NoWeight(), openvertices=(), optimizer=Greedy
 
     code = EinCode([[[i] for i=1:nsets]...,
         [count[e] for e in elements]...], collect(Int,openvertices))
-    SetCovering(_optimize_code(code, uniformsize(code, 2), optimizer, simplifier), sets, weights)
+    SetCovering(_optimize_code(code, uniformsize_fix(code, 2, fixedvertices), optimizer, simplifier), sets, weights, fixedvertices)
 end
 
 function cover_count(sets)
@@ -69,6 +70,7 @@ flavors(::Type{<:SetCovering}) = [0, 1]
 get_weights(gp::SetCovering, i::Int) = [0, gp.weights[i]]
 terms(gp::SetCovering) = getixsv(gp.code)[1:length(gp.sets)]
 labels(gp::SetCovering) = [1:length(gp.sets)...]
+fixedvertices(gp::SetCovering) = gp.fixedvertices
 
 # generate tensors
 function generate_tensors(x::T, gp::SetCovering) where T
@@ -76,8 +78,8 @@ function generate_tensors(x::T, gp::SetCovering) where T
     nsets == 0 && return []
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors
-    return vcat(add_labels!([misv(Ref(x) .^ get_weights(gp, i)) for i=1:nsets], ixs[1:nsets], labels(gp)),
-            [cover_tensor(T, ix) for ix in ixs[nsets+1:end]]
+    return select_dims(vcat(add_labels!([misv(Ref(x) .^ get_weights(gp, i)) for i=1:nsets], ixs[1:nsets], labels(gp)),
+            [cover_tensor(T, ix) for ix in ixs[nsets+1:end]]), ixs, fixedvertices(gp)
     )
 end
 

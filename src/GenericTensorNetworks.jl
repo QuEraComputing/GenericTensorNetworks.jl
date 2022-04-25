@@ -30,7 +30,7 @@ export line_graph
 
 # Tensor Networks (Graph problems)
 export GraphProblem, optimize_code, NoWeight
-export flavors, labels, terms, nflavor, get_weights
+export flavors, labels, terms, nflavor, get_weights, fixedvertices
 export IndependentSet, mis_compactify!, is_independent_set
 export MaximalIS, is_maximal_independent_set
 export MaxCut, cut_size

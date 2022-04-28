@@ -16,11 +16,12 @@ julia> ev[2]
 0x0000000000000002
 ```
 """
-struct StaticElementVector{N,S,C}
+struct StaticElementVector{N,S,C} <: AbstractVector{UInt64}
     data::NTuple{C,UInt64}
 end
 
 Base.length(::StaticElementVector{N,S,C}) where {N,S,C} = N
+Base.size(::StaticElementVector{N,S,C}) where {N,S,C} = (N,)
 Base.:(==)(x::StaticElementVector, y::AbstractVector) = [x...] == [y...]
 Base.:(==)(x::AbstractVector, y::StaticElementVector) = [x...] == [y...]
 Base.:(==)(x::StaticElementVector{N,S,C}, y::StaticElementVector{N,S,C}) where {N,S,C} = x.data == y.data

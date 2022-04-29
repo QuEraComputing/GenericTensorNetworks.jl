@@ -138,6 +138,7 @@ function Base.iterate(x::StaticElementVector{N,S,C}, state=1) where {N,S,C}
 end
 
 Base.show(io::IO, t::StaticElementVector) = Base.print(io, "$(join(Int.(t), ""))")
+Base.show(io::IO, ::MIME"text/plain", t::StaticElementVector) = Base.show(io, t)
 
 function Base.count_ones(x::StaticBitVector)
     sum(v->count_ones(v),x.data)

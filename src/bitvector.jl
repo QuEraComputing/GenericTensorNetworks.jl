@@ -16,11 +16,12 @@ julia> ev[2]
 0x0000000000000002
 ```
 """
-struct StaticElementVector{N,S,C}
+struct StaticElementVector{N,S,C} <: AbstractVector{UInt64}
     data::NTuple{C,UInt64}
 end
 
 Base.length(::StaticElementVector{N,S,C}) where {N,S,C} = N
+Base.size(::StaticElementVector{N,S,C}) where {N,S,C} = (N,)
 Base.:(==)(x::StaticElementVector, y::AbstractVector) = [x...] == [y...]
 Base.:(==)(x::AbstractVector, y::StaticElementVector) = [x...] == [y...]
 Base.:(==)(x::StaticElementVector{N,S,C}, y::StaticElementVector{N,S,C}) where {N,S,C} = x.data == y.data
@@ -137,6 +138,7 @@ function Base.iterate(x::StaticElementVector{N,S,C}, state=1) where {N,S,C}
 end
 
 Base.show(io::IO, t::StaticElementVector) = Base.print(io, "$(join(Int.(t), ""))")
+Base.show(io::IO, ::MIME"text/plain", t::StaticElementVector) = Base.show(io, t)
 
 function Base.count_ones(x::StaticBitVector)
     sum(v->count_ones(v),x.data)

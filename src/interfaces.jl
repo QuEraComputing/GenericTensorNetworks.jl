@@ -14,7 +14,7 @@ The maximum-K set sizes. e.g. the largest size of the [`IndependentSet`](@ref)  
 * BLAS (on CPU) and GPU are supported only if `K` is `Single`,
 """
 struct SizeMax{K} <: AbstractProperty end
-SizeMax(k::Union{Int,Type{Single}}=Single) = SizeMax{k}()
+SizeMax(k::Union{Int,Type{Single}}=Single) = (@assert k == Single || k > 0; SizeMax{k}())
 max_k(::SizeMax{K}) where K = K
 
 """
@@ -29,7 +29,7 @@ The inverted Tropical number emulates the min-plus tropical number.
 * BLAS (on CPU) and GPU are supported only if `K` is `Single`,
 """
 struct SizeMin{K} <: AbstractProperty end
-SizeMin(k::Union{Int,Type{Single}}=Single) = SizeMin{k}()
+SizeMin(k::Union{Int,Type{Single}}=Single) = (@assert k == Single || k > 0; SizeMin{k}())
 max_k(::SizeMin{K}) where K = K
 
 """
@@ -56,7 +56,7 @@ it counts independent sets of size ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(
 * GPU is supported,
 """
 struct CountingMax{K} <: AbstractProperty end
-CountingMax(K::Union{Int,Type{Single}}=Single) = CountingMax{K}()
+CountingMax(k::Union{Int,Type{Single}}=Single) = (@assert k == Single || k > 0; CountingMax{k}())
 max_k(::CountingMax{K}) where K = K
 
 """
@@ -70,7 +70,7 @@ Counting the number of sets with smallest-K size.
 * GPU is supported,
 """
 struct CountingMin{K} <: AbstractProperty end
-CountingMin(K::Union{Int,Type{Single}}=Single) = CountingMin{K}()
+CountingMin(k::Union{Int,Type{Single}}=Single) = (@assert k == Single || k > 0; CountingMin{k}())
 min_k(::CountingMin{K}) where K = K
 
 """
@@ -126,7 +126,7 @@ Keyword Arguments
 * `bounded`, if it is true, use bounding trick (or boolean gradients) to reduce the working memory to store intermediate configurations.
 """
 struct SingleConfigMax{K,BOUNDED} <:AbstractProperty end
-SingleConfigMax(k::Union{Int,Type{Single}}=Single; bounded::Bool=false) = SingleConfigMax{k, bounded}()
+SingleConfigMax(k::Union{Int,Type{Single}}=Single; bounded::Bool=false) = (@assert k == Single || k > 0; SingleConfigMax{k, bounded}())
 max_k(::SingleConfigMax{K}) where K = K
 
 """
@@ -144,7 +144,7 @@ Keyword Arguments
 * `bounded`, if it is true, use bounding trick (or boolean gradients) to reduce the working memory to store intermediate configurations.
 """
 struct SingleConfigMin{K,BOUNDED} <:AbstractProperty end
-SingleConfigMin(k::Union{Int,Type{Single}}=Single; bounded::Bool=false) = SingleConfigMin{k,bounded}()
+SingleConfigMin(k::Union{Int,Type{Single}}=Single; bounded::Bool=false) = (@assert k == Single || k > 0; SingleConfigMin{k,bounded}())
 min_k(::SingleConfigMin{K}) where K = K
 
 """
@@ -180,7 +180,7 @@ Keyword Arguments
 * `tree_storage`, if it is true, it uses more memory efficient tree-structure to store the configurations.
 """
 struct ConfigsMax{K, BOUNDED, TREESTORAGE} <:AbstractProperty end
-ConfigsMax(K::Union{Int,Type{Single}}=Single; bounded::Bool=true, tree_storage::Bool=false) = ConfigsMax{K,bounded,tree_storage}()
+ConfigsMax(k::Union{Int,Type{Single}}=Single; bounded::Bool=true, tree_storage::Bool=false) = (@assert k == Single || k > 0; ConfigsMax{k,bounded,tree_storage}())
 max_k(::ConfigsMax{K}) where K = K
 tree_storage(::ConfigsMax{K,BOUNDED,TREESTORAGE}) where {K,BOUNDED,TREESTORAGE} = TREESTORAGE
 
@@ -199,7 +199,7 @@ Keyword Arguments
 * `tree_storage`, if it is true, it uses more memory efficient tree-structure to store the configurations.
 """
 struct ConfigsMin{K, BOUNDED, TREESTORAGE} <:AbstractProperty end
-ConfigsMin(K::Union{Int,Type{Single}}=Single; bounded::Bool=true, tree_storage::Bool=false) = ConfigsMin{K,bounded, tree_storage}()
+ConfigsMin(k::Union{Int,Type{Single}}=Single; bounded::Bool=true, tree_storage::Bool=false) = (@assert k == Single || k > 0; ConfigsMin{k,bounded, tree_storage}())
 min_k(::ConfigsMin{K}) where K = K
 tree_storage(::ConfigsMin{K,BOUNDED,TREESTORAGE}) where {K,BOUNDED,TREESTORAGE} = TREESTORAGE
 

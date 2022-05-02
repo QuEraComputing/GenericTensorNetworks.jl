@@ -193,4 +193,5 @@ end
     @test solve(gp, ConfigsMax(Single)) isa Array
     @test_throws ArgumentError solve(gp, ConfigsMin(2))
     @test solve(gp, ConfigsMin(Single)) isa Array
+    @test_throws AssertionError ConfigsMin(0)
 end

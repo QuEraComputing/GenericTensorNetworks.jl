@@ -231,27 +231,29 @@ Keyword arguments
 * `T` is the "base" element type, sometimes can be used to reduce the memory cost.
 """
 function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=false)
-    if !_solvable(gp, property)
-        throw(ArgumentError("Graph property `$(typeof(property))` is not computable for graph problem of type `$(typeof(gp))`."))
-    end
+    assert_solvable(gp, property)
     if property isa SizeMax{1}
         return contractx(gp, _x(Tropical{T}; invert=false); usecuda=usecuda)
     elseif property isa SizeMin{1}
-        return post_invert_exponent.(contractx(gp, _x(Tropical{T}; invert=true); usecuda=usecuda))
+        res = contractx(gp, _x(Tropical{T}; invert=true); usecuda=usecuda)
+        return asarray(post_invert_exponent.(res), res)
     elseif property isa SizeMax
         return contractx(gp, _x(ExtendedTropical{max_k(property), Tropical{T}}; invert=false); usecuda=usecuda)
     elseif property isa SizeMin
-        return post_invert_exponent.(contractx(gp, _x(ExtendedTropical{max_k(property), Tropical{T}}; invert=true); usecuda=usecuda))
+        res = contractx(gp, _x(ExtendedTropical{max_k(property), Tropical{T}}; invert=true); usecuda=usecuda)
+        return asarray(post_invert_exponent.(res), res)
     elseif property isa CountingAll
         return contractx(gp, one(T); usecuda=usecuda)
     elseif property isa CountingMax{1}
         return contractx(gp, _x(CountingTropical{T,T}; invert=false); usecuda=usecuda)
     elseif property isa CountingMin{1}
-        return post_invert_exponent.(contractx(gp, _x(CountingTropical{T,T}; invert=true); usecuda=usecuda))
+        res = contractx(gp, _x(CountingTropical{T,T}; invert=true); usecuda=usecuda)
+        return asarray(post_invert_exponent.(res), res)
     elseif property isa CountingMax
         return contractx(gp, TruncatedPoly(ntuple(i->i == max_k(property) ? one(T) : zero(T), max_k(property)), one(T)); usecuda=usecuda)
     elseif property isa CountingMin
-        return post_invert_exponent.(contractx(gp, pre_invert_exponent(TruncatedPoly(ntuple(i->i == min_k(property) ? one(T) : zero(T), min_k(property)), one(T))); usecuda=usecuda))
+        res = contractx(gp, pre_invert_exponent(TruncatedPoly(ntuple(i->i == min_k(property) ? one(T) : zero(T), min_k(property)), one(T))); usecuda=usecuda)
+        return asarray(post_invert_exponent.(res), res)
     elseif property isa GraphPolynomial
         return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
     elseif property isa SingleConfigMax{1,false}
@@ -296,7 +298,40 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
 end
 
 # raise an error if the property for problem can not be computed
-_solvable(::Any, ::Any) = true
+assert_solvable(::Any, ::Any) = nothing
+function assert_solvable(problem, property::GraphPolynomial)
+    if has_noninteger_weights(problem)
+        throw(ArgumentError("Graph property `$(typeof(property))` is not computable due to having non-integer weights."))
+    end
+end
+function assert_solvable(problem, property::ConfigsMax)
+    if max_k(property) != 1 && has_noninteger_weights(problem)
+        throw(ArgumentError("Graph property `$(typeof(property))` is not computable due to having non-integer weights. Maybe you wanted `SingleConfigMax($(max_k(property)))`?"))
+    end
+end
+function assert_solvable(problem, property::ConfigsMin)
+    if min_k(property) != 1 && has_noninteger_weights(problem)
+        throw(ArgumentError("Graph property `$(typeof(property))` is not computable due to having non-integer weights. Maybe you wanted `SingleConfigMin($(min_k(property)))`?"))
+    end
+end
+function assert_solvable(problem, property::CountingMax)
+    if max_k(property) != 1 && has_noninteger_weights(problem)
+        throw(ArgumentError("Graph property `$(typeof(property))` is not computable due to having non-integer weights. Maybe you wanted `SizeMax($(max_k(property)))`?"))
+    end
+end
+function assert_solvable(problem, property::CountingMin)
+    if min_k(property) != 1 && has_noninteger_weights(problem)
+        throw(ArgumentError("Graph property `$(typeof(property))` is not computable due to having non-integer weights. Maybe you wanted `SizeMin($(min_k(property)))`?"))
+    end
+end
+function has_noninteger_weights(problem::GraphProblem)
+    for i in 1:length(terms(problem))
+        if any(!isinteger, get_weights(problem, i))
+            return true
+        end
+    end
+    return false
+end
 
 """
     max_size(problem; usecuda=false)

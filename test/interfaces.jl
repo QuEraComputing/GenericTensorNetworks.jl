@@ -178,3 +178,19 @@ end
     @test estimate_memory(gp, GraphPolynomial(method=:fitting); T=Float32) * 4 == estimate_memory(gp, GraphPolynomial(method=:fft))
     @test estimate_memory(gp, GraphPolynomial(method=:finitefield)) * 10 == estimate_memory(gp, GraphPolynomial(method=:polynomial); T=Float32)
 end
+
+@testset "error on not solvable problems" begin
+    gp = IndependentSet(smallgraph(:petersen); weights=rand(1:3, 10))
+    @test !GenericTensorNetworks.has_noninteger_weights(gp)
+    gp = IndependentSet(smallgraph(:petersen); weights=rand(10))
+    @test GenericTensorNetworks.has_noninteger_weights(gp)
+    @test_throws ArgumentError solve(gp, GraphPolynomial())
+    @test_throws ArgumentError solve(gp, CountingMax(2))
+    @test solve(gp, CountingMax(1)) isa Array
+    @test_throws ArgumentError solve(gp, ConfigsMax(2))
+    @test solve(gp, CountingMin(1)) isa Array
+    @test_throws ArgumentError solve(gp, ConfigsMin(2))
+    @test solve(gp, ConfigsMax(1)) isa Array
+    @test_throws ArgumentError solve(gp, ConfigsMin(2))
+    @test solve(gp, ConfigsMin(1)) isa Array
+end

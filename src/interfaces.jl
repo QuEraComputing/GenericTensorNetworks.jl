@@ -163,13 +163,13 @@ tree_storage(::ConfigsAll{TREESTORAGE}) where {TREESTORAGE} = TREESTORAGE
 
 """
     ConfigsMax{K, BOUNDED, TREESTORAGE} <:AbstractProperty
-    ConfigsMax(K=1; bounded=true, tree_storage=true)
+    ConfigsMax(K=Extrema(); bounded=true, tree_storage=true)
 
 Find configurations with largest-K sizes, e.g. for [`IndependentSet`](@ref) problem,
 it is finding all independent sets of sizes ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
 
-* The corresponding data type is [`CountingTropical`](@ref)`{Float64,<:ConfigEnumerator}` for `K == 1` and [`TruncatedPoly`](@ref)`{K,<:ConfigEnumerator}` for `K > 1`.
-* Weighted graph problems is only supported for `K == 1`.
+* The corresponding data type is [`CountingTropical`](@ref)`{Float64,<:ConfigEnumerator}` for `K == Extrema()` and [`TruncatedPoly`](@ref)`{K,<:ConfigEnumerator}` for `K` being an integer.
+* Weighted graph problems is only supported for `K == Extrema()`.
 
 Keyword Arguments
 ----------------------------

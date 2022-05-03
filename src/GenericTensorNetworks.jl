@@ -43,7 +43,7 @@ export SetPacking, is_set_packing
 export SetCovering, is_set_covering
 
 # Interfaces
-export solve, SizeMax, SizeMin, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin
+export solve, SizeMax, SizeMin, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin, Single
 
 # Utilities
 export save_configs, load_configs, hamming_distribution, save_sumproduct, load_sumproduct

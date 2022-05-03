@@ -7,7 +7,7 @@ using Graphs, Test
         gp = IndependentSet(g; optimizer=optimizer)
         res1 = solve(gp, SizeMax())[]
         res2 = solve(gp, CountingAll())[]
-        res3 = solve(gp, CountingMax(1))[]
+        res3 = solve(gp, CountingMax(Single))[]
         res4 = solve(gp, CountingMax(2))[]
         res5 = solve(gp, GraphPolynomial(; method = :polynomial))[]
         res6 = solve(gp, SingleConfigMax())[]
@@ -49,7 +49,7 @@ end
     gp = IndependentSet(g; optimizer=TreeSA(nslices=5, ntrials=1))
     res1 = solve(gp, SizeMax())[]
     res2 = solve(gp, CountingAll())[]
-    res3 = solve(gp, CountingMax(1))[]
+    res3 = solve(gp, CountingMax(Single))[]
     res4 = solve(gp, CountingMax(2))[]
     res5 = solve(gp, GraphPolynomial(; method = :polynomial))[]
     res6 = solve(gp, SingleConfigMax())[]
@@ -90,7 +90,7 @@ end
     gp = IndependentSet(g; weights=collect(1:10))
     res1 = solve(gp, SizeMax())[]
     @test res1 == Tropical(24.0)
-    res2 = solve(gp, CountingMax(1))[]
+    res2 = solve(gp, CountingMax(Single))[]
     @test res2 == CountingTropical(24.0, 1.0)
     res2b = solve(gp, CountingMax(2))[]
     @test res2b == Max2Poly(1.0, 1.0, 24.0)
@@ -98,8 +98,8 @@ end
     res3b = solve(gp, SingleConfigMax(; bounded=true))[]
     @test res3 == res3b
     @test sum(collect(res3.c.data) .* (1:10))  == 24.0
-    res4 = solve(gp, ConfigsMax(1; bounded=false))[]
-    res4b = solve(gp, ConfigsMax(1; bounded=true))[]
+    res4 = solve(gp, ConfigsMax(Single; bounded=false))[]
+    res4b = solve(gp, ConfigsMax(Single; bounded=true))[]
     @test res4 == res4b
     @test res4.c.data[] == res3.c.data
 
@@ -177,4 +177,21 @@ end
     @test estimate_memory(gp, ConfigsMax(bounded=true)) == estimate_memory(gp, SingleConfigMax(bounded=false))
     @test estimate_memory(gp, GraphPolynomial(method=:fitting); T=Float32) * 4 == estimate_memory(gp, GraphPolynomial(method=:fft))
     @test estimate_memory(gp, GraphPolynomial(method=:finitefield)) * 10 == estimate_memory(gp, GraphPolynomial(method=:polynomial); T=Float32)
+end
+
+@testset "error on not solvable problems" begin
+    gp = IndependentSet(smallgraph(:petersen); weights=rand(1:3, 10))
+    @test !GenericTensorNetworks.has_noninteger_weights(gp)
+    gp = IndependentSet(smallgraph(:petersen); weights=rand(10))
+    @test GenericTensorNetworks.has_noninteger_weights(gp)
+    @test_throws ArgumentError solve(gp, GraphPolynomial())
+    @test_throws ArgumentError solve(gp, CountingMax(2))
+    @test solve(gp, CountingMax(Single)) isa Array
+    @test_throws ArgumentError solve(gp, ConfigsMax(2))
+    @test solve(gp, CountingMin(Single)) isa Array
+    @test_throws ArgumentError solve(gp, ConfigsMin(2))
+    @test solve(gp, ConfigsMax(Single)) isa Array
+    @test_throws ArgumentError solve(gp, ConfigsMin(2))
+    @test solve(gp, ConfigsMin(Single)) isa Array
+    @test_throws AssertionError ConfigsMin(0)
 end

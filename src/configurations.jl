@@ -35,12 +35,12 @@ function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false
         T = config_type(CountingTropical{T,T}, length(labels(gp)), nflavor(gp); all, tree_storage)
         xs = generate_tensors(_x(T; invert), gp)
         ret = bounding_contract(AllConfigs{1}(), gp.code, xst, ymask, xs)
-        return invert ? post_invert_exponent.(ret) : ret
+        return invert ? asarray(post_invert_exponent.(ret), ret) : ret
     else
         @assert ndims(ymask) == 0
         t, res = solution_ad(gp.code, xst, ymask)
         ret = fill(CountingTropical(asscalar(t).n, ConfigSampler(StaticBitVector(map(l->res[l], 1:length(res))))))
-        return invert ? post_invert_exponent.(ret) : ret
+        return invert ? asarray(post_invert_exponent.(ret), ret) : ret
     end
 end
 
@@ -63,7 +63,7 @@ function solutions(gp::GraphProblem, ::Type{BT}; all::Bool, usecuda::Bool=false,
     end
     T = config_type(BT, length(labels(gp)), nflavor(gp); all, tree_storage)
     ret = contractx(gp, _x(T; invert); usecuda=usecuda)
-    return invert ? post_invert_exponent.(ret) : ret
+    return invert ? asarray(post_invert_exponent.(ret), ret) : ret
 end
 
 """
@@ -79,7 +79,7 @@ function bestk_solutions(gp::GraphProblem, k::Int; invert::Bool=false, tree_stor
     T = config_type(TruncatedPoly{k,T,T}, length(labels(gp)), nflavor(gp); all=true, tree_storage)
     xs = generate_tensors(_x(T; invert), gp)
     ret = bounding_contract(AllConfigs{k}(), gp.code, xst, ymask, xs)
-    return invert ? post_invert_exponent.(ret) : ret
+    return invert ? asarray(post_invert_exponent.(ret), ret) : ret
 end
 
 """

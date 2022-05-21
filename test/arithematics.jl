@@ -95,14 +95,18 @@ end
 
 @testset "powers" begin
     x = ConfigEnumerator([bv"00111"])
+    y = 2.0
     @test x ^ 0 == one(x)
-    @test x ^ 2.0 == x
+    @test Base.literal_pow(^, x, Val(2.0)) == x
+    @test x ^ y == x
     x = SumProductTree(bv"00111")
     @test x ^ 0 == one(x)
-    @test x ^ 2.0 == x
+    @test Base.literal_pow(^, x, Val(2.0)) == x
+    @test x ^ y == x
     x = ConfigSampler(bv"00111")
     @test x ^ 0 == one(x)
-    @test x ^ 2.0 == x
+    @test Base.literal_pow(^, x, Val(2.0)) == x
+    @test x ^ y == x
 
     x = ExtendedTropical{3}(Tropical.([1.0, 2.0, 3.0]))
     @test x ^ 1 == x
@@ -110,7 +114,16 @@ end
     @test x ^ 1.0 == x
     @test x ^ 0.0 == one(x)
     @test x ^ 2 == ExtendedTropical{3}(Tropical.([2.0, 4.0, 6.0]))
-    @test x ^ 2.0 == ExtendedTropical{3}(Tropical.([2.0, 4.0, 6.0]))
+    @test Base.literal_pow(^, x, Val(2.0)) == ExtendedTropical{3}(Tropical.([2.0, 4.0, 6.0]))
+    @test Base.literal_pow(^, x, Val(2.0)) == x ^ y
+    
+    # truncated poly
+    x = TruncatedPoly((2,3), 5)
+    @test x ^ 2 == TruncatedPoly((12,9), 10)
+    @test_throws ErrorException x ^ -2
+    x = TruncatedPoly((0.0,3.0), 5)
+    @test x ^ 2 == TruncatedPoly((0,9), 10)
+    @test x ^ -2 == TruncatedPoly((0.0,3^-2), -10)
 end
 
 @testset "push coverage" begin

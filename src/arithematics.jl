@@ -169,6 +169,19 @@ function Base.show(io::IO, ::MIME"text/plain", x::TruncatedPoly{K}) where K
     end
 end
 
+Base.literal_pow(::typeof(^), a::TruncatedPoly, ::Val{b}) where b = a ^ b
+function Base.:^(x::TruncatedPoly{K,T,TO}, b::Integer) where {K,T,TO}
+    if b >= 0
+        return Base.power_by_squaring(x, b)
+    else
+        if count(!iszero, x.coeffs) <= 1
+            return TruncatedPoly{K,T,TO}(ntuple(i->iszero(x.coeffs[i]) ? x.coeffs[i] : x.coeffs[i] ^ b, K), x.maxorder*b)
+        else
+            error("can not apply negative power over truncated polynomial: $x")
+        end
+    end
+end
+
 ############################ ExtendedTropical #####################
 """
     ExtendedTropical{K,TO} <: Number
@@ -342,12 +355,15 @@ function Base.:+(a::ExtendedTropical{K,TO}, b::ExtendedTropical{K,TO}) where {K,
     return ExtendedTropical{K,TO}(res)
 end
 
+Base.literal_pow(::typeof(^), a::ExtendedTropical, ::Val{b}) where b = a ^ b
 Base.:^(a::ExtendedTropical, b::Integer) = Base.invoke(^, Tuple{ExtendedTropical, Real}, a, b)
 function Base.:^(a::ExtendedTropical{K,TO}, b::Real) where {K,TO}
     if iszero(b)  # to avoid NaN
         return one(ExtendedTropical{K,TO})
     else
-        return ExtendedTropical{K,TO}(a.orders .^ b)
+        # sort for negative order
+        # the -Inf cannot become possitive after powering
+        return ExtendedTropical{K,TO}(sort!(map(x->iszero(x) ? x : x^b, a.orders)))
     end
 end
 
@@ -812,6 +828,7 @@ for TYPE in [:AbstractSetNumber, :TruncatedPoly, :ExtendedTropical]
 end
 
 # to handle power of polynomials
+Base.literal_pow(::typeof(^), x::SumProductTree, ::Val{y}) where y = Base.:^(x, y)
 function Base.:^(x::SumProductTree, y::Real)
     if y == 0
         return one(x)
@@ -821,6 +838,7 @@ function Base.:^(x::SumProductTree, y::Real)
         error("pow of non-leaf nodes is forbidden!")
     end
 end
+Base.literal_pow(::typeof(^), x::ConfigEnumerator, ::Val{y}) where y = Base.:^(x, y)
 function Base.:^(x::ConfigEnumerator, y::Real)
     if y <= 0
         return one(x)
@@ -830,6 +848,7 @@ function Base.:^(x::ConfigEnumerator, y::Real)
         error("pow of configuration enumerator of `size > 1` is forbidden!")
     end
 end
+Base.literal_pow(::typeof(^), x::ConfigSampler, ::Val{y}) where y = Base.:^(x, y)
 function Base.:^(x::ConfigSampler, y::Real)
     if y <= 0
         return one(x)

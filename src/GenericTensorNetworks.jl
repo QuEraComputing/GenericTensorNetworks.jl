@@ -6,7 +6,7 @@ using TropicalNumbers
 using OMEinsum
 using OMEinsum: timespace_complexity, getixsv
 using Graphs, Random
-using DelimitedFiles, Serialization
+using DelimitedFiles, Serialization, Printf
 
 # OMEinsum
 export timespace_complexity, timespacereadwrite_complexity, @ein_str, getixsv, getiyv
@@ -41,6 +41,7 @@ export DominatingSet, is_dominating_set
 export Matching, is_matching
 export SetPacking, is_set_packing
 export SetCovering, is_set_covering
+export OpenPitMining, is_valid_mining, print_mining
 
 # Interfaces
 export solve, SizeMax, SizeMin, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin, Single

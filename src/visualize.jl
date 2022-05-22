@@ -360,7 +360,7 @@ function tile_images(imgs, grid; image_size=(3.0, 3.0), format=SVG, io=nothing)
     m, n = grid
     dx, dy = (image_size[1]*n)*cm, (image_size[2]*m)*cm
     img = Compose.compose(context(),
-        ntuple(k->(context((mod1(k,n)-1)/n, ((k-1)÷n)/m, 1.0/n, 1.0/m), imgs[k]), m*n)...)
+                          ntuple(k->(context((mod1(k,n)-1)/n, ((k-1)÷n)/m, 1.0/n, 1.0/m), imgs[k]), min(m*n, length(imgs)))...)
 
     if io === nothing
         Compose.set_default_graphic_size(dx, dy)

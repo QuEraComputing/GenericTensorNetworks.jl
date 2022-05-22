@@ -16,13 +16,13 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-adbda161">
+     id="img-5d22c77a">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-adbda161-1">
+<g stroke-width="0.67" stroke="#000000" id="img-5d22c77a-1">
   <g transform="translate(76.48,39.02)">
     <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
   </g>
@@ -69,7 +69,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-adbda161-2">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-5d22c77a-2">
   <g transform="translate(60,27.04)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
@@ -101,7 +101,7 @@ show_graph(graph; locs=locations)</code></pre><?xml version="1.0" encoding="UTF-
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-adbda161-3">
+<g fill="#000000" font-size="3.13" id="img-5d22c77a-3">
   <g transform="translate(60,27.04)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -311,7 +311,7 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
  10
  30
  30
-  5</code></pre><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="Find-one-best-solution"><a class="docs-heading-anchor" href="#Find-one-best-solution">Find one best solution</a><a id="Find-one-best-solution-1"></a><a class="docs-heading-anchor-permalink" href="#Find-one-best-solution" title="Permalink"></a></h5><p>We can use the bounded or unbounded <a href="../../ref/#GenericTensorNetworks.SingleConfigMax"><code>SingleConfigMax</code></a> to find one of the solutions with largest size. The unbounded (default) version uses a joint type of <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a> and <a href="../../ref/#GenericTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> in computation, where <code>CountingTropical</code> finds the maximum size and <code>ConfigSampler</code> samples one of the best solutions. The bounded version uses the binary gradient back-propagation (see our paper) to compute the gradients. It requires caching intermediate states, but is often faster (on CPU) because it can use <a href="https://github.com/TensorBFS/TropicalGEMM.jl"><code>TropicalGEMM</code></a> (see <a href="../../performancetips/#Performance-Tips">Performance Tips</a>).</p><pre><code class="language-julia hljs">max_config = solve(problem, SingleConfigMax(; bounded=false))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, ConfigSampler{10, 1, 1}(0100100110))ₜ</code></pre><p>The return value has type <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a> with its counting field having <a href="../../ref/#GenericTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> type. The <code>data</code> field of <a href="../../ref/#GenericTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> is a bit string that corresponds to the solution</p><pre><code class="language-julia hljs">single_solution = max_config.c.data</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0100100110</code></pre><p>This bit string should be read from left to right, with the i-th bit being 1 (0) to indicate the i-th vertex is present (absent) in the set. We can visualize this MIS with the following function.</p><pre><code class="language-julia hljs">show_graph(graph; locs=locations, vertex_colors=
+  5</code></pre><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="Find-one-best-solution"><a class="docs-heading-anchor" href="#Find-one-best-solution">Find one best solution</a><a id="Find-one-best-solution-1"></a><a class="docs-heading-anchor-permalink" href="#Find-one-best-solution" title="Permalink"></a></h5><p>We can use the bounded or unbounded <a href="../../ref/#GenericTensorNetworks.SingleConfigMax"><code>SingleConfigMax</code></a> to find one of the solutions with largest size. The unbounded (default) version uses a joint type of <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a> and <a href="../../ref/#GenericTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> in computation, where <code>CountingTropical</code> finds the maximum size and <code>ConfigSampler</code> samples one of the best solutions. The bounded version uses the binary gradient back-propagation (see our paper) to compute the gradients. It requires caching intermediate states, but is often faster (on CPU) because it can use <a href="https://github.com/TensorBFS/TropicalGEMM.jl"><code>TropicalGEMM</code></a> (see <a href="../../performancetips/#Performance-Tips">Performance Tips</a>).</p><pre><code class="language-julia hljs">max_config = solve(problem, SingleConfigMax(; bounded=false))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, ConfigSampler{10, 1, 1}(1001001100))ₜ</code></pre><p>The return value has type <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a> with its counting field having <a href="../../ref/#GenericTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> type. The <code>data</code> field of <a href="../../ref/#GenericTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> is a bit string that corresponds to the solution</p><pre><code class="language-julia hljs">single_solution = max_config.c.data</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1001001100</code></pre><p>This bit string should be read from left to right, with the i-th bit being 1 (0) to indicate the i-th vertex is present (absent) in the set. We can visualize this MIS with the following function.</p><pre><code class="language-julia hljs">show_graph(graph; locs=locations, vertex_colors=
     [iszero(single_solution[i]) ? &quot;white&quot; : &quot;red&quot; for i=1:nv(graph)])</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -322,13 +322,13 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
      stroke-width="0.3"
      font-size="3.88"
 
-     id="img-5f97ce9b">
+     id="img-9adcfbcf">
 <defs>
   <marker id="arrow" markerWidth="15" markerHeight="7" refX="5" refY="3.5" orient="auto" markerUnits="strokeWidth">
     <path d="M0,0 L15,3.5 L0,7 z" stroke="context-stroke" fill="context-stroke"/>
   </marker>
 </defs>
-<g stroke-width="0.67" stroke="#000000" id="img-5f97ce9b-1">
+<g stroke-width="0.67" stroke="#000000" id="img-9adcfbcf-1">
   <g transform="translate(76.48,39.02)">
     <path fill="none" d="M-16.48,-11.97 L16.48,11.97 " class="primitive"/>
   </g>
@@ -375,57 +375,57 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
     <path fill="none" d="M16,11.62 L-16,-11.62 " class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-5f97ce9b-2">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9adcfbcf-2">
   <g transform="translate(40.23,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-5f97ce9b-3">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9adcfbcf-3">
   <g transform="translate(47.78,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-5f97ce9b-4">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-9adcfbcf-4">
   <g transform="translate(72.22,78.52)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-5f97ce9b-5">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-9adcfbcf-5">
   <g transform="translate(79.77,55.27)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-5f97ce9b-6">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9adcfbcf-6">
   <g transform="translate(60,40.9)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-5f97ce9b-7">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9adcfbcf-7">
   <g transform="translate(27.04,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-5f97ce9b-8">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-9adcfbcf-8">
   <g transform="translate(39.63,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-5f97ce9b-9">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9adcfbcf-9">
   <g transform="translate(80.37,89.73)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-5f97ce9b-10">
+<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-9adcfbcf-10">
   <g transform="translate(92.96,50.99)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g stroke-width="0.67" fill="#FFFFFF" stroke="#000000" id="img-5f97ce9b-11">
+<g stroke-width="0.67" fill="#FF0000" stroke="#000000" id="img-9adcfbcf-11">
   <g transform="translate(60,27.04)">
     <circle cx="0" cy="0" r="3.33" class="primitive"/>
   </g>
 </g>
-<g fill="#000000" font-size="3.13" id="img-5f97ce9b-12">
+<g fill="#000000" font-size="3.13" id="img-9adcfbcf-12">
   <g transform="translate(60,27.04)">
     <g class="primitive">
       <text text-anchor="middle" dy="0.35em">1</text>
@@ -624,40 +624,46 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 
 ]]> </script>
 </svg>
-<h5 id="Enumerate-all-solutions-and-best-several-solutions"><a class="docs-heading-anchor" href="#Enumerate-all-solutions-and-best-several-solutions">Enumerate all solutions and best several solutions</a><a id="Enumerate-all-solutions-and-best-several-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Enumerate-all-solutions-and-best-several-solutions" title="Permalink"></a></h5><p>We can use bounded or unbounded <a href="../../ref/#GenericTensorNetworks.ConfigsMax"><code>ConfigsMax</code></a> to find all solutions with largest-K set sizes. In most cases, the bounded (default) version is preferred because it can reduce the memory usage significantly.</p><pre><code class="language-julia hljs">all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, {1001001100, 1010000011, 0100100110, 0010111000, 0101010001})ₜ</code></pre><p>The return value has type <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a>, while its counting field having type <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a>. The <code>data</code> field of a <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a> instance contains a vector of bit strings.</p><pre><code class="language-julia hljs">all_max_configs.c.data</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5-element Vector{StaticBitVector{10, 1}}:
- 1001001100
- 1010000011
+<h5 id="Enumerate-all-solutions-and-best-several-solutions"><a class="docs-heading-anchor" href="#Enumerate-all-solutions-and-best-several-solutions">Enumerate all solutions and best several solutions</a><a id="Enumerate-all-solutions-and-best-several-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Enumerate-all-solutions-and-best-several-solutions" title="Permalink"></a></h5><p>We can use bounded or unbounded <a href="../../ref/#GenericTensorNetworks.ConfigsMax"><code>ConfigsMax</code></a> to find all solutions with largest-K set sizes. In most cases, the bounded (default) version is preferred because it can reduce the memory usage significantly.</p><pre><code class="language-julia hljs">all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, {0100100110, 1010000011, 1001001100, 0010111000, 0101010001})ₜ</code></pre><p>The return value has type <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a>, while its counting field having type <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a>. The <code>data</code> field of a <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a> instance contains a vector of bit strings.</p><pre><code class="language-julia hljs">all_max_configs.c.data</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5-element Vector{StaticBitVector{10, 1}}:
  0100100110
+ 1010000011
+ 1001001100
  0010111000
- 0101010001</code></pre><p>These solutions can be visualized with the <a href="../../ref/#GenericTensorNetworks.show_gallery"><code>show_gallery</code></a> function.</p><pre><code class="language-julia hljs">show_gallery(graph, (1, length(all_max_configs.c)); locs=locations, vertex_configs=all_max_configs.c);</code></pre><p>We can use <a href="../../ref/#GenericTensorNetworks.ConfigsAll"><code>ConfigsAll</code></a> to enumerate all sets satisfying the independence constraint.</p><pre><code class="language-julia hljs">all_independent_sets = solve(problem, ConfigsAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0010000000, 0100000000, 0000100000, 0010100000, 0100100000, 0000000001, 0010000001, 0100000001, 1000000000, 1010000000, 1000000001, 1010000001, 0000000100, 0100000100, 0000100100, 0100100100, 1000000100, 0000001000, 0010001000, 0000101000, 0010101000, 1000001000, 1010001000, 0000001100, 0000101100, 1000001100, 0001000000, 0101000000, 0001000001, 0101000001, 1001000000, 1001000001, 0001000100, 0101000100, 1001000100, 0001001000, 1001001000, 0001001100, 1001001100, 0000000010, 0010000010, 0100000010, 0000100010, 0010100010, 0100100010, 0000000011, 0010000011, 0100000011, 1000000010, 1010000010, 1000000011, 1010000011, 0000000110, 0100000110, 0000100110, 0100100110, 1000000110, 0000010000, 0010010000, 0100010000, 0000110000, 0010110000, 0100110000, 0000010001, 0010010001, 0100010001, 0000011000, 0010011000, 0000111000, 0010111000, 0001010000, 0101010000, 0001010001, 0101010001, 0001011000}</code></pre><p>The return value has type <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a>.</p><h5 id="Sample-solutions"><a class="docs-heading-anchor" href="#Sample-solutions">Sample solutions</a><a id="Sample-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Sample-solutions" title="Permalink"></a></h5><p>It is often difficult to store all configurations in a vector. A more clever way to store the data is using the sum product tree format.</p><pre><code class="language-julia hljs">all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (count = 76.0)
+ 0101010001</code></pre><p>These solutions can be visualized with the <a href="../../ref/#GenericTensorNetworks.show_gallery"><code>show_gallery</code></a> function.</p><pre><code class="language-julia hljs">show_gallery(graph, (1, length(all_max_configs.c)); locs=locations, vertex_configs=all_max_configs.c);</code></pre><p>We can use <a href="../../ref/#GenericTensorNetworks.ConfigsAll"><code>ConfigsAll</code></a> to enumerate all sets satisfying the independence constraint.</p><pre><code class="language-julia hljs">all_independent_sets = solve(problem, ConfigsAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0000100000, 0000000010, 0000100010, 0000001000, 0000101000, 0010000000, 0010100000, 0010000010, 0010100010, 0010001000, 0010101000, 0000000100, 0000100100, 0000000110, 0000100110, 0000001100, 0000101100, 0000000001, 0000000011, 0010000001, 0010000011, 0001000000, 0001001000, 0001000100, 0001001100, 0001000001, 0100000000, 0100100000, 0100000010, 0100100010, 0100000100, 0100100100, 0100000110, 0100100110, 0100000001, 0100000011, 0101000000, 0101000100, 0101000001, 1000000000, 1000000010, 1000001000, 1010000000, 1010000010, 1010001000, 1000000100, 1000000110, 1000001100, 1000000001, 1000000011, 1010000001, 1010000011, 1001000000, 1001001000, 1001000100, 1001001100, 1001000001, 0000010000, 0000110000, 0000011000, 0000111000, 0010010000, 0010110000, 0010011000, 0010111000, 0000010001, 0010010001, 0001010000, 0001011000, 0001010001, 0100010000, 0100110000, 0100010001, 0101010000, 0101010001}</code></pre><p>The return value has type <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a>.</p><h5 id="Sample-solutions"><a class="docs-heading-anchor" href="#Sample-solutions">Sample solutions</a><a id="Sample-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Sample-solutions" title="Permalink"></a></h5><p>It is often difficult to store all configurations in a vector. A more clever way to store the data is using the sum product tree format.</p><pre><code class="language-julia hljs">all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (count = 76.0)
 ├─ + (count = 58.0)
 │  ├─ + (count = 40.0)
 │  │  ├─ + (count = 27.0)
-│  │  │  ├─ + (count = 18.0)
-│  │  │  │  ├─ + (count = 17.0)
+│  │  │  ├─ + (count = 26.0)
+│  │  │  │  ├─ + (count = 22.0)
 │  │  │  │  │  ⋮
 │  │  │  │  │  
-│  │  │  │  └─ * (count = 1.0)
+│  │  │  │  └─ * (count = 4.0)
 │  │  │  │     ⋮
 │  │  │  │     
-│  │  │  └─ + (count = 9.0)
-│  │  │     ├─ + (count = 8.0)
+│  │  │  └─ * (count = 1.0)
+│  │  │     ├─ OnehotVec{10, 2}(4, 1)
 │  │  │     │  ⋮
 │  │  │     │  
-│  │  │     └─ * (count = 1.0)
+│  │  │     └─ OnehotVec{10, 2}(10, 1)
 │  │  │        ⋮
 │  │  │        
-│  │  └─ * (count = 13.0)
-│  │     ├─ OnehotVec{10, 2}(4, 1)
-│  │     └─ + (count = 13.0)
-│  │        ├─ + (count = 9.0)
+│  │  └─ + (count = 13.0)
+│  │     ├─ + (count = 12.0)
+│  │     │  ├─ + (count = 10.0)
+│  │     │  │  ⋮
+│  │     │  │  
+│  │     │  └─ * (count = 2.0)
+│  │     │     ⋮
+│  │     │     
+│  │     └─ * (count = 1.0)
+│  │        ├─ OnehotVec{10, 2}(4, 1)
 │  │        │  ⋮
 │  │        │  
-│  │        └─ + (count = 4.0)
+│  │        └─ * (count = 1.0)
 │  │           ⋮
 │  │           
 │  └─ * (count = 18.0)
-│     ├─ OnehotVec{10, 2}(9, 1)
+│     ├─ OnehotVec{10, 2}(1, 1)
 │     └─ + (count = 18.0)
 │        ├─ + (count = 17.0)
 │        │  ├─ + (count = 13.0)
@@ -667,49 +673,55 @@ amount2:1-d})};a.filter.invert.toString=function(){return this()};a.filter.brigh
 │        │     ⋮
 │        │     
 │        └─ * (count = 1.0)
-│           ├─ OnehotVec{10, 2}(1, 1)
+│           ├─ OnehotVec{10, 2}(4, 1)
 │           │  ⋮
 │           │  
-│           └─ OnehotVec{10, 2}(8, 1)
+│           └─ OnehotVec{10, 2}(10, 1)
 │              ⋮
 │              
 └─ * (count = 18.0)
    ├─ OnehotVec{10, 2}(6, 1)
    └─ + (count = 18.0)
       ├─ + (count = 13.0)
-      │  ├─ * (count = 9.0)
-      │  │  ├─ + (count = 3.0)
+      │  ├─ + (count = 12.0)
+      │  │  ├─ + (count = 10.0)
       │  │  │  ⋮
       │  │  │  
-      │  │  └─ + (count = 3.0)
+      │  │  └─ * (count = 2.0)
       │  │     ⋮
       │  │     
-      │  └─ * (count = 4.0)
-      │     ├─ + (count = 2.0)
+      │  └─ * (count = 1.0)
+      │     ├─ OnehotVec{10, 2}(4, 1)
       │     │  ⋮
       │     │  
-      │     └─ * (count = 2.0)
+      │     └─ OnehotVec{10, 2}(10, 1)
       │        ⋮
       │        
-      └─ * (count = 5.0)
-         ├─ OnehotVec{10, 2}(4, 1)
-         └─ + (count = 5.0)
-            ├─ * (count = 4.0)
+      └─ + (count = 5.0)
+         ├─ + (count = 4.0)
+         │  ├─ + (count = 3.0)
+         │  │  ⋮
+         │  │  
+         │  └─ * (count = 1.0)
+         │     ⋮
+         │     
+         └─ * (count = 1.0)
+            ├─ OnehotVec{10, 2}(4, 1)
             │  ⋮
             │  
-            └─ OnehotVec{10, 2}(7, 1)
+            └─ * (count = 1.0)
                ⋮
                
 </code></pre><p>The return value has the <a href="../../ref/#GenericTensorNetworks.SumProductTree"><code>SumProductTree</code></a> type. Its length corresponds to the number of configurations.</p><pre><code class="language-julia hljs">length(all_independent_sets_tree)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">76.0</code></pre><p>We can use <code>Base.collect</code> function to create a <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a> or use <a href="../../ref/#GenericTensorNetworks.generate_samples"><code>generate_samples</code></a> to generate samples from it.</p><pre><code class="language-julia hljs">collect(all_independent_sets_tree)
 
 generate_samples(all_independent_sets_tree, 10)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{StaticBitVector{10, 1}}:
- 0010000001
- 0010000000
- 0100000000
- 0100000100
- 1010001000
- 0000001100
- 0100100010
- 0100000011
- 1000000010
- 0010010000</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../MaximalIS/">Maximal independent set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.17 on <span class="colophon-date" title="Sunday 22 May 2022 06:30">Sunday 22 May 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 0000000000
+ 0000100010
+ 0001001000
+ 0101000000
+ 0101000100
+ 0101000001
+ 0000010000
+ 0010010000
+ 0000110000
+ 0000010001</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../MaximalIS/">Maximal independent set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.17 on <span class="colophon-date" title="Sunday 22 May 2022 06:34">Sunday 22 May 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

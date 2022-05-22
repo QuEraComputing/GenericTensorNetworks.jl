@@ -141,3 +141,63 @@ function print_mining(rewards::AbstractMatrix{T}, config) where T
         println()
     end
 end
+
+function _open_pit_mining_branching!(rewards::AbstractMatrix{T}, mask::AbstractMatrix{Bool}, setmask::AbstractMatrix{Bool}, idx::Int) where T
+    # find next
+    idx < 1 && return zero(T)
+    i, j = divrem(idx-1, size(mask, 2)) .+ 1 # row-wise!
+    while i > j || size(mask, 1)-i+1 < j || setmask[i, j]  # skip not allowed or already decided
+        idx -= 1
+        idx < 1 && return zero(T)
+        i, j = divrem(idx-1, size(mask, 2)) .+ 1 # row-wise!
+    end
+    if rewards[i, j] < 0 # do not mine!
+        setmask[i, j] = true
+        return _open_pit_mining_branching!(rewards, mask, setmask, idx-1)
+    else
+        _mask = copy(mask)
+        _setmask = copy(setmask)
+        # CASE 1: try mine current block
+        # set mask
+        reward0, nflip = set_recur!(mask, setmask, rewards, i, j, index_cache)
+        reward1 = _open_pit_mining_branching!(rewards, mask, setmask, idx-1) + reward0
+        unset_recur!(mask, setmask, rewards, i, j, index_cache, nflip)
+
+        # CASE 1: try do not mine current block
+        # unset mask
+        _setmask[i, j] = true
+        reward2 = _open_pit_mining_branching!(rewards, _mask, _setmask, idx-1)
+        
+        # choose the right branch
+        if reward2 > reward1
+            copyto!(mask, _mask)
+            copyto!(setmask, _setmask)
+            return reward2
+        else
+            return reward1
+        end
+    end
+end
+
+function set_recur!(mask, setmask, rewards::AbstractMatrix{T}, i, j) where T
+    reward = zero(T)
+    for k=1:i
+        start = max(1, j-(i-k))
+        stop = min(size(mask, 2), j+(i-k))
+        @inbounds for l=start:stop
+            if !setmask[k,l]
+                mask[k,l] = true
+                setmask[k,l] = true
+                reward += rewards[k,l]
+            end
+        end
+    end
+    return reward
+end
+
+function open_pit_mining_branching(rewards::AbstractMatrix{T}) where T
+    idx = length(rewards)
+    mask = falses(size(rewards))
+    rewards = _open_pit_mining_branching!(rewards, mask, falses(size(rewards)), idx)
+    return rewards, mask
+end

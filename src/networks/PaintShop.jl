@@ -1,13 +1,23 @@
 """
     PaintShop{CT<:AbstractEinsum} <: GraphProblem
     PaintShop(sequence::AbstractVector; openvertices=(),
-             optimizer=GreedyMethod(), simplifier=nothing)
+            optimizer=GreedyMethod(), simplifier=nothing,
+            fixedvertices=Dict()
+        )
 
 The [binary paint shop problem](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/PaintShop.html).
-`optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
 
-Example
------------------------------------------
+Positional arguments
+-------------------------------
+
+Keyword arguments
+-------------------------------
+* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
+* `fixedvertices` is a dict to specify the values of degree of freedoms, where a value can be `0` (the first appearence in blue) or `1` (the first appearence in red).
+* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
+
+Examples
+-------------------------------
 One can encode the paint shop problem `abaccb` as the following
 
 ```jldoctest; setup=:(using GenericTensorNetworks)

@@ -1,10 +1,22 @@
 """
     Coloring{K,CT<:AbstractEinsum, WT<:Union{NoWeight, Vector}} <: GraphProblem
-    Coloring{K}(graph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+    Coloring{K}(graph; weights=NoWeight(), openvertices=(),
+            optimizer=GreedyMethod(), simplifier=nothing,
+            fixedvertices=Dict()
+        )
 
 The [Vertex Coloring](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/Coloring.html) problem.
-`weights` has one to one correspondence with `edges(graph)`.
-`optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
+
+Positional arguments
+-------------------------------
+* `graph` is the problem graph.
+
+Keyword arguments
+-------------------------------
+* `weights` are associated with the edges of the `graph`.
+* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
+* `fixedvertices` is a dict to specify the values of degree of freedoms on vertices, where a value can be in ``0,...,K-1`` (different colors).
+* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
 """
 struct Coloring{K,CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
     code::CT

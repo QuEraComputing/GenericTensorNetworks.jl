@@ -1,10 +1,22 @@
 """
     Matching{CT<:AbstractEinsum, WT<:Union{NoWeight,Vector}} <: GraphProblem
-    Matching(graph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing)
+    Matching(graph; weights=NoWeight(), openvertices=(),
+            optimizer=GreedyMethod(), simplifier=nothing,
+            fixedvertices=Dict()
+        )
 
 The [Vertex matching](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/Matching.html) problem.
-`weights` has one to one correspondence with `edges(graph)`.
-`optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
+
+Positional arguments
+-------------------------------
+* `graph` is the problem graph.
+
+Keyword arguments
+-------------------------------
+* `weights` are associated with the edges of the `graph`.
+* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
+* `fixedvertices` is a dict to specify the values of degree of freedoms on edges, where a value can be `0` (not matched) or `1` (mathced).
+* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
 """
 struct Matching{CT<:AbstractEinsum, WT<:Union{NoWeight,Vector}} <: GraphProblem
     code::CT

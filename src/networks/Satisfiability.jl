@@ -109,12 +109,48 @@ end
 """
     Satisfiability{CT<:AbstractEinsum,T,WT<:Union{NoWeight, Vector}} <: GraphProblem
     Satisfiability(cnf::CNF; weights=NoWeight(), openvertices=(),
-                 optimizer=GreedyMethod(), simplifier=nothing)
+            optimizer=GreedyMethod(), simplifier=nothing,
+            fixedvertices=Dict()
+        )
 
 The [satisfiability](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/Satisfiability.html) problem.
-In the constructor, `cnf` is a logical expresion in conjunctive normal form ([`CNF`](@ref)) for the satisfiability problems.
-`weights` are associated with clauses.
-`optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
+
+Positional arguments
+-------------------------------
+* `cnf` is a conjunctive normal form ([`CNF`](@ref)) for specifying the satisfiability problems.
+
+Keyword arguments
+-------------------------------
+* `weights` are associated with clauses.
+* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
+* `fixedvertices` is a dict to specify the values of boolean variables, where a value can be `0` or `1`.
+* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
+
+Examples
+-------------------------------
+```jldoctest; setup=:(using GenericTensorNetworks)
+julia> @bools x y z a b c
+
+julia> c1 = x ∨ ¬y
+x ∨ ¬y
+
+julia> c2 = c ∨ (¬a ∨ b)
+c ∨ ¬a ∨ b
+
+julia> c3 = (z ∨ ¬a) ∨ y
+z ∨ ¬a ∨ y
+
+julia> c4 = (c ∨ z) ∨ ¬b
+c ∨ z ∨ ¬b
+
+julia> cnf = (c1 ∧ c4) ∧ (c2 ∧ c3)
+(x ∨ ¬y) ∧ (c ∨ z ∨ ¬b) ∧ (c ∨ ¬a ∨ b) ∧ (z ∨ ¬a ∨ y)
+
+julia> gp = Satisfiability(cnf);
+
+julia> solve(gp, SizeMax())[]
+4.0ₜ
+```
 """
 struct Satisfiability{CT<:AbstractEinsum,T,WT<:Union{NoWeight, Vector}} <: GraphProblem
     code::CT

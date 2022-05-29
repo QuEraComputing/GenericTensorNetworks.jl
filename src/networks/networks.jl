@@ -117,6 +117,7 @@ include("Satisfiability.jl")
 include("DominatingSet.jl")
 include("SetPacking.jl")
 include("SetCovering.jl")
+include("OpenPitMining.jl")
 
 # forward the time, space and readwrite complexity
 OMEinsum.timespacereadwrite_complexity(gp::GraphProblem) = timespacereadwrite_complexity(gp.code, uniformsize(gp.code, nflavor(gp)))

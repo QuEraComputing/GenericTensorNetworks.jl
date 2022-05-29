@@ -10,4 +10,8 @@ using GenericTensorNetworks, Test, Graphs
     @test is_valid_mining(rewards, res.c.data)
     @test res.n == 21
     print_mining(rewards, res.c.data)
+    val, mask = GenericTensorNetworks.open_pit_mining_branching(rewards)
+    @test val == res.n
+    res_b = map(block->mask[block...], problem.blocks)
+    @test res_b == [res.c.data...]
 end

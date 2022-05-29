@@ -1,7 +1,11 @@
 """
     OpenPitMining{ET, CT<:AbstractEinsum} <: GraphProblem
     OpenPitMining(rewards; openvertices=(),
-                 optimizer=GreedyMethod(), simplifier=nothing)
+                 optimizer=GreedyMethod(), simplifier=nothing,
+                 fixedvertices=Dict())
+
+The open pit mining problem.
+This problem can be solved in polynomial time with the pseudoflow algorithm.
 
 Positional arguments
 -------------------------------
@@ -11,6 +15,8 @@ Keyword arguments
 -------------------------------
 * `openvertices` specifies labels of the output tensor.
 * `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
+* `fixedvertices` is a dict to specify the values of labels, where a value can be `0` (not mined) or `1` (mined)
+* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
 
 Example
 -----------------------------------
@@ -117,6 +123,11 @@ function is_valid_mining(rewards::AbstractMatrix, config)
     return true
 end
 
+"""
+    print_mining(rewards::AbstractMatrix, config)
+
+Printing the mining solution in a colored REPL.
+"""
 function print_mining(rewards::AbstractMatrix{T}, config) where T
     k = 0
     for i=1:size(rewards, 1)
@@ -159,9 +170,8 @@ function _open_pit_mining_branching!(rewards::AbstractMatrix{T}, mask::AbstractM
         _setmask = copy(setmask)
         # CASE 1: try mine current block
         # set mask
-        reward0, nflip = set_recur!(mask, setmask, rewards, i, j, index_cache)
+        reward0 = set_recur!(mask, setmask, rewards, i, j)
         reward1 = _open_pit_mining_branching!(rewards, mask, setmask, idx-1) + reward0
-        unset_recur!(mask, setmask, rewards, i, j, index_cache, nflip)
 
         # CASE 1: try do not mine current block
         # unset mask
@@ -195,6 +205,12 @@ function set_recur!(mask, setmask, rewards::AbstractMatrix{T}, i, j) where T
     return reward
 end
 
+"""
+    open_pit_mining_branching(rewards::AbstractMatrix)
+
+Solve the open pit mining problem with the naive branching algorithm.
+NOTE: open pit mining can be solved in polynomial time, but this one runs in exponential time.
+"""
 function open_pit_mining_branching(rewards::AbstractMatrix{T}) where T
     idx = length(rewards)
     mask = falses(size(rewards))

@@ -1,10 +1,22 @@
 """
     MaximalIS{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
     MaximalIS(graph; weights=NoWeight(), openvertices=(),
-                 optimizer=GreedyMethod(), simplifier=nothing)
+            optimizer=GreedyMethod(), simplifier=nothing,
+            fixedvertices=Dict()
+        )
 
 The [maximal independent set](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/MaximalIS.html) problem. In the constructor, `weights` are the weights of vertices.
-`optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
+
+Positional arguments
+-------------------------------
+* `graph` is the problem graph.
+
+Keyword arguments
+-------------------------------
+* `weights` are associated with the vertices of the `graph`.
+* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
+* `fixedvertices` is a dict to specify the values of degree of freedoms, where a value can be `0` (absent in the set) or `1` (present in the set).
+* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
 """
 struct MaximalIS{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
     code::CT

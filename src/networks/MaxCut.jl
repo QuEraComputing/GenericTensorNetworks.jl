@@ -1,11 +1,22 @@
 """
     MaxCut{CT<:AbstractEinsum,WT<:Union{NoWieght, Vector}} <: GraphProblem
     MaxCut(graph; weights=NoWeight(), openvertices=(),
-                optimizer=GreedyMethod(), simplifier=nothing)
+            optimizer=GreedyMethod(), simplifier=nothing,
+            fixedvertices=Dict()
+        )
 
 The [cutting](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/MaxCut.html) problem (or spin glass problem).
-In the constructor, `weights` are the weights of edges.
-`optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
+
+Positional arguments
+-------------------------------
+* `graph` is the problem graph.
+
+Keyword arguments
+-------------------------------
+* `weights` are associated with the edges of the `graph`.
+* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
+* `fixedvertices` is a dict to specify the values of degree of freedoms, where a value can be `0` (in one side of the cut) or `1` (in the other side of the cut).
+* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
 """
 struct MaxCut{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
     code::CT

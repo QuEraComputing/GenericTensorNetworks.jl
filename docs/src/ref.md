@@ -13,6 +13,7 @@ PaintShop
 Satisfiability
 SetCovering
 SetPacking
+OpenPitMining
 ```
 
 #### Graph Problem Interfaces
@@ -54,6 +55,9 @@ satisfiable
 ∨
 ¬
 ∧
+
+is_valid_mining
+print_mining
 ```
 
 ## Properties

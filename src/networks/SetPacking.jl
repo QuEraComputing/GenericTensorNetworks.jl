@@ -1,7 +1,9 @@
 """
     SetPacking{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
     SetPacking(sets; weights=NoWeight(), openvertices=(),
-                 optimizer=GreedyMethod(), simplifier=nothing)
+            optimizer=GreedyMethod(), simplifier=nothing,
+            fixedvertices=Dict()
+        )
 
 The [set packing problem](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/SetPacking.html), a generalization of independent set problem to hypergraphs.
 
@@ -12,12 +14,12 @@ Positional arguments
 Keyword arguments
 -------------------------------
 * `weights` are associated with sets.
-* `openvertices` specifies labels of the output tensor.
 * `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
+* `fixedvertices` is a dict to specify the values of degree of freedoms, where a value can be `0` (absent in the set) or `1` (present in the set).
+* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
 
-
-Example
------------------------------------
+Examples
+-------------------------------
 ```jldoctest; setup=:(using GenericTensorNetworks, Random; Random.seed!(2))
 julia> sets = [[1, 2, 5], [1, 3], [2, 4], [3, 6], [2, 3, 6]];  # each set is a vertex
 

@@ -44,7 +44,7 @@ struct PaintShop{CT<:AbstractEinsum,LT} <: GraphProblem
     fixedvertices::Dict{LT,Int}
 end
 
-function paintshop_from_pairs(pairs::AbstractVector{Tuple{Int,Int}}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{LT,Int}())
+function paintshop_from_pairs(pairs::AbstractVector{Tuple{Int,Int}}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict())
     n = length(pairs)
     @assert sort!(vcat(collect.(pairs)...)) == collect(1:2n)
     sequence = zeros(Int, 2*n)

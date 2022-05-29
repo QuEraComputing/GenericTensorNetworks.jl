@@ -6,11 +6,11 @@ using Test, GenericTensorNetworks, Graphs
         add_edge!(g, i, j)
     end
     code = Coloring{3}(g; optimizer=GreedyMethod())
-    res = best_solutions(code; all=true)[]
+    res = GenericTensorNetworks.best_solutions(code; all=true)[]
     @test length(res.c.data) == 12
     g = smallgraph(:petersen)
     code = Coloring{3}(g; optimizer=GreedyMethod())
-    res = best_solutions(code; all=true)[]
+    res = GenericTensorNetworks.best_solutions(code; all=true)[]
     @test length(res.c.data) == 120
 
     c = solve(code, SingleConfigMax())[]

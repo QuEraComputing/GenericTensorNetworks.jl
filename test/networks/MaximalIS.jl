@@ -1,4 +1,5 @@
 using GenericTensorNetworks, Test, Graphs
+using GenericTensorNetworks: graph_polynomial
 
 @testset "counting maximal IS" begin
     g = random_regular_graph(20, 3)

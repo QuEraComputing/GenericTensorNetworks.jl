@@ -27,7 +27,7 @@ end
 function MaxCut(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
     @assert weights isa NoWeight || length(weights) == ne(g)
     rawcode = EinCode([[minmax(e.src,e.dst)...] for e in Graphs.edges(g)], collect(Int, openvertices))  # labels for edge tensors
-    MaxCut(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), g, weights, fixedvertices)
+    MaxCut(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), g, weights, Dict{Int,Int}(fixedvertices))
 end
 
 flavors(::Type{<:MaxCut}) = [0, 1]

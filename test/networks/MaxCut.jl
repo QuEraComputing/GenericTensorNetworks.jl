@@ -35,7 +35,7 @@ end
         add_edge!(g, i, j)
     end
     code = MaxCut(g; optimizer=GreedyMethod())
-    res = best_solutions(code; all=true)[]
+    res = GenericTensorNetworks.best_solutions(code; all=true)[]
     @test length(res.c.data) == 2
     @test cut_size(g, res.c.data[1]) == 5
 end

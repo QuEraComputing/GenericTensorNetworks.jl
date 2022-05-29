@@ -44,7 +44,7 @@ struct PaintShop{CT<:AbstractEinsum,LT} <: GraphProblem
     fixedvertices::Dict{LT,Int}
 end
 
-function paintshop_from_pairs(pairs::AbstractVector{Tuple{Int,Int}}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{LT,Int}())
+function paintshop_from_pairs(pairs::AbstractVector{Tuple{Int,Int}}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict())
     n = length(pairs)
     @assert sort!(vcat(collect.(pairs)...)) == collect(1:2n)
     sequence = zeros(Int, 2*n)
@@ -61,7 +61,7 @@ function PaintShop(sequence::AbstractVector{T}; openvertices=(), fixedvertices=D
                 [[sequence[i], sequence[i+1]] for i=1:n-1], # labels for edge tensors
                 ),
                 collect(T, openvertices))
-    PaintShop(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), sequence, isfirst, fixedvertices)
+    PaintShop(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), sequence, isfirst, Dict{T,Int}(fixedvertices))
 end
 
 flavors(::Type{<:PaintShop}) = [0, 1]

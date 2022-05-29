@@ -31,7 +31,7 @@ function Coloring{K}(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixedv
     rawcode = EinCode(([[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
                        [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...), collect(Int, openvertices))  # labels for edge tensors
     code = _optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier)
-    Coloring{K}(code, g, weights, fixedvertices)
+    Coloring{K}(code, g, weights, Dict{Int,Int}(fixedvertices))
 end
 
 flavors(::Type{<:Coloring{K}}) where K = collect(0:K-1)

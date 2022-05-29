@@ -44,7 +44,7 @@ function SetCovering(sets::AbstractVector{Vector{ET}}; weights=NoWeight(), openv
 
     code = EinCode([[[i] for i=1:nsets]...,
         [count[e] for e in elements]...], collect(Int,openvertices))
-    SetCovering(_optimize_code(code, uniformsize_fix(code, 2, fixedvertices), optimizer, simplifier), sets, weights, fixedvertices)
+    SetCovering(_optimize_code(code, uniformsize_fix(code, 2, fixedvertices), optimizer, simplifier), sets, weights, Dict{ET,Int}(fixedvertices))
 end
 
 function cover_count(sets)

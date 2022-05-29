@@ -33,7 +33,7 @@ end
     gp = Satisfiability(cnf)
 
     @test solve(gp, SizeMax())[].n == 4.0
-    res = best_solutions(gp; all=true)[].c.data
+    res = GenericTensorNetworks.best_solutions(gp; all=true)[].c.data
     for i=0:1<<6-1
         v = StaticBitVector(Bool[i>>(k-1) & 1 for k=1:6])
         if v ∈ res
@@ -54,7 +54,7 @@ end
     gp = Satisfiability(cnf; weights=fill(2, length(cnf)))
 
     @test solve(gp, SizeMax())[].n == 8.0
-    res = best_solutions(gp; all=true)[].c.data
+    res = GenericTensorNetworks.best_solutions(gp; all=true)[].c.data
     for i=0:1<<6-1
         v = StaticBitVector(Bool[i>>(k-1) & 1 for k=1:6])
         if v ∈ res

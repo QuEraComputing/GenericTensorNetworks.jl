@@ -42,7 +42,7 @@ function IndependentSet(g::SimpleGraph; weights=NoWeight(), openvertices=(), fix
     rawcode = EinCode([[[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
                        [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...], collect(Int, openvertices))  # labels for edge tensors
     code = _optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier)
-    IndependentSet(code, g, weights, fixedvertices)
+    IndependentSet(code, g, weights, Dict{Int,Int}(fixedvertices))
 end
 
 flavors(::Type{<:IndependentSet}) = [0, 1]

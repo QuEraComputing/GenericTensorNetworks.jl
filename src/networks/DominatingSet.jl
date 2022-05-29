@@ -28,7 +28,7 @@ end
 function DominatingSet(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
     @assert weights isa NoWeight || length(weights) == nv(g)
     rawcode = EinCode(([[Graphs.neighbors(g, v)..., v] for v in Graphs.vertices(g)]...,), collect(Int, openvertices))
-    DominatingSet(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), g, weights, fixedvertices)
+    DominatingSet(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), g, weights, Dict{Int,Int}(fixedvertices))
 end
 
 flavors(::Type{<:DominatingSet}) = [0, 1]

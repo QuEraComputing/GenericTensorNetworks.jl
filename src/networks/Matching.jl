@@ -22,16 +22,16 @@ struct Matching{CT<:AbstractEinsum, WT<:Union{NoWeight,Vector}} <: GraphProblem
     code::CT
     graph::SimpleGraph{Int}
     weights::WT
-    fixedvertices::Dict{Int,Int}
+    fixedvertices::Dict{Tuple{Int,Int},Int}
 end
 
-function Matching(g::SimpleGraph; weights=NoWeight(), openvertices=(),fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
+function Matching(g::SimpleGraph; weights=NoWeight(), openvertices=(),fixedvertices=Dict{Tuple{Int,Int},Int}(), optimizer=GreedyMethod(), simplifier=nothing)
     @assert weights isa NoWeight || length(weights) == ne(g)
     edges = [minmax(e.src,e.dst) for e in Graphs.edges(g)]
     rawcode = EinCode(vcat([[s] for s in edges], # labels for edge tensors
                 [[minmax(i,j) for j in neighbors(g, i)] for i in Graphs.vertices(g)]),
                 collect(Tuple{Int,Int}, openvertices))
-    Matching(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), g, weights, fixedvertices)
+    Matching(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), g, weights, Dict{Tuple{Int,Int},Int}(fixedvertices))
 end
 
 flavors(::Type{<:Matching}) = [0, 1]

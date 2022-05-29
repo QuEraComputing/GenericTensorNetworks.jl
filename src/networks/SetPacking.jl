@@ -40,7 +40,7 @@ function SetPacking(sets::AbstractVector{Vector{ET}}; weights=NoWeight(), openve
     nsets = length(sets)
     @assert weights isa NoWeight || length(weights) == nsets
     code = EinCode(vcat([[i] for i=1:nsets], [[i,j] for i=1:nsets,j=1:nsets if j>i && !isempty(sets[i] ∩ sets[j])]), collect(Int,openvertices))
-    SetPacking(_optimize_code(code, uniformsize_fix(code, 2, openvertices), optimizer, simplifier), sets, weights, fixedvertices)
+    SetPacking(_optimize_code(code, uniformsize_fix(code, 2, openvertices), optimizer, simplifier), sets, weights, Dict{ET,Int}(fixedvertices))
 end
 
 flavors(::Type{<:SetPacking}) = [0, 1]

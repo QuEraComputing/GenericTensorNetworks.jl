@@ -28,7 +28,7 @@ end
 function MaximalIS(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{Int,Int}())
     @assert weights isa NoWeight || length(weights) == nv(g)
     rawcode = EinCode(([[Graphs.neighbors(g, v)..., v] for v in Graphs.vertices(g)]...,), collect(Int, openvertices))
-    MaximalIS(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), g, weights, fixedvertices)
+    MaximalIS(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), g, weights, Dict{Int,Int}(fixedvertices))
 end
 
 flavors(::Type{<:MaximalIS}) = [0, 1]

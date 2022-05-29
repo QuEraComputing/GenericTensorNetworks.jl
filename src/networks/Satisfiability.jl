@@ -161,7 +161,7 @@ end
 
 function Satisfiability(cnf::CNF{T}; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{T,Int}()) where T
     rawcode = EinCode([[getfield.(c.vars, :name)...] for c in cnf.clauses], collect(T, openvertices))
-    Satisfiability(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), cnf, weights, fixedvertices)
+    Satisfiability(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), cnf, weights, Dict{T,Int}(fixedvertices))
 end
 
 flavors(::Type{<:Satisfiability}) = [0, 1]  # false, true

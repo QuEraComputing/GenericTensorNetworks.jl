@@ -61,7 +61,7 @@ function PaintShop(sequence::AbstractVector{T}; openvertices=(), fixedvertices=D
                 [[sequence[i], sequence[i+1]] for i=1:n-1], # labels for edge tensors
                 ),
                 collect(T, openvertices))
-    PaintShop(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), sequence, isfirst, fixedvertices)
+    PaintShop(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), sequence, isfirst, Dict{LT,Int}(fixedvertices))
 end
 
 flavors(::Type{<:PaintShop}) = [0, 1]

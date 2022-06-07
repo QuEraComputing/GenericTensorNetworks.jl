@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Make extensions · GenericTensorNetworks.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link rel="canonical" href="https://QuEraComputing.github.io/GenericTensorNetworks.jl/extension/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.044/juliamono.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">GenericTensorNetworks.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><span class="tocitem">Problems</span><ul><li><a class="tocitem" href="../tutorials/IndependentSet/">Independent set problem</a></li><li><a class="tocitem" href="../tutorials/MaximalIS/">Maximal independent set problem</a></li><li><a class="tocitem" href="../tutorials/MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../tutorials/Matching/">Vertex Matching problem</a></li><li><a class="tocitem" href="../tutorials/PaintShop/">Binary paint shop problem</a></li><li><a class="tocitem" href="../tutorials/Coloring/">Coloring problem</a></li><li><a class="tocitem" href="../tutorials/DominatingSet/">Dominating set problem</a></li><li><a class="tocitem" href="../tutorials/Satisfiability/">Satisfiability problem</a></li><li><a class="tocitem" href="../tutorials/SetCovering/">Set covering problem</a></li><li><a class="tocitem" href="../tutorials/SetPacking/">Set packing problem</a></li></ul></li><li><span class="tocitem">Topics</span><ul><li class="is-active"><a class="tocitem" href>Make extensions</a></li><li><a class="tocitem" href="../tutorials/saveload/">Save and load solutions</a></li><li><a class="tocitem" href="../sumproduct/">Sum product tree representation</a></li><li><a class="tocitem" href="../tutorials/weighted/">Weighted problems</a></li><li><a class="tocitem" href="../tutorials/open/">Open degree of freedoms</a></li></ul></li><li><a class="tocitem" href="../performancetips/">Performance Tips</a></li><li><a class="tocitem" href="../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Topics</a></li><li class="is-active"><a href>Make extensions</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Make extensions</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/docs/src/extension.md#" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Make-extensions"><a class="docs-heading-anchor" href="#Make-extensions">Make extensions</a><a id="Make-extensions-1"></a><a class="docs-heading-anchor-permalink" href="#Make-extensions" title="Permalink"></a></h1><p>The code we will show below is a gist of how this package is implemented for pedagogical purpose, which covers many functionalities of the main repo without caring much about performance. This project depends on multiple open source packages in the Julia ecosystem:</p><ul><li><a href="https://github.com/under-Peter/OMEinsum.jl">OMEinsum</a> and <a href="https://github.com/TensorBFS/OMEinsumContractionOrders.jl">OMEinsumContractionOrders</a> are packages providing the support for Einstein&#39;s (or tensor network) notation and state-of-the-art algorithms for contraction order optimization, which includes multiple state of the art algorithms.</li><li><a href="https://github.com/TensorBFS/TropicalNumbers.jl">TropicalNumbers</a> and <a href="https://github.com/TensorBFS/TropicalGEMM.jl">TropicalGEMM</a> are packages providing tropical number and efficient tropical matrix multiplication.</li><li><a href="https://github.com/JuliaGraphs/Graphs.jl">Graphs</a> is a foundational package for graph manipulation in the Julia community.</li><li><a href="https://github.com/JuliaMath/Polynomials.jl">Polynomials</a> is a package providing polynomial algebra and polynomial fitting.</li><li><a href="https://github.com/scheinerman/Mods.jl">Mods</a> and the <a href="https://github.com/JuliaMath/Primes.jl">Primes</a> package providing finite field algebra and prime number manipulation.</li></ul><p>They can be installed in a similar way to <code>GenericTensorNetworks</code>. After installing the required packages, one can open a Julia REPL, and copy-paste the following code snippet into it.</p><pre><code class="language-julia hljs">using OMEinsum, OMEinsumContractionOrders
+using Graphs
+using Random
+
+# generate a random regular graph of size 50, degree 3
+graph = (Random.seed!(2); Graphs.random_regular_graph(50, 3))
+
+# generate einsum code, i.e. the labels of tensors
+code = EinCode(([minmax(e.src,e.dst) for e in Graphs.edges(graph)]..., # labels for edge tensors
+                [(i,) for i in Graphs.vertices(graph)]...), ())        # labels for vertex tensors
+
+# an einsum contraction without a contraction order specified is called `EinCode`,
+# an einsum contraction having a contraction order (specified as a tree structure) is called `NestedEinsum`.
+# assign each label a dimension-2, it will be used in the contraction order optimization
+# `uniquelabels` function extracts the tensor labels into a vector.
+size_dict = Dict([s=&gt;2 for s in uniquelabels(code)])
+# optimize the contraction order using the `TreeSA` method; the target space complexity is 2^17
+optimized_code = optimize_code(code, size_dict, TreeSA())
+println(&quot;time/space complexity is $(OMEinsum.timespace_complexity(optimized_code, size_dict))&quot;)
+
+# a function for computing the independence polynomial
+function independence_polynomial(x::T, code) where {T}
+	xs = map(getixsv(code)) do ix
+        # if the tensor rank is 1, create a vertex tensor.
+        # otherwise the tensor rank must be 2, create a bond tensor.
+        length(ix)==1 ? [one(T), x] : [one(T) one(T); one(T) zero(T)]
+    end
+    # both `EinCode` and `NestedEinsum` are callable, inputs are tensors.
+	code(xs...)
+end
+
+########## COMPUTING THE MAXIMUM INDEPENDENT SET SIZE AND ITS COUNTING/DEGENERACY ###########
+
+# using Tropical numbers to compute the MIS size and the MIS degeneracy.
+using TropicalNumbers
+mis_size(code) = independence_polynomial(TropicalF64(1.0), code)[]
+println(&quot;the maximum independent set size is $(mis_size(optimized_code).n)&quot;)
+
+# A `CountingTropical` object has two fields, tropical field `n` and counting field `c`.
+mis_count(code) = independence_polynomial(CountingTropical{Float64,Float64}(1.0, 1.0), code)[]
+println(&quot;the degeneracy of maximum independent sets is $(mis_count(optimized_code).c)&quot;)
+
+########## COMPUTING THE INDEPENDENCE POLYNOMIAL ###########
+
+# using Polynomial numbers to compute the polynomial directly
+using Polynomials
+println(&quot;the independence polynomial is $(independence_polynomial(Polynomial([0.0, 1.0]), optimized_code)[])&quot;)
+
+########## FINDING MIS CONFIGURATIONS ###########
+
+# define the set algebra
+struct ConfigEnumerator{N}
+    # NOTE: BitVector is dynamic and it can be very slow; check our repo for the static version
+    data::Vector{BitVector}
+end
+function Base.:+(x::ConfigEnumerator{N}, y::ConfigEnumerator{N}) where {N}
+    res = ConfigEnumerator{N}(vcat(x.data, y.data))
+    return res
+end
+function Base.:*(x::ConfigEnumerator{L}, y::ConfigEnumerator{L}) where {L}
+    M, N = length(x.data), length(y.data)
+    z = Vector{BitVector}(undef, M*N)
+    for j=1:N, i=1:M
+        z[(j-1)*M+i] = x.data[i] .| y.data[j]
+    end
+    return ConfigEnumerator{L}(z)
+end
+Base.zero(::Type{ConfigEnumerator{N}}) where {N} = ConfigEnumerator{N}(BitVector[])
+Base.one(::Type{ConfigEnumerator{N}}) where {N} = ConfigEnumerator{N}([falses(N)])
+
+# the algebra sampling one of the configurations
+struct ConfigSampler{N}
+    data::BitVector
+end
+
+function Base.:+(x::ConfigSampler{N}, y::ConfigSampler{N}) where {N}  # biased sampling: return `x`
+    return x  # randomly pick one
+end
+function Base.:*(x::ConfigSampler{L}, y::ConfigSampler{L}) where {L}
+    ConfigSampler{L}(x.data .| y.data)
+end
+
+Base.zero(::Type{ConfigSampler{N}}) where {N} = ConfigSampler{N}(trues(N))
+Base.one(::Type{ConfigSampler{N}}) where {N} = ConfigSampler{N}(falses(N))
+
+# enumerate all configurations if `all` is true; compute one otherwise.
+# a configuration is stored in the data type of `StaticBitVector`; it uses integers to represent bit strings.
+# `ConfigTropical` is defined in `TropicalNumbers`. It has two fields: tropical number `n` and optimal configuration `config`.
+# `CountingTropical{T,&lt;:ConfigEnumerator}` stores configurations instead of simple counting.
+function mis_config(code; all=false)
+    # map a vertex label to an integer
+    vertex_index = Dict([s=&gt;i for (i, s) in enumerate(uniquelabels(code))])
+    N = length(vertex_index)  # number of vertices
+    xs = map(getixsv(code)) do ix
+        T = all ? CountingTropical{Float64, ConfigEnumerator{N}} : CountingTropical{Float64, ConfigSampler{N}}
+        if length(ix) == 2
+            return [one(T) one(T); one(T) zero(T)]
+        else
+            s = falses(N)
+            s[vertex_index[ix[1]]] = true  # one hot vector
+            if all
+                [one(T), T(1.0, ConfigEnumerator{N}([s]))]
+            else
+                [one(T), T(1.0, ConfigSampler{N}(s))]
+            end
+        end
+    end
+	return code(xs...)
+end
+
+println(&quot;one of the optimal configurations is $(mis_config(optimized_code; all=false)[].c.data)&quot;)
+
+# direct enumeration of configurations can be very slow; please check the bounding version in our Github repo.
+println(&quot;all optimal configurations are $(mis_config(optimized_code; all=true)[].c)&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../tutorials/SetPacking/">« Set packing problem</a><a class="docs-footer-nextpage" href="../tutorials/saveload/">Save and load solutions »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.19 on <span class="colophon-date" title="Tuesday 7 June 2022 04:33">Tuesday 7 June 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

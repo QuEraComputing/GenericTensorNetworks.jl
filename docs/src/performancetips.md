@@ -1,6 +1,5 @@
 # Performance Tips
-
-## Optimize tensor network contraction orders
+## Optimize contraction orders
 
 Let us use the independent set problem on 3-regular graphs as an example.
 ```julia
@@ -68,7 +67,7 @@ The finite field approach only requires 298 KB memory, while using the [`Polynom
     * The actual run time memory can be several times larger than the size of the maximum tensor, so the [`estimate_memory`](@ref) is more accurate in estimating the peak memory.
     * For mutable element types like [`ConfigEnumerator`](@ref), none of memory estimation functions measure the actual memory usage correctly.
 
-## Slicing
+## Slicing technique
 
 For large scale applications, it is also possible to slice over certain degrees of freedom to reduce the space complexity, i.e.
 loop and accumulate over certain degrees of freedom so that one can have a smaller tensor network inside the loop due to the removal of these degrees of freedom.
@@ -175,3 +174,41 @@ Solution space properties computable on GPU includes
 * [`CountingMax`](@ref) and [`CountingMin`](@ref)
 * [`GraphPolynomial`](@ref)
 * [`SingleConfigMax`](@ref) and [`SingleConfigMin`](@ref)
+
+## Benchmarks
+We run a single thread benchmark on central processing units (CPU) Intel(R) Xeon(R) CPU E5-2686 v4 @ 2.30GHz, and its CUDA version on a GPU Tesla V100-SXM2 16G. The results are summarized in the following plot. The benchmark code can be found in [our paper repository](https://github.com/GiggleLiu/NoteOnTropicalMIS/tree/master/benchmarks).
+
+![benchmark-independent-set](assets/fig1.png)
+This benchmark results is for computing different solution space properties of independent sets of random three-regular graphs with different tensor element types. The time in these plots only includes tensor network contraction, without taking into account the contraction order finding and just-in-time compilation time. Legends are properties, algebra, and devices that we used in the computation; one can find the corresponding computed solution space property in Table 1 in the [paper](https://arxiv.org/abs/2205.03718).
+
+* (a) time and space complexity versus the number of vertices for the benchmarked graphs.
+* (b) The computation time for calculating the MIS size and for counting the number of all independent sets (ISs), the number of MISs, the number of independent sets having size ``\alpha(G)`` and ``\alpha(G)-1``, and finding 100 largest set sizes.
+* (c) The computation time for calculating the independence polynomials with different approaches.
+* (d) The computation time for configuration enumeration, including single MIS configuration, the enumeration of all independent set configurations, all MIS configurations, all independent sets, and all independent set configurations having size ``\alpha(G)`` and ``\alpha(G)-1``.
+
+The graphs in all benchmarks are random three-regular graphs, which have treewidth that is asymptotically smaller than ``|V|/6``. In this benchmark, we do not include traditional algorithms for finding the MIS sizes such as branching or dynamic programming. To the best of our knowledge, these algorithms are not suitable for computing most of the solution space properties mentioned in this paper. The main goal of this section is to show the relative computation time for calculating different solution space properties.
+
+Panel (a) shows the time and space complexity of tensor network contraction for different graph sizes. The contraction order is obtained using the `TreeSA` algorithm that implemented in [OMEinsumContractionOrders](https://github.com/TensorBFS/OMEinsumContractionOrders.jl). If we assume our contraction-order finding program has found the optimal treewidth, which is very likely to be true, the space complexity is the same as the treewidth of the problem graph.
+Slicing technique has been used for graphs with space complexity greater than ``2^{27}`` (above the yellow dashed line) to fit the computation into a 16GB memory. One can see that all the computation times in panels (b), (c), and (d) have a strong correlation with the predicted time and space complexity.
+While in panel (d), the computation time of configuration enumeration also strongly correlates with other factors such as the configuration space size.
+Among these benchmarks, computational tasks with data types real numbers, complex numbers, or [Tropical](@ref) numbers (CPU only) can utilize fast basic linear algebra subprograms (BLAS) functions. These tasks usually compute much faster than ones with other element types in the same category.
+Immutable data types with no reference to other values can be compiled to GPU devices that run much faster than CPUs in all cases when the problem scale is big enough.
+These data types do not include those defined in [Polynomial](@ref), [ConfigEnumerator](@ref), [ExtendedTropical](@ref) and [SumProductTree](@ref) or a data type containing them as a part.
+In panel (c), one can see the Fourier transformation-based method is the fastest in computing the independence polynomial,
+but it may suffer from round-off errors. The finite field (GF(p)) approach is the only method that does not have round-off errors and can be run on a GPU.
+In panel (d), one can see the technique to bound the enumeration space (see paper) improves the performance for more than one order of magnitude in enumerating the MISs. The bounding technique can also reduce the memory usage significantly, without which the largest computable graph size is only ``\sim150`` on a device with 32GB main memory.
+
+We show the benchmark of computing the maximal independent set properties on 3-regular graphs in the following plot,
+including a comparison to the Bron-Kerbosch algorithm from Julia package [Graphs](https://github.com/JuliaGraphs/Graphs.jl)
+
+![benchmark-maximal-independent-set](assets/fig2.png)
+
+In this plot, benchmarks of computing different solution space properties of the maximal independent sets (ISs) problem on random three regular graphs at different sizes.
+
+* (a) time and space complexity of tensor network contraction.
+* (b) The wall clock time for counting and enumeration of maximal ISs.
+
+Panel (a) shows the space and time complexities of tensor contraction, which are typically larger than those for the independent set problem.
+In panel (b), one can see counting maximal independent sets are much more efficient than enumerating them, while our generic tensor network approach runs slightly faster than the Bron-Kerbosch approach in enumerating all maximal independent sets.
+
+

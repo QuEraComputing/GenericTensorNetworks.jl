@@ -34,7 +34,7 @@ end
     gp = IndependentSet(g, optimizer=TreeSA(; ntrials=1); simplifier=MergeGreedy())
     p6 = graph_polynomial(gp, Val(:polynomial))[]
     p7 = graph_polynomial(gp, Val(:finitefield))[]
-    @test p6 ≈ p7
+    @test p6.coeffs ≈ p7.coeffs
 end
 
 @testset "open indices" begin

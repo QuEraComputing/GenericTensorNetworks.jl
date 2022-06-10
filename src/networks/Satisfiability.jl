@@ -113,7 +113,7 @@ end
             fixedvertices=Dict()
         )
 
-The [satisfiability](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/Satisfiability.html) problem.
+The [satisfiability](https://psychic-meme-f4d866f8.pages.github.io/dev/generated/Satisfiability.html) problem.
 
 Positional arguments
 -------------------------------

@@ -5,7 +5,7 @@
             fixedvertices=Dict()
         )
 
-The [Vertex matching](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/Matching.html) problem.
+The [Vertex matching](https://psychic-meme-f4d866f8.pages.github.io/dev/generated/Matching.html) problem.
 
 Positional arguments
 -------------------------------

@@ -5,7 +5,7 @@
             fixedvertices=Dict()
         )
 
-The [dominating set](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/DominatingSet.html) problem.
+The [dominating set](https://psychic-meme-f4d866f8.pages.github.io/dev/generated/DominatingSet.html) problem.
 
 Positional arguments
 -------------------------------

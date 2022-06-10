@@ -5,7 +5,7 @@
             fixedvertices=Dict()
         )
 
-The [maximal independent set](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/MaximalIS.html) problem. In the constructor, `weights` are the weights of vertices.
+The [maximal independent set](https://psychic-meme-f4d866f8.pages.github.io/dev/generated/MaximalIS.html) problem. In the constructor, `weights` are the weights of vertices.
 
 Positional arguments
 -------------------------------

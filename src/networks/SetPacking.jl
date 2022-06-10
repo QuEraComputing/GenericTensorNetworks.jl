@@ -5,7 +5,7 @@
             fixedvertices=Dict()
         )
 
-The [set packing problem](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/SetPacking.html), a generalization of independent set problem to hypergraphs.
+The [set packing problem](https://psychic-meme-f4d866f8.pages.github.io/dev/generated/SetPacking.html), a generalization of independent set problem to hypergraphs.
 
 Positional arguments
 -------------------------------

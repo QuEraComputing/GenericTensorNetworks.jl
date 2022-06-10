@@ -57,5 +57,5 @@ The following diagram lists possible combinations of input arguments, where func
 <img src="assets/fig7.svg" width="75%"/>
 </div>
 ```⠀
-You can find many examples in this documentation, a good one to start with is [solving the independent set problem](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/IndependentSet/).
+You can find many examples in this documentation, a good one to start with is [Independent set problem](@ref).
 

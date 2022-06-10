@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Save and load solutions · GenericTensorNetworks.jl</title><script data-outdated-warner src="../../assets/warner.js"></script><link rel="canonical" href="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/saveload/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.044/juliamono.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GenericTensorNetworks.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Problems</span><ul><li><a class="tocitem" href="../IndependentSet/">Independent set problem</a></li><li><a class="tocitem" href="../MaximalIS/">Maximal independent set problem</a></li><li><a class="tocitem" href="../MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../Matching/">Vertex Matching problem</a></li><li><a class="tocitem" href="../PaintShop/">Binary paint shop problem</a></li><li><a class="tocitem" href="../Coloring/">Coloring problem</a></li><li><a class="tocitem" href="../DominatingSet/">Dominating set problem</a></li><li><a class="tocitem" href="../Satisfiability/">Satisfiability problem</a></li><li><a class="tocitem" href="../SetCovering/">Set covering problem</a></li><li><a class="tocitem" href="../SetPacking/">Set packing problem</a></li></ul></li><li><span class="tocitem">Topics</span><ul><li><a class="tocitem" href="../../gist/">Gist</a></li><li class="is-active"><a class="tocitem" href>Save and load solutions</a><ul class="internal"><li><a class="tocitem" href="#Loading-solutions-to-python"><span>Loading solutions to python</span></a></li></ul></li><li><a class="tocitem" href="../../sumproduct/">Sum product tree representation</a></li><li><a class="tocitem" href="../weighted/">Weighted problems</a></li><li><a class="tocitem" href="../open/">Open and fixed degrees of freedom</a></li></ul></li><li><a class="tocitem" href="../../performancetips/">Performance Tips</a></li><li><a class="tocitem" href="../../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Topics</a></li><li class="is-active"><a href>Save and load solutions</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Save and load solutions</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/examples/saveload.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Save-and-load-solutions"><a class="docs-heading-anchor" href="#Save-and-load-solutions">Save and load solutions</a><a id="Save-and-load-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Save-and-load-solutions" title="Permalink"></a></h1><p>Let us use the maximum independent set problem on Petersen graph as an example. The following code enumerates all independent sets.</p><pre><code class="language-julia hljs">using GenericTensorNetworks, Graphs
+
+problem = IndependentSet(Graphs.smallgraph(:petersen))
+
+all_independent_sets = solve(problem, ConfigsAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 1000000000, 0000010000, 0010000000, 1010000000, 0010010000, 0001000000, 1001000000, 0001010000, 0100000000, 0100010000, 0101000000, 0101010000, 0000000010, 1000000010, 0010000010, 1010000010, 0100000010, 0000000001, 1000000001, 0000010001, 0010000001, 1010000001, 0010010001, 0001000001, 1001000001, 0001010001, 0100000001, 0100010001, 0101000001, 0101010001, 0000000011, 1000000011, 0010000011, 1010000011, 0100000011, 0000100000, 0000110000, 0010100000, 0010110000, 0100100000, 0100110000, 0000100010, 0010100010, 0100100010, 0000000100, 1000000100, 0001000100, 1001000100, 0100000100, 0101000100, 0000000110, 1000000110, 0100000110, 0000100100, 0100100100, 0000100110, 0100100110, 0000001000, 1000001000, 0000011000, 0010001000, 1010001000, 0010011000, 0001001000, 1001001000, 0001011000, 0000101000, 0000111000, 0010101000, 0010111000, 0000001100, 1000001100, 0001001100, 1001001100, 0000101100}</code></pre><p>The return value has type <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a>. We can use <a href="../../ref/#GenericTensorNetworks.save_configs"><code>save_configs</code></a> and <a href="../../ref/#GenericTensorNetworks.load_configs"><code>load_configs</code></a> to save and read a <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a> instance to the disk.</p><pre><code class="language-julia hljs">filename = tempname()
+
+save_configs(filename, all_independent_sets; format=:binary)
+
+loaded_sets = load_configs(filename; format=:binary, bitlength=10)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 1000000000, 0000010000, 0010000000, 1010000000, 0010010000, 0001000000, 1001000000, 0001010000, 0100000000, 0100010000, 0101000000, 0101010000, 0000000010, 1000000010, 0010000010, 1010000010, 0100000010, 0000000001, 1000000001, 0000010001, 0010000001, 1010000001, 0010010001, 0001000001, 1001000001, 0001010001, 0100000001, 0100010001, 0101000001, 0101010001, 0000000011, 1000000011, 0010000011, 1010000011, 0100000011, 0000100000, 0000110000, 0010100000, 0010110000, 0100100000, 0100110000, 0000100010, 0010100010, 0100100010, 0000000100, 1000000100, 0001000100, 1001000100, 0100000100, 0101000100, 0000000110, 1000000110, 0100000110, 0000100100, 0100100100, 0000100110, 0100100110, 0000001000, 1000001000, 0000011000, 0010001000, 1010001000, 0010011000, 0001001000, 1001001000, 0001011000, 0000101000, 0000111000, 0010101000, 0010111000, 0000001100, 1000001100, 0001001100, 1001001100, 0000101100}</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>When loading the data in the binary format, bit string length information <code>bitlength</code> is required.</p></div></div><p>For the <a href="../../ref/#GenericTensorNetworks.SumProductTree"><code>SumProductTree</code></a> type output, we can use <a href="../../ref/#GenericTensorNetworks.save_sumproduct"><code>save_sumproduct</code></a> and <a href="../../ref/#GenericTensorNetworks.load_sumproduct"><code>load_sumproduct</code></a> to save and load serialized data.</p><pre><code class="language-julia hljs">all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]
+
+save_sumproduct(filename, all_independent_sets_tree)
+
+loaded_sets_tree = load_sumproduct(filename)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (count = 76.0)
+├─ + (count = 75.0)
+│  ├─ + (count = 71.0)
+│  │  ├─ + (count = 67.0)
+│  │  │  ├─ + (count = 58.0)
+│  │  │  │  ├─ + (count = 54.0)
+│  │  │  │  │  ⋮
+│  │  │  │  │  
+│  │  │  │  └─ * (count = 4.0)
+│  │  │  │     ⋮
+│  │  │  │     
+│  │  │  └─ * (count = 9.0)
+│  │  │     ├─ * (count = 9.0)
+│  │  │     │  ⋮
+│  │  │     │  
+│  │  │     └─ OnehotVec{10, 2}(7, 1)
+│  │  │        ⋮
+│  │  │        
+│  │  └─ * (count = 4.0)
+│  │     ├─ * (count = 4.0)
+│  │     │  ├─ * (count = 4.0)
+│  │     │  │  ⋮
+│  │     │  │  
+│  │     │  └─ OnehotVec{10, 2}(7, 1)
+│  │     │     ⋮
+│  │     │     
+│  │     └─ OnehotVec{10, 2}(5, 1)
+│  └─ * (count = 4.0)
+│     ├─ * (count = 4.0)
+│     │  ├─ * (count = 2.0)
+│     │  │  ├─ + (count = 2.0)
+│     │  │  │  ⋮
+│     │  │  │  
+│     │  │  └─ OnehotVec{10, 2}(8, 1)
+│     │  │     ⋮
+│     │  │     
+│     │  └─ + (count = 2.0)
+│     │     ├─ 0000000000
+│     │     │  ⋮
+│     │     │  
+│     │     └─ OnehotVec{10, 2}(4, 1)
+│     │        ⋮
+│     │        
+│     └─ OnehotVec{10, 2}(7, 1)
+└─ * (count = 1.0)
+   ├─ * (count = 1.0)
+   │  ├─ OnehotVec{10, 2}(8, 1)
+   │  └─ OnehotVec{10, 2}(7, 1)
+   └─ OnehotVec{10, 2}(5, 1)
+</code></pre><h2 id="Loading-solutions-to-python"><a class="docs-heading-anchor" href="#Loading-solutions-to-python">Loading solutions to python</a><a id="Loading-solutions-to-python-1"></a><a class="docs-heading-anchor-permalink" href="#Loading-solutions-to-python" title="Permalink"></a></h2><p>The following python script loads and unpacks the solutions as a numpy array from a <code>:binary</code> format file.</p><pre><code class="language-python hljs">import numpy as np
+
+def loadfile(filename:str, bitlength:int):
+    C = int(np.ceil(bitlength / 64))
+    arr = np.fromfile(filename, dtype=&quot;uint8&quot;)
+    # Some axes should be transformed from big endian to little endian
+    res = np.unpackbits(arr).reshape(-1, C, 8, 8)[:,::-1,::-1,:]
+    res = res.reshape(-1, C*64)[:, :(64*C-bitlength)-1:-1]
+    print(&quot;number of solutions = %d&quot;%(len(res)))
+    return res  # in big endian format
+
+res = loadfile(filename, 10)</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>Check section <a href="../MaximalIS/#Maximal-independent-set-problem">Maximal independent set problem</a> for solution space properties related the maximal independent sets. That example also contains using cases of finding solution space properties related to minimum sizes:</p><ul><li><a href="../../ref/#GenericTensorNetworks.SizeMin"><code>SizeMin</code></a> for finding minimum several set sizes,</li><li><a href="../../ref/#GenericTensorNetworks.CountingMin"><code>CountingMin</code></a> for counting minimum several set sizes,</li><li><a href="../../ref/#GenericTensorNetworks.SingleConfigMin"><code>SingleConfigMin</code></a> for finding one solution with minimum several sizes,</li><li><a href="../../ref/#GenericTensorNetworks.ConfigsMin"><code>ConfigsMin</code></a> for enumerating solutions with minimum several sizes,</li></ul></div></div><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../gist/">« Gist</a><a class="docs-footer-nextpage" href="../../sumproduct/">Sum product tree representation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.19 on <span class="colophon-date" title="Friday 10 June 2022 06:09">Friday 10 June 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

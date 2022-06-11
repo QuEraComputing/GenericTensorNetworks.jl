@@ -18,8 +18,8 @@ let
     """Run all Pluto notebooks (".jl" files) in `notebook_dir` and write outputs to HTML files."""
     notebook_dir = joinpath(pkgdir(GenericTensorNetworks), "notebooks")
     target_dir = joinpath(pkgdir(GenericTensorNetworks), "docs", "src", "notebooks")
-    cp(notebook_dir, target_dir)
-    println("Building tutorials")
+    cp(notebook_dir, target_dir; force=true)
+    @info "Building tutorials"
     # Evaluate notebooks in the same process to avoid having to recompile from scratch each time.
     # This is similar to how Documenter and Franklin evaluate code.
     # Note that things like method overrides and other global changes may leak between notebooks!

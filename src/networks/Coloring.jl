@@ -5,7 +5,7 @@
             fixedvertices=Dict()
         )
 
-The [Vertex Coloring](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/Coloring.html) problem.
+The [Vertex Coloring](https://psychic-meme-f4d866f8.pages.github.io/dev/generated/Coloring.html) problem.
 
 Positional arguments
 -------------------------------

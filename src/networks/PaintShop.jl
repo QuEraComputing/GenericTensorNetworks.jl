@@ -5,7 +5,7 @@
             fixedvertices=Dict()
         )
 
-The [binary paint shop problem](https://psychic-meme-f4d866f8.pages.github.io/dev/tutorials/PaintShop.html).
+The [binary paint shop problem](https://psychic-meme-f4d866f8.pages.github.io/dev/generated/PaintShop.html).
 
 Positional arguments
 -------------------------------

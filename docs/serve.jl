@@ -10,7 +10,7 @@ function serve(;host::String="0.0.0.0", port::Int=8000)
         doc_env=true,
         skip_dirs=[
             joinpath("docs", "src", "assets"),
-            joinpath("docs", "src", "tutorials"),
+            joinpath("docs", "src", "generated"),
         ],
         literate="examples",
         host=\"$host\",

@@ -1,4 +1,4 @@
-# Make extensions
+# Gist of implementation
 
 The code we will show below is a gist of how this package is implemented for pedagogical purpose, which covers many functionalities of the main repo without caring much about performance.
 This project depends on multiple open source packages in the Julia ecosystem:

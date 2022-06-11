@@ -10,7 +10,7 @@ for each in readdir(pkgdir(GenericTensorNetworks, "examples"))
     input_file = pkgdir(GenericTensorNetworks, "examples", each)
     endswith(input_file, ".jl") || continue
     @info "building" input_file
-    output_dir = pkgdir(GenericTensorNetworks, "docs", "src", "tutorials")
+    output_dir = pkgdir(GenericTensorNetworks, "docs", "src", "generated")
     @info "executing" input_file
     Literate.markdown(input_file, output_dir; name=each[1:end-3], execute=false)
 end
@@ -47,24 +47,24 @@ makedocs(;
     pages=[
         "Home" => "index.md",
         "Problems" => [
-            "Independent set problem" => "tutorials/IndependentSet.md",
-            "Maximal independent set problem" => "tutorials/MaximalIS.md",
-            "Cutting problem" => "tutorials/MaxCut.md",
-            "Vertex Matching problem" => "tutorials/Matching.md",
-            "Binary paint shop problem" => "tutorials/PaintShop.md",
-            "Coloring problem" => "tutorials/Coloring.md",
-            "Dominating set problem" => "tutorials/DominatingSet.md",
-            "Satisfiability problem" => "tutorials/Satisfiability.md",
-            "Set covering problem" => "tutorials/SetCovering.md",
-            "Set packing problem" => "tutorials/SetPacking.md",
-            #"Other problems" => "tutorials/Others.md",
+            "Independent set problem" => "generated/IndependentSet.md",
+            "Maximal independent set problem" => "generated/MaximalIS.md",
+            "Cutting problem" => "generated/MaxCut.md",
+            "Vertex Matching problem" => "generated/Matching.md",
+            "Binary paint shop problem" => "generated/PaintShop.md",
+            "Coloring problem" => "generated/Coloring.md",
+            "Dominating set problem" => "generated/DominatingSet.md",
+            "Satisfiability problem" => "generated/Satisfiability.md",
+            "Set covering problem" => "generated/SetCovering.md",
+            "Set packing problem" => "generated/SetPacking.md",
+            #"Other problems" => "generated/Others.md",
         ],
         "Topics" => [
-            "Make extensions" => "extension.md",
-            "Save and load solutions" => "tutorials/saveload.md",
+            "Gist" => "gist.md",
+            "Save and load solutions" => "generated/saveload.md",
             "Sum product tree representation" => "sumproduct.md",
-            "Weighted problems" => "tutorials/weighted.md",
-            "Open degree of freedoms" => "tutorials/open.md"
+            "Weighted problems" => "generated/weighted.md",
+            "Open and fixed degrees of freedom" => "generated/open.md"
         ],
         "Performance Tips" => "performancetips.md",
         "References" => "ref.md",

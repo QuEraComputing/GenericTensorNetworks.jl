@@ -15,7 +15,7 @@ macro bind(def, element)
 end
 
 # ╔═╡ ababcad9-415c-4a1e-97a5-322a15e98c80
-using Revise, GenericTensorNetworks, Graphs, PlutoUI
+using GenericTensorNetworks, Graphs, PlutoUI
 
 # ╔═╡ 9d955aa6-f8dc-4a16-a883-60d3ddf61636
 graph = Graphs.smallgraph(:petersen)
@@ -25,7 +25,7 @@ graph = Graphs.smallgraph(:petersen)
 rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
 
 # ╔═╡ 1520b6a8-79cb-49c2-8ea8-a84bb2120158
-locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.5, i) for i=0:4]...]
+locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0,  0.5, i) for i=0:4]...]
 
 # ╔═╡ 3bd9bf83-2dd2-4800-bc56-dd41985a82a0
 show_graph(graph; locs=locations, scale=0.6)
@@ -72,13 +72,11 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 GenericTensorNetworks = "3521c873-ad32-4bb4-b63d-f4f178f42b49"
 Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 
 [compat]
 GenericTensorNetworks = "~1.0.4"
 Graphs = "~1.7.0"
 PlutoUI = "~0.7.39"
-Revise = "~3.3.3"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -87,7 +85,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0-rc1"
 manifest_format = "2.0"
-project_hash = "8ccae8b37cce36e11f28c07bd92bcf886606dec0"
+project_hash = "4b22f5b87e6ff0d4b9c6969a9962e0fc31ac2609"
 
 [[deps.AbstractFFTs]]
 deps = ["ChainRulesCore", "LinearAlgebra"]
@@ -185,12 +183,6 @@ deps = ["ChainRulesCore", "LinearAlgebra", "Test"]
 git-tree-sha1 = "1e315e3f4b0b7ce40feded39c73049692126cf53"
 uuid = "9e997f8a-9a97-42d5-a9f1-ce6bfc15e2c0"
 version = "0.1.3"
-
-[[deps.CodeTracking]]
-deps = ["InteractiveUtils", "UUIDs"]
-git-tree-sha1 = "6d4fa04343a7fc9f9cb9cff9558929f3d2752717"
-uuid = "da1fd8a2-8d9e-5ec2-8556-3022fb5608a2"
-version = "1.0.9"
 
 [[deps.ColorTypes]]
 deps = ["FixedPointNumbers", "Random"]
@@ -442,12 +434,6 @@ git-tree-sha1 = "3c837543ddb02250ef42f4738347454f95079d4e"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.3"
 
-[[deps.JuliaInterpreter]]
-deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
-git-tree-sha1 = "52617c41d2761cc05ed81fe779804d3b7f14fff7"
-uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
-version = "0.9.13"
-
 [[deps.LLVM]]
 deps = ["CEnum", "LLVMExtra_jll", "Libdl", "Printf", "Unicode"]
 git-tree-sha1 = "e7e9184b0bf0158ac4e4aa9daf00041b5909bf1a"
@@ -540,12 +526,6 @@ version = "0.3.15"
 
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
-
-[[deps.LoweredCodeUtils]]
-deps = ["JuliaInterpreter"]
-git-tree-sha1 = "dedbebe234e06e1ddad435f5c6f4b85cd8ce55f7"
-uuid = "6f1432cf-f94c-5a45-995e-cdbf5db27b0b"
-version = "2.2.2"
 
 [[deps.MKL_jll]]
 deps = ["Artifacts", "IntelOpenMP_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "Pkg"]
@@ -731,12 +711,6 @@ deps = ["UUIDs"]
 git-tree-sha1 = "838a3a4188e2ded87a4f9f184b4b0d78a1e91cb7"
 uuid = "ae029012-a4dd-5104-9daa-d747884805df"
 version = "1.3.0"
-
-[[deps.Revise]]
-deps = ["CodeTracking", "Distributed", "FileWatching", "JuliaInterpreter", "LibGit2", "LoweredCodeUtils", "OrderedCollections", "Pkg", "REPL", "Requires", "UUIDs", "Unicode"]
-git-tree-sha1 = "4d4239e93531ac3e7ca7e339f15978d0b5149d03"
-uuid = "295af30f-e4ad-537b-8983-00126c2a3abe"
-version = "3.3.3"
 
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"

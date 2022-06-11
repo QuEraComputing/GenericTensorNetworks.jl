@@ -29,11 +29,11 @@ Viznet = "52a3aca4-6234-47fd-b74a-806bdf78ede9"
 
 [compat]
 AbstractTrees = "0.3, 0.4"
-CUDA = "3.5"
+CUDA = "3.5,3.6,3.7,3.8,3.9,3.10"
 Cairo = "1.0"
 Compose = "0.9"
 FFTW = "1.4"
-Graphs = "1.6"
+Graphs = "1.7"
 Mods = "1.3"
 OMEinsum = "0.6.1"
 OMEinsumContractionOrders = "0.6"

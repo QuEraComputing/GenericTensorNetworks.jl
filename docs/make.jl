@@ -3,6 +3,7 @@ using GenericTensorNetworks
 using GenericTensorNetworks: TropicalNumbers, Polynomials, Mods, OMEinsum, OMEinsumContractionOrders
 using Documenter
 using DocThemeIndigo
+using PlutoStaticHTML
 using Literate
 
 for each in readdir(pkgdir(GenericTensorNetworks, "examples"))
@@ -12,6 +13,22 @@ for each in readdir(pkgdir(GenericTensorNetworks, "examples"))
     output_dir = pkgdir(GenericTensorNetworks, "docs", "src", "tutorials")
     @info "executing" input_file
     Literate.markdown(input_file, output_dir; name=each[1:end-3], execute=false)
+end
+
+"""Run all Pluto notebooks (".jl" files) in `notebook_dir` and write outputs to HTML files."""
+function build()
+    notebook_dir = joinpath(pkgdir(GenericTensorNetworks), "notebooks")
+    target_dir = joinpath(pkgdir(GenericTensorNetworks), "docs", "src", "notebooks")
+    cp(notebook_dir, target_dir)
+    println("Building tutorials")
+    # Evaluate notebooks in the same process to avoid having to recompile from scratch each time.
+    # This is similar to how Documenter and Franklin evaluate code.
+    # Note that things like method overrides and other global changes may leak between notebooks!
+    use_distributed = false
+    output_format = documenter_output
+    bopts = BuildOptions(target_dir; use_distributed, output_format)
+    build_notebooks(bopts)
+    return nothing
 end
 
 indigo = DocThemeIndigo.install(GenericTensorNetworks)

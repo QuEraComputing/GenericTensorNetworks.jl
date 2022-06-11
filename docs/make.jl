@@ -11,12 +11,11 @@ for each in readdir(pkgdir(GenericTensorNetworks, "examples"))
     endswith(input_file, ".jl") || continue
     @info "building" input_file
     output_dir = pkgdir(GenericTensorNetworks, "docs", "src", "generated")
-    @info "executing" input_file
     Literate.markdown(input_file, output_dir; name=each[1:end-3], execute=false)
 end
 
-"""Run all Pluto notebooks (".jl" files) in `notebook_dir` and write outputs to HTML files."""
-function build()
+let
+    """Run all Pluto notebooks (".jl" files) in `notebook_dir` and write outputs to HTML files."""
     notebook_dir = joinpath(pkgdir(GenericTensorNetworks), "notebooks")
     target_dir = joinpath(pkgdir(GenericTensorNetworks), "docs", "src", "notebooks")
     cp(notebook_dir, target_dir)

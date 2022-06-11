@@ -7,3 +7,4 @@ docs/build/
 docs/src/generated/
 docs/src/assets/indigo.css
 docs/src/notebooks
+.vscode

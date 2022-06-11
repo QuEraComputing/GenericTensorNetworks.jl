@@ -23,7 +23,7 @@ let
     # Evaluate notebooks in the same process to avoid having to recompile from scratch each time.
     # This is similar to how Documenter and Franklin evaluate code.
     # Note that things like method overrides and other global changes may leak between notebooks!
-    use_distributed = false
+    use_distributed = true
     output_format = documenter_output
     bopts = BuildOptions(target_dir; use_distributed, output_format)
     build_notebooks(bopts)

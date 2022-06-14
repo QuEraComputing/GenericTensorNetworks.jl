@@ -1,4 +1,4 @@
-using Compose, Viznet, Cairo
+using Luxor
 
 struct Rescaler{T}
     xmin::T
@@ -51,10 +51,6 @@ function get_rescaler(locs::AbstractVector{<:Tuple}, pad)
     ymax = maximum(x->x[2], locs)
     return Rescaler(promote(xmin, xmax, ymin, ymax, pad)...)
 end
-
-default_vertex_style(scale, stroke_color, fill_color) = compose(Compose.context(), Viznet.nodestyle(:default, r=0.15cm*scale), Compose.stroke(stroke_color), fill(fill_color), linewidth(0.3mm*scale))
-default_text_style(scale, color) = Viznet.textstyle(:default, fontsize(4pt*scale), fill(color))
-default_edge_style(scale, color) = Viznet.bondstyle(:default, Compose.stroke(color), linewidth(0.3mm*scale))
 
 """
     show_graph(graph;
@@ -164,32 +160,41 @@ function _viz_atoms(locs, edges, vertex_colors, edge_colors, texts, config, resc
     rescale = rescale * config.image_size * config.scale * 1.6
     if vertex_colors !== nothing
         @assert length(locs) == length(vertex_colors)
-        vertex_styles = [default_vertex_style(rescale, config.vertex_stroke_color, color) for color in vertex_colors]
     else
-        vertex_styles = fill(default_vertex_style(rescale, config.vertex_stroke_color, config.vertex_fill_color), length(locs))
+        vertex_colors = fill(config.vertex_fill_color, length(locs))
     end
     if edge_colors !== nothing
         @assert length(edges) == length(edge_colors)
-        edge_styles = [default_edge_style(rescale, color) for color in edge_colors]
     else
-        edge_styles = fill(default_edge_style(rescale, config.edge_color), length(edges))
+        edge_colors = fill(config.edge_color, length(edges))
     end
     if texts !== nothing
         @assert length(locs) == length(texts)
     end
-    text_style = default_text_style(rescale, config.vertex_text_color)
     img1 = Viznet.canvas() do
         for (i, vertex) in enumerate(locs)
-            vertex_styles[i] >> vertex
+            draw_vertex(vertex...; fill_color=vertex_colors[i], stroke_color=config.vertex_stroke_color, r=0.15cm*rescale, line_width=0.3mm*rescale)
             if config.vertex_text_color !== "transparent"
-                text_style >> (vertex, texts === nothing ? "$i" : texts[i])
+                draw_text(vertex..., texts === nothing ? "$i" : texts[i]; fontsize=4pt*rescale, color=config.vertex_text_color)
             end
         end
         for (k, (i, j)) in enumerate(edges)
             edge_styles[k] >> (locs[i], locs[j])
+            draw_edge(locs...; color=edge_colors[k], line_width = 0.3mm*rescale)
         end
     end
     Compose.compose(Compose.context(), img1)
+end
+draw_text(i, j, text; fontsize, color)
+function draw_edge(i, j; color, line_width)
+    setline(line_width)
+end
+function draw_vertex(x, y; stroke_color, fill_color, line_width, r)
+    setcolor(fill_color)
+    circle(Point(x, y), r, :fill)
+    setline(line_width)
+    setcolor(stroke_color)
+    circle(Point(x, y), r, :stroke)
 end
 
 """
@@ -293,7 +298,7 @@ Keyword arguments
 * `vertex_configs` is an iterator of bit strings for specifying vertex configurations, e.g. a [`ConfigEnumerator`](@ref) instance.
 * `edge_configs` is an iterator of bit strings for specifying edge configurations.
 * `texts` is a vector of strings for labeling vertices.
-* `format` is the output format, which can be `Compose.SVG`, `Compose.PNG`, `Compose.PDF` et al. Check the [Compose documentation](http://giovineitalia.github.io/Compose.jl/latest/) for details.
+* `format` is the output format, which can be `"svg"` or `"png"`. Check the [Luxor documentation]() for details.
 * `io` can be `nothing` for the direct output, or a filename to saving to a file. For direct output, you will need a VSCode editor, an Atom editor, a Pluto notebook or a Jupyter notebook to display the image.
 
 Extra keyword arguments

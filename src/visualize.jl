@@ -1,6 +1,28 @@
 module ShowGraph
 using Luxor, Graphs
-export show_graph, show_einsum, show_gallery, spring_layout
+export show_graph, show_einsum, show_gallery, spring_layout!
+
+const CONFIGHELP = """
+Extra keyword arguments
+-------------------------------
+* general
+    * `pad::Float64 = 1.0`, the padding space
+    * `unit::Float64 = 60`, the unit distance as the number of pixels
+    * `offsetx::Float64 = 0.0`, the origin of x axis
+    * `offsety::Float64 = 0.0`, the origin of y axis
+    * `xspan::Float64 = 1.0`, the width of the graph/image
+    * `yspan::Float64 = 1.0`, the height of the graph/image
+    * `fontsize::Float64 = 12`, the font size
+* vertex
+    * `vertex_text_color::String = "black"`, the default text color
+    * `vertex_stroke_color = "black"`, the default stroke color for vertices
+    * `vertex_fill_color = "transparent"`, the default default fill color for vertices
+    * `vertex_size::Float64 = 0.15`, the default vertex size
+    * `vertex_line_width::Float64 = 1`, the default vertex stroke line width
+* edge
+    * `edge_color::String = "black"`, the default edge color
+    * `edge_line_width::Float64 = 1`, the default line width
+"""
 
 function autoconfig(locations; pad, kwargs...)
     n = length(locations)
@@ -24,19 +46,23 @@ function autoconfig(locations; pad, kwargs...)
 end
 
 """
-    show_graph(graph;
-        locs=spring_layout(graph),
-        vertex_colors=["black", "black", ...],
-        edge_colors=["black", "black", ...],
-        texts=["1", "2", ...],
-        vertex_sizes=nothing,
-        format=:png,
-        io=nothing,
-        pad=1.0,
-        kwargs...
-        )
+    show_graph(graph::SimpleGraph;
+        locs=nothing,
+        spring::Bool=true,
+        optimal_distance=1.0,
+        spring_mask=trues(nv(graph)),
 
-Show a graph featured with vertex and edge information.
+        vertex_colors=nothing,
+        vertex_sizes=nothing,
+        vertex_stroke_colors=nothing,
+        vertex_text_colors=nothing,
+        edge_colors=nothing,
+        texts = nothing,
+        format=:png,
+        filename=nothing,
+        kwargs...)
+
+Show a graph in VSCode, Pluto or Jupyter notebook, or save it to a file.
 
 Positional arguments
 -----------------------------
@@ -45,34 +71,33 @@ Positional arguments
 Keyword arguments
 -----------------------------
 * `locs` is a vector of tuples for specifying the vertex locations.
-* `vertex_colors` is a vector of color strings for specifying vertex configurations, e.g. a [`ConfigEnumerator`](@ref) instance.
-* `edge_colors` is a vector of color strings for specifying edge configurations.
-* `texts` is a vector of strings for labeling vertices.
-* `format` is the output format, which can be `:svg`, `:png` or `:pdf`..
-* `io` can be `nothing` for the direct output, or a filename to saving to a file. For direct output, you will need a VSCode editor, an Atom editor, a Pluto notebook or a Jupyter notebook to display the image.
+* `spring` is switch to use spring method to optimize the location.
+* `optimal_distance` is a optimal distance parameter for `spring` optimizer.
+* `spring_mask` specfies which location is optimizable for `spring` optimizer.
 
-Extra keyword arguments
--------------------------------
-* line, vertex and text
-    * `pad::Float64` = 1.0
-* vertex
-    * `vertex_text_color::String` = "black"
-    * `vertex_stroke_color` = "black"
-    * `vertex_fill_color` = "white"
-* edge
-    * `edge_color::String` = "black"
+* `vertex_colors` is a vector of color strings for specifying vertex fill colors.
+* `vertex_sizes` is a vector of real numbers for specifying vertex sizes.
+* `vertex_stroke_colors` is a vector of color strings for specifying vertex stroke colors.
+* `vertex_text_colors` is a vector of color strings for specifying vertex text colors.
+* `edge_colors` is a vector of color strings for specifying edge colors.
+* `texts` is a vector of strings for labeling vertices.
+* `format` is the output format, which can be `:svg`, `:png` or `:pdf`.
+* `filename` is a string as the output filename.
+
+$CONFIGHELP
 
 Example
 ------------------------------
 ```jldoctest
 julia> using Graphs, GenericTensorNetworks
 
-julia> show_graph(smallgraph(:petersen); format=:png, io=tempname(), vertex_colors=rand(["blue", "red"], 10));
+julia> show_graph(smallgraph(:petersen); format=:png, vertex_colors=rand(["blue", "red"], 10));
 ```
 """
 function show_graph(locations, edges;
         vertex_colors=nothing,
         vertex_sizes=nothing,
+        vertex_stroke_colors=nothing,
         vertex_text_colors=nothing,
         edge_colors=nothing,
         texts = nothing,
@@ -85,14 +110,37 @@ function show_graph(locations, edges;
         config = autoconfig(locations; pad, kwargs...)
         Dx, Dy = (config.xspan+2*config.pad)*config.unit, (config.yspan+2*config.pad)*config.unit
         _draw(Dx, Dy; format, filename) do
-            _show_graph(map(loc->(loc[1]+config.offsetx, loc[2]+config.offsety), locations), edges, vertex_colors, vertex_text_colors, vertex_sizes, edge_colors, texts, config)
+            _show_graph(map(loc->(loc[1]+config.offsetx, loc[2]+config.offsety), locations), edges,
+            vertex_colors, vertex_stroke_colors, vertex_text_colors, vertex_sizes, edge_colors, texts, config)
         end
     end
 end
 
 # NOTE: the final positions are in range [-5, 5]
-function show_graph(graph::SimpleGraph; C=5.0, locs=map(x->x .* C, spring_layout(graph)), kwargs...)
+function show_graph(graph::SimpleGraph;
+        locs=nothing,
+        spring::Bool=true,
+        optimal_distance=1.0,
+        spring_mask=trues(nv(graph)),
+        kwargs...)
+    locs = autolocs(graph, locs, spring, optimal_distance, spring_mask)
     show_graph(locs, [(e.src, e.dst) for e in edges(graph)]; kwargs...)
+end
+
+function autolocs(graph, locs, spring, optimal_distance, spring_mask)
+    if spring
+        locs_x = locs === nothing ? [2*rand()-1.0 for i=1:nv(graph)] : getindex.(locs, 1)
+        locs_y = locs === nothing ? [2*rand()-1.0 for i=1:nv(graph)] : getindex.(locs, 2)
+        spring_layout!(graph;
+                    C=optimal_distance,
+                    locs_x,
+                    locs_y,
+                    mask=spring_mask   # mask for which to relocate
+                    )
+        collect(zip(locs_x, locs_y))
+    else
+        locs
+    end
 end
 
 function _draw(f, Dx, Dy; format, filename)
@@ -119,28 +167,34 @@ Base.@kwdef struct GraphDisplayConfig
     offsety::Float64 = 0.0  # the zero of y axis
     xspan::Float64 = 1.0
     yspan::Float64 = 1.0
+    fontsize::Float64 = 12
 
     # vertex
     vertex_text_color::String = "black"
     vertex_stroke_color = "black"
-    vertex_fill_color = "white"
+    vertex_fill_color = "transparent"
     vertex_size::Float64 = 0.15
-    vertex_fontsize::Float64 = 12
     vertex_line_width::Float64 = 1  # in pt
     # edge
     edge_color::String = "black"
     edge_line_width::Float64 = 1  # in pt
 end
 
-function _show_graph(locs, edges, vertex_colors, vertex_text_colors, vertex_sizes, edge_colors, texts, config)
-    for (i, vertex) in enumerate(locs)
-        draw_vertex(vertex...; fill_color=_get(vertex_colors, i, config.vertex_fill_color), stroke_color=config.vertex_stroke_color, r=_get(vertex_sizes, i, config.vertex_size), line_width=config.vertex_line_width, unit=config.unit)
-        draw_text(vertex..., _get(texts, i, "$i"); fontsize=config.vertex_fontsize, color=_get(vertex_text_colors, i, config.vertex_text_color), unit=config.unit)
-    end
+function _show_graph(locs, edges, vertex_colors, vertex_stroke_colors, vertex_text_colors, vertex_sizes, edge_colors, texts, config)
+    # edges
     for (k, (i, j)) in enumerate(edges)
         ri = _get(vertex_sizes, i, config.vertex_size)
         rj = _get(vertex_sizes, j, config.vertex_size)
-        draw_edge(locs[i], locs[j]; color=_get(edge_colors,k,config.edge_color), line_width=config.edge_line_width, ri, rj, unit=config.unit)
+        draw_edge(locs[i], locs[j]; color=_get(edge_colors,k,config.edge_color),
+            line_width=config.edge_line_width, ri, rj, unit=config.unit)
+    end
+    # vertices
+    for (i, vertex) in enumerate(locs)
+        draw_vertex(vertex...; fill_color=_get(vertex_colors, i, config.vertex_fill_color),
+            stroke_color=_get(vertex_stroke_colors, i, config.vertex_stroke_color),
+            r=_get(vertex_sizes, i, config.vertex_size), line_width=config.vertex_line_width, unit=config.unit)
+        draw_text(vertex..., _get(texts, i, "$i"); fontsize=config.fontsize,
+            color=_get(vertex_text_colors, i, config.vertex_text_color), unit=config.unit)
     end
 end
 _get(::Nothing, i::Int, default) = default
@@ -176,12 +230,14 @@ Spring layout for graph plotting, returns a vector of vertex locations.
     This function is copied from [`GraphPlot.jl`](https://github.com/JuliaGraphs/GraphPlot.jl),
     where you can find more information about his function.
 """
-function spring_layout(g::AbstractGraph,
+function spring_layout!(g::AbstractGraph;
                        locs_x=2*rand(nv(g)).-1.0,
-                       locs_y=2*rand(nv(g)).-1.0;
-                       C=2.0,
+                       locs_y=2*rand(nv(g)).-1.0,
+                       C=2.0,   # the optimal vertex distance
                        MAXITER=100,
-                       INITTEMP=2.0)
+                       INITTEMP=2.0,
+                       mask::AbstractVector{Bool}=trues(length(locs_x))   # mask for which to relocate
+                       )
 
     nvg = nv(g)
     adj_matrix = adjacency_matrix(g)
@@ -226,6 +282,7 @@ function spring_layout(g::AbstractGraph,
         temp = INITTEMP / iter
         # Now apply them, but limit to temperature
         for i = 1:nvg
+            mask[i] || continue
             fx = force_x[i]
             fy = force_y[i]
             force_mag  = sqrt((fx * fx) + (fy * fy))
@@ -235,29 +292,28 @@ function spring_layout(g::AbstractGraph,
         end
     end
 
-    # Scale to unit square
-    min_x, max_x = minimum(locs_x), maximum(locs_x)
-    min_y, max_y = minimum(locs_y), maximum(locs_y)
-    function scaler(z, a, b)
-        2.0*((z - a)/(b - a)) - 1.0
-    end
-    map!(z -> scaler(z, min_x, max_x), locs_x, locs_x)
-    map!(z -> scaler(z, min_y, max_y), locs_y, locs_y)
-
-    return collect(zip(locs_x, locs_y))
+    locs_x, locs_y
 end
 
 """
     show_gallery(graph::SimpleGraph, grid::Tuple{Int,Int};
-        locs=spring_layout(graph), 
+        locs=nothing,
+        spring::Bool=true,
+        optimal_distance=1.0,
+        spring_mask=trues(nv(graph)),
+
         vertex_configs=nothing,
         edge_configs=nothing,
-        texts=["1", "2", ...],
+
+        vertex_sizes=nothing,
+        vertex_stroke_colors=nothing,
+        vertex_text_colors=nothing,
+        texts=nothing,
         format=:png,
-        io=nothing,
+        filename=nothing,
         kwargs...)
 
-Show a gallery of graphs for multiple vertex configurations or edge configurations.
+Show a gallery of graphs for multiple vertex configurations or edge configurations in VSCode, Pluto or Jupyter notebook, or save it to a file.
 
 Positional arguments
 -----------------------------
@@ -267,41 +323,48 @@ Positional arguments
 Keyword arguments
 -----------------------------
 * `locs` is a vector of tuples for specifying the vertex locations.
-* `vertex_configs` is an iterator of bit strings for specifying vertex configurations, e.g. a [`ConfigEnumerator`](@ref) instance.
-* `edge_configs` is an iterator of bit strings for specifying edge configurations.
-* `texts` is a vector of strings for labeling vertices.
-* `format` is the output format, which can be `:svg`, `:pdf` or `:png`.
-* `io` can be `nothing` for the direct output, or a filename to saving to a file. For direct output, you will need a VSCode editor, an Atom editor, a Pluto notebook or a Jupyter notebook to display the image.
+* `spring` is switch to use spring method to optimize the location.
+* `optimal_distance` is a optimal distance parameter for `spring` optimizer.
+* `spring_mask` specfies which location is optimizable for `spring` optimizer.
 
-Extra keyword arguments
--------------------------------
-* line, vertex and text
-    * `pad::Float64` = 1.0
-* vertex
-    * `vertex_text_color::String` = "black"
-    * `vertex_stroke_color` = "black"
-    * `vertex_fill_color` = "white"
-* edge
-    * `edge_color::String` = "black"
+* `vertex_configs` is an iterator of bit strings for specifying vertex configurations, e.g. a [`ConfigEnumerator`](@ref) instance. It will be rendered as vertex colors.
+* `edge_configs` is an iterator of bit strings for specifying edge configurations. It will be rendered as edge colors.
+
+* `vertex_sizes` is a vector of real numbers for specifying vertex sizes.
+* `vertex_stroke_colors` is a vector of color strings for specifying vertex stroke colors.
+* `vertex_text_colors` is a vector of color strings for specifying vertex text colors.
+* `texts` is a vector of strings for labeling vertices.
+* `format` is the output format, which can be `:svg`, `:png` or `:pdf`.
+* `filename` is a string as the output filename.
+
+$CONFIGHELP
 
 Example
 -------------------------------
 ```jldoctest
 julia> using Graphs, GenericTensorNetworks
 
-julia> show_gallery(smallgraph(:petersen), (2, 3); format=:png, io=tempname(), vertex_configs=[rand(Bool, 10) for k=1:6]);
+julia> show_gallery(smallgraph(:petersen), (2, 3); format=:png, vertex_configs=[rand(Bool, 10) for k=1:6]);
 ```
 """
-function show_gallery(graph::SimpleGraph, grid::Tuple{Int,Int}; C=5.0, locs=map(x->x .* C, spring_layout(graph)), kwargs...)
+function show_gallery(graph::SimpleGraph, grid::Tuple{Int,Int};
+        locs=nothing,
+        spring::Bool=true,
+        optimal_distance=1.0,
+        spring_mask=trues(nv(graph)),
+        kwargs...)
+    locs = autolocs(graph, locs, spring, optimal_distance, spring_mask)
     show_gallery(locs, [(e.src, e.dst) for e in edges(graph)], grid; kwargs...)
 end
 function show_gallery(locs, edges, grid::Tuple{Int,Int};
         vertex_configs=nothing,
         edge_configs=nothing,
         vertex_sizes=nothing,
+        vertex_stroke_colors=nothing,
         vertex_text_colors=nothing,
         texts=nothing,
-        format=:png, filename=nothing,
+        format=:png,
+        filename=nothing,
         pad=1.0,
         kwargs...)
     config = autoconfig(locs; pad, kwargs...)
@@ -329,7 +392,8 @@ function show_gallery(locs, edges, grid::Tuple{Int,Int};
                     k > length(edge_configs) && break
                     [iszero(edge_configs[k][i]) ? config.edge_color : "red" for i=1:ne]
                 end
-                _show_graph(locs, edges, vertex_colors, vertex_text_colors, vertex_sizes, edge_colors, texts, config)
+                _show_graph(locs, edges, vertex_colors, vertex_stroke_colors, vertex_text_colors,
+                vertex_sizes, edge_colors, texts, config)
             end
         end
     end
@@ -338,6 +402,52 @@ end
 end
 
 using .ShowGraph
+
+"""
+    show_einsum(ein::AbstractEinsum;
+        tensor_locs=nothing,
+        label_locs=nothing,  # dict
+        spring::Bool=true,
+        optimal_distance=1.0,
+
+        tensor_size=0.3,
+        tensor_color="black",
+        tensor_text_color="white",
+        annotate_tensors=false,
+
+        label_size=0.15,
+        label_color="black",
+        open_label_color="red",
+        annotate_labels=true,
+        kwargs...
+        )
+
+Positional arguments
+-----------------------------
+* `ein` is an Einsum contraction code (provided by package `OMEinsum`).
+
+Keyword arguments
+-----------------------------
+* `tensor_locs` is a vector of tuples for specifying the vertex locations.
+* `label_locs` is a vector of tuples for specifying the vertex locations.
+* `spring` is switch to use spring method to optimize the location.
+* `optimal_distance` is a optimal distance parameter for `spring` optimizer.
+
+* `tensor_color` is a string to specify the color of tensor nodes.
+* `tensor_size` is a real number to specify the size of tensor nodes.
+* `tensor_text_color` is a color strings to specify tensor text color.
+* `annotate_tensors` is a boolean switch for annotate different tensors by integers.
+
+* `label_size` is a real number to specify label text node size.
+* `label_color` is a color strings to specify label text color.
+* `open_label_color` is a color strings to specify open label text color.
+* `annotate_labels` is a boolean switch for annotate different labels.
+
+* `format` is the output format, which can be `:svg`, `:png` or `:pdf`.
+* `filename` is a string as the output filename.
+ 
+$(ShowGraph.CONFIGHELP)
+"""
 function show_einsum(ein::AbstractEinsum;
         label_size=0.15,
         label_color="black",
@@ -349,7 +459,8 @@ function show_einsum(ein::AbstractEinsum;
         annotate_tensors=false,
         tensor_locs=nothing,
         label_locs=nothing,  # dict
-        C = 5.0,
+        spring::Bool=true,
+        optimal_distance=1.0,
         kwargs...
         )
     ixs = getixsv(ein)
@@ -369,14 +480,14 @@ function show_einsum(ein::AbstractEinsum;
         end
     end
     if label_locs === nothing && tensor_locs === nothing
-        locs=map(x->x .* C, spring_layout(graph))
+        locs = ShowGraph.autolocs(graph, nothing, spring, optimal_distance, trues(nv(graph)))
     elseif label_locs === nothing
         # infer label locs from tensor locs
         label_locs = [(lst = [iloc for (iloc,ix) in zip(tensor_locs, ixs) if l ∈ ix]; reduce((x,y)->x .+ y, lst) ./ length(lst)) for l in labels]
         locs = [label_locs..., tensor_locs...]
     elseif tensor_locs === nothing
         # infer tensor locs from label locs
-        tensor_locs = [length(ix) == 0 ? (C*randn(), C*randn()) : reduce((x,y)-> x .+ y, [label_locs[l] for l in ix]) ./ length(ix) for ix in ixs]
+        tensor_locs = [length(ix) == 0 ? (optimal_distance*randn(), optimal_distance*randn()) : reduce((x,y)-> x .+ y, [label_locs[l] for l in ix]) ./ length(ix) for ix in ixs]
         locs = [label_locs..., tensor_locs...]
     else
         locs = [label_locs..., tensor_locs...]

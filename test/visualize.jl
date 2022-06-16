@@ -13,8 +13,9 @@ end
 
 @testset "einsum" begin
     graph = smallgraph(:petersen)
-    @test show_einsum(pb.code; C=3, annotate_tensors=true) isa Any
-    @test show_einsum(pb.code; C=3, tensor_locs=[(randn(), randn()) .* 2 for i=1:25]) isa Any
+    pb = IndependentSet(graph)
+    @test show_einsum(pb.code; optimal_distance=2, annotate_tensors=true) isa Any
+    @test show_einsum(pb.code; tensor_locs=[(randn(), randn()) .* 2 for i=1:25]) isa Any
     @test show_einsum(pb.code; label_locs=[(randn(), randn()) .* 2 for i=1:10]) isa Any
     @test show_einsum(pb.code; tensor_locs=[(randn(), randn()) for i=1:25], label_locs=[(randn(), randn()) for i=1:10]) isa Any
 end

@@ -1,4 +1,6 @@
-using Luxor
+module ShowGraph
+using Luxor, Graphs
+export show_graph, show_einsum, show_gallery, spring_layout
 
 function autoconfig(locations; pad, kwargs...)
     n = length(locations)
@@ -27,6 +29,7 @@ end
         vertex_colors=["black", "black", ...],
         edge_colors=["black", "black", ...],
         texts=["1", "2", ...],
+        vertex_sizes=nothing,
         format=:png,
         io=nothing,
         pad=1.0,
@@ -69,6 +72,8 @@ julia> show_graph(smallgraph(:petersen); format=:png, io=tempname(), vertex_colo
 """
 function show_graph(locations, edges;
         vertex_colors=nothing,
+        vertex_sizes=nothing,
+        vertex_text_colors=nothing,
         edge_colors=nothing,
         texts = nothing,
         format=:png, filename=nothing,
@@ -80,7 +85,7 @@ function show_graph(locations, edges;
         config = autoconfig(locations; pad, kwargs...)
         Dx, Dy = (config.xspan+2*config.pad)*config.unit, (config.yspan+2*config.pad)*config.unit
         _draw(Dx, Dy; format, filename) do
-            _show_graph(map(loc->(loc[1]+config.offsetx, loc[2]+config.offsety), locations), edges, vertex_colors, edge_colors, texts, config)
+            _show_graph(map(loc->(loc[1]+config.offsetx, loc[2]+config.offsety), locations), edges, vertex_colors, vertex_text_colors, vertex_sizes, edge_colors, texts, config)
         end
     end
 end
@@ -100,7 +105,7 @@ function _draw(f, Dx, Dy; format, filename)
     else
         _format = filename
     end
-    Luxor.Drawing(Dx, Dy, _format)
+    Luxor.Drawing(round(Int,Dx), round(Int,Dy), _format)
     Luxor.origin(0, 0)
     f()
     Luxor.finish()
@@ -127,42 +132,32 @@ Base.@kwdef struct GraphDisplayConfig
     edge_line_width::Float64 = 1  # in pt
 end
 
-function _show_graph(locs, edges, vertex_colors, edge_colors, texts, config)
-    if vertex_colors !== nothing
-        @assert length(locs) == length(vertex_colors)
-    else
-        vertex_colors = fill(config.vertex_fill_color, length(locs))
-    end
-    if edge_colors !== nothing
-        @assert length(edges) == length(edge_colors)
-    else
-        edge_colors = fill(config.edge_color, length(edges))
-    end
-    if texts !== nothing
-        @assert length(locs) == length(texts)
-    end
+function _show_graph(locs, edges, vertex_colors, vertex_text_colors, vertex_sizes, edge_colors, texts, config)
     for (i, vertex) in enumerate(locs)
-        draw_vertex(vertex...; fill_color=vertex_colors[i], stroke_color=config.vertex_stroke_color, r=config.vertex_size, line_width=config.vertex_line_width, unit=config.unit)
-        if config.vertex_text_color !== "transparent"
-            draw_text(vertex..., texts === nothing ? "$i" : texts[i]; fontsize=config.vertex_fontsize, color=config.vertex_text_color, unit=config.unit)
-        end
+        draw_vertex(vertex...; fill_color=_get(vertex_colors, i, config.vertex_fill_color), stroke_color=config.vertex_stroke_color, r=_get(vertex_sizes, i, config.vertex_size), line_width=config.vertex_line_width, unit=config.unit)
+        draw_text(vertex..., _get(texts, i, "$i"); fontsize=config.vertex_fontsize, color=_get(vertex_text_colors, i, config.vertex_text_color), unit=config.unit)
     end
     for (k, (i, j)) in enumerate(edges)
-        draw_edge(locs[i], locs[j]; color=edge_colors[k], line_width=config.edge_line_width, r=config.vertex_size, unit=config.unit)
+        ri = _get(vertex_sizes, i, config.vertex_size)
+        rj = _get(vertex_sizes, j, config.vertex_size)
+        draw_edge(locs[i], locs[j]; color=_get(edge_colors,k,config.edge_color), line_width=config.edge_line_width, ri, rj, unit=config.unit)
     end
 end
+_get(::Nothing, i::Int, default) = default
+_get(x, i::Int, default) = x[i]
+
 function draw_text(x, y, text; fontsize, color, unit)
     Luxor.fontsize(fontsize)
     setcolor(color)
     Luxor.text(text, Point(unit*x, unit*y), valign=:middle, halign=:center)
 end
-function draw_edge(i, j; color, line_width, r, unit)
+function draw_edge(i, j; color, line_width, ri, rj, unit)
     setcolor(color)
     setline(line_width)
     a, b = Point(i...), Point(j...)
-    nints, ip1, ip2 =  intersectionlinecircle(a, b, a, r)
+    nints, ip1, ip2 =  intersectionlinecircle(a, b, a, ri)
     a_ = ip1
-    nints, ip1, ip2 =  intersectionlinecircle(a, b, b, r)
+    nints, ip1, ip2 =  intersectionlinecircle(a, b, b, rj)
     b_ = ip2
     line(a_ * unit, b_ * unit, :stroke)
 end
@@ -303,6 +298,8 @@ end
 function show_gallery(locs, edges, grid::Tuple{Int,Int};
         vertex_configs=nothing,
         edge_configs=nothing,
+        vertex_sizes=nothing,
+        vertex_text_colors=nothing,
         texts=nothing,
         format=:png, filename=nothing,
         pad=1.0,
@@ -332,8 +329,59 @@ function show_gallery(locs, edges, grid::Tuple{Int,Int};
                     k > length(edge_configs) && break
                     [iszero(edge_configs[k][i]) ? config.edge_color : "red" for i=1:ne]
                 end
-                _show_graph(locs, edges, vertex_colors, edge_colors, texts, config)
+                _show_graph(locs, edges, vertex_colors, vertex_text_colors, vertex_sizes, edge_colors, texts, config)
             end
         end
     end
+end
+
+end
+
+using .ShowGraph
+function show_einsum(ein::AbstractEinsum;
+        label_size=0.15,
+        label_color="black",
+        open_label_color="red",
+        tensor_size=0.3,
+        tensor_color="black",
+        tensor_text_color="white",
+        annotate_labels=true,
+        annotate_tensors=false,
+        tensor_locs=nothing,
+        label_locs=nothing,  # dict
+        C = 5.0,
+        kwargs...
+        )
+    ixs = getixsv(ein)
+    iy = getiyv(ein)
+    labels = uniquelabels(ein)
+    m = length(labels)
+    n = length(ixs)
+    labelmap = Dict(zip(labels, 1:m))
+    colors = [["transparent" for l in labels]..., fill(tensor_color, n)...]
+    sizes = [fill(label_size, m)..., fill(tensor_size, n)...]
+    texts = [[annotate_labels ? "$(labels[i])" : "" for i=1:m]..., [annotate_tensors ? "$i" : "" for i=1:n]...]
+    vertex_text_colors = [[l ∈ iy ? open_label_color : label_color for l in labels]..., [tensor_text_color for ix in ixs]...]
+    graph = SimpleGraph(m+n)
+    for (j, ix) in enumerate(ixs)
+        for l in ix
+            add_edge!(graph, j+m, labelmap[l])
+        end
+    end
+    if label_locs === nothing && tensor_locs === nothing
+        locs=map(x->x .* C, spring_layout(graph))
+    elseif label_locs === nothing
+        # infer label locs from tensor locs
+        label_locs = [(lst = [iloc for (iloc,ix) in zip(tensor_locs, ixs) if l ∈ ix]; reduce((x,y)->x .+ y, lst) ./ length(lst)) for l in labels]
+        locs = [label_locs..., tensor_locs...]
+    elseif tensor_locs === nothing
+        # infer tensor locs from label locs
+        tensor_locs = [length(ix) == 0 ? (C*randn(), C*randn()) : reduce((x,y)-> x .+ y, [label_locs[l] for l in ix]) ./ length(ix) for ix in ixs]
+        locs = [label_locs..., tensor_locs...]
+    else
+        locs = [label_locs..., tensor_locs...]
+    end
+    show_graph(locs, [(e.src, e.dst) for e in edges(graph)]; texts, vertex_colors=colors,
+        vertex_text_colors,
+        vertex_sizes=sizes, vertex_line_width=0, kwargs...)
 end

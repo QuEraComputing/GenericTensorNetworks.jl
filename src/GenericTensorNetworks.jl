@@ -50,7 +50,7 @@ export solve, SizeMax, SizeMin, CountingAll, CountingMax, CountingMin, GraphPoly
 export save_configs, load_configs, hamming_distribution, save_sumproduct, load_sumproduct
 
 # Visualization
-export show_graph, spring_layout, show_gallery
+export show_graph, spring_layout, show_gallery, show_einsum
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 

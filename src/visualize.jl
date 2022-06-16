@@ -1,55 +1,24 @@
 using Luxor
 
-struct Rescaler{T}
-    xmin::T
-    xmax::T
-    ymin::T
-    ymax::T
-    pad::T
-end
-
-getscale(r::Rescaler) = min(1/(r.xmax-r.xmin+2*r.pad), 1/(r.ymax-r.ymin+2*r.pad))
-
-function config_plotting(sites)
-    n = length(sites)
-    if n <= 1
-        return (1.0, 0.5, 0.4, 1.0)
-    end
-    shortest_distance = Inf
-    for i=1:n
-        for j=i+1:n
-            shortest_distance = min(sqrt(sum(abs2, sites[i] .- sites[j])), shortest_distance)
-        end
-    end
-
-    rescaler = get_rescaler(sites, 0.0)
-    xpad = (rescaler.xmax - rescaler.xmin) * 0.2 + shortest_distance
-    ypad = (rescaler.ymax - rescaler.ymin) * 0.2 + shortest_distance
-    pad = max(xpad, ypad)
-    scale = shortest_distance
-    return (pad=pad, scale=scale)
-end
-
-function (r::Rescaler{T})(x; dims=(1,2)) where T
-    xmin, ymin, xmax, ymax, pad = r.xmin, r.ymin, r.xmax, r.ymax, r.pad
-    scale = getscale(r)
-    if dims == (1,2)
-        return (x[1]-xmin+pad, ymax+pad-x[2]) .* scale
-    elseif dims == 1
-        return (x - xmin + pad) * scale
-    elseif dims == 2
-        return (ymax + pad - x) * scale
+function autoconfig(locations; pad, kwargs...)
+    n = length(locations)
+    if n >= 1
+        # compute the size and the margin
+        xmin = minimum(x->x[1], locations)
+        ymin = minimum(x->x[2], locations)
+        xmax = maximum(x->x[1], locations)
+        ymax = maximum(x->x[2], locations)
+        xspan = xmax - xmin
+        yspan = ymax - ymin
+        offsetx = -xmin + pad
+        offsety = -ymin + pad
     else
-        throw(ArgumentError("dims should be (1,2), 1 or 2."))
+        xspan = 0.0
+        yspan = 0.0
+        offsetx = 0.0
+        offsety = 0.0
     end
-end
-
-function get_rescaler(locs::AbstractVector{<:Tuple}, pad)
-    xmin = minimum(x->x[1], locs)
-    ymin = minimum(x->x[2], locs)
-    xmax = maximum(x->x[1], locs)
-    ymax = maximum(x->x[2], locs)
-    return Rescaler(promote(xmin, xmax, ymin, ymax, pad)...)
+    return GraphDisplayConfig(; pad, offsetx, offsety, xspan, yspan, kwargs...)
 end
 
 """
@@ -58,8 +27,9 @@ end
         vertex_colors=["black", "black", ...],
         edge_colors=["black", "black", ...],
         texts=["1", "2", ...],
-        format=SVG,
+        format=:png,
         io=nothing,
+        pad=1.0,
         kwargs...
         )
 
@@ -75,89 +45,89 @@ Keyword arguments
 * `vertex_colors` is a vector of color strings for specifying vertex configurations, e.g. a [`ConfigEnumerator`](@ref) instance.
 * `edge_colors` is a vector of color strings for specifying edge configurations.
 * `texts` is a vector of strings for labeling vertices.
-* `format` is the output format, which can be `Compose.SVG`, `Compose.PNG`, `Compose.PDF` et al. Check the [Compose documentation](http://giovineitalia.github.io/Compose.jl/latest/) for details.
+* `format` is the output format, which can be `:svg`, `:png` or `:pdf`..
 * `io` can be `nothing` for the direct output, or a filename to saving to a file. For direct output, you will need a VSCode editor, an Atom editor, a Pluto notebook or a Jupyter notebook to display the image.
 
 Extra keyword arguments
 -------------------------------
 * line, vertex and text
-    * `scale::Float64` = 1.0
-    * `pad::Float64` = 1.5
+    * `pad::Float64` = 1.0
 * vertex
     * `vertex_text_color::String` = "black"
     * `vertex_stroke_color` = "black"
     * `vertex_fill_color` = "white"
 * edge
     * `edge_color::String` = "black"
-* image size in `cm`
-    * `image_size::Float64` = 12
 
 Example
 ------------------------------
 ```jldoctest
-julia> using Graphs, GenericTensorNetworks, Compose
+julia> using Graphs, GenericTensorNetworks
 
-julia> show_graph(smallgraph(:petersen); format=Compose.SVG, io=tempname(), vertex_colors=rand(["blue", "red"], 10));
+julia> show_graph(smallgraph(:petersen); format=:png, io=tempname(), vertex_colors=rand(["blue", "red"], 10));
 ```
 """
 function show_graph(locations, edges;
         vertex_colors=nothing,
         edge_colors=nothing,
         texts = nothing,
-        format=SVG, io=nothing,
+        format=:png, filename=nothing,
+        pad=1.0,
         kwargs...)
     if length(locations) == 0
-        dx, dy = 12cm, 12cm
-        img = Compose.compose(Compose.context())
+        _draw(()->nothing, 100, 100; format, filename)
     else
-        img, (dx, dy) = viz_graph(locations, edges; vertex_colors=vertex_colors, edge_colors=edge_colors, texts=texts, config=GraphDisplayConfig(; config_plotting(locations)..., kwargs...))
-    end
-    if io === nothing
-        Compose.set_default_graphic_size(dx, dy)
-        return img
-    else
-        return format(io, dx, dy)(img)
+        config = autoconfig(locations; pad, kwargs...)
+        Dx, Dy = (config.xspan+2*config.pad)*config.unit, (config.yspan+2*config.pad)*config.unit
+        _draw(Dx, Dy; format, filename) do
+            _show_graph(map(loc->(loc[1]+config.offsetx, loc[2]+config.offsety), locations), edges, vertex_colors, edge_colors, texts, config)
+        end
     end
 end
-function show_graph(graph::SimpleGraph; locs=spring_layout(graph), kwargs...)
+
+# NOTE: the final positions are in range [-5, 5]
+function show_graph(graph::SimpleGraph; C=5.0, locs=map(x->x .* C, spring_layout(graph)), kwargs...)
     show_graph(locs, [(e.src, e.dst) for e in edges(graph)]; kwargs...)
 end
 
-function fit_image(rescaler::Rescaler, image_size, imgs...)
-    X = rescaler.xmax - rescaler.xmin + 2*rescaler.pad
-    Y = rescaler.ymax - rescaler.ymin + 2*rescaler.pad
-    img_rescale = image_size/max(X, Y)*cm
-    if Y < X
-        return Compose.compose(Compose.context(0, 0, 1.0, X/Y), imgs...), (X*img_rescale, Y*img_rescale)
+function _draw(f, Dx, Dy; format, filename)
+    if filename === nothing
+        if format == :pdf
+            _format = tempname()*".pdf"
+        else
+            _format = format
+        end
     else
-        return Compose.compose(Compose.context(0, 0, Y/X, 1.0), imgs...), (X*img_rescale, Y*img_rescale)
+        _format = filename
     end
+    Luxor.Drawing(Dx, Dy, _format)
+    Luxor.origin(0, 0)
+    f()
+    Luxor.finish()
+    Luxor.preview()
 end
-
-# Returns a 2-tuple of (image::Context, size)
-function viz_graph(locs, edges; vertex_colors, edge_colors, texts, config)
-    rescaler = get_rescaler(locs, config.pad)
-    img = _viz_atoms(rescaler.(locs), edges, vertex_colors, edge_colors, texts, config, getscale(rescaler))
-    return fit_image(rescaler, config.image_size, img)
-end
-
 Base.@kwdef struct GraphDisplayConfig
     # line, vertex and text
-    scale::Float64 = 1.0
-    pad::Float64 = 1.5
+    pad::Float64 = 1.0
+    unit::Int = 60   # how many pixels as unit?
+    offsetx::Float64 = 0.0  # the zero of x axis
+    offsety::Float64 = 0.0  # the zero of y axis
+    xspan::Float64 = 1.0
+    yspan::Float64 = 1.0
 
     # vertex
     vertex_text_color::String = "black"
     vertex_stroke_color = "black"
     vertex_fill_color = "white"
+    vertex_size::Float64 = 0.15
+    vertex_fontsize::Float64 = 12
+    vertex_line_width::Float64 = 1  # in pt
     # edge
     edge_color::String = "black"
-    # image size in cm
-    image_size::Float64 = 12
+    edge_line_width::Float64 = 1  # in pt
 end
 
-function _viz_atoms(locs, edges, vertex_colors, edge_colors, texts, config, rescale)
-    rescale = rescale * config.image_size * config.scale * 1.6
+function _show_graph(locs, edges, vertex_colors, edge_colors, texts, config)
     if vertex_colors !== nothing
         @assert length(locs) == length(vertex_colors)
     else
@@ -171,30 +141,37 @@ function _viz_atoms(locs, edges, vertex_colors, edge_colors, texts, config, resc
     if texts !== nothing
         @assert length(locs) == length(texts)
     end
-    img1 = Viznet.canvas() do
-        for (i, vertex) in enumerate(locs)
-            draw_vertex(vertex...; fill_color=vertex_colors[i], stroke_color=config.vertex_stroke_color, r=0.15cm*rescale, line_width=0.3mm*rescale)
-            if config.vertex_text_color !== "transparent"
-                draw_text(vertex..., texts === nothing ? "$i" : texts[i]; fontsize=4pt*rescale, color=config.vertex_text_color)
-            end
-        end
-        for (k, (i, j)) in enumerate(edges)
-            edge_styles[k] >> (locs[i], locs[j])
-            draw_edge(locs...; color=edge_colors[k], line_width = 0.3mm*rescale)
+    for (i, vertex) in enumerate(locs)
+        draw_vertex(vertex...; fill_color=vertex_colors[i], stroke_color=config.vertex_stroke_color, r=config.vertex_size, line_width=config.vertex_line_width, unit=config.unit)
+        if config.vertex_text_color !== "transparent"
+            draw_text(vertex..., texts === nothing ? "$i" : texts[i]; fontsize=config.vertex_fontsize, color=config.vertex_text_color, unit=config.unit)
         end
     end
-    Compose.compose(Compose.context(), img1)
+    for (k, (i, j)) in enumerate(edges)
+        draw_edge(locs[i], locs[j]; color=edge_colors[k], line_width=config.edge_line_width, r=config.vertex_size, unit=config.unit)
+    end
 end
-draw_text(i, j, text; fontsize, color)
-function draw_edge(i, j; color, line_width)
+function draw_text(x, y, text; fontsize, color, unit)
+    Luxor.fontsize(fontsize)
+    setcolor(color)
+    Luxor.text(text, Point(unit*x, unit*y), valign=:middle, halign=:center)
+end
+function draw_edge(i, j; color, line_width, r, unit)
+    setcolor(color)
     setline(line_width)
+    a, b = Point(i...), Point(j...)
+    nints, ip1, ip2 =  intersectionlinecircle(a, b, a, r)
+    a_ = ip1
+    nints, ip1, ip2 =  intersectionlinecircle(a, b, b, r)
+    b_ = ip2
+    line(a_ * unit, b_ * unit, :stroke)
 end
-function draw_vertex(x, y; stroke_color, fill_color, line_width, r)
+function draw_vertex(x, y; stroke_color, fill_color, line_width, r, unit)
     setcolor(fill_color)
-    circle(Point(x, y), r, :fill)
+    circle(unit*Point(x, y), unit*r, :fill)
     setline(line_width)
     setcolor(stroke_color)
-    circle(Point(x, y), r, :stroke)
+    circle(Point(unit*x, unit*y), unit*r, :stroke)
 end
 
 """
@@ -281,7 +258,7 @@ end
         vertex_configs=nothing,
         edge_configs=nothing,
         texts=["1", "2", ...],
-        format=SVG,
+        format=:png,
         io=nothing,
         kwargs...)
 
@@ -298,79 +275,65 @@ Keyword arguments
 * `vertex_configs` is an iterator of bit strings for specifying vertex configurations, e.g. a [`ConfigEnumerator`](@ref) instance.
 * `edge_configs` is an iterator of bit strings for specifying edge configurations.
 * `texts` is a vector of strings for labeling vertices.
-* `format` is the output format, which can be `"svg"` or `"png"`. Check the [Luxor documentation]() for details.
+* `format` is the output format, which can be `:svg`, `:pdf` or `:png`.
 * `io` can be `nothing` for the direct output, or a filename to saving to a file. For direct output, you will need a VSCode editor, an Atom editor, a Pluto notebook or a Jupyter notebook to display the image.
 
 Extra keyword arguments
 -------------------------------
 * line, vertex and text
-    * `scale::Float64` = 1.0
-    * `pad::Float64` = 1.5
+    * `pad::Float64` = 1.0
 * vertex
     * `vertex_text_color::String` = "black"
     * `vertex_stroke_color` = "black"
     * `vertex_fill_color` = "white"
 * edge
     * `edge_color::String` = "black"
-* image size in `cm`
-    * `image_size::Float64` = 12
 
 Example
 -------------------------------
 ```jldoctest
-julia> using Graphs, GenericTensorNetworks, Compose
+julia> using Graphs, GenericTensorNetworks
 
-julia> show_gallery(smallgraph(:petersen), (2, 3); format=Compose.SVG, io=tempname(), vertex_configs=[rand(Bool, 10) for k=1:6]);
+julia> show_gallery(smallgraph(:petersen), (2, 3); format=:png, io=tempname(), vertex_configs=[rand(Bool, 10) for k=1:6]);
 ```
 """
-function show_gallery(graph::SimpleGraph, grid::Tuple{Int,Int}; locs=spring_layout(graph), kwargs...)
+function show_gallery(graph::SimpleGraph, grid::Tuple{Int,Int}; C=5.0, locs=map(x->x .* C, spring_layout(graph)), kwargs...)
     show_gallery(locs, [(e.src, e.dst) for e in edges(graph)], grid; kwargs...)
 end
 function show_gallery(locs, edges, grid::Tuple{Int,Int};
         vertex_configs=nothing,
         edge_configs=nothing,
         texts=nothing,
-        format=SVG, io=nothing,
-        image_size = 12/max(grid...),
-        scale=0.7, kwargs...)
+        format=:png, filename=nothing,
+        pad=1.0,
+        kwargs...)
+    config = autoconfig(locs; pad, kwargs...)
     m, n = grid
     nv, ne = length(locs), length(edges)
-    imgs = Compose.Context[]
-    display_config = GraphDisplayConfig(; config_plotting(locs)..., image_size, scale, kwargs...)
-    for i=1:m
-        for j=1:n
-            # set colors
-            k = (i-1) * n + j
-            vertex_colors = if vertex_configs isa Nothing
-                fill("white", nv)
-            else
-                k > length(vertex_configs) && break
-                [iszero(vertex_configs[k][i]) ? display_config.vertex_fill_color : "red" for i=1:nv]
+    dx = (config.xspan+2*config.pad)*config.unit
+    dy = (config.yspan+2*config.pad)*config.unit
+    Dx, Dy = dx*n, dy*m
+    locs = map(loc->(loc[1]+config.offsetx, loc[2]+config.offsety), locs)
+    _draw(Dx, Dy; format, filename) do
+        for i=1:m
+            for j=1:n
+                origin((j-1)*dx, (i-1)*dy)
+                # set colors
+                k = (i-1) * n + j
+                vertex_colors = if vertex_configs isa Nothing
+                    fill("white", nv)
+                else
+                    k > length(vertex_configs) && break
+                    [iszero(vertex_configs[k][i]) ? config.vertex_fill_color : "red" for i=1:nv]
+                end
+                edge_colors = if edge_configs isa Nothing
+                    fill("black", ne)
+                else
+                    k > length(edge_configs) && break
+                    [iszero(edge_configs[k][i]) ? config.edge_color : "red" for i=1:ne]
+                end
+                _show_graph(locs, edges, vertex_colors, edge_colors, texts, config)
             end
-            edge_colors = if edge_configs isa Nothing
-                fill("black", ne)
-            else
-                k > length(edge_configs) && break
-                [iszero(edge_configs[k][i]) ? display_config.edge_color : "red" for i=1:ne]
-            end
-            
-            img, (dx, dy) = viz_graph(locs, edges; vertex_colors, edge_colors, texts, config=display_config)
-            push!(imgs, img)
         end
-    end
-    return tile_images(imgs, grid; image_size=(display_config.image_size, display_config.image_size), io, format)
-end
-
-function tile_images(imgs, grid; image_size=(3.0, 3.0), format=SVG, io=nothing)
-    m, n = grid
-    dx, dy = (image_size[1]*n)*cm, (image_size[2]*m)*cm
-    img = Compose.compose(context(),
-                          ntuple(k->(context((mod1(k,n)-1)/n, ((k-1)÷n)/m, 1.0/n, 1.0/m), imgs[k]), min(m*n, length(imgs)))...)
-
-    if io === nothing
-        Compose.set_default_graphic_size(dx, dy)
-        return img
-    else
-        return format(io, dx, dy)(img)
     end
 end

@@ -7,6 +7,7 @@ using OMEinsum
 using OMEinsum: timespace_complexity, getixsv
 using Graphs, Random
 using DelimitedFiles, Serialization, Printf
+using LuxorGraphPlot
 
 # OMEinsum
 export timespace_complexity, timespacereadwrite_complexity, @ein_str, getixsv, getiyv
@@ -62,7 +63,6 @@ include("graph_polynomials.jl")
 include("configurations.jl")
 include("graphs.jl")
 include("bounding.jl")
-include("visualize.jl")
 include("fileio.jl")
 include("interfaces.jl")
 include("deprecate.jl")

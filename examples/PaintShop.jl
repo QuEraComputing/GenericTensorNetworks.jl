@@ -19,7 +19,7 @@ sequence = collect("iadgbeadfcchghebif")
 # We can visualize this paint shop problem as a graph
 rot(a, b, θ) = cos(θ)*a + sin(θ)*b, cos(θ)*b - sin(θ)*a
 
-locations = [rot(0.0, 1.0, -0.25π - 1.5*π*(i-0.5)/length(sequence)) for i=1:length(sequence)]
+locations = [rot(0.0, 2.0, -0.25π - 1.5*π*(i-0.5)/length(sequence)) for i=1:length(sequence)]
 
 graph = path_graph(length(sequence))
 for i=1:length(sequence) 

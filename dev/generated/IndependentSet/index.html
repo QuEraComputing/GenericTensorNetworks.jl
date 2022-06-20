@@ -110,7 +110,7 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
     \end{matrix}\right)\]</p><p>where <span>$x_v$</span> is a variable associated with <span>$v$</span>. Similarly, for each edge <span>$(u, v) \in E$</span>, we define a matrix <span>$B$</span> indexed by <span>$s_u$</span> and <span>$s_v$</span> as</p><p class="math-container">\[B = \left(\begin{matrix}
 1  &amp; 1\\
 1 &amp; 0
-\end{matrix}\right).\]</p><p>Ideally, an optimal contraction order has a space complexity <span>$2^{{\rm tw}(G)}$</span>, where <span>${\rm tw(G)}$</span> is the <a href="https://en.wikipedia.org/wiki/Treewidth">tree-width</a> of <span>$G$</span> (or <code>graph</code> in the code). We can check the time, space and read-write complexities by typing</p><pre><code class="language-julia hljs">timespacereadwrite_complexity(problem)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(7.965784284662087, 4.0, 8.661778097771986)</code></pre><p>The three return values are <code>log2</code> values of the the number of element-wise multiplication operations, the number elements in the largest tensor during contraction and the number of tensor element read-write operations. For more information about how to improve the contraction order, please check the <a href="../../performancetips/#Performance-Tips">Performance Tips</a>.</p><h2 id="Solution-space-properties"><a class="docs-heading-anchor" href="#Solution-space-properties">Solution space properties</a><a id="Solution-space-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solution-space-properties" title="Permalink"></a></h2><h3 id="Maximum-independent-set-size-\\alpha(G)"><a class="docs-heading-anchor" href="#Maximum-independent-set-size-\\alpha(G)">Maximum independent set size <span>$\alpha(G)$</span></a><a id="Maximum-independent-set-size-\\alpha(G)-1"></a><a class="docs-heading-anchor-permalink" href="#Maximum-independent-set-size-\\alpha(G)" title="Permalink"></a></h3><p>We can compute solution space properties with the <a href="../../ref/#GenericTensorNetworks.solve"><code>solve</code></a> function, which takes two positional arguments, the problem instance and the wanted property.</p><pre><code class="language-julia hljs">maximum_independent_set_size = solve(problem, SizeMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4.0ₜ</code></pre><p>Here <a href="../../ref/#GenericTensorNetworks.SizeMax"><code>SizeMax</code></a> means finding the solution with maximum set size. The return value has <a href="../../ref/#TropicalNumbers.Tropical"><code>Tropical</code></a> type. We can get its content by typing</p><pre><code class="language-julia hljs">maximum_independent_set_size.n</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4.0</code></pre><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="Count-all-solutions-and-best-several-solutions"><a class="docs-heading-anchor" href="#Count-all-solutions-and-best-several-solutions">Count all solutions and best several solutions</a><a id="Count-all-solutions-and-best-several-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Count-all-solutions-and-best-several-solutions" title="Permalink"></a></h5><p>We can count all independent sets with the <a href="../../ref/#GenericTensorNetworks.CountingAll"><code>CountingAll</code></a> property.</p><pre><code class="language-julia hljs">count_all_independent_sets = solve(problem, CountingAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">76.0</code></pre><p>The return value has type <code>Float64</code>.</p><p>We can count the maximum independent sets with <a href="../../ref/#GenericTensorNetworks.CountingMax"><code>CountingMax</code></a>.</p><pre><code class="language-julia hljs">count_maximum_independent_sets = solve(problem, CountingMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, 5.0)ₜ</code></pre><p>The return value has type <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a>, which contains two fields. They are <code>n</code> being the maximum independent set size and <code>c</code> being the number of the maximum independent sets.</p><pre><code class="language-julia hljs">count_maximum_independent_sets.c</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5.0</code></pre><p>Similarly, we can count independent sets of sizes <span>$\alpha(G)$</span> and <span>$\alpha(G)-1$</span> by feeding an integer positional argument to <a href="../../ref/#GenericTensorNetworks.CountingMax"><code>CountingMax</code></a>.</p><pre><code class="language-julia hljs">count_max2_independent_sets = solve(problem, CountingMax(2))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">30.0*x^3 + 5.0*x^4</code></pre><p>The return value has type <a href="../../ref/#GenericTensorNetworks.TruncatedPoly"><code>TruncatedPoly</code></a>, which contains two fields. They are <code>maxorder</code> being the maximum independent set size and <code>coeffs</code> being the number of independent sets having sizes <span>$\alpha(G)-1$</span> and <span>$\alpha(G)$</span>.</p><pre><code class="language-julia hljs">count_max2_independent_sets.coeffs</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(30.0, 5.0)</code></pre><h5 id="Find-the-graph-polynomial"><a class="docs-heading-anchor" href="#Find-the-graph-polynomial">Find the graph polynomial</a><a id="Find-the-graph-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#Find-the-graph-polynomial" title="Permalink"></a></h5><p>We can count the number of independent sets at any size, which is equivalent to finding the coefficients of an independence polynomial that defined as</p><p class="math-container">\[I(G, x) = \sum_{k=0}^{\alpha(G)} a_k x^k,\]</p><p>where <span>$\alpha(G)$</span> is the maximum independent set size, <span>$a_k$</span> is the number of independent sets of size <span>$k$</span>. The total number of independent sets is thus equal to <span>$I(G, 1)$</span>. There are 3 methods to compute a graph polynomial, <code>:finitefield</code>, <code>:fft</code> and <code>:polynomial</code>. These methods are introduced in the docstring of <a href="../../ref/#GenericTensorNetworks.GraphPolynomial"><code>GraphPolynomial</code></a>.</p><pre><code class="language-julia hljs">independence_polynomial = solve(problem, GraphPolynomial(; method=:finitefield))[]</code></pre>1 &#43; 10&#8729;x &#43; 30&#8729;x<sup>2</sup> &#43; 30&#8729;x<sup>3</sup> &#43; 5&#8729;x<sup>4</sup><p>The return type is <a href="https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2"><code>Polynomial</code></a>.</p><pre><code class="language-julia hljs">independence_polynomial.coeffs</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5-element Vector{BigInt}:
+\end{matrix}\right).\]</p><p>Ideally, an optimal contraction order has a space complexity <span>$2^{{\rm tw}(G)}$</span>, where <span>${\rm tw(G)}$</span> is the <a href="https://en.wikipedia.org/wiki/Treewidth">tree-width</a> of <span>$G$</span> (or <code>graph</code> in the code). We can check the time, space and read-write complexities by typing</p><pre><code class="language-julia hljs">timespacereadwrite_complexity(problem)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(7.965784284662087, 4.0, 8.661778097771988)</code></pre><p>The three return values are <code>log2</code> values of the the number of element-wise multiplication operations, the number elements in the largest tensor during contraction and the number of tensor element read-write operations. For more information about how to improve the contraction order, please check the <a href="../../performancetips/#Performance-Tips">Performance Tips</a>.</p><h2 id="Solution-space-properties"><a class="docs-heading-anchor" href="#Solution-space-properties">Solution space properties</a><a id="Solution-space-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solution-space-properties" title="Permalink"></a></h2><h3 id="Maximum-independent-set-size-\\alpha(G)"><a class="docs-heading-anchor" href="#Maximum-independent-set-size-\\alpha(G)">Maximum independent set size <span>$\alpha(G)$</span></a><a id="Maximum-independent-set-size-\\alpha(G)-1"></a><a class="docs-heading-anchor-permalink" href="#Maximum-independent-set-size-\\alpha(G)" title="Permalink"></a></h3><p>We can compute solution space properties with the <a href="../../ref/#GenericTensorNetworks.solve"><code>solve</code></a> function, which takes two positional arguments, the problem instance and the wanted property.</p><pre><code class="language-julia hljs">maximum_independent_set_size = solve(problem, SizeMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4.0ₜ</code></pre><p>Here <a href="../../ref/#GenericTensorNetworks.SizeMax"><code>SizeMax</code></a> means finding the solution with maximum set size. The return value has <a href="../../ref/#TropicalNumbers.Tropical"><code>Tropical</code></a> type. We can get its content by typing</p><pre><code class="language-julia hljs">maximum_independent_set_size.n</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4.0</code></pre><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="Count-all-solutions-and-best-several-solutions"><a class="docs-heading-anchor" href="#Count-all-solutions-and-best-several-solutions">Count all solutions and best several solutions</a><a id="Count-all-solutions-and-best-several-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Count-all-solutions-and-best-several-solutions" title="Permalink"></a></h5><p>We can count all independent sets with the <a href="../../ref/#GenericTensorNetworks.CountingAll"><code>CountingAll</code></a> property.</p><pre><code class="language-julia hljs">count_all_independent_sets = solve(problem, CountingAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">76.0</code></pre><p>The return value has type <code>Float64</code>.</p><p>We can count the maximum independent sets with <a href="../../ref/#GenericTensorNetworks.CountingMax"><code>CountingMax</code></a>.</p><pre><code class="language-julia hljs">count_maximum_independent_sets = solve(problem, CountingMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, 5.0)ₜ</code></pre><p>The return value has type <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a>, which contains two fields. They are <code>n</code> being the maximum independent set size and <code>c</code> being the number of the maximum independent sets.</p><pre><code class="language-julia hljs">count_maximum_independent_sets.c</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5.0</code></pre><p>Similarly, we can count independent sets of sizes <span>$\alpha(G)$</span> and <span>$\alpha(G)-1$</span> by feeding an integer positional argument to <a href="../../ref/#GenericTensorNetworks.CountingMax"><code>CountingMax</code></a>.</p><pre><code class="language-julia hljs">count_max2_independent_sets = solve(problem, CountingMax(2))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">30.0*x^3 + 5.0*x^4</code></pre><p>The return value has type <a href="../../ref/#GenericTensorNetworks.TruncatedPoly"><code>TruncatedPoly</code></a>, which contains two fields. They are <code>maxorder</code> being the maximum independent set size and <code>coeffs</code> being the number of independent sets having sizes <span>$\alpha(G)-1$</span> and <span>$\alpha(G)$</span>.</p><pre><code class="language-julia hljs">count_max2_independent_sets.coeffs</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(30.0, 5.0)</code></pre><h5 id="Find-the-graph-polynomial"><a class="docs-heading-anchor" href="#Find-the-graph-polynomial">Find the graph polynomial</a><a id="Find-the-graph-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#Find-the-graph-polynomial" title="Permalink"></a></h5><p>We can count the number of independent sets at any size, which is equivalent to finding the coefficients of an independence polynomial that defined as</p><p class="math-container">\[I(G, x) = \sum_{k=0}^{\alpha(G)} a_k x^k,\]</p><p>where <span>$\alpha(G)$</span> is the maximum independent set size, <span>$a_k$</span> is the number of independent sets of size <span>$k$</span>. The total number of independent sets is thus equal to <span>$I(G, 1)$</span>. There are 3 methods to compute a graph polynomial, <code>:finitefield</code>, <code>:fft</code> and <code>:polynomial</code>. These methods are introduced in the docstring of <a href="../../ref/#GenericTensorNetworks.GraphPolynomial"><code>GraphPolynomial</code></a>.</p><pre><code class="language-julia hljs">independence_polynomial = solve(problem, GraphPolynomial(; method=:finitefield))[]</code></pre>1 &#43; 10&#8729;x &#43; 30&#8729;x<sup>2</sup> &#43; 30&#8729;x<sup>3</sup> &#43; 5&#8729;x<sup>4</sup><p>The return type is <a href="https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2"><code>Polynomial</code></a>.</p><pre><code class="language-julia hljs">independence_polynomial.coeffs</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5-element Vector{BigInt}:
   1
  10
  30
@@ -214,12 +214,12 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 </g>
 </g>
 </svg>
-'/><h5 id="Enumerate-all-solutions-and-best-several-solutions"><a class="docs-heading-anchor" href="#Enumerate-all-solutions-and-best-several-solutions">Enumerate all solutions and best several solutions</a><a id="Enumerate-all-solutions-and-best-several-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Enumerate-all-solutions-and-best-several-solutions" title="Permalink"></a></h5><p>We can use bounded or unbounded <a href="../../ref/#GenericTensorNetworks.ConfigsMax"><code>ConfigsMax</code></a> to find all solutions with largest-K set sizes. In most cases, the bounded (default) version is preferred because it can reduce the memory usage significantly.</p><pre><code class="language-julia hljs">all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, {1010000011, 1001001100, 0100100110, 0010111000, 0101010001})ₜ</code></pre><p>The return value has type <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a>, while its counting field having type <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a>. The <code>data</code> field of a <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a> instance contains a vector of bit strings.</p><pre><code class="language-julia hljs">all_max_configs.c.data</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5-element Vector{StaticBitVector{10, 1}}:
- 1010000011
- 1001001100
+'/><h5 id="Enumerate-all-solutions-and-best-several-solutions"><a class="docs-heading-anchor" href="#Enumerate-all-solutions-and-best-several-solutions">Enumerate all solutions and best several solutions</a><a id="Enumerate-all-solutions-and-best-several-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Enumerate-all-solutions-and-best-several-solutions" title="Permalink"></a></h5><p>We can use bounded or unbounded <a href="../../ref/#GenericTensorNetworks.ConfigsMax"><code>ConfigsMax</code></a> to find all solutions with largest-K set sizes. In most cases, the bounded (default) version is preferred because it can reduce the memory usage significantly.</p><pre><code class="language-julia hljs">all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, {0100100110, 1001001100, 1010000011, 0101010001, 0010111000})ₜ</code></pre><p>The return value has type <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a>, while its counting field having type <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a>. The <code>data</code> field of a <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a> instance contains a vector of bit strings.</p><pre><code class="language-julia hljs">all_max_configs.c.data</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5-element Vector{StaticBitVector{10, 1}}:
  0100100110
- 0010111000
- 0101010001</code></pre><p>These solutions can be visualized with the <a href="../../ref/#LuxorGraphPlot.show_gallery"><code>show_gallery</code></a> function.</p><pre><code class="language-julia hljs">show_gallery(graph, (1, length(all_max_configs.c)); locs=locations, vertex_configs=all_max_configs.c, format=:svg)</code></pre><img src='data:image/svg+xml;utf-8,<?xml version="1.0" encoding="UTF-8"?>
+ 1001001100
+ 1010000011
+ 0101010001
+ 0010111000</code></pre><p>These solutions can be visualized with the <a href="../../ref/#LuxorGraphPlot.show_gallery"><code>show_gallery</code></a> function.</p><pre><code class="language-julia hljs">show_gallery(graph, (1, length(all_max_configs.c)); locs=locations, vertex_configs=all_max_configs.c, format=:svg)</code></pre><img src='data:image/svg+xml;utf-8,<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1741pt" height="337pt" viewBox="0 0 1741 337" version="1.1">
 <defs>
 <g>
@@ -274,15 +274,15 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 223.910156 170.332031 L 146.140625 113.832031 "/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 222.191406 175.625 L 126.0625 175.625 "/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 202.113281 113.832031 L 124.34375 170.332031 "/>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 183.125 277.082031 C 183.125 282.050781 179.097656 286.082031 174.125 286.082031 C 169.15625 286.082031 165.125 282.050781 165.125 277.082031 C 165.125 272.113281 169.15625 268.082031 174.125 268.082031 C 179.097656 268.082031 183.125 272.113281 183.125 277.082031 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 183.125 277.082031 C 183.125 282.050781 179.097656 286.082031 174.125 286.082031 C 169.15625 286.082031 165.125 282.050781 165.125 277.082031 C 165.125 272.113281 169.15625 268.082031 174.125 268.082031 C 179.097656 268.082031 183.125 272.113281 183.125 277.082031 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="170.646782" y="281.396039"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 297.253906 194.164062 C 297.253906 199.132812 293.222656 203.164062 288.253906 203.164062 C 283.28125 203.164062 279.253906 199.132812 279.253906 194.164062 C 279.253906 189.195312 283.28125 185.164062 288.253906 185.164062 C 293.222656 185.164062 297.253906 189.195312 297.253906 194.164062 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 297.253906 194.164062 C 297.253906 199.132812 293.222656 203.164062 288.253906 203.164062 C 283.28125 203.164062 279.253906 199.132812 279.253906 194.164062 C 279.253906 189.195312 283.28125 185.164062 288.253906 185.164062 C 293.222656 185.164062 297.253906 189.195312 297.253906 194.164062 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-2" x="284.773564" y="198.517079"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 253.660156 60 C 253.660156 64.96875 249.632812 69 244.660156 69 C 239.691406 69 235.660156 64.96875 235.660156 60 C 235.660156 55.03125 239.691406 51 244.660156 51 C 249.632812 51 253.660156 55.03125 253.660156 60 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 253.660156 60 C 253.660156 64.96875 249.632812 69 244.660156 69 C 239.691406 69 235.660156 64.96875 235.660156 60 C 235.660156 55.03125 239.691406 51 244.660156 51 C 249.632812 51 253.660156 55.03125 253.660156 60 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-3" x="241.181012" y="64.353"/>
 </g>
@@ -290,7 +290,7 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-4" x="100.112552" y="64.308"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 69 194.164062 C 69 199.132812 64.96875 203.164062 60 203.164062 C 55.03125 203.164062 51 199.132812 51 194.164062 C 51 189.195312 55.03125 185.164062 60 185.164062 C 64.96875 185.164062 69 189.195312 69 194.164062 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 69 194.164062 C 69 199.132812 64.96875 203.164062 60 203.164062 C 55.03125 203.164062 51 199.132812 51 194.164062 C 51 189.195312 55.03125 185.164062 60 185.164062 C 64.96875 185.164062 69 189.195312 69 194.164062 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-5" x="56.52" y="198.469079"/>
 </g>
@@ -302,7 +302,7 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-7" x="227.710173" y="179.928059"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 218.394531 108.542969 C 218.394531 113.511719 214.363281 117.542969 209.394531 117.542969 C 204.421875 117.542969 200.394531 113.511719 200.394531 108.542969 C 200.394531 103.570312 204.421875 99.542969 209.394531 99.542969 C 214.363281 99.542969 218.394531 103.570312 218.394531 108.542969 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 218.394531 108.542969 C 218.394531 113.511719 214.363281 117.542969 209.394531 117.542969 C 204.421875 117.542969 200.394531 113.511719 200.394531 108.542969 C 200.394531 103.570312 204.421875 99.542969 209.394531 99.542969 C 214.363281 99.542969 218.394531 103.570312 218.394531 108.542969 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-8" x="205.913897" y="112.89402"/>
 </g>
@@ -310,7 +310,7 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-9" x="135.379667" y="112.89402"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 126.0625 175.625 C 126.0625 180.59375 122.035156 184.625 117.0625 184.625 C 112.09375 184.625 108.0625 180.59375 108.0625 175.625 C 108.0625 170.652344 112.09375 166.625 117.0625 166.625 C 122.035156 166.625 126.0625 170.652344 126.0625 175.625 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 126.0625 175.625 C 126.0625 180.59375 122.035156 184.625 117.0625 184.625 C 112.09375 184.625 108.0625 180.59375 108.0625 175.625 C 108.0625 170.652344 112.09375 166.625 117.0625 166.625 C 122.035156 166.625 126.0625 170.652344 126.0625 175.625 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="110.103391" y="179.976059"/>
   <use xlink:href="%23glyph0-10" x="117.063391" y="179.976059"/>
@@ -386,15 +386,15 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 920.417969 170.332031 L 842.648438 113.832031 "/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 918.699219 175.625 L 822.570312 175.625 "/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 898.621094 113.832031 L 820.851562 170.332031 "/>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 879.632812 277.082031 C 879.632812 282.050781 875.605469 286.082031 870.632812 286.082031 C 865.664062 286.082031 861.632812 282.050781 861.632812 277.082031 C 861.632812 272.113281 865.664062 268.082031 870.632812 268.082031 C 875.605469 268.082031 879.632812 272.113281 879.632812 277.082031 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 879.632812 277.082031 C 879.632812 282.050781 875.605469 286.082031 870.632812 286.082031 C 865.664062 286.082031 861.632812 282.050781 861.632812 277.082031 C 861.632812 272.113281 865.664062 268.082031 870.632812 268.082031 C 875.605469 268.082031 879.632812 272.113281 879.632812 277.082031 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="867.15391" y="281.396039"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 993.761719 194.164062 C 993.761719 199.132812 989.730469 203.164062 984.761719 203.164062 C 979.789062 203.164062 975.761719 199.132812 975.761719 194.164062 C 975.761719 189.195312 979.789062 185.164062 984.761719 185.164062 C 989.730469 185.164062 993.761719 189.195312 993.761719 194.164062 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 993.761719 194.164062 C 993.761719 199.132812 989.730469 203.164062 984.761719 203.164062 C 979.789062 203.164062 975.761719 199.132812 975.761719 194.164062 C 975.761719 189.195312 979.789062 185.164062 984.761719 185.164062 C 989.730469 185.164062 993.761719 189.195312 993.761719 194.164062 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-2" x="981.280692" y="198.517079"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 950.167969 60 C 950.167969 64.96875 946.140625 69 941.167969 69 C 936.199219 69 932.167969 64.96875 932.167969 60 C 932.167969 55.03125 936.199219 51 941.167969 51 C 946.140625 51 950.167969 55.03125 950.167969 60 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 950.167969 60 C 950.167969 64.96875 946.140625 69 941.167969 69 C 936.199219 69 932.167969 64.96875 932.167969 60 C 932.167969 55.03125 936.199219 51 941.167969 51 C 946.140625 51 950.167969 55.03125 950.167969 60 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-3" x="937.68814" y="64.353"/>
 </g>
@@ -402,7 +402,7 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-4" x="796.61968" y="64.308"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 765.507812 194.164062 C 765.507812 199.132812 761.476562 203.164062 756.507812 203.164062 C 751.535156 203.164062 747.507812 199.132812 747.507812 194.164062 C 747.507812 189.195312 751.535156 185.164062 756.507812 185.164062 C 761.476562 185.164062 765.507812 189.195312 765.507812 194.164062 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 765.507812 194.164062 C 765.507812 199.132812 761.476562 203.164062 756.507812 203.164062 C 751.535156 203.164062 747.507812 199.132812 747.507812 194.164062 C 747.507812 189.195312 751.535156 185.164062 756.507812 185.164062 C 761.476562 185.164062 765.507812 189.195312 765.507812 194.164062 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-5" x="753.027128" y="198.469079"/>
 </g>
@@ -414,7 +414,7 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-7" x="924.217301" y="179.928059"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 914.902344 108.542969 C 914.902344 113.511719 910.871094 117.542969 905.902344 117.542969 C 900.929688 117.542969 896.902344 113.511719 896.902344 108.542969 C 896.902344 103.570312 900.929688 99.542969 905.902344 99.542969 C 910.871094 99.542969 914.902344 103.570312 914.902344 108.542969 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 914.902344 108.542969 C 914.902344 113.511719 910.871094 117.542969 905.902344 117.542969 C 900.929688 117.542969 896.902344 113.511719 896.902344 108.542969 C 896.902344 103.570312 900.929688 99.542969 905.902344 99.542969 C 910.871094 99.542969 914.902344 103.570312 914.902344 108.542969 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-8" x="902.421025" y="112.89402"/>
 </g>
@@ -422,7 +422,7 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-9" x="831.886795" y="112.89402"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 822.570312 175.625 C 822.570312 180.59375 818.542969 184.625 813.570312 184.625 C 808.601562 184.625 804.570312 180.59375 804.570312 175.625 C 804.570312 170.652344 808.601562 166.625 813.570312 166.625 C 818.542969 166.625 822.570312 170.652344 822.570312 175.625 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 822.570312 175.625 C 822.570312 180.59375 818.542969 184.625 813.570312 184.625 C 808.601562 184.625 804.570312 180.59375 804.570312 175.625 C 804.570312 170.652344 808.601562 166.625 813.570312 166.625 C 818.542969 166.625 822.570312 170.652344 822.570312 175.625 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="806.610519" y="179.976059"/>
   <use xlink:href="%23glyph0-10" x="813.570519" y="179.976059"/>
@@ -446,19 +446,19 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="1215.407474" y="281.396039"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1342.015625 194.164062 C 1342.015625 199.132812 1337.984375 203.164062 1333.015625 203.164062 C 1328.042969 203.164062 1324.015625 199.132812 1324.015625 194.164062 C 1324.015625 189.195312 1328.042969 185.164062 1333.015625 185.164062 C 1337.984375 185.164062 1342.015625 189.195312 1342.015625 194.164062 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1342.015625 194.164062 C 1342.015625 199.132812 1337.984375 203.164062 1333.015625 203.164062 C 1328.042969 203.164062 1324.015625 199.132812 1324.015625 194.164062 C 1324.015625 189.195312 1328.042969 185.164062 1333.015625 185.164062 C 1337.984375 185.164062 1342.015625 189.195312 1342.015625 194.164062 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-2" x="1329.534256" y="198.517079"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1298.421875 60 C 1298.421875 64.96875 1294.390625 69 1289.421875 69 C 1284.449219 69 1280.421875 64.96875 1280.421875 60 C 1280.421875 55.03125 1284.449219 51 1289.421875 51 C 1294.390625 51 1298.421875 55.03125 1298.421875 60 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1298.421875 60 C 1298.421875 64.96875 1294.390625 69 1289.421875 69 C 1284.449219 69 1280.421875 64.96875 1280.421875 60 C 1280.421875 55.03125 1284.449219 51 1289.421875 51 C 1294.390625 51 1298.421875 55.03125 1298.421875 60 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-3" x="1285.941704" y="64.353"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1157.351562 60 C 1157.351562 64.96875 1153.324219 69 1148.351562 69 C 1143.382812 69 1139.351562 64.96875 1139.351562 60 C 1139.351562 55.03125 1143.382812 51 1148.351562 51 C 1153.324219 51 1157.351562 55.03125 1157.351562 60 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1157.351562 60 C 1157.351562 64.96875 1153.324219 69 1148.351562 69 C 1143.382812 69 1139.351562 64.96875 1139.351562 60 C 1139.351562 55.03125 1143.382812 51 1148.351562 51 C 1153.324219 51 1157.351562 55.03125 1157.351562 60 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-4" x="1144.873243" y="64.308"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1113.761719 194.164062 C 1113.761719 199.132812 1109.730469 203.164062 1104.761719 203.164062 C 1099.789062 203.164062 1095.761719 199.132812 1095.761719 194.164062 C 1095.761719 189.195312 1099.789062 185.164062 1104.761719 185.164062 C 1109.730469 185.164062 1113.761719 189.195312 1113.761719 194.164062 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1113.761719 194.164062 C 1113.761719 199.132812 1109.730469 203.164062 1104.761719 203.164062 C 1099.789062 203.164062 1095.761719 199.132812 1095.761719 194.164062 C 1095.761719 189.195312 1099.789062 185.164062 1104.761719 185.164062 C 1109.730469 185.164062 1113.761719 189.195312 1113.761719 194.164062 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-5" x="1101.280692" y="198.469079"/>
 </g>
@@ -466,7 +466,7 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-6" x="1215.407474" y="221.387039"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1284.949219 175.625 C 1284.949219 180.59375 1280.921875 184.625 1275.949219 184.625 C 1270.980469 184.625 1266.949219 180.59375 1266.949219 175.625 C 1266.949219 170.652344 1270.980469 166.625 1275.949219 166.625 C 1280.921875 166.625 1284.949219 170.652344 1284.949219 175.625 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1284.949219 175.625 C 1284.949219 180.59375 1280.921875 184.625 1275.949219 184.625 C 1270.980469 184.625 1266.949219 180.59375 1266.949219 175.625 C 1266.949219 170.652344 1270.980469 166.625 1275.949219 166.625 C 1280.921875 166.625 1284.949219 170.652344 1284.949219 175.625 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-7" x="1272.470865" y="179.928059"/>
 </g>
@@ -478,7 +478,7 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-9" x="1180.140359" y="112.89402"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1170.824219 175.625 C 1170.824219 180.59375 1166.792969 184.625 1161.824219 184.625 C 1156.855469 184.625 1152.824219 180.59375 1152.824219 175.625 C 1152.824219 170.652344 1156.855469 166.625 1161.824219 166.625 C 1166.792969 166.625 1170.824219 170.652344 1170.824219 175.625 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1170.824219 175.625 C 1170.824219 180.59375 1166.792969 184.625 1161.824219 184.625 C 1156.855469 184.625 1152.824219 180.59375 1152.824219 175.625 C 1152.824219 170.652344 1156.855469 166.625 1161.824219 166.625 C 1166.792969 166.625 1170.824219 170.652344 1170.824219 175.625 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="1154.864083" y="179.976059"/>
   <use xlink:href="%23glyph0-10" x="1161.824083" y="179.976059"/>
@@ -502,19 +502,19 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="1563.661038" y="281.396039"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1690.269531 194.164062 C 1690.269531 199.132812 1686.238281 203.164062 1681.269531 203.164062 C 1676.296875 203.164062 1672.269531 199.132812 1672.269531 194.164062 C 1672.269531 189.195312 1676.296875 185.164062 1681.269531 185.164062 C 1686.238281 185.164062 1690.269531 189.195312 1690.269531 194.164062 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1690.269531 194.164062 C 1690.269531 199.132812 1686.238281 203.164062 1681.269531 203.164062 C 1676.296875 203.164062 1672.269531 199.132812 1672.269531 194.164062 C 1672.269531 189.195312 1676.296875 185.164062 1681.269531 185.164062 C 1686.238281 185.164062 1690.269531 189.195312 1690.269531 194.164062 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-2" x="1677.78782" y="198.517079"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1646.675781 60 C 1646.675781 64.96875 1642.644531 69 1637.675781 69 C 1632.703125 69 1628.675781 64.96875 1628.675781 60 C 1628.675781 55.03125 1632.703125 51 1637.675781 51 C 1642.644531 51 1646.675781 55.03125 1646.675781 60 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1646.675781 60 C 1646.675781 64.96875 1642.644531 69 1637.675781 69 C 1632.703125 69 1628.675781 64.96875 1628.675781 60 C 1628.675781 55.03125 1632.703125 51 1637.675781 51 C 1642.644531 51 1646.675781 55.03125 1646.675781 60 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-3" x="1634.195268" y="64.353"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1505.605469 60 C 1505.605469 64.96875 1501.578125 69 1496.605469 69 C 1491.636719 69 1487.605469 64.96875 1487.605469 60 C 1487.605469 55.03125 1491.636719 51 1496.605469 51 C 1501.578125 51 1505.605469 55.03125 1505.605469 60 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1505.605469 60 C 1505.605469 64.96875 1501.578125 69 1496.605469 69 C 1491.636719 69 1487.605469 64.96875 1487.605469 60 C 1487.605469 55.03125 1491.636719 51 1496.605469 51 C 1501.578125 51 1505.605469 55.03125 1505.605469 60 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-4" x="1493.126807" y="64.308"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1462.015625 194.164062 C 1462.015625 199.132812 1457.984375 203.164062 1453.015625 203.164062 C 1448.042969 203.164062 1444.015625 199.132812 1444.015625 194.164062 C 1444.015625 189.195312 1448.042969 185.164062 1453.015625 185.164062 C 1457.984375 185.164062 1462.015625 189.195312 1462.015625 194.164062 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1462.015625 194.164062 C 1462.015625 199.132812 1457.984375 203.164062 1453.015625 203.164062 C 1448.042969 203.164062 1444.015625 199.132812 1444.015625 194.164062 C 1444.015625 189.195312 1448.042969 185.164062 1453.015625 185.164062 C 1457.984375 185.164062 1462.015625 189.195312 1462.015625 194.164062 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-5" x="1449.534256" y="198.469079"/>
 </g>
@@ -522,7 +522,7 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-6" x="1563.661038" y="221.387039"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1633.203125 175.625 C 1633.203125 180.59375 1629.175781 184.625 1624.203125 184.625 C 1619.234375 184.625 1615.203125 180.59375 1615.203125 175.625 C 1615.203125 170.652344 1619.234375 166.625 1624.203125 166.625 C 1629.175781 166.625 1633.203125 170.652344 1633.203125 175.625 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1633.203125 175.625 C 1633.203125 180.59375 1629.175781 184.625 1624.203125 184.625 C 1619.234375 184.625 1615.203125 180.59375 1615.203125 175.625 C 1615.203125 170.652344 1619.234375 166.625 1624.203125 166.625 C 1629.175781 166.625 1633.203125 170.652344 1633.203125 175.625 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-7" x="1620.724429" y="179.928059"/>
 </g>
@@ -534,14 +534,14 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-9" x="1528.393922" y="112.89402"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1519.078125 175.625 C 1519.078125 180.59375 1515.046875 184.625 1510.078125 184.625 C 1505.105469 184.625 1501.078125 180.59375 1501.078125 175.625 C 1501.078125 170.652344 1505.105469 166.625 1510.078125 166.625 C 1515.046875 166.625 1519.078125 170.652344 1519.078125 175.625 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1519.078125 175.625 C 1519.078125 180.59375 1515.046875 184.625 1510.078125 184.625 C 1505.105469 184.625 1501.078125 180.59375 1501.078125 175.625 C 1501.078125 170.652344 1505.105469 166.625 1510.078125 166.625 C 1515.046875 166.625 1519.078125 170.652344 1519.078125 175.625 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="1503.117647" y="179.976059"/>
   <use xlink:href="%23glyph0-10" x="1510.077647" y="179.976059"/>
 </g>
 </g>
 </svg>
-'/><p>We can use <a href="../../ref/#GenericTensorNetworks.ConfigsAll"><code>ConfigsAll</code></a> to enumerate all sets satisfying the independence constraint.</p><pre><code class="language-julia hljs">all_independent_sets = solve(problem, ConfigsAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0000000001, 0000001000, 0010000000, 0010000001, 0010001000, 0001000000, 0001000001, 0001001000, 0000100000, 0000101000, 0010100000, 0010101000, 0100000000, 0100000001, 0101000000, 0101000001, 0100100000, 1000000000, 1000000001, 1000001000, 1010000000, 1010000001, 1010001000, 1001000000, 1001000001, 1001001000, 0000000010, 0000000011, 0010000010, 0010000011, 0000100010, 0010100010, 0100000010, 0100000011, 0100100010, 1000000010, 1000000011, 1010000010, 1010000011, 0000000100, 0000001100, 0001000100, 0001001100, 0000100100, 0000101100, 0100000100, 0101000100, 0100100100, 1000000100, 1000001100, 1001000100, 1001001100, 0000000110, 0000100110, 0100000110, 0100100110, 1000000110, 0000010000, 0000010001, 0000011000, 0010010000, 0010010001, 0010011000, 0001010000, 0001010001, 0001011000, 0000110000, 0000111000, 0010110000, 0010111000, 0100010000, 0100010001, 0101010000, 0101010001, 0100110000}</code></pre><p>The return value has type <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a>.</p><h5 id="Sample-solutions"><a class="docs-heading-anchor" href="#Sample-solutions">Sample solutions</a><a id="Sample-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Sample-solutions" title="Permalink"></a></h5><p>It is often difficult to store all configurations in a vector. A more clever way to store the data is using the sum product tree format.</p><pre><code class="language-julia hljs">all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (count = 76.0)
+'/><p>We can use <a href="../../ref/#GenericTensorNetworks.ConfigsAll"><code>ConfigsAll</code></a> to enumerate all sets satisfying the independence constraint.</p><pre><code class="language-julia hljs">all_independent_sets = solve(problem, ConfigsAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0100000000, 0010000000, 0000000001, 0100000001, 0010000001, 0000100000, 0100100000, 0010100000, 0001000000, 0101000000, 0001000001, 0101000001, 0000001000, 0010001000, 0000101000, 0010101000, 0001001000, 0000000100, 0100000100, 0000100100, 0100100100, 0001000100, 0101000100, 0000001100, 0000101100, 0001001100, 0000000010, 0100000010, 0010000010, 0000000011, 0100000011, 0010000011, 0000100010, 0100100010, 0010100010, 0000000110, 0100000110, 0000100110, 0100100110, 1000000000, 1010000000, 1000000001, 1010000001, 1001000000, 1001000001, 1000001000, 1010001000, 1001001000, 1000000100, 1001000100, 1000001100, 1001001100, 1000000010, 1010000010, 1000000011, 1010000011, 1000000110, 0000010000, 0100010000, 0010010000, 0000010001, 0100010001, 0010010001, 0000110000, 0100110000, 0010110000, 0001010000, 0101010000, 0001010001, 0101010001, 0000011000, 0010011000, 0000111000, 0010111000, 0001011000}</code></pre><p>The return value has type <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a>.</p><h5 id="Sample-solutions"><a class="docs-heading-anchor" href="#Sample-solutions">Sample solutions</a><a id="Sample-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Sample-solutions" title="Permalink"></a></h5><p>It is often difficult to store all configurations in a vector. A more clever way to store the data is using the sum product tree format.</p><pre><code class="language-julia hljs">all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (count = 76.0)
 ├─ + (count = 58.0)
 │  ├─ + (count = 40.0)
 │  │  ├─ + (count = 27.0)
@@ -553,27 +553,21 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 │  │  │  │     ⋮
 │  │  │  │     
 │  │  │  └─ * (count = 9.0)
-│  │  │     ├─ OnehotVec{10, 2}(1, 1)
+│  │  │     ├─ + (count = 9.0)
 │  │  │     │  ⋮
 │  │  │     │  
-│  │  │     └─ * (count = 9.0)
+│  │  │     └─ OnehotVec{10, 2}(8, 1)
 │  │  │        ⋮
 │  │  │        
-│  │  └─ + (count = 13.0)
-│  │     ├─ + (count = 9.0)
-│  │     │  ├─ + (count = 8.0)
+│  │  └─ * (count = 13.0)
+│  │     ├─ + (count = 13.0)
+│  │     │  ├─ * (count = 9.0)
 │  │     │  │  ⋮
 │  │     │  │  
-│  │     │  └─ * (count = 1.0)
+│  │     │  └─ * (count = 4.0)
 │  │     │     ⋮
 │  │     │     
-│  │     └─ * (count = 4.0)
-│  │        ├─ OnehotVec{10, 2}(1, 1)
-│  │        │  ⋮
-│  │        │  
-│  │        └─ * (count = 4.0)
-│  │           ⋮
-│  │           
+│  │     └─ OnehotVec{10, 2}(9, 1)
 │  └─ + (count = 18.0)
 │     ├─ + (count = 13.0)
 │     │  ├─ + (count = 9.0)
@@ -584,27 +578,21 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 │     │  │     ⋮
 │     │  │     
 │     │  └─ * (count = 4.0)
-│     │     ├─ OnehotVec{10, 2}(1, 1)
+│     │     ├─ + (count = 4.0)
 │     │     │  ⋮
 │     │     │  
-│     │     └─ * (count = 4.0)
+│     │     └─ OnehotVec{10, 2}(8, 1)
 │     │        ⋮
 │     │        
-│     └─ + (count = 5.0)
-│        ├─ + (count = 4.0)
-│        │  ├─ + (count = 3.0)
+│     └─ * (count = 5.0)
+│        ├─ + (count = 5.0)
+│        │  ├─ * (count = 4.0)
 │        │  │  ⋮
 │        │  │  
 │        │  └─ * (count = 1.0)
 │        │     ⋮
 │        │     
-│        └─ * (count = 1.0)
-│           ├─ OnehotVec{10, 2}(1, 1)
-│           │  ⋮
-│           │  
-│           └─ * (count = 1.0)
-│              ⋮
-│              
+│        └─ OnehotVec{10, 2}(9, 1)
 └─ * (count = 18.0)
    ├─ + (count = 18.0)
    │  ├─ + (count = 17.0)
@@ -616,26 +604,26 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
    │  │  │     ⋮
    │  │  │     
    │  │  └─ * (count = 4.0)
-   │  │     ├─ * (count = 2.0)
+   │  │     ├─ * (count = 4.0)
    │  │     │  ⋮
    │  │     │  
-   │  │     └─ + (count = 2.0)
+   │  │     └─ OnehotVec{10, 2}(7, 1)
    │  │        ⋮
    │  │        
    │  └─ * (count = 1.0)
-   │     ├─ OnehotVec{10, 2}(2, 1)
-   │     └─ OnehotVec{10, 2}(5, 1)
+   │     ├─ OnehotVec{10, 2}(4, 1)
+   │     └─ OnehotVec{10, 2}(7, 1)
    └─ OnehotVec{10, 2}(6, 1)
 </code></pre><p>The return value has the <a href="../../ref/#GenericTensorNetworks.SumProductTree"><code>SumProductTree</code></a> type. Its length corresponds to the number of configurations.</p><pre><code class="language-julia hljs">length(all_independent_sets_tree)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">76.0</code></pre><p>We can use <code>Base.collect</code> function to create a <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a> or use <a href="../../ref/#GenericTensorNetworks.generate_samples"><code>generate_samples</code></a> to generate samples from it.</p><pre><code class="language-julia hljs">collect(all_independent_sets_tree)
 
 generate_samples(all_independent_sets_tree, 10)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{StaticBitVector{10, 1}}:
- 0001000000
- 1010000001
- 1000001000
- 0010000010
- 0000000010
- 0100100010
- 1010000011
- 0001000100
- 0000000110
- 0000111000</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../MaximalIS/">Maximal independent set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.19 on <span class="colophon-date" title="Monday 20 June 2022 16:20">Monday 20 June 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 0000000000
+ 0100100000
+ 0101000001
+ 0001001000
+ 0100000100
+ 0000001100
+ 0000100010
+ 1000000001
+ 1010001000
+ 0101010001</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../MaximalIS/">Maximal independent set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.19 on <span class="colophon-date" title="Monday 20 June 2022 19:59">Monday 20 June 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

@@ -13,7 +13,7 @@ graph = Graphs.smallgraph(:petersen)
 ## set the vertex locations manually instead of using the default spring layout
 rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
 
-locations = [[rot15(0.0, 1.0, i) for i=0:4]..., [rot15(0.0, 0.6, i) for i=0:4]...]
+locations = [[rot15(0.0, 2.0, i) for i=0:4]..., [rot15(0.0, 1.0, i) for i=0:4]...]
 
 show_graph(graph; locs=locations)
 

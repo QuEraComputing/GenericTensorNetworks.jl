@@ -131,7 +131,8 @@ MergeGreedy
 ```@docs
 show_graph
 show_gallery
-spring_layout
+show_einsum
+spring_layout!
 
 diagonal_coupled_graph
 square_lattice_graph

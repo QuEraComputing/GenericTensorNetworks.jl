@@ -7,6 +7,7 @@ using OMEinsum
 using OMEinsum: timespace_complexity, getixsv
 using Graphs, Random
 using DelimitedFiles, Serialization, Printf
+using LuxorGraphPlot
 
 # OMEinsum
 export timespace_complexity, timespacereadwrite_complexity, @ein_str, getixsv, getiyv
@@ -50,7 +51,7 @@ export solve, SizeMax, SizeMin, CountingAll, CountingMax, CountingMin, GraphPoly
 export save_configs, load_configs, hamming_distribution, save_sumproduct, load_sumproduct
 
 # Visualization
-export show_graph, spring_layout, show_gallery
+export show_graph, spring_layout!, show_gallery, show_einsum
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 
@@ -62,11 +63,11 @@ include("graph_polynomials.jl")
 include("configurations.jl")
 include("graphs.jl")
 include("bounding.jl")
-include("visualize.jl")
 include("fileio.jl")
 include("interfaces.jl")
 include("deprecate.jl")
 include("multiprocessing.jl")
+include("visualize.jl")
 
 using Requires
 function __init__()

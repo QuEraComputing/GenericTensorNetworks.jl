@@ -67,6 +67,7 @@ include("fileio.jl")
 include("interfaces.jl")
 include("deprecate.jl")
 include("multiprocessing.jl")
+include("visualize.jl")
 
 using Requires
 function __init__()

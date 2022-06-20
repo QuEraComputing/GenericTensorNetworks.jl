@@ -18,7 +18,7 @@ rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*�
 
 locations = [[rot15(0.0, 2.0, i) for i=0:4]..., [rot15(0.0, 1.0, i) for i=0:4]...]
 
-show_graph(graph; locs=locations)
+show_graph(graph; locs=locations, format=:svg)
 
 # ## Generic tensor network representation
 # We can use [`MaximalIS`](@ref) to construct the tensor network for solving the maximal independent set problem as
@@ -73,7 +73,7 @@ all(c->is_maximal_independent_set(graph, c), maximal_configs)
 
 #
 
-show_gallery(graph, (3, 5); locs=locations, vertex_configs=maximal_configs)
+show_gallery(graph, (3, 5); locs=locations, vertex_configs=maximal_configs, format=:svg)
 
 # This result should be consistent with that given by the [Bron Kerbosch algorithm](https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm) on the complement of Petersen graph.
 cliques = maximal_cliques(complement(graph))
@@ -84,7 +84,7 @@ cliques = maximal_cliques(complement(graph))
 # It is the [`ConfigsMin`](@ref) property in the program.
 minimum_maximal_configs = solve(problem, ConfigsMin())[].c
 
-show_gallery(graph, (2, 5); locs=locations, vertex_configs=minimum_maximal_configs)
+show_gallery(graph, (2, 5); locs=locations, vertex_configs=minimum_maximal_configs, format=:svg)
 
 # Similarly, if one is only interested in computing one of the minimum sets,
 # one can use the graph property [`SingleConfigMin`](@ref).

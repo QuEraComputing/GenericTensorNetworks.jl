@@ -15,7 +15,7 @@ rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*�
 
 locations = [[rot15(0.0, 2.0, i) for i=0:4]..., [rot15(0.0, 1.0, i) for i=0:4]...]
 
-show_graph(graph; locs=locations)
+show_graph(graph; locs=locations, format=:svg)
 
 # The graphical display is available in the following editors
 # * a [VSCode](https://github.com/julia-vscode/julia-vscode) editor,
@@ -118,7 +118,7 @@ single_solution = max_config.c.data
 
 # This bit string should be read from left to right, with the i-th bit being 1 (0) to indicate the i-th vertex is present (absent) in the set.
 # We can visualize this MIS with the following function.
-show_graph(graph; locs=locations, vertex_colors=
+show_graph(graph; locs=locations, format=:svg, vertex_colors=
     [iszero(single_solution[i]) ? "white" : "red" for i=1:nv(graph)])
 
 # ##### Enumerate all solutions and best several solutions
@@ -131,7 +131,7 @@ all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]
 all_max_configs.c.data
 
 # These solutions can be visualized with the [`show_gallery`](@ref) function.
-show_gallery(graph, (1, length(all_max_configs.c)); locs=locations, vertex_configs=all_max_configs.c);
+show_gallery(graph, (1, length(all_max_configs.c)); locs=locations, vertex_configs=all_max_configs.c, format=:svg)
 
 # We can use [`ConfigsAll`](@ref) to enumerate all sets satisfying the independence constraint.
 all_independent_sets = solve(problem, ConfigsAll())[]

@@ -19,7 +19,7 @@ rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*�
 
 locations = [[rot15(0.0, 2.0, i) for i=0:4]..., [rot15(0.0, 1.0, i) for i=0:4]...]
 
-show_graph(graph; locs=locations, vertex_colors=
+show_graph(graph; locs=locations, format=:svg, vertex_colors=
           [iszero(max_config_weighted.c.data[i]) ? "white" : "red" for i=1:nv(graph)])
 
 # The only solution space property that can not be defined for general real-weighted (not including integer-weighted) graphs is the [`GraphPolynomial`](@ref).
@@ -39,5 +39,5 @@ max5_configs = solve(problem, SingleConfigMax(5))[]
 max5_configs.orders
 
 # Let us visually check these configurations
-show_gallery(graph, (1, 5); locs=locations, vertex_configs=[max5_configs.orders[k].c.data for k=1:5])
+show_gallery(graph, (1, 5); locs=locations, format=:svg, vertex_configs=[max5_configs.orders[k].c.data for k=1:5])
 

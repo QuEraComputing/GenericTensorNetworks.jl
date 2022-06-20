@@ -19,7 +19,7 @@ rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*�
 
 locations = [[rot15(0.0, 2.0, i) for i=0:4]..., [rot15(0.0, 1.0, i) for i=0:4]...]
 
-show_graph(graph; locs=locations)
+show_graph(graph; locs=locations, format=:svg)
 
 # ## Generic tensor network representation
 # We can use [`DominatingSet`](@ref) to construct the tensor network for solving the dominating set problem as
@@ -72,7 +72,7 @@ all(c->is_dominating_set(graph, c), min_configs)
 
 #
 
-show_gallery(graph, (2, 5); locs=locations, vertex_configs=min_configs)
+show_gallery(graph, (2, 5); locs=locations, vertex_configs=min_configs, format=:svg)
 
 # Similarly, if one is only interested in computing one of the minimum dominating sets,
 # one can use the graph property [`SingleConfigMin`](@ref).

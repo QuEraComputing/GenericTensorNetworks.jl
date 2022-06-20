@@ -17,7 +17,7 @@ rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*�
 
 locations = [[rot15(0.0, 2.0, i) for i=0:4]..., [rot15(0.0, 1.0, i) for i=0:4]...]
 
-show_graph(graph; locs=locations)
+show_graph(graph; locs=locations, format=:svg)
 
 # ## Generic tensor network representation
 # We construct the tensor network for the matching problem by typing
@@ -66,7 +66,7 @@ matching_poly = solve(problem, GraphPolynomial())[]
 match_config = solve(problem, SingleConfigMax())[]
 
 # Let us show the result by coloring the matched edges to red
-show_graph(graph; locs=locations, edge_colors=
+show_graph(graph; locs=locations, format=:svg, edge_colors=
     [isone(match_config.c.data[i]) ? "red" : "black" for i=1:ne(graph)])
 
 # where we use edges with red color to related pairs of matched vertices.

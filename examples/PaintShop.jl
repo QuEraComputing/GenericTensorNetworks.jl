@@ -27,7 +27,7 @@ for i=1:length(sequence)
     i != j && add_edge!(graph, i, j)
 end
 
-show_graph(graph; locs=locations, texts=string.(sequence), edge_colors=
+show_graph(graph; locs=locations, texts=string.(sequence), format=:svg, edge_colors=
     [sequence[e.src] == sequence[e.dst] ? "blue" : "black" for e in edges(graph)])
 
 # Vertices connected by blue edges must have different colors,
@@ -90,7 +90,7 @@ best_configs = solve(problem, ConfigsMin())[]
 
 painting1 = paint_shop_coloring_from_config(problem, best_configs.c.data[1])
 
-show_graph(graph; locs=locations, texts=string.(sequence),
+show_graph(graph; locs=locations, format=:svg, texts=string.(sequence),
     edge_colors=[sequence[e.src] == sequence[e.dst] ? "blue" : "black" for e in edges(graph)],
     vertex_colors=[isone(c) ? "red" : "black" for c in painting1], vertex_text_color="white")
 

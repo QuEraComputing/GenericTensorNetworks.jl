@@ -15,7 +15,7 @@ The solvable problems include [Independent set problem](@ref), [Maximal independ
 
 ## Background knowledge
 
-Please check our paper ["Computing properties of independent sets by generic programming tensor networks"]()(paper to be released soon).
+Please check our paper ["Computing properties of independent sets by generic programming tensor networks"](https://arxiv.org/abs/2205.03718).
 If you find our paper or software useful in your work, we would be grateful if you could cite our work. The [CITATION.bib](https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/CITATION.bib) file in the root of this repository lists the relevant papers.
 
 ## Quick start

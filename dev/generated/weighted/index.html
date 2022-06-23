@@ -114,10 +114,10 @@ show_graph(graph; locs=locations, format=:svg, vertex_colors=
  22.0ₜ
  22.0ₜ
  23.0ₜ
- 24.0ₜ</code></pre><p>We can see the <code>order</code> is a vector of <a href="../../ref/#TropicalNumbers.Tropical"><code>Tropical</code></a> numbers. Similarly, we can get weighted independent sets with maximum 5 sizes as follows.</p><pre><code class="language-julia hljs">max5_configs = solve(problem, SingleConfigMax(5))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">ExtendedTropical{5, CountingTropical{Float64, ConfigSampler{10, 1, 1}}}(CountingTropical{Float64, ConfigSampler{10, 1, 1}}[(22.0, ConfigSampler{10, 1, 1}(0000100110))ₜ, (22.0, ConfigSampler{10, 1, 1}(0010000011))ₜ, (22.0, ConfigSampler{10, 1, 1}(0101010001))ₜ, (23.0, ConfigSampler{10, 1, 1}(1010000011))ₜ, (24.0, ConfigSampler{10, 1, 1}(0100100110))ₜ])</code></pre><p>The return value also has type <a href="../../ref/#GenericTensorNetworks.ExtendedTropical"><code>ExtendedTropical</code></a>, but this time the element type of <code>orders</code> has been changed to <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a><code>{Float64,</code><a href="../../ref/#GenericTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a><code>}</code>.</p><pre><code class="language-julia hljs">max5_configs.orders</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5-element Vector{CountingTropical{Float64, ConfigSampler{10, 1, 1}}}:
+ 24.0ₜ</code></pre><p>We can see the <code>order</code> is a vector of <a href="../../ref/#TropicalNumbers.Tropical"><code>Tropical</code></a> numbers. Similarly, we can get weighted independent sets with maximum 5 sizes as follows.</p><pre><code class="language-julia hljs">max5_configs = solve(problem, SingleConfigMax(5))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">ExtendedTropical{5, CountingTropical{Float64, ConfigSampler{10, 1, 1}}}(CountingTropical{Float64, ConfigSampler{10, 1, 1}}[(22.0, ConfigSampler{10, 1, 1}(0000100110))ₜ, (22.0, ConfigSampler{10, 1, 1}(0101010001))ₜ, (22.0, ConfigSampler{10, 1, 1}(0010000011))ₜ, (23.0, ConfigSampler{10, 1, 1}(1010000011))ₜ, (24.0, ConfigSampler{10, 1, 1}(0100100110))ₜ])</code></pre><p>The return value also has type <a href="../../ref/#GenericTensorNetworks.ExtendedTropical"><code>ExtendedTropical</code></a>, but this time the element type of <code>orders</code> has been changed to <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a><code>{Float64,</code><a href="../../ref/#GenericTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a><code>}</code>.</p><pre><code class="language-julia hljs">max5_configs.orders</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5-element Vector{CountingTropical{Float64, ConfigSampler{10, 1, 1}}}:
  (22.0, ConfigSampler{10, 1, 1}(0000100110))ₜ
- (22.0, ConfigSampler{10, 1, 1}(0010000011))ₜ
  (22.0, ConfigSampler{10, 1, 1}(0101010001))ₜ
+ (22.0, ConfigSampler{10, 1, 1}(0010000011))ₜ
  (23.0, ConfigSampler{10, 1, 1}(1010000011))ₜ
  (24.0, ConfigSampler{10, 1, 1}(0100100110))ₜ</code></pre><p>Let us visually check these configurations</p><pre><code class="language-julia hljs">show_gallery(graph, (1, 5); locs=locations, format=:svg, vertex_configs=[max5_configs.orders[k].c.data for k=1:5])</code></pre><img src='data:image/svg+xml;utf-8,<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1741pt" height="337pt" viewBox="0 0 1741 337" version="1.1">
@@ -234,15 +234,15 @@ show_graph(graph; locs=locations, format=:svg, vertex_colors=
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="518.900346" y="281.396039"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 645.507812 194.164062 C 645.507812 199.132812 641.476562 203.164062 636.507812 203.164062 C 631.535156 203.164062 627.507812 199.132812 627.507812 194.164062 C 627.507812 189.195312 631.535156 185.164062 636.507812 185.164062 C 641.476562 185.164062 645.507812 189.195312 645.507812 194.164062 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 645.507812 194.164062 C 645.507812 199.132812 641.476562 203.164062 636.507812 203.164062 C 631.535156 203.164062 627.507812 199.132812 627.507812 194.164062 C 627.507812 189.195312 631.535156 185.164062 636.507812 185.164062 C 641.476562 185.164062 645.507812 189.195312 645.507812 194.164062 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-2" x="633.027128" y="198.517079"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 601.914062 60 C 601.914062 64.96875 597.886719 69 592.914062 69 C 587.945312 69 583.914062 64.96875 583.914062 60 C 583.914062 55.03125 587.945312 51 592.914062 51 C 597.886719 51 601.914062 55.03125 601.914062 60 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 601.914062 60 C 601.914062 64.96875 597.886719 69 592.914062 69 C 587.945312 69 583.914062 64.96875 583.914062 60 C 583.914062 55.03125 587.945312 51 592.914062 51 C 597.886719 51 601.914062 55.03125 601.914062 60 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-3" x="589.434576" y="64.353"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 460.847656 60 C 460.847656 64.96875 456.816406 69 451.847656 69 C 446.875 69 442.847656 64.96875 442.847656 60 C 442.847656 55.03125 446.875 51 451.847656 51 C 456.816406 51 460.847656 55.03125 460.847656 60 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 460.847656 60 C 460.847656 64.96875 456.816406 69 451.847656 69 C 446.875 69 442.847656 64.96875 442.847656 60 C 442.847656 55.03125 446.875 51 451.847656 51 C 456.816406 51 460.847656 55.03125 460.847656 60 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-4" x="448.366116" y="64.308"/>
 </g>
@@ -250,7 +250,7 @@ show_graph(graph; locs=locations, format=:svg, vertex_colors=
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-5" x="404.773564" y="198.469079"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 531.378906 217.082031 C 531.378906 222.050781 527.351562 226.082031 522.378906 226.082031 C 517.410156 226.082031 513.378906 222.050781 513.378906 217.082031 C 513.378906 212.113281 517.410156 208.082031 522.378906 208.082031 C 527.351562 208.082031 531.378906 212.113281 531.378906 217.082031 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 531.378906 217.082031 C 531.378906 222.050781 527.351562 226.082031 522.378906 226.082031 C 517.410156 226.082031 513.378906 222.050781 513.378906 217.082031 C 513.378906 212.113281 517.410156 208.082031 522.378906 208.082031 C 527.351562 208.082031 531.378906 212.113281 531.378906 217.082031 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-6" x="518.900346" y="221.387039"/>
 </g>
@@ -262,7 +262,7 @@ show_graph(graph; locs=locations, format=:svg, vertex_colors=
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-8" x="554.167461" y="112.89402"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 496.113281 108.542969 C 496.113281 113.511719 492.082031 117.542969 487.113281 117.542969 C 482.144531 117.542969 478.113281 113.511719 478.113281 108.542969 C 478.113281 103.570312 482.144531 99.542969 487.113281 99.542969 C 492.082031 99.542969 496.113281 103.570312 496.113281 108.542969 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 496.113281 108.542969 C 496.113281 113.511719 492.082031 117.542969 487.113281 117.542969 C 482.144531 117.542969 478.113281 113.511719 478.113281 108.542969 C 478.113281 103.570312 482.144531 99.542969 487.113281 99.542969 C 492.082031 99.542969 496.113281 103.570312 496.113281 108.542969 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-9" x="483.633231" y="112.89402"/>
 </g>
@@ -290,15 +290,15 @@ show_graph(graph; locs=locations, format=:svg, vertex_colors=
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="867.15391" y="281.396039"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 993.761719 194.164062 C 993.761719 199.132812 989.730469 203.164062 984.761719 203.164062 C 979.789062 203.164062 975.761719 199.132812 975.761719 194.164062 C 975.761719 189.195312 979.789062 185.164062 984.761719 185.164062 C 989.730469 185.164062 993.761719 189.195312 993.761719 194.164062 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 993.761719 194.164062 C 993.761719 199.132812 989.730469 203.164062 984.761719 203.164062 C 979.789062 203.164062 975.761719 199.132812 975.761719 194.164062 C 975.761719 189.195312 979.789062 185.164062 984.761719 185.164062 C 989.730469 185.164062 993.761719 189.195312 993.761719 194.164062 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-2" x="981.280692" y="198.517079"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 950.167969 60 C 950.167969 64.96875 946.140625 69 941.167969 69 C 936.199219 69 932.167969 64.96875 932.167969 60 C 932.167969 55.03125 936.199219 51 941.167969 51 C 946.140625 51 950.167969 55.03125 950.167969 60 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 950.167969 60 C 950.167969 64.96875 946.140625 69 941.167969 69 C 936.199219 69 932.167969 64.96875 932.167969 60 C 932.167969 55.03125 936.199219 51 941.167969 51 C 946.140625 51 950.167969 55.03125 950.167969 60 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-3" x="937.68814" y="64.353"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 809.101562 60 C 809.101562 64.96875 805.070312 69 800.101562 69 C 795.128906 69 791.101562 64.96875 791.101562 60 C 791.101562 55.03125 795.128906 51 800.101562 51 C 805.070312 51 809.101562 55.03125 809.101562 60 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 809.101562 60 C 809.101562 64.96875 805.070312 69 800.101562 69 C 795.128906 69 791.101562 64.96875 791.101562 60 C 791.101562 55.03125 795.128906 51 800.101562 51 C 805.070312 51 809.101562 55.03125 809.101562 60 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-4" x="796.61968" y="64.308"/>
 </g>
@@ -306,7 +306,7 @@ show_graph(graph; locs=locations, format=:svg, vertex_colors=
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-5" x="753.027128" y="198.469079"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 879.632812 217.082031 C 879.632812 222.050781 875.605469 226.082031 870.632812 226.082031 C 865.664062 226.082031 861.632812 222.050781 861.632812 217.082031 C 861.632812 212.113281 865.664062 208.082031 870.632812 208.082031 C 875.605469 208.082031 879.632812 212.113281 879.632812 217.082031 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 879.632812 217.082031 C 879.632812 222.050781 875.605469 226.082031 870.632812 226.082031 C 865.664062 226.082031 861.632812 222.050781 861.632812 217.082031 C 861.632812 212.113281 865.664062 208.082031 870.632812 208.082031 C 875.605469 208.082031 879.632812 212.113281 879.632812 217.082031 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-6" x="867.15391" y="221.387039"/>
 </g>
@@ -318,7 +318,7 @@ show_graph(graph; locs=locations, format=:svg, vertex_colors=
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-8" x="902.421025" y="112.89402"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 844.367188 108.542969 C 844.367188 113.511719 840.335938 117.542969 835.367188 117.542969 C 830.394531 117.542969 826.367188 113.511719 826.367188 108.542969 C 826.367188 103.570312 830.394531 99.542969 835.367188 99.542969 C 840.335938 99.542969 844.367188 103.570312 844.367188 108.542969 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 844.367188 108.542969 C 844.367188 113.511719 840.335938 117.542969 835.367188 117.542969 C 830.394531 117.542969 826.367188 113.511719 826.367188 108.542969 C 826.367188 103.570312 830.394531 99.542969 835.367188 99.542969 C 840.335938 99.542969 844.367188 103.570312 844.367188 108.542969 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-9" x="831.886795" y="112.89402"/>
 </g>
@@ -441,4 +441,4 @@ show_graph(graph; locs=locations, format=:svg, vertex_colors=
 </g>
 </g>
 </svg>
-'/><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../sumproduct/">« Sum product tree representation</a><a class="docs-footer-nextpage" href="../open/">Open and fixed degrees of freedom »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.19 on <span class="colophon-date" title="Wednesday 22 June 2022 14:06">Wednesday 22 June 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+'/><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../sumproduct/">« Sum product tree representation</a><a class="docs-footer-nextpage" href="../open/">Open and fixed degrees of freedom »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.19 on <span class="colophon-date" title="Thursday 23 June 2022 23:26">Thursday 23 June 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

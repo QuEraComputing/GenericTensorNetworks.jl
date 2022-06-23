@@ -41,9 +41,9 @@ labels(gp::Matching) = getindex.(terms(gp))
 fixedvertices(gp::Matching) = gp.fixedvertices
 
 function generate_tensors(x::T, m::Matching) where T
-    ne(m.graph) == 0 && return []
+    ne(m.graph) == 0 && return Array{T}[]
     ixs = getixsv(m.code)
-    tensors = AbstractArray{T}[]
+    tensors = Array{T}[]
     for i=1:length(ixs)
         ix = ixs[i]
         if i<=ne(m.graph)

@@ -81,8 +81,9 @@ function generate_tensors(x::T, gp::SetCovering) where T
     nsets == 0 && return []
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors
-    return select_dims(vcat(add_labels!([misv(Ref(x) .^ get_weights(gp, i)) for i=1:nsets], ixs[1:nsets], labels(gp)),
-            [cover_tensor(T, ix) for ix in ixs[nsets+1:end]]), ixs, fixedvertices(gp)
+    return select_dims([
+        add_labels!(Array{T}[misv(Ref(x) .^ get_weights(gp, i)) for i=1:nsets], ixs[1:nsets], labels(gp))...,
+            Array{T}[cover_tensor(T, ix) for ix in ixs[nsets+1:end]]...], ixs, fixedvertices(gp)
     )
 end
 

@@ -51,3 +51,9 @@ end
         @test count(!iszero, c) == 13
     end
 end
+
+@testset "empty graph" begin
+    g = SimpleGraph(4)
+    pb = MaximalIS(g)
+    @test solve(pb, SizeMax()) !== 4
+end

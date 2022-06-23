@@ -54,8 +54,9 @@ function generate_tensors(x::T, gp::SetPacking) where T
     length(gp.sets) == 0 && return []
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors
-    return select_dims(vcat(add_labels!([misv(Ref(x) .^ get_weights(gp, i)) for i=1:length(gp.sets)], ixs[1:length(gp.sets)], labels(gp)),
-            [misb(T, length(ix)) for ix in ixs[length(gp.sets)+1:end]]), ixs, fixedvertices(gp),
+    return select_dims([
+        add_labels!(Array{T}[misv(Ref(x) .^ get_weights(gp, i)) for i=1:length(gp.sets)], ixs[1:length(gp.sets)], labels(gp))...,
+        Array{T}[misb(T, length(ix)) for ix in ixs[length(gp.sets)+1:end]]...], ixs, fixedvertices(gp),
     )
 end
 

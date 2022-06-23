@@ -56,9 +56,10 @@ function generate_tensors(x::T, gp::IndependentSet) where T
     nv(gp.graph) == 0 && return []
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors
-    return select_dims(vcat(add_labels!([misv(Ref(x) .^ get_weights(gp, i)) for i=1:nv(gp.graph)], ixs[1:nv(gp.graph)], labels(gp)),
-            [misb(T, length(ix)) for ix in ixs[nv(gp.graph)+1:end]] # if n!=2, it corresponds to set packing problem.
-    ), ixs, fixedvertices(gp))
+    return select_dims([
+            add_labels!(Array{T}[misv(Ref(x) .^ get_weights(gp, i)) for i=1:nv(gp.graph)], ixs[1:nv(gp.graph)], labels(gp))...,
+            Array{T}[misb(T, length(ix)) for ix in ixs[nv(gp.graph)+1:end]]... # if n!=2, it corresponds to set packing problem.
+    ], ixs, fixedvertices(gp))
 end
 
 function misb(::Type{T}, n::Integer=2) where T

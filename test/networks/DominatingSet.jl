@@ -25,3 +25,9 @@ end
         @test is_dominating_set(g, config)
     end
 end
+
+@testset "empty graph" begin
+    g = SimpleGraph(4)
+    pb = MaximalIS(g)
+    @test solve(pb, SizeMax()) !== 4
+end

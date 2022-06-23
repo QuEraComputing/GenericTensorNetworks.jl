@@ -98,8 +98,10 @@ function generate_tensors(x::T, gp::OpenPitMining) where T
     nblocks == 0 && return []
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors
-    return select_dims(vcat(add_labels!([Ref(x) .^ get_weights(gp, i) for i=1:nblocks], ixs[1:nblocks], labels(gp)),
-            [mining_tensor(T) for ix in ixs[nblocks+1:end]]), ixs, fixedvertices(gp)
+    return select_dims([
+        add_labels!(Array{T}[Ref(x) .^ get_weights(gp, i) for i=1:nblocks], ixs[1:nblocks], labels(gp))...,
+        Array{T}[mining_tensor(T) for ix in ixs[nblocks+1:end]]...
+        ], ixs, fixedvertices(gp)
     )
 end
 

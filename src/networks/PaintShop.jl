@@ -57,9 +57,8 @@ function PaintShop(sequence::AbstractVector{T}; openvertices=(), fixedvertices=D
     @assert all(l->count(==(l), sequence)==2, sequence)
     n = length(sequence)
     isfirst = [findfirst(==(sequence[i]), sequence) == i for i=1:n]
-    rawcode = EinCode(vcat(
+    rawcode = EinCode(
                 [[sequence[i], sequence[i+1]] for i=1:n-1], # labels for edge tensors
-                ),
                 collect(T, openvertices))
     PaintShop(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), sequence, isfirst, Dict{T,Int}(fixedvertices))
 end
@@ -73,7 +72,7 @@ fixedvertices(gp::PaintShop) = gp.fixedvertices
 function generate_tensors(x::T, c::PaintShop) where T
     ixs = getixsv(c.code)
     tensors = [paintshop_bond_tensor((Ref(x) .^ get_weights(c, i))...) for i=1:length(ixs)]
-    return select_dims(add_labels!([flip_labels(tensors[i], c.isfirst[i], c.isfirst[i+1]) for i=1:length(ixs)], ixs, labels(c)), ixs, fixedvertices(c))
+    return select_dims(add_labels!(Array{T}[flip_labels(tensors[i], c.isfirst[i], c.isfirst[i+1]) for i=1:length(ixs)], ixs, labels(c)), ixs, fixedvertices(c))
 end
 
 function paintshop_bond_tensor(a::T, b::T) where T

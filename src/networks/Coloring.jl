@@ -42,9 +42,10 @@ fixedvertices(gp::Coloring) = gp.fixedvertices
 
 function generate_tensors(x::T, c::Coloring{K}) where {K,T}
     ixs = getixsv(c.code)
-    return select_dims(vcat(
-        add_labels!([coloringv(T, K) for i=1:nv(c.graph)], ixs[1:nv(c.graph)], labels(c)), [coloringb(x, K) .^ get_weights(c, i) for i=1:ne(c.graph)]
-    ), ixs, fixedvertices(c))
+    return select_dims([
+        add_labels!(Array{T}[coloringv(T, K) for i=1:nv(c.graph)], ixs[1:nv(c.graph)], labels(c))...,
+        Array{T}[coloringb(x, K) .^ get_weights(c, i) for i=1:ne(c.graph)]...
+    ], ixs, fixedvertices(c))
 end
 
 # coloring bond tensor

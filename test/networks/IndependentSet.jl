@@ -12,3 +12,9 @@ using GenericTensorNetworks, Test, Graphs
     mis_compactify!(m)
     @test count(!iszero, m) == 3
 end
+
+@testset "empty graph" begin
+    g = SimpleGraph(4)
+    pb = IndependentSet(g)
+    @test solve(pb, SizeMax()) !== 4
+end

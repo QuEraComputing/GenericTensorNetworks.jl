@@ -26,3 +26,9 @@ end
     res = solve(problem, SingleConfigMax())[].c.data
     @test is_vertex_coloring(g, res)
 end
+
+@testset "empty graph" begin
+    g = SimpleGraph(4)
+    pb = Coloring{3}(g)
+    @test solve(pb, SizeMax()) !== 4
+end

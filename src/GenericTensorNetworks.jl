@@ -34,7 +34,7 @@ export GraphProblem, optimize_code, NoWeight
 export flavors, labels, terms, nflavor, get_weights, fixedvertices
 export IndependentSet, mis_compactify!, is_independent_set
 export MaximalIS, is_maximal_independent_set
-export MaxCut, cut_size
+export cut_size, spinglass_energy, SpinGlass
 export PaintShop, paintshop_from_pairs, num_paint_shop_color_switch, paint_shop_coloring_from_config
 export Coloring, is_vertex_coloring
 export Satisfiability, CNF, CNFClause, BoolVar, satisfiable, @bools, ∨, ¬, ∧
@@ -68,6 +68,8 @@ include("interfaces.jl")
 include("deprecate.jl")
 include("multiprocessing.jl")
 include("visualize.jl")
+
+Base.@deprecate MaxCut(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing) SpinGlass(g; edge_weights=weights, openvertices, fixedvertices, optimizer, simplifier)
 
 using Requires
 function __init__()

@@ -8,7 +8,7 @@ MaximalIS
 Matching
 Coloring
 DominatingSet
-MaxCut
+SpinGlass
 PaintShop
 Satisfiability
 SetCovering
@@ -43,6 +43,7 @@ is_set_covering
 is_set_packing
 
 cut_size
+spinglass_energy
 num_paint_shop_color_switch
 paint_shop_coloring_from_config
 mis_compactify!

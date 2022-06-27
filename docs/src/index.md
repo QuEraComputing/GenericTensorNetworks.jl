@@ -11,7 +11,7 @@ The *solution space properties* include
 * The enumeration of solutions at certain sizes.
 * The direct sampling of solutions at certain sizes.
 
-The solvable problems include [Independent set problem](@ref), [Maximal independent set problem](@ref), [Cutting problem (Spin-glass problem)](@ref), [Vertex matching problem](@ref), [Binary paint shop problem](@ref), [Coloring problem](@ref), [Dominating set problem](@ref), [Satisfiability problem](@ref), [Set packing problem](@ref) and [Set covering problem](@ref).
+The solvable problems include [Independent set problem](@ref), [Maximal independent set problem](@ref), [Spin-glass problem (Cutting problem)](@ref), [Vertex matching problem](@ref), [Binary paint shop problem](@ref), [Coloring problem](@ref), [Dominating set problem](@ref), [Satisfiability problem](@ref), [Set packing problem](@ref) and [Set covering problem](@ref).
 
 ## Background knowledge
 
@@ -32,8 +32,9 @@ julia> solve(
            IndependentSet(
                Graphs.random_regular_graph(20, 3);
                optimizer = TreeSA(),
-               weights = NoWeight(),  # the default value
-               openvertices = ()      # the default value
+               weights = NoWeight(),    # default: uniform weight 1
+               openvertices = (),       # default: no open vertices
+               fixedvertices = Dict()   # default: no fixed vertices
            ),
            GraphPolynomial();
            usecuda=false              # the default value
@@ -45,7 +46,8 @@ Polynomial(1 + 20*x + 160*x^2 + 659*x^3 + 1500*x^4 + 1883*x^5 + 1223*x^6 + 347*x
 Here the main function [`solve`](@ref) takes three input arguments, the problem instance of type [`IndependentSet`](@ref), the property instance of type [`GraphPolynomial`](@ref) and an optional key word argument `usecuda` to decide use GPU or not.
 If one wants to use GPU to accelerate the computation, the `using CUDA` statement must uncommented.
 
-The problem instance takes four arguments to initialize, the only positional argument is the graph instance that one wants to solve, the key word argument `optimizer` is for specifying the tensor network optimization algorithm, the key word argument `weights` is for specifying the weights of vertices as either a vector or `NoWeight()` and the keyword argument `openvertices` is for specifying the degrees of freedom not summed over.
+The problem instance takes four arguments to initialize, the only positional argument is the graph instance that one wants to solve, the key word argument `optimizer` is for specifying the tensor network optimization algorithm, the key word argument `weights` is for specifying the weights of vertices as either a vector or `NoWeight()`.
+The keyword argument `openvertices` is a tuple of labels for specifying the degrees of freedom not summed over, and `fixedvertices` is a label-value dictionary for specifying the fixed values of the degree of freedoms.
 Here, we use [`TreeSA`](@ref) method as the tensor network optimizer, and leave `weights` and `openvertices` the default values.
 The [`TreeSA`](@ref) method finds the best contraction order in most of our applications, while the default [`GreedyMethod`](@ref) runs the fastest.
 

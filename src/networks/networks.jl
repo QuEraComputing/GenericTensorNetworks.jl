@@ -9,6 +9,10 @@ struct NoWeight end
 Base.getindex(::NoWeight, i) = 1
 Base.eltype(::NoWeight) = Int
 
+struct ZeroWeight end
+Base.getindex(::ZeroWeight, i) = 0
+Base.eltype(::ZeroWeight) = Int
+
 ######## Interfaces for graph problems ##########
 """
     get_weights(problem::GraphProblem, sym) -> Vector
@@ -109,7 +113,7 @@ generate_tensors(::Type{GT}) where GT = length(flavors(GT))
 
 include("IndependentSet.jl")
 include("MaximalIS.jl")
-include("MaxCut.jl")
+include("SpinGlass.jl")
 include("Matching.jl")
 include("Coloring.jl")
 include("PaintShop.jl")

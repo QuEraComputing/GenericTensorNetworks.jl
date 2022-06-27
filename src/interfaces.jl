@@ -87,8 +87,8 @@ Method Argument
     * It does not have round-off error,
     * GPU is supported,
     * It accepts keyword arguments `maxorder` (optional, e.g. the MIS size in the [`IndependentSet`](@ref) problem).
-* `:polynomial`, use polynomial numbers to solve the polynomial directly.
-    * The corresponding tensor element type is [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2).
+* `:polynomial` and `:laurent`, use (Laurent) polynomial numbers to solve the polynomial directly.
+    * The corresponding tensor element types are [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2) and [`LaurentPolynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomials.LaurentPolynomial).
     * It might have small round-off error depending on the data type for storing the counting.
     * It has memory overhead that linear to the graph size.
 * `:fft`, use fast fourier transformation to fit the polynomial.
@@ -258,7 +258,23 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
         res = contractx(gp, pre_invert_exponent(TruncatedPoly(ntuple(i->i == min_k(property) ? one(T) : zero(T), min_k(property)), one(T))); usecuda=usecuda)
         return asarray(post_invert_exponent.(res), res)
     elseif property isa GraphPolynomial
-        return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
+        all_possitive = true
+        all_negative = true
+        for i in 1:length(terms(problem))
+            wi = get_weights(problem, i)
+            all_possitive = all_possitive && all(>=(0), wi)
+            all_negative = all_negative && all(<=(0), wi)
+        end
+        if all_possitive
+            return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
+        elseif all_negative
+            return invert_polynomial(graph_polynomial(chweights(-weights(gp)), Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...))
+        else
+            if graph_polynomial_method(property) != :laurent
+                @warn "Weights are not all positive or all negative, switch to using laurent polynomial."
+            end
+            return graph_polynomial(gp, Val(:laurent); usecuda=usecuda, T=T, property.kwargs...)
+        end
     elseif property isa SingleConfigMax{Single,false}
         return solutions(gp, CountingTropical{T,T}; all=false, usecuda=usecuda)
     elseif property isa (SingleConfigMax{K,false} where K)
@@ -298,6 +314,11 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
     else
         error("unknown property: `$property`.")
     end
+end
+
+function solve(gp::ReducedProblem, property::AbstractProperty; T=Float64, usecuda=false)
+    res = solve(target_problem(gp), property; T, usecuda)
+    return asarray(extract_result.(Ref(gp), res), res)
 end
 
 # raise an error if the property for problem can not be computed
@@ -381,6 +402,10 @@ function estimate_memory(problem::GraphProblem, ::GraphPolynomial{:polynomial}; 
     # this is the upper bound
     return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * length(labels(problem)))
 end
+function estimate_memory(problem::GraphProblem, ::GraphPolynomial{:laurent}; T=Float64)
+    # this is the upper bound
+    return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * length(labels(problem)))
+end
 function estimate_memory(problem::GraphProblem, ::Union{SizeMax{K},SizeMin{K}}; T=Float64) where K
     return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * _asint(K))
 end
@@ -405,6 +430,7 @@ for (PROP, ET) in [
         (:(CountingMax{K}), :(TruncatedPoly{K,T,T})), (:(CountingMin{K}), :(TruncatedPoly{K,T,T})),
         (:(GraphPolynomial{:finitefield}), :(Mod{N,Int32} where N)), (:(GraphPolynomial{:fft}), :(Complex{T})), 
         (:(GraphPolynomial{:polynomial}), :(Polynomial{T, :x})), (:(GraphPolynomial{:fitting}), :T),
+        (:(GraphPolynomial{:laurent}), :(LaurentPolynomial{T, :x}))
     ]
     @eval tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T,K} = $ET
 end

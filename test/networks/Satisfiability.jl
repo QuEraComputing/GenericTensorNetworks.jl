@@ -21,6 +21,9 @@ using GenericTensorNetworks
     gp = Satisfiability(cnf)
     @test satisfiable(cnf, Dict(:x=>true, :y=>true, :z=>true, :a=>false, :b=>false, :c=>true))
     @test !satisfiable(cnf, Dict(:x=>false, :y=>true, :z=>true, :a=>false, :b=>false, :c=>true))
+    @test weights(gp) == NoWeight()
+    @test weights(chweights(gp, fill(3, 4))) == fill(3,4)
+    @test_throws AssertionError Satisfiability(cnf; weights=fill(3, 9))
 end
 
 @testset "enumeration - sat" begin

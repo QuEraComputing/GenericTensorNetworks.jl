@@ -40,6 +40,10 @@ terms(gp::Matching) = getixsv(gp.code)[1:ne(gp.graph)]
 labels(gp::Matching) = getindex.(terms(gp))
 fixedvertices(gp::Matching) = gp.fixedvertices
 
+# weights interface
+weights(c::Matching) = c.weights
+chweights(c::Matching, weights) = Matching(c.code, c.graph, weights, c.fixedvertices)
+
 function generate_tensors(x::T, m::Matching) where T
     ne(m.graph) == 0 && return Array{T}[]
     ixs = getixsv(m.code)

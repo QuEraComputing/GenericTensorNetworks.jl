@@ -51,6 +51,10 @@ terms(gp::IndependentSet) = getixsv(gp.code)[1:nv(gp.graph)]
 labels(gp::IndependentSet) = [1:nv(gp.graph)...]
 fixedvertices(gp::IndependentSet) = gp.fixedvertices
 
+# weights interface
+weights(c::IndependentSet) = c.weights
+chweights(c::IndependentSet, weights) = IndependentSet(c.code, c.graph, weights, c.fixedvertices)
+
 # generate tensors
 function generate_tensors(x::T, gp::IndependentSet) where T
     nv(gp.graph) == 0 && return []

@@ -69,6 +69,10 @@ terms(gp::PaintShop) = getixsv(gp.code)
 labels(gp::PaintShop) = unique(gp.sequence)
 fixedvertices(gp::PaintShop) = gp.fixedvertices
 
+# weights interface
+weights(c::PaintShop) = NoWeight()
+chweights(c::PaintShop, weights) = c
+
 function generate_tensors(x::T, c::PaintShop) where T
     ixs = getixsv(c.code)
     tensors = [paintshop_bond_tensor((Ref(x) .^ get_weights(c, i))...) for i=1:length(ixs)]

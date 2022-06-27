@@ -92,6 +92,16 @@ terms(gp::OpenPitMining) = [[r] for r in gp.blocks]
 labels(gp::OpenPitMining) = gp.blocks
 fixedvertices(gp::OpenPitMining) = gp.fixedvertices
 
+# weights interface
+weights(c::OpenPitMining) = [c.rewards[b...] for b in c.blocks]
+function chweights(c::OpenPitMining, weights)
+    rewards = copy(c.rewards)
+    for (w, b) in zip(weights, c.blocks)
+        rewards[b...] = w
+    end
+    OpenPitMining(c.code, rewards, c.blocks, c.fixedvertices)
+end
+
 # generate tensors
 function generate_tensors(x::T, gp::OpenPitMining) where T
     nblocks = length(gp.blocks)

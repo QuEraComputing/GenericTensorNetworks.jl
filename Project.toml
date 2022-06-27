@@ -1,7 +1,7 @@
 name = "GenericTensorNetworks"
 uuid = "3521c873-ad32-4bb4-b63d-f4f178f42b49"
 authors = ["GiggleLiu <cacate0129@gmail.com> and contributors"]
-version = "1.1.0"
+version = "1.2.0"
 
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"

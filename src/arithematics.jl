@@ -862,6 +862,10 @@ function _x(::Type{Polynomial{BS,X}}; invert) where {BS,X}
     @assert !invert   # not supported, because it is not useful
     Polynomial{BS,X}([zero(BS), one(BS)])
 end
+# will be used in spin-glass polynomial
+function _x(::Type{LaurentPolynomial{BS,X}}; invert) where {BS,X}
+    LaurentPolynomial{BS,X}([one(BS)], invert ? -1 : 1)
+end
 function _x(::Type{TruncatedPoly{K,BS,OS}}; invert) where {K,BS,OS}
     ret = TruncatedPoly{K,BS,OS}(ntuple(i->i<K ? zero(BS) : one(BS), K),one(OS))
     invert ? pre_invert_exponent(ret) : ret
@@ -905,5 +909,6 @@ pre_invert_exponent(t::TruncatedPoly{K}) where K = TruncatedPoly(t.coeffs, -t.ma
 pre_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
 # negate the exponents after entering the solver
 post_invert_exponent(t::TruncatedPoly{K}) where K = TruncatedPoly(ntuple(i->t.coeffs[K-i+1], K), -t.maxorder+(K-1))
+post_invert_exponent(t::LaurentPolynomial) = error("This method is not implemented yet, please file an issue if you find a using case!")
 post_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
 post_invert_exponent(t::ExtendedTropical{K}) where K = ExtendedTropical{K}(map(i->inv(t.orders[i]), K:-1:1))

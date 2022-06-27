@@ -40,6 +40,10 @@ terms(gp::Coloring) = getixsv(gp.code)[1:nv(gp.graph)]
 labels(gp::Coloring) = [1:nv(gp.graph)...]
 fixedvertices(gp::Coloring) = gp.fixedvertices
 
+# weights interface
+weights(c::Coloring) = c.weights
+chweights(c::Coloring{K}, weights) where K = Coloring{K}(c.code, c.graph, weights, c.fixedvertices)
+
 function generate_tensors(x::T, c::Coloring{K}) where {K,T}
     ixs = getixsv(c.code)
     return select_dims([

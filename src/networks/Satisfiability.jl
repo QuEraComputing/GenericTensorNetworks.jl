@@ -160,6 +160,7 @@ struct Satisfiability{CT<:AbstractEinsum,T,WT<:Union{NoWeight, Vector}} <: Graph
 end
 
 function Satisfiability(cnf::CNF{T}; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{T,Int}()) where T
+    @assert weights isa NoWeight || length(weights) == length(cnf) "weights size inconsistent! should be $(length(cnf)), got: $(length(weights))"
     rawcode = EinCode([[getfield.(c.vars, :name)...] for c in cnf.clauses], collect(T, openvertices))
     Satisfiability(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), cnf, weights, Dict{T,Int}(fixedvertices))
 end
@@ -169,6 +170,10 @@ get_weights(s::Satisfiability, i::Int) = [0, s.weights[i]]
 terms(gp::Satisfiability) = getixsv(gp.code)
 labels(gp::Satisfiability) = unique!(vcat(getixsv(gp.code)...))
 fixedvertices(gp::Satisfiability) = gp.fixedvertices
+
+# weights interface
+weights(c::Satisfiability) = c.weights
+chweights(c::Satisfiability, weights) = Satisfiability(c.code, c.cnf, weights, c.fixedvertices)
 
 """
     satisfiable(cnf::CNF, config::AbstractDict)

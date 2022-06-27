@@ -49,6 +49,10 @@ terms(gp::SetPacking) = getixsv(gp.code)[1:length(gp.sets)]
 labels(gp::SetPacking) = [1:length(gp.sets)...]
 fixedvertices(gp::SetPacking) = gp.fixedvertices
 
+# weights interface
+weights(c::SetPacking) = c.weights
+chweights(c::SetPacking, weights) = SetPacking(c.code, c.sets, weights, c.fixedvertices)
+
 # generate tensors
 function generate_tensors(x::T, gp::SetPacking) where T
     length(gp.sets) == 0 && return []

@@ -200,3 +200,7 @@ end
     hd2 = hamming_distribution(cs, cs) |> normalize
     @test isapprox(hd1, hd2, atol=0.01)
 end
+
+@testset "LaurentPolynomial" begin
+    @test GenericTensorNetworks._x(LaurentPolynomial{Float64, :x}; invert=false) == GenericTensorNetworks._x(Polynomial{Float64, :x}; invert=false)
+end

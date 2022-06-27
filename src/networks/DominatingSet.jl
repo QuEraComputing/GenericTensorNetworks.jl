@@ -37,6 +37,10 @@ terms(gp::DominatingSet) = getixsv(gp.code)
 labels(gp::DominatingSet) = [1:length(getixsv(gp.code))...]
 fixedvertices(gp::DominatingSet) = gp.fixedvertices
 
+# weights interface
+weights(c::DominatingSet) = c.weights
+chweights(c::DominatingSet, weights) = DominatingSet(c.code, c.graph, weights, c.fixedvertices)
+
 function generate_tensors(x::T, mi::DominatingSet) where T
     ixs = getixsv(mi.code)
     isempty(ixs) && return []

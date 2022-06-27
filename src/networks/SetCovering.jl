@@ -75,6 +75,10 @@ terms(gp::SetCovering) = getixsv(gp.code)[1:length(gp.sets)]
 labels(gp::SetCovering) = [1:length(gp.sets)...]
 fixedvertices(gp::SetCovering) = gp.fixedvertices
 
+# weights interface
+weights(c::SetCovering) = c.weights
+chweights(c::SetCovering, weights) = SetCovering(c.code, c.sets, weights, c.fixedvertices)
+
 # generate tensors
 function generate_tensors(x::T, gp::SetCovering) where T
     nsets = length(gp.sets)

@@ -113,7 +113,7 @@ generate_tensors(::Type{GT}) where GT = length(flavors(GT))
 
 include("IndependentSet.jl")
 include("MaximalIS.jl")
-include("SpinGlass.jl")
+include("MaxCut.jl")
 include("Matching.jl")
 include("Coloring.jl")
 include("PaintShop.jl")
@@ -122,6 +122,8 @@ include("DominatingSet.jl")
 include("SetPacking.jl")
 include("SetCovering.jl")
 include("OpenPitMining.jl")
+include("Reduced.jl")
+include("SpinGlass.jl")
 
 # forward the time, space and readwrite complexity
 OMEinsum.timespacereadwrite_complexity(gp::GraphProblem) = timespacereadwrite_complexity(gp.code, uniformsize(gp.code, nflavor(gp)))

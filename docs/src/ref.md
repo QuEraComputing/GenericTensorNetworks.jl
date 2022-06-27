@@ -9,6 +9,7 @@ Matching
 Coloring
 DominatingSet
 SpinGlass
+MaxCut
 PaintShop
 Satisfiability
 SetCovering
@@ -93,7 +94,7 @@ SumProductTree
 ConfigSampler
 ```
 
-`GenericTensorNetworks` also exports the [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2) type defined in package `Polynomials`.
+`GenericTensorNetworks` also exports the [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2) and [`LaurentPolynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomials.LaurentPolynomial) types defined in package `Polynomials`.
 
 ```@docs
 StaticBitVector

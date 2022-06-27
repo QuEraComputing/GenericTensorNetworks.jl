@@ -37,6 +37,10 @@ terms(gp::MaximalIS) = getixsv(gp.code)
 labels(gp::MaximalIS) = [1:length(getixsv(gp.code))...]
 fixedvertices(gp::MaximalIS) = gp.fixedvertices
 
+# weights interface
+weights(c::MaximalIS) = c.weights
+chweights(c::MaximalIS, weights) = MaximalIS(c.code, c.graph, weights, c.fixedvertices)
+
 function generate_tensors(x::T, mi::MaximalIS) where T
     ixs = getixsv(mi.code)
     isempty(ixs) && return []

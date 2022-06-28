@@ -26,10 +26,10 @@ show_graph(graph; locs=locations, format=:svg)
 
 # ## Generic tensor network representation
 # We define an anti-ferromagnetic spin glass problem as
-problem = SpinGlass(graph; J=fill(-1, ne(g)));
+problem = SpinGlass(graph; J=fill(-1, ne(graph)));
 
 # ### Theory (can skip)
-# The spin glass problem is reduced to the [cutting problem](@ref) for solving.
+# The spin glass problem is reduced to the [Cutting problem](@ref) for solving.
 # Let ``G=(V,E)`` be a graph, the cutting problem can also be described by the following energy model
 # ```math
 # H^c = \sum_{ij \in E} C_{ij} (1 - n_i) n_j + (1 - n_j) n_i + \sum_{i \in V} w_i n_i,

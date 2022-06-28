@@ -3,7 +3,7 @@ using GenericTensorNetworks, Test, Graphs
 @testset "memory estimation" begin
     g = smallgraph(:petersen)
     J = rand(15)
-    h = randn(10) .* 0
+    h = randn(10) .* 0.5
     gp = SpinGlass(g; h, J)
     M = zeros(10, 10)
     for (e,j) in zip(edges(g), J)

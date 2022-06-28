@@ -31,7 +31,7 @@ end
 function SpinGlass(g::SimpleGraph; J=NoWeight(), h=ZeroWeight(), kwargs...)
     @assert J isa NoWeight || length(J) == ne(g)
     @assert h isa ZeroWeight || length(h) == nv(g)
-    SpinGlass(MaxCut(g; edge_weights=[2*J[i] for i=1:ne(g)], vertex_weights=[2*h[i] for i=1:nv(g)], kwargs...), J, h)
+    SpinGlass(MaxCut(g; edge_weights=[2*J[i] for i=1:ne(g)], vertex_weights=[-2*h[i] for i=1:nv(g)], kwargs...), J, h)
 end
 
 function SpinGlass(M::AbstractMatrix, h::AbstractVector; kwargs...)
@@ -56,7 +56,7 @@ function extract_result(sg::SpinGlass, res::Union{Polynomial{BS,X}, LaurentPolyn
     sumh = sum(i->sg.h[i], 1:nv(sg.target.graph))
     # the cut size is always even if the input J is integer
     lres = LaurentPolynomial{BS,X}(res)
-    return lres * LaurentPolynomial{BS,X}([one(eltype(res.coeffs))], -sumJ - sumh)
+    return lres * LaurentPolynomial{BS,X}([one(eltype(res.coeffs))], -sumJ + sumh)
 end
 
 # the configurations are not changed
@@ -77,7 +77,8 @@ where ``s_i \\in \\{-1, 1\\}`` stands for spin ↓ and spin ↑.
 """
 function spinglass_energy(g::SimpleGraph, config; J=NoWeight(), h=ZeroWeight())
     eng = zero(promote_type(eltype(J), eltype(h)))
-    s = 1 .- 2 .* config  # 0 -> spin 1, 1 -> spin -1
+    # NOTE: cast to Int to avoid using unsigned :nt
+    s = 1 .- 2 .* Int.(config)  # 0 -> spin 1, 1 -> spin -1
     # coupling terms
     for (i, e) in enumerate(edges(g))
         eng += (s[e.src] * s[e.dst]) * -J[i]

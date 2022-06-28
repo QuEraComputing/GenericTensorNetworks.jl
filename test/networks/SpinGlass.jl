@@ -3,7 +3,7 @@ using GenericTensorNetworks, Test, Graphs
 @testset "memory estimation" begin
     g = smallgraph(:petersen)
     J = rand(15)
-    h = randn(10)
+    h = randn(10) .* 0
     gp = SpinGlass(g; h, J)
     M = zeros(10, 10)
     for (e,j) in zip(edges(g), J)
@@ -18,7 +18,11 @@ using GenericTensorNetworks, Test, Graphs
     @test solve(gp, SizeMax())[].n ≈ sorted_energies[end]
     @test solve(gp, SizeMin())[].n ≈ sorted_energies[1]
     @test getfield.(solve(gp, SizeMax(2))[].orders |> collect, :n) ≈ sorted_energies[end-1:end]
-    @test getfield.(solve(gp, SingleConfigMax(2))[].orders |> collect, :n) ≈ sorted_energies[end-1:end]
+    res = solve(gp, SingleConfigMax(2))[].orders |> collect
+    @test getfield.(res, :n) ≈ sorted_energies[end-1:end]
+    @test spinglass_energy(g, res[1].c.data; J, h) ≈ res[end-1].n
+    @test spinglass_energy(g, res[2].c.data; J, h) ≈ res[end].n
+    val, ind = findmax(energies)
 
     # integer weights
     J = NoWeight()

@@ -6,10 +6,10 @@
 # ## Problem definition
 # Let ``G=(V, E)`` be a graph, the [spin-glass](https://en.wikipedia.org/wiki/Spin_glass) problem in physics is characterized by the following energy function
 # ```math
-# H = \sum_{ij \in E} J_{ij} s_i s_j + \sum_{i \in V} h_i s_i,
+# H = -\sum_{ij \in E} J_{ij} s_i s_j + \sum_{i \in V} h_i s_i,
 # ```
 # where ``h_i`` is an onsite energy term associated with spin ``s_i \in \{-1, 1\}``, and ``J_{ij}`` is the coupling strength between spins ``s_i`` and ``s_j``.
-# In the program, we use boolean variable `n_i = \frac{1-s_i}{2}` to represent a spin configuration.
+# In the program, we use boolean variable ``n_i = \frac{1-s_i}{2}`` to represent a spin configuration.
 
 using GenericTensorNetworks, Graphs
 
@@ -32,23 +32,24 @@ problem = SpinGlass(graph; J=fill(-1, ne(graph)));
 # The spin glass problem is reduced to the [Cutting problem](@ref) for solving.
 # Let ``G=(V,E)`` be a graph, the cutting problem can also be described by the following energy model
 # ```math
-# H^c = \sum_{ij \in E} C_{ij} (1 - n_i) n_j + (1 - n_j) n_i + \sum_{i \in V} w_i n_i,
+# H^c = \sum_{ij \in E} C_{ij} ((1 - n_i) n_j + (1 - n_j) n_i) + \sum_{i \in V} w_i n_i,
 # ```
 # where ``n_i`` is the same as the partition index in the cutting problem,
-# ``C_{ij} = -2J_{ij}`` are edge weights and ``w_i = 2h_i`` are vertex weights.
+# ``C_{ij} = 2J_{ij}`` are edge weights and ``w_i = -2h_i`` are vertex weights.
 # The total energy is shifted by ``-\sum_{ij\in E}J_{ij} + \sum_{i \in V} h_i``.
 
 # ## Solving properties
 # ### Minimum and maximum energies
+# Its ground state energy is -9.
 Emin = solve(problem, SizeMin())[]
-#
+# While the state correspond to the highest energy has the ferromagnetic order.
 Emax = solve(problem, SizeMax())[]
 
 # ### Counting properties
 # ##### graph polynomial
 # The graph polynomial defined for the spin glass problem is a Laurent polynomial
 # ```math
-# Z(G, x) = \sum_{k=E_{\rm min}}^{E_{\rm max}(G)} c_k x^k,
+# Z(G, J, h, x) = \sum_{k=E_{\rm min}}^{E_{\rm max}} c_k x^k,
 # ```
 # where ``E_{\rm min}`` and ``E_{\rm max}`` are minimum and maximum energies,
 # ``c_k`` is the number of spin configurations with energy ``k``.

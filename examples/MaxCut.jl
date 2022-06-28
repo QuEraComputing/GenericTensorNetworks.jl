@@ -28,19 +28,26 @@ problem = MaxCut(graph);
 
 # ### Theory (can skip)
 #
-# For a vertex ``v\in V``, we define a boolean degree of freedom ``s_v\in\{0, 1\}``.
-# Then the maximum cutting problem can be encoded to tensor networks by mapping an edge ``(i,j)\in E`` to an edge matrix labelled by ``s_is_j``
+# We associated a vertex ``v\in V`` with a boolean degree of freedom ``s_v\in\{0, 1\}``.
+# Then the maximum cutting problem can be encoded to tensor networks by mapping an edge ``(i,j)\in E`` to an edge matrix labelled by ``s_i`` and ``s_j``
 # ```math
-# B(x_{\langle i, j\rangle}) = \left(\begin{matrix}
-#     1 & x_{\langle i, j\rangle}^{w_{\langle i,j \rangle}}\\
-#     x_{\langle i, j\rangle}^{w_{\langle i,j \rangle}} & 1
+# B(x_i, x_j, w_{ij}) = \left(\begin{matrix}
+#     1 & x_{i}^{w_{ij}}\\
+#     x_{j}^{w_{ij}} & 1
 # \end{matrix}\right),
 # ```
-# If and only if there is a cut on edge ``(i, j)``,
-# this tensor contributes a factor ``x_{\langle i, j\rangle}^{w_{\langle i,j \rangle}}``,
-# where ``w_{\langle i,j\rangle}`` is the weight of this edge.
-# Similar to other problems, we can define a polynomial about edges variables by setting ``x_{\langle i, j\rangle} = x``,
-# where its k-th coefficient is two times the number of configurations of cut size k.
+# where ``w_{ij}`` is a real number associated with edge ``(i, j)`` as the edge weight.
+# If and only if the bipartition cuts on edge ``(i, j)``,
+# this tensor contributes a factor ``x_{i}^{w_{ij}}`` or ``x_{j}^{w_{ij}}``.
+# Similarly, one can assign weights to vertices, which corresponds to the onsite energy terms in the spin glass.
+# The vertex tensor is
+# ```math
+# W(x_i, w_i) = \left(\begin{matrix}
+#     1\\
+#     x_{i}^{w_i}
+# \end{matrix}\right),
+# ```
+# where ``w_i`` is a real number associated with vertex ``i`` as the vertex weight.
 
 # Its contraction time space complexity is ``2^{{\rm tw}(G)}``, where ``{\rm tw(G)}`` is the [tree-width](https://en.wikipedia.org/wiki/Treewidth) of ``G``.
 

@@ -8,6 +8,7 @@ using OMEinsum: timespace_complexity, getixsv, NestedEinsum, getixs, getiy, Dyna
 using Graphs, Random
 using DelimitedFiles, Serialization, Printf
 using LuxorGraphPlot
+import Polynomials
 using Polynomials: Polynomial, LaurentPolynomial, printpoly, fit
 using FFTW
 using Mods, Primes

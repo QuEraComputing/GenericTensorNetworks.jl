@@ -32,20 +32,20 @@ function DominatingSet(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixe
 end
 
 flavors(::Type{<:DominatingSet}) = [0, 1]
-get_weights(gp::DominatingSet, i::Int) = [0, gp.weights[i]]
 terms(gp::DominatingSet) = getixsv(gp.code)
 labels(gp::DominatingSet) = [1:length(getixsv(gp.code))...]
 fixedvertices(gp::DominatingSet) = gp.fixedvertices
 
 # weights interface
-weights(c::DominatingSet) = c.weights
+get_weights(c::DominatingSet) = c.weights
+get_weights(gp::DominatingSet, i::Int) = [0, gp.weights[i]]
 chweights(c::DominatingSet, weights) = DominatingSet(c.code, c.graph, weights, c.fixedvertices)
 
 function generate_tensors(x::T, mi::DominatingSet) where T
     ixs = getixsv(mi.code)
     isempty(ixs) && return []
 	return select_dims(add_labels!(map(enumerate(ixs)) do (i, ix)
-        dominating_set_tensor((Ref(x) .^ get_weights(mi, i))..., length(ix))
+        dominating_set_tensor(_pow.(Ref(x), get_weights(mi, i))..., length(ix))
     end, ixs, labels(mi)), ixs, fixedvertices(mi))
 end
 function dominating_set_tensor(a::T, b::T, d::Int) where T

@@ -8,8 +8,8 @@ using GenericTensorNetworks: solutions
     @test res.n == 5
     @test length(res.c.data) == 6
     code = Matching(g; optimizer=GreedyMethod(), fixedvertices=Dict((1,2)=>1))
-    @test weights(code) == NoWeight()
-    @test weights(chweights(code, fill(3, 15))) == fill(3, 15)
+    @test get_weights(code) == NoWeight()
+    @test get_weights(chweights(code, fill(3, 15))) == fill(3, 15)
     res = solutions(code, CountingTropicalF64; all=true)[]
     @test res.n == 5
     k = findfirst(x->x==(1,2), labels(code))

@@ -258,17 +258,12 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
         res = contractx(gp, pre_invert_exponent(TruncatedPoly(ntuple(i->i == min_k(property) ? one(T) : zero(T), min_k(property)), one(T))); usecuda=usecuda)
         return asarray(post_invert_exponent.(res), res)
     elseif property isa GraphPolynomial
-        all_possitive = true
-        all_negative = true
-        for i in 1:length(terms(problem))
-            wi = get_weights(problem, i)
-            all_possitive = all_possitive && all(>=(0), wi)
-            all_negative = all_negative && all(<=(0), wi)
-        end
-        if all_possitive
+        ws = get_weights(gp)
+        if ws isa NoWeight || ws isa ZeroWeight || all(>=(0), ws)
             return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
-        elseif all_negative
-            return invert_polynomial(graph_polynomial(chweights(-weights(gp)), Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...))
+        elseif all(<=(0), ws)
+            res = graph_polynomial(chweights(gp, -ws), Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
+            return asarray(invert_polynomial.(res), res)
         else
             if graph_polynomial_method(property) != :laurent
                 @warn "Weights are not all positive or all negative, switch to using laurent polynomial."

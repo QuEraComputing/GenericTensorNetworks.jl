@@ -35,13 +35,13 @@ function Matching(g::SimpleGraph; weights=NoWeight(), openvertices=(),fixedverti
 end
 
 flavors(::Type{<:Matching}) = [0, 1]
-get_weights(m::Matching, i::Int) = [0, m.weights[i]]
 terms(gp::Matching) = getixsv(gp.code)[1:ne(gp.graph)]
 labels(gp::Matching) = getindex.(terms(gp))
 fixedvertices(gp::Matching) = gp.fixedvertices
 
 # weights interface
-weights(c::Matching) = c.weights
+get_weights(c::Matching) = c.weights
+get_weights(m::Matching, i::Int) = [0, m.weights[i]]
 chweights(c::Matching, weights) = Matching(c.code, c.graph, weights, c.fixedvertices)
 
 function generate_tensors(x::T, m::Matching) where T
@@ -52,7 +52,7 @@ function generate_tensors(x::T, m::Matching) where T
         ix = ixs[i]
         if i<=ne(m.graph)
             @assert length(ix) == 1
-            t = Ref(x) .^ get_weights(m, i) # x is defined on edges.
+            t = _pow.(Ref(x), get_weights(m, i)) # x is defined on edges.
         else
             t = match_tensor(T, length(ix))
         end

@@ -1,8 +1,3 @@
-using Polynomials
-using OMEinsum: NestedEinsum, getixs, getiy
-using FFTW
-using Graphs
-
 """
     graph_polynomial(problem, method; usecuda=false, T=Float64, kwargs...)
 

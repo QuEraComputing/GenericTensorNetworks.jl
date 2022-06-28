@@ -70,13 +70,13 @@ function cover_tensor(::Type{T}, set_indices::AbstractVector{Int}) where T
 end
 
 flavors(::Type{<:SetCovering}) = [0, 1]
-get_weights(gp::SetCovering, i::Int) = [0, gp.weights[i]]
 terms(gp::SetCovering) = getixsv(gp.code)[1:length(gp.sets)]
 labels(gp::SetCovering) = [1:length(gp.sets)...]
 fixedvertices(gp::SetCovering) = gp.fixedvertices
 
 # weights interface
-weights(c::SetCovering) = c.weights
+get_weights(c::SetCovering) = c.weights
+get_weights(gp::SetCovering, i::Int) = [0, gp.weights[i]]
 chweights(c::SetCovering, weights) = SetCovering(c.code, c.sets, weights, c.fixedvertices)
 
 # generate tensors
@@ -86,7 +86,7 @@ function generate_tensors(x::T, gp::SetCovering) where T
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors
     return select_dims([
-        add_labels!(Array{T}[misv(Ref(x) .^ get_weights(gp, i)) for i=1:nsets], ixs[1:nsets], labels(gp))...,
+        add_labels!(Array{T}[misv(_pow.(Ref(x), get_weights(gp, i))) for i=1:nsets], ixs[1:nsets], labels(gp))...,
             Array{T}[cover_tensor(T, ix) for ix in ixs[nsets+1:end]]...], ixs, fixedvertices(gp)
     )
 end

@@ -32,20 +32,20 @@ function MaximalIS(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimize
 end
 
 flavors(::Type{<:MaximalIS}) = [0, 1]
-get_weights(gp::MaximalIS, i::Int) = [0, gp.weights[i]]
 terms(gp::MaximalIS) = getixsv(gp.code)
 labels(gp::MaximalIS) = [1:length(getixsv(gp.code))...]
 fixedvertices(gp::MaximalIS) = gp.fixedvertices
 
 # weights interface
-weights(c::MaximalIS) = c.weights
+get_weights(c::MaximalIS) = c.weights
+get_weights(gp::MaximalIS, i::Int) = [0, gp.weights[i]]
 chweights(c::MaximalIS, weights) = MaximalIS(c.code, c.graph, weights, c.fixedvertices)
 
 function generate_tensors(x::T, mi::MaximalIS) where T
     ixs = getixsv(mi.code)
     isempty(ixs) && return []
 	return select_dims(add_labels!(map(enumerate(ixs)) do (i, ix)
-        maximal_independent_set_tensor((Ref(x) .^ get_weights(mi, i))..., length(ix))
+        maximal_independent_set_tensor(_pow.(Ref(x), get_weights(mi, i))..., length(ix))
     end, ixs, labels(mi)), ixs, fixedvertices(mi))
 end
 function maximal_independent_set_tensor(a::T, b::T, d::Int) where T

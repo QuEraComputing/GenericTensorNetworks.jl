@@ -1,13 +1,19 @@
 module GenericTensorNetworks
 
-using OMEinsumContractionOrders: SlicedEinsum
+using OMEinsumContractionOrders
 using Core: Argument
 using TropicalNumbers
 using OMEinsum
-using OMEinsum: timespace_complexity, getixsv
+using OMEinsum: timespace_complexity, getixsv, NestedEinsum, getixs, getiy, DynamicEinCode
 using Graphs, Random
 using DelimitedFiles, Serialization, Printf
 using LuxorGraphPlot
+using Polynomials: Polynomial, LaurentPolynomial, printpoly, fit
+using FFTW
+using Mods, Primes
+using Base.Cartesian
+import AbstractTrees: children, printnode, print_tree
+import StatsBase
 
 # OMEinsum
 export timespace_complexity, timespacereadwrite_complexity, @ein_str, getixsv, getiyv
@@ -31,7 +37,7 @@ export line_graph
 
 # Tensor Networks (Graph problems)
 export GraphProblem, optimize_code, NoWeight, ZeroWeight
-export flavors, labels, terms, nflavor, get_weights, fixedvertices, weights, chweights
+export flavors, labels, terms, nflavor, get_weights, fixedvertices, chweights
 export IndependentSet, mis_compactify!, is_independent_set
 export MaximalIS, is_maximal_independent_set
 export cut_size, MaxCut

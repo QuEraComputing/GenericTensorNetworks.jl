@@ -1,5 +1,3 @@
-using OMEinsum: DynamicEinCode
-
 struct AllConfigs{K} end
 largest_k(::AllConfigs{K}) where K = K
 struct SingleConfig end

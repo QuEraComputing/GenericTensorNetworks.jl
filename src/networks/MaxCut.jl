@@ -38,20 +38,20 @@ end
 
 flavors(::Type{<:MaxCut}) = [0, 1]
 # first `ne` indices are for edge weights, last `nv` indices are for vertex weights.
-get_weights(gp::MaxCut, i::Int) = i <= ne(gp.graph) ? [0, gp.edge_weights[i]] : [0, gp.vertex_weights[i-ne(gp.graph)]]
 terms(gp::MaxCut) = getixsv(gp.code)
 labels(gp::MaxCut) = [1:nv(gp.graph)...]
 fixedvertices(gp::MaxCut) = gp.fixedvertices
 
 # weights interface
-weights(c::MaxCut) = [[c.edge_weights[i] for i=1:ne(c.graph)]..., [c.vertex_weights[i] for i=1:nv(c.graph)]...]
+get_weights(c::MaxCut) = [[c.edge_weights[i] for i=1:ne(c.graph)]..., [c.vertex_weights[i] for i=1:nv(c.graph)]...]
+get_weights(gp::MaxCut, i::Int) = i <= ne(gp.graph) ? [0, gp.edge_weights[i]] : [0, gp.vertex_weights[i-ne(gp.graph)]]
 chweights(c::MaxCut, weights) = MaxCut(c.code, c.graph, weights[1:ne(c.graph)], weights[ne(c.graph)+1:end], c.fixedvertices)
 
 function generate_tensors(x::T, gp::MaxCut) where T
     ixs = getixsv(gp.code)
     l = ne(gp.graph)
     tensors = [
-        Array{T}[maxcutb((Ref(x) .^ get_weights(gp, i)) ...) for i=1:l]...,
+        Array{T}[maxcutb(_pow.(Ref(x), get_weights(gp, i))...) for i=1:l]...,
         add_labels!(Array{T}[Ref(x) .^ get_weights(gp, i+l) for i=1:nv(gp.graph)], ixs[l+1:end], labels(gp))...
     ]
     return select_dims(tensors, ixs, fixedvertices(gp))

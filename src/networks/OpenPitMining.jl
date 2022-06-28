@@ -87,13 +87,13 @@ function mining_tensor(::Type{T}) where T
 end
 
 flavors(::Type{<:OpenPitMining}) = [0, 1]
-get_weights(gp::OpenPitMining, i::Int) = [0, gp.rewards[gp.blocks[i]...]]
 terms(gp::OpenPitMining) = [[r] for r in gp.blocks]
 labels(gp::OpenPitMining) = gp.blocks
 fixedvertices(gp::OpenPitMining) = gp.fixedvertices
 
 # weights interface
-weights(c::OpenPitMining) = [c.rewards[b...] for b in c.blocks]
+get_weights(c::OpenPitMining) = [c.rewards[b...] for b in c.blocks]
+get_weights(gp::OpenPitMining, i::Int) = [0, gp.rewards[gp.blocks[i]...]]
 function chweights(c::OpenPitMining, weights)
     rewards = copy(c.rewards)
     for (w, b) in zip(weights, c.blocks)
@@ -109,7 +109,7 @@ function generate_tensors(x::T, gp::OpenPitMining) where T
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors
     return select_dims([
-        add_labels!(Array{T}[Ref(x) .^ get_weights(gp, i) for i=1:nblocks], ixs[1:nblocks], labels(gp))...,
+        add_labels!(Array{T}[_pow.(Ref(x), get_weights(gp, i)) for i=1:nblocks], ixs[1:nblocks], labels(gp))...,
         Array{T}[mining_tensor(T) for ix in ixs[nblocks+1:end]]...
         ], ixs, fixedvertices(gp)
     )

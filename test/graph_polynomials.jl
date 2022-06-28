@@ -24,10 +24,16 @@ end
     p3 = graph_polynomial(IndependentSet(g), Val(:fft))[]
     p4 = graph_polynomial(IndependentSet(g), Val(:finitefield))[]
     p5 = graph_polynomial(IndependentSet(g), Val(:finitefield); max_iter=1)[]
+    p8 = solve(IndependentSet(g), GraphPolynomial(; method=:laurent))[]
+    p9 = solve(IndependentSet(g; weights=fill(-1, 10)), GraphPolynomial(; method=:polynomial))[]
+    p10 = solve(IndependentSet(g; weights=rand([1,-1], 10)), GraphPolynomial(; method=:laurent))[]
     @test p1 ≈ p2
     @test p1 ≈ p3
     @test p1 ≈ p4
     @test p1 ≈ p5
+    @test p1 ≈ p8
+    @test p1 ≈ GenericTensorNetworks.invert_polynomial(p9)
+    @test sum(p10.coeffs) == sum(p1.coeffs)
 
     # test overflow
     g = random_regular_graph(120, 3)

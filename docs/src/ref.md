@@ -29,6 +29,7 @@ labels
 terms
 flavors
 get_weights
+chweights
 nflavor
 fixedvertices
 ```

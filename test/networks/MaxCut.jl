@@ -14,8 +14,8 @@ using GenericTensorNetworks: max_size, graph_polynomial
     # weighted
     ws = collect(1:ne(g))
     gp = MaxCut(g; edge_weights=ws)
-    @test weights(gp) == [ws..., zeros(10)...]
-    @test weights(chweights(gp, fill(3, 25))) == fill(3, 25)
+    @test get_weights(gp) == [ws..., zeros(10)...]
+    @test get_weights(chweights(gp, fill(3, 25))) == fill(3, 25)
     mc = max_size(gp)
     config = solve(gp, SingleConfigMax())[].c.data
     @test solve(gp, CountingMax())[].c == 2

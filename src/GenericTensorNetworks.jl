@@ -26,7 +26,7 @@ export estimate_memory
 # Algebras
 export StaticBitVector, StaticElementVector, @bv_str
 export is_commutative_semiring
-export Max2Poly, TruncatedPoly, Polynomial, Tropical, CountingTropical, StaticElementVector, Mod
+export Max2Poly, TruncatedPoly, Polynomial, LaurentPolynomial, Tropical, CountingTropical, StaticElementVector, Mod
 export ConfigEnumerator, onehotv, ConfigSampler, SumProductTree
 export CountingTropicalF64, CountingTropicalF32, TropicalF64, TropicalF32, ExtendedTropical
 export generate_samples, OnehotVec

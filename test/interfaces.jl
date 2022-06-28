@@ -166,6 +166,7 @@ end
         @test estimate_memory(gp, property) isa Integer
     end
     @test GenericTensorNetworks.tensor_element_type(Float32, 10, 2, GraphPolynomial(method=:polynomial)) == Polynomial{Float32, :x}
+    @test GenericTensorNetworks.tensor_element_type(Float32, 10, 2, GraphPolynomial(method=:laurent)) == LaurentPolynomial{Float32, :x}
     @test sizeof(GenericTensorNetworks.tensor_element_type(Float32, 10, 2, GraphPolynomial(method=:fitting))) == 4
     @test sizeof(GenericTensorNetworks.tensor_element_type(Float32, 10, 2, GraphPolynomial(method=:fft))) == 8
     @test sizeof(GenericTensorNetworks.tensor_element_type(Float64, 10, 2, GraphPolynomial(method=:finitefield))) == 4

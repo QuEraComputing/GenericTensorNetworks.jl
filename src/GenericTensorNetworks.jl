@@ -1,13 +1,20 @@
 module GenericTensorNetworks
 
-using OMEinsumContractionOrders: SlicedEinsum
+using OMEinsumContractionOrders
 using Core: Argument
 using TropicalNumbers
 using OMEinsum
-using OMEinsum: timespace_complexity, getixsv
+using OMEinsum: timespace_complexity, getixsv, NestedEinsum, getixs, getiy, DynamicEinCode
 using Graphs, Random
 using DelimitedFiles, Serialization, Printf
 using LuxorGraphPlot
+import Polynomials
+using Polynomials: Polynomial, LaurentPolynomial, printpoly, fit
+using FFTW
+using Mods, Primes
+using Base.Cartesian
+import AbstractTrees: children, printnode, print_tree
+import StatsBase
 
 # OMEinsum
 export timespace_complexity, timespacereadwrite_complexity, @ein_str, getixsv, getiyv
@@ -19,7 +26,7 @@ export estimate_memory
 # Algebras
 export StaticBitVector, StaticElementVector, @bv_str
 export is_commutative_semiring
-export Max2Poly, TruncatedPoly, Polynomial, Tropical, CountingTropical, StaticElementVector, Mod
+export Max2Poly, TruncatedPoly, Polynomial, LaurentPolynomial, Tropical, CountingTropical, StaticElementVector, Mod
 export ConfigEnumerator, onehotv, ConfigSampler, SumProductTree
 export CountingTropicalF64, CountingTropicalF32, TropicalF64, TropicalF32, ExtendedTropical
 export generate_samples, OnehotVec
@@ -30,11 +37,12 @@ export square_lattice_graph, unit_disk_graph, random_diagonal_coupled_graph, ran
 export line_graph
 
 # Tensor Networks (Graph problems)
-export GraphProblem, optimize_code, NoWeight
-export flavors, labels, terms, nflavor, get_weights, fixedvertices
+export GraphProblem, optimize_code, NoWeight, ZeroWeight
+export flavors, labels, terms, nflavor, get_weights, fixedvertices, chweights
 export IndependentSet, mis_compactify!, is_independent_set
 export MaximalIS, is_maximal_independent_set
-export cut_size, spinglass_energy, SpinGlass
+export cut_size, MaxCut
+export spinglass_energy, SpinGlass
 export PaintShop, paintshop_from_pairs, num_paint_shop_color_switch, paint_shop_coloring_from_config
 export Coloring, is_vertex_coloring
 export Satisfiability, CNF, CNFClause, BoolVar, satisfiable, @bools, ∨, ¬, ∧
@@ -68,8 +76,6 @@ include("interfaces.jl")
 include("deprecate.jl")
 include("multiprocessing.jl")
 include("visualize.jl")
-
-Base.@deprecate MaxCut(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing) SpinGlass(g; edge_weights=weights, openvertices, fixedvertices, optimizer, simplifier)
 
 using Requires
 function __init__()

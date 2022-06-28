@@ -11,7 +11,7 @@ The *solution space properties* include
 * The enumeration of solutions at certain sizes.
 * The direct sampling of solutions at certain sizes.
 
-The solvable problems include [Independent set problem](@ref), [Maximal independent set problem](@ref), [Spin-glass problem (Cutting problem)](@ref), [Vertex matching problem](@ref), [Binary paint shop problem](@ref), [Coloring problem](@ref), [Dominating set problem](@ref), [Satisfiability problem](@ref), [Set packing problem](@ref) and [Set covering problem](@ref).
+The solvable problems include [Independent set problem](@ref), [Maximal independent set problem](@ref), [Spin-glass problem](@ref), [Cutting problem](@ref), [Vertex matching problem](@ref), [Binary paint shop problem](@ref), [Coloring problem](@ref), [Dominating set problem](@ref), [Satisfiability problem](@ref), [Set packing problem](@ref) and [Set covering problem](@ref).
 
 ## Background knowledge
 

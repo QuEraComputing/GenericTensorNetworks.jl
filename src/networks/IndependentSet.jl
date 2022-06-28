@@ -46,10 +46,14 @@ function IndependentSet(g::SimpleGraph; weights=NoWeight(), openvertices=(), fix
 end
 
 flavors(::Type{<:IndependentSet}) = [0, 1]
-get_weights(gp::IndependentSet, i::Int) = [0, gp.weights[i]]
 terms(gp::IndependentSet) = getixsv(gp.code)[1:nv(gp.graph)]
 labels(gp::IndependentSet) = [1:nv(gp.graph)...]
 fixedvertices(gp::IndependentSet) = gp.fixedvertices
+
+# weights interface
+get_weights(c::IndependentSet) = c.weights
+get_weights(gp::IndependentSet, i::Int) = [0, gp.weights[i]]
+chweights(c::IndependentSet, weights) = IndependentSet(c.code, c.graph, weights, c.fixedvertices)
 
 # generate tensors
 function generate_tensors(x::T, gp::IndependentSet) where T
@@ -57,7 +61,7 @@ function generate_tensors(x::T, gp::IndependentSet) where T
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors
     return select_dims([
-            add_labels!(Array{T}[misv(Ref(x) .^ get_weights(gp, i)) for i=1:nv(gp.graph)], ixs[1:nv(gp.graph)], labels(gp))...,
+            add_labels!(Array{T}[misv(_pow.(Ref(x), get_weights(gp, i))) for i=1:nv(gp.graph)], ixs[1:nv(gp.graph)], labels(gp))...,
             Array{T}[misb(T, length(ix)) for ix in ixs[nv(gp.graph)+1:end]]... # if n!=2, it corresponds to set packing problem.
     ], ixs, fixedvertices(gp))
 end

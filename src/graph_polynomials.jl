@@ -1,8 +1,3 @@
-using Polynomials
-using OMEinsum: NestedEinsum, getixs, getiy
-using FFTW
-using Graphs
-
 """
     graph_polynomial(problem, method; usecuda=false, T=Float64, kwargs...)
 
@@ -51,6 +46,11 @@ end
 function graph_polynomial(gp::GraphProblem, ::Val{:polynomial}; usecuda=false, T=Float64)
     @assert !usecuda "Polynomial type can not be computed on GPU!"
     contractx(gp::GraphProblem, Polynomial(T[0, 1]))
+end
+
+function graph_polynomial(gp::GraphProblem, ::Val{:laurent}; usecuda=false, T=Float64)
+    @assert !usecuda "Polynomial type can not be computed on GPU!"
+    contractx(gp::GraphProblem, LaurentPolynomial(T[1], 1))
 end
 
 function _polynomial_single(gp::GraphProblem, ::Type{T}; usecuda, maxorder) where T

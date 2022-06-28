@@ -35,16 +35,20 @@ function Coloring{K}(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixedv
 end
 
 flavors(::Type{<:Coloring{K}}) where K = collect(0:K-1)
-get_weights(c::Coloring{K}, i::Int) where K = fill(c.weights[i], K)
 terms(gp::Coloring) = getixsv(gp.code)[1:nv(gp.graph)]
 labels(gp::Coloring) = [1:nv(gp.graph)...]
 fixedvertices(gp::Coloring) = gp.fixedvertices
+
+# weights interface
+get_weights(c::Coloring) = c.weights
+get_weights(c::Coloring{K}, i::Int) where K = fill(c.weights[i], K)
+chweights(c::Coloring{K}, weights) where K = Coloring{K}(c.code, c.graph, weights, c.fixedvertices)
 
 function generate_tensors(x::T, c::Coloring{K}) where {K,T}
     ixs = getixsv(c.code)
     return select_dims([
         add_labels!(Array{T}[coloringv(T, K) for i=1:nv(c.graph)], ixs[1:nv(c.graph)], labels(c))...,
-        Array{T}[coloringb(x, K) .^ get_weights(c, i) for i=1:ne(c.graph)]...
+        Array{T}[_pow.(coloringb(x, K), get_weights(c, i)) for i=1:ne(c.graph)]...
     ], ixs, fixedvertices(c))
 end
 

@@ -1,6 +1,3 @@
-using Graphs, OMEinsumContractionOrders
-import StatsBase
-
 """
     random_square_lattice_graph(m::Int, n::Int, ρ::Real)
 

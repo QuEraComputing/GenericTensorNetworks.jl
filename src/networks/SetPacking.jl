@@ -44,10 +44,14 @@ function SetPacking(sets::AbstractVector{Vector{ET}}; weights=NoWeight(), openve
 end
 
 flavors(::Type{<:SetPacking}) = [0, 1]
-get_weights(gp::SetPacking, i::Int) = [0, gp.weights[i]]
 terms(gp::SetPacking) = getixsv(gp.code)[1:length(gp.sets)]
 labels(gp::SetPacking) = [1:length(gp.sets)...]
 fixedvertices(gp::SetPacking) = gp.fixedvertices
+
+# weights interface
+get_weights(c::SetPacking) = c.weights
+get_weights(gp::SetPacking, i::Int) = [0, gp.weights[i]]
+chweights(c::SetPacking, weights) = SetPacking(c.code, c.sets, weights, c.fixedvertices)
 
 # generate tensors
 function generate_tensors(x::T, gp::SetPacking) where T
@@ -55,7 +59,7 @@ function generate_tensors(x::T, gp::SetPacking) where T
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors
     return select_dims([
-        add_labels!(Array{T}[misv(Ref(x) .^ get_weights(gp, i)) for i=1:length(gp.sets)], ixs[1:length(gp.sets)], labels(gp))...,
+        add_labels!(Array{T}[misv(_pow.(Ref(x), get_weights(gp, i))) for i=1:length(gp.sets)], ixs[1:length(gp.sets)], labels(gp))...,
         Array{T}[misb(T, length(ix)) for ix in ixs[length(gp.sets)+1:end]]...], ixs, fixedvertices(gp),
     )
 end

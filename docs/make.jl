@@ -49,6 +49,7 @@ makedocs(;
             "Independent set problem" => "generated/IndependentSet.md",
             "Maximal independent set problem" => "generated/MaximalIS.md",
             "Spin glass problem" => "generated/SpinGlass.md",
+            "Cutting problem" => "generated/MaxCut.md",
             "Vertex matching problem" => "generated/Matching.md",
             "Binary paint shop problem" => "generated/PaintShop.md",
             "Coloring problem" => "generated/Coloring.md",

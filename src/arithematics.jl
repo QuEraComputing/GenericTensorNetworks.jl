@@ -1,9 +1,3 @@
-using Polynomials: Polynomial
-using TropicalNumbers: Tropical, CountingTropical
-using Mods, Primes
-using Base.Cartesian
-import AbstractTrees: children, printnode, print_tree
-
 @enum TreeTag LEAF SUM PROD ZERO ONE
 
 # pirate
@@ -860,22 +854,34 @@ end
 # variable `x`
 function _x(::Type{Polynomial{BS,X}}; invert) where {BS,X}
     @assert !invert   # not supported, because it is not useful
-    Polynomial{BS,X}([zero(BS), one(BS)])
+    return Polynomial{BS,X}([zero(BS), one(BS)])
+end
+# will be used in spin-glass polynomial
+function _x(::Type{LaurentPolynomial{BS,X}}; invert) where {BS,X}
+    return LaurentPolynomial{BS,X}([one(BS)], invert ? -1 : 1)
 end
 function _x(::Type{TruncatedPoly{K,BS,OS}}; invert) where {K,BS,OS}
     ret = TruncatedPoly{K,BS,OS}(ntuple(i->i<K ? zero(BS) : one(BS), K),one(OS))
-    invert ? pre_invert_exponent(ret) : ret
+    return invert ? pre_invert_exponent(ret) : ret
 end
 function _x(::Type{CountingTropical{TV,BS}}; invert) where {TV,BS}
     ret = CountingTropical{TV,BS}(one(TV), one(BS))
-    invert ? pre_invert_exponent(ret) : ret
+    return invert ? pre_invert_exponent(ret) : ret
 end
 function _x(::Type{Tropical{TV}}; invert) where {TV}
     ret = Tropical{TV}(one(TV))
-    invert ? pre_invert_exponent(ret) : ret
+    return invert ? pre_invert_exponent(ret) : ret
 end
 function _x(::Type{ExtendedTropical{K,TO}}; invert) where {K,TO}
     return ExtendedTropical{K,TO}(map(i->i==K ? _x(TO; invert=invert) : zero(TO), 1:K))
+end
+
+# invert the exponents of polynomial, returns a Laurent polynomial
+function invert_polynomial(poly::Polynomial{BS,X}) where {BS,X}
+    return LaurentPolynomial{BS,X}(poly.coeffs[end:-1:1], -length(poly.coeffs)+1)
+end
+function invert_polynomial(poly::LaurentPolynomial{BS,X}) where {BS,X}
+    return LaurentPolynomial{BS,X}(poly.coeffs[end:-1:1], -poly.m[]-length(poly.coeffs)+1)
 end
 
 # for finding all solutions
@@ -905,5 +911,6 @@ pre_invert_exponent(t::TruncatedPoly{K}) where K = TruncatedPoly(t.coeffs, -t.ma
 pre_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
 # negate the exponents after entering the solver
 post_invert_exponent(t::TruncatedPoly{K}) where K = TruncatedPoly(ntuple(i->t.coeffs[K-i+1], K), -t.maxorder+(K-1))
+post_invert_exponent(t::LaurentPolynomial) = error("This method is not implemented yet, please file an issue if you find a using case!")
 post_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
 post_invert_exponent(t::ExtendedTropical{K}) where K = ExtendedTropical{K}(map(i->inv(t.orders[i]), K:-1:1))

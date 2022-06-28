@@ -11,6 +11,8 @@ using GenericTensorNetworks, Test, Graphs
     @test count(!iszero, m) == 12
     mis_compactify!(m)
     @test count(!iszero, m) == 3
+    @test get_weights(g) == NoWeight()
+    @test get_weights(chweights(g, fill(3, 10))) == fill(3, 10)
 end
 
 @testset "empty graph" begin

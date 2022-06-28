@@ -15,12 +15,23 @@ Base.eltype(::ZeroWeight) = Int
 
 ######## Interfaces for graph problems ##########
 """
-    get_weights(problem::GraphProblem, sym) -> Vector
+    get_weights(problem::GraphProblem, i::Int) -> Vector
+    get_weights(problem::GraphProblem) -> Vector
 
-The weights for the degree of freedom specified by `sym` of the graph problem, where `sym` is a symbol.
-In graph polynomial, integer weights are the orders of `x`.
+The weights for the `problem` or the weights for the degree of freedom specified by the `i`-th term if a second argument is provided.
+Weights are associated with [`terms`](@ref) in the graph problem.
+In graph polynomial, integer weights can be the exponents.
 """
 function get_weights end
+
+"""
+    chweights(problem::GraphProblem, weights) -> GraphProblem
+
+Change the weights for the `problem` and return a new problem instance.
+Weights are associated with [`terms`](@ref) in the graph problem.
+In graph polynomial, integer weights can be the exponents.
+"""
+function chweights end
 
 """
     labels(problem::GraphProblem) -> Vector
@@ -36,7 +47,7 @@ function labels end
 
 The terms of a graph problem is defined as the tensor labels that defining local energies (or weights) in the graph problem.
 e.g. for the maximum independent set problems, they are the vertex-tensor labels: [1], [2], [3]...
-The weight of a term is same as the power of `x` in the graph polynomial.
+The weight of a term is same as the exponents in the graph polynomial.
 """
 function terms end
 
@@ -113,7 +124,7 @@ generate_tensors(::Type{GT}) where GT = length(flavors(GT))
 
 include("IndependentSet.jl")
 include("MaximalIS.jl")
-include("SpinGlass.jl")
+include("MaxCut.jl")
 include("Matching.jl")
 include("Coloring.jl")
 include("PaintShop.jl")
@@ -122,6 +133,8 @@ include("DominatingSet.jl")
 include("SetPacking.jl")
 include("SetCovering.jl")
 include("OpenPitMining.jl")
+include("Reduced.jl")
+include("SpinGlass.jl")
 
 # forward the time, space and readwrite complexity
 OMEinsum.timespacereadwrite_complexity(gp::GraphProblem) = timespacereadwrite_complexity(gp.code, uniformsize(gp.code, nflavor(gp)))
@@ -171,6 +184,16 @@ function select_dims(tensors::AbstractVector{<:AbstractArray{T}}, ixs, fixedvert
     map(tensors, ixs) do t, ix
         dims = map(ixi->ixi ∉ keys(fixedvertices) ? Colon() : (fixedvertices[ixi]+1:fixedvertices[ixi]+1), ix)
         t[dims...]
+    end
+end
+
+_pow(x, i) = x^i
+function _pow(x::LaurentPolynomial{BS,X}, i) where {BS,X}
+    if i >= 0
+        return x^i
+    else
+        @assert length(x.coeffs) == 1
+        return LaurentPolynomial(x.coeffs .^ i, x.m[]+i)
     end
 end
 

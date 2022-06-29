@@ -82,7 +82,12 @@ end
 
 Polynomial truncated to largest `K` orders. `T` is the coefficients type and `TO` is the orders type.
 
-Example
+Fields
+------------------------
+* `coeffs` is the largest-K coefficients of a polynomial. In `GenericTensorNetworks`, it can be the counting or enumeration of solutions.
+* `maxorder` is the order of a polynomial.
+
+Examples
 ------------------------
 ```jldoctest; setup=(using GenericTensorNetworks)
 julia> TruncatedPoly((1,2,3), 6)
@@ -191,7 +196,11 @@ This algebra maps
 * `0` to set [-Inf, -Inf, ..., -Inf, -Inf]
 * `1` to set [-Inf, -Inf, ..., -Inf, 0]
 
-Example
+Fields
+------------------------
+* `orders` is a vector of [`Tropical`](@ref) ([`CoutingTropical`](@ref)) numbers as the largest-K solution sizes (solutions).
+
+Examples
 ------------------------------
 ```jldoctest; setup=(using GenericTensorNetworks)
 julia> x = ExtendedTropical{3}(Tropical.([1.0, 2, 3]))
@@ -376,7 +385,11 @@ Set algebra for enumerating configurations, where `N` is the length of configura
 `C` is the size of storage in unit of `UInt64`,
 `S` is the bit width to store a single element in a configuration, i.e. `log2(# of flavors)`, for bitstrings, it is `1``.
 
-Example
+Fields
+------------------------
+* `data` is a vector of [`StaticElementVector`](@ref) as the solution set.
+
+Examples
 ----------------------
 ```jldoctest; setup=:(using GenericTensorNetworks)
 julia> a = ConfigEnumerator([StaticBitVector([1,1,1,0,0]), StaticBitVector([1,0,0,0,1])])
@@ -441,7 +454,11 @@ The algebra for sampling one configuration, where `N` is the length of configura
 !!! note
     `ConfigSampler` is a **probabilistic** commutative semiring, adding two config samplers do not give you deterministic results.
 
-Example
+Fields
+----------------------
+* `data` is a [`StaticElementVector`](@ref) as the sampled solution.
+
+Examples
 ----------------------
 ```jldoctest; setup=:(using GenericTensorNetworks, Random; Random.seed!(2))
 julia> ConfigSampler(StaticBitVector([1,1,1,0,0]))
@@ -495,7 +512,7 @@ Fields
 * `data` is the element stored in a `LEAF` node.
 * `left` and `right` are two operands of a `SUM` or `PROD` node.
 
-Example
+Examples
 ------------------------
 ```jldoctest; setup=:(using GenericTensorNetworks)
 julia> s = SumProductTree(bv"00111")
@@ -697,7 +714,7 @@ end
 
 Direct sampling configurations from a [`SumProductTree`](@ref) instance.
 
-Example
+Examples
 -----------------------------
 ```jldoctest; setup=:(using GenericTensorNetworks)
 julia> using Graphs

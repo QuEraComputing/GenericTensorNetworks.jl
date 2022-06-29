@@ -6,7 +6,11 @@
 `S` is the stride defined as the `log2(# of flavors)`.
 When the number of flavors is 2, it is a `StaticBitVector`.
 
-Example
+Fields
+-------------------------------
+* `data` is a tuple of `UInt64` for storing the configuration of static elements.
+
+Examples
 -------------------------------
 ```jldoctest; setup=:(using GenericTensorNetworks)
 julia> ev = StaticElementVector(3, [1,2,0,1,2])
@@ -14,6 +18,14 @@ julia> ev = StaticElementVector(3, [1,2,0,1,2])
 
 julia> ev[2]
 0x0000000000000002
+
+julia> collect(Int, ev)
+5-element Vector{Int64}:
+ 1
+ 2
+ 0
+ 1
+ 2
 ```
 """
 struct StaticElementVector{N,S,C} <: AbstractVector{UInt64}
@@ -87,7 +99,7 @@ end
     StaticBitVector{N,C} = StaticElementVector{N,1,C}
     StaticBitVector(x::AbstractVector)
 
-Example
+Examples
 -------------------------------
 ```jldoctest; setup=:(using GenericTensorNetworks)
 julia> sb = StaticBitVector([1,0,0,1,1])
@@ -95,6 +107,14 @@ julia> sb = StaticBitVector([1,0,0,1,1])
 
 julia> sb[3]
 0x0000000000000000
+
+julia> collect(Int, sb)
+5-element Vector{Int64}:
+ 1
+ 0
+ 0
+ 1
+ 1
 ```
 """
 const StaticBitVector{N,C} = StaticElementVector{N,1,C}

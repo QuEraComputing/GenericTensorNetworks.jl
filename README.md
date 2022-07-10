@@ -5,12 +5,11 @@
 [![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/)
 
 
-This package implements generic tensor networks to compute *solution space properties* of a class of hard combinatorial problems.
+This package implements generic tensor networks to compute *solution space properties* of a class of hard combinatorial optimization problems.
 The *solution space properties* include
 * The maximum/minimum solution sizes,
 * The number of solutions at certain sizes,
-* The enumeration of solutions at certain sizes.
-* The direct sampling of solutions at certain sizes.
+* The enumeration/sampling of solutions at certain sizes.
 
 The solvable problems include [Independent set problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/IndependentSet/), [Maximal independent set problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/MaximalIS/), [Spin-glass problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/SpinGlass/), [Cutting problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/MaxCut/), [Vertex matching problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/Matching/), [Binary paint shop problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/PaintShop/), [Coloring problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/Coloring/), [Dominating set problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/DominatingSet/), [Set packing problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/SetPacking/), [Satisfiability problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/Satisfiability/) and [Set covering problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/SetCovering/).
 
@@ -32,7 +31,7 @@ pkg> add GenericTensorNetworks
 
 To update, just type `up` in the package mode.
 
-We recommend using **Julia version >= 1.7**, otherwise your program can suffer from significant (exponential in tensor dimension) overheads when permuting the dimensions of a large tensor.
+We recommend you to use **Julia version >= 1.7**, otherwise your program can suffer from significant (exponential in tensor dimension) overheads when permuting the dimensions of a large tensor.
 If you have to use an older version Julia, you can overwrite the `LinearAlgebra.permutedims!` by adding the following patch to your own project.
 
 ```julia

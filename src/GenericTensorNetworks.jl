@@ -1,6 +1,5 @@
 module GenericTensorNetworks
 
-using OMEinsumContractionOrders
 using Core: Argument
 using TropicalNumbers
 using OMEinsum

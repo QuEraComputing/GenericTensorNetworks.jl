@@ -1,6 +1,6 @@
 using Pkg
 using GenericTensorNetworks
-using GenericTensorNetworks: TropicalNumbers, Polynomials, Mods, OMEinsum, OMEinsumContractionOrders, LuxorGraphPlot
+using GenericTensorNetworks: TropicalNumbers, Polynomials, Mods, OMEinsum, OMEinsum.OMEinsumContractionOrders, LuxorGraphPlot
 using Documenter
 using DocThemeIndigo
 using PlutoStaticHTML

@@ -64,11 +64,11 @@ function cached_einsum(se::SlicedEinsum, @nospecialize(xs), size_dict)
 end
 function cached_einsum(code::NestedEinsum, @nospecialize(xs), size_dict)
     if OMEinsum.isleaf(code)
-        y = xs[code.tensorindex]
+        y = xs[OMEinsum.tensorindex(code)]
         return CacheTree(y, CacheTree{eltype(y)}[])
     else
-        caches = [cached_einsum(arg, xs, size_dict) for arg in code.args]
-        y = einsum(code.eins, ntuple(i->caches[i].content, length(caches)), size_dict)
+        caches = [cached_einsum(arg, xs, size_dict) for arg in OMEinsum.siblings(code)]
+        y = einsum(OMEinsum.rootcode(code), ntuple(i->caches[i].content, length(caches)), size_dict)
         return CacheTree(y, caches)
     end
 end
@@ -84,8 +84,9 @@ function generate_masktree(mode, code::NestedEinsum, cache, mask, size_dict)
     if OMEinsum.isleaf(code)
         return CacheTree(mask, CacheTree{Bool}[])
     else
-        submasks = backward_tropical(mode, getixs(code.eins), (getfield.(cache.siblings, :content)...,), OMEinsum.getiy(code.eins), cache.content, mask, size_dict)
-        return CacheTree(mask, generate_masktree.(Ref(mode), code.args, cache.siblings, submasks, Ref(size_dict)))
+        eins = OMEinsum.rootcode(code)
+        submasks = backward_tropical(mode, getixs(eins), (getfield.(cache.siblings, :content)...,), OMEinsum.getiy(eins), cache.content, mask, size_dict)
+        return CacheTree(mask, generate_masktree.(Ref(mode), OMEinsum.siblings(code), cache.siblings, submasks, Ref(size_dict)))
     end
 end
 
@@ -98,12 +99,12 @@ function masked_einsum(se::SlicedEinsum, @nospecialize(xs), masks, size_dict)
 end
 function masked_einsum(code::NestedEinsum, @nospecialize(xs), masks, size_dict)
     if OMEinsum.isleaf(code)
-        y = copy(xs[code.tensorindex])
+        y = copy(xs[OMEinsum.tensorindex(code)])
         y[OMEinsum.asarray(.!masks.content)] .= Ref(zero(eltype(y)))
         return y
     else
-        xs = [masked_einsum(arg, xs, mask, size_dict) for (arg, mask) in zip(code.args, masks.siblings)]
-        y = einsum(code.eins, (xs...,), size_dict)
+        xs = [masked_einsum(arg, xs, mask, size_dict) for (arg, mask) in zip(OMEinsum.siblings(code), masks.siblings)]
+        y = einsum(OMEinsum.rootcode(code), (xs...,), size_dict)
         y[OMEinsum.asarray(.!masks.content)] .= Ref(zero(eltype(y)))
         return y
     end
@@ -121,10 +122,10 @@ Contraction method with bounding.
 """
 function bounding_contract(mode::AllConfigs, code::EinCode, @nospecialize(xsa), ymask, @nospecialize(xsb); size_info=nothing)
     LT = OMEinsum.labeltype(code)
-    bounding_contract(mode, NestedEinsum(NestedEinsum{DynamicEinCode{LT}}.(1:length(xsa)), code), xsa, ymask, xsb; size_info=size_info)
+    bounding_contract(mode, DynamicNestedEinsum(DynamicNestedEinsum{LT}.(1:length(xsa)), code), xsa, ymask, xsb; size_info=size_info)
 end
 function bounding_contract(mode::AllConfigs, code::Union{NestedEinsum,SlicedEinsum}, @nospecialize(xsa), ymask, @nospecialize(xsb); size_info=nothing)
-    size_dict = size_info===nothing ? Dict{OMEinsum.labeltype(code.eins),Int}() : copy(size_info)
+    size_dict = size_info===nothing ? Dict{OMEinsum.labeltype(code),Int}() : copy(size_info)
     OMEinsum.get_size_dict!(code, xsa, size_dict)
     # compute intermediate tensors
     @debug "caching einsum..."
@@ -139,11 +140,11 @@ end
 # get the optimal solution with automatic differentiation.
 function solution_ad(code::EinCode, @nospecialize(xsa), ymask; size_info=nothing)
     LT = OMEinsum.labeltype(code)
-    solution_ad(NestedEinsum(NestedEinsum{DynamicEinCode{LT}}.(1:length(xsa)), code), xsa, ymask; size_info=size_info)
+    solution_ad(DynamicNestedEinsum(DynamicNestedEinsum{LT}.(1:length(xsa)), code), xsa, ymask; size_info=size_info)
 end
 
 function solution_ad(code::Union{NestedEinsum,SlicedEinsum}, @nospecialize(xsa), ymask; size_info=nothing)
-    size_dict = size_info===nothing ? Dict{OMEinsum.labeltype(code.eins),Int}() : copy(size_info)
+    size_dict = size_info===nothing ? Dict{OMEinsum.labeltype(code),Int}() : copy(size_info)
     OMEinsum.get_size_dict!(code, xsa, size_dict)
     # compute intermediate tensors
     @debug "caching einsum..."
@@ -165,7 +166,7 @@ function read_config!(code::SlicedEinsum, mt, out)
 end
 
 function read_config!(code::NestedEinsum, mt, out)
-    for (arg, ix, sibling) in zip(code.args, getixs(code.eins), mt.siblings)
+    for (arg, ix, sibling) in zip(OMEinsum.siblings(code), getixs(OMEinsum.rootcode(code)), mt.siblings)
         if OMEinsum.isleaf(arg)
             mask = convert(Array, sibling.content)  # note: the content can be CuArray
             for ci in CartesianIndices(mask)

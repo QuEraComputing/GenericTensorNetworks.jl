@@ -1,4 +1,4 @@
-using GenericTensorNetworks, Test, OMEinsum, OMEinsumContractionOrders
+using GenericTensorNetworks, Test, OMEinsum
 using Mods, Polynomials, TropicalNumbers
 using Graphs, Random
 using GenericTensorNetworks: StaticBitVector, graph_polynomial

@@ -13,7 +13,7 @@ They can be installed in a similar way to `GenericTensorNetworks`.
 After installing the required packages, one can open a Julia REPL, and copy-paste the following code snippet into it.
 
 ```julia
-using OMEinsum, OMEinsumContractionOrders
+using OMEinsum
 using Graphs
 using Random
 

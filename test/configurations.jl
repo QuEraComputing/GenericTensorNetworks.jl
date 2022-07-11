@@ -1,7 +1,6 @@
 using GenericTensorNetworks, Test, Graphs
 using OMEinsum
 using TropicalNumbers: CountingTropicalF64
-using OMEinsumContractionOrders: uniformsize
 using GenericTensorNetworks: _onehotv, _x, sampler_type, set_type, best_solutions, best2_solutions, solutions, all_solutions, bestk_solutions, AllConfigs, SingleConfig, max_size, max_size_count
 
 @testset "Config types" begin

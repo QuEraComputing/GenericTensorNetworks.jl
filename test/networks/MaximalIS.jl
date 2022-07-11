@@ -39,7 +39,7 @@ end
     @test min2.coeffs == (2, 150, 7510)
 
     for bounded in [false, true]
-        println("bounded = ", bounded, ", configs max1")
+        @info("bounded = ", bounded, ", configs max1")
         @test length(solve(MaximalIS(g), ConfigsMin(; bounded=bounded))[].c) == 2
         println("bounded = ", bounded, ", configs max3")
         cmin2 = solve(MaximalIS(g), ConfigsMin(3; bounded=bounded))[]

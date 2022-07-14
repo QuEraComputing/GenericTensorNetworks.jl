@@ -185,9 +185,11 @@ md"## Our contribution to Julia community
 
 # ╔═╡ 1efd09bb-f920-4f11-a21d-60406a484939
 md"
-# Why do we limit our imagination on floating point numbers?
 ![](https://docs.julialang.org/en/v1/assets/logo.svg)
 "
+
+# ╔═╡ b45ef978-9187-471b-b8c6-80dd59cece1e
+md"# Why do we limit our imagination on floating point numbers?"
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1200,5 +1202,6 @@ version = "3.5.0+0"
 # ╟─f7fc9135-05f2-47da-bec0-d3581949eb44
 # ╟─fc44aba0-2d95-4a18-b5dc-923520714dc0
 # ╟─1efd09bb-f920-4f11-a21d-60406a484939
+# ╟─b45ef978-9187-471b-b8c6-80dd59cece1e
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

@@ -67,6 +67,26 @@ The finite field approach only requires 298 KB memory, while using the [`Polynom
     * The actual run time memory can be several times larger than the size of the maximum tensor, so the [`estimate_memory`](@ref) is more accurate in estimating the peak memory.
     * For mutable element types like [`ConfigEnumerator`](@ref), none of memory estimation functions measure the actual memory usage correctly.
 
+You can also save an optimized contraction order to a JSON file on your local disk and load it back later.
+```julia
+julia> using Graphs, GenericTensorNetworks
+
+julia> problem = IndependentSet(smallgraph(:petersen));
+
+julia> filename = tempname();
+
+julia> GenericTensorNetworks.writejson(filename, problem.code);
+```
+
+To read the saved contraction order out, just type
+```julia
+julia> saved_code = GenericTensorNetworks.readjson(filename);
+
+julia> loaded_problem = GenericTensorNetworks.IndependentSet(saved_code, smallgraph(:petersen), NoWeight(), Dict{Int,Int}());
+```
+
+In the last line, we called the default constructor, which takes four arguments: contraction code, graph, weights and fixed vertices.
+
 ## Slicing technique
 
 For large scale applications, it is also possible to slice over certain degrees of freedom to reduce the space complexity, i.e.

@@ -28,7 +28,8 @@ Keyword arguments
 * `spring` is switch to use spring method to optimize the location.
 * `optimal_distance` is a optimal distance parameter for `spring` optimizer.
 
-* `tensor_color` is a string to specify the color of tensor nodes.
+* `tensor_colors` is a vector of strings to specify the colors of tensor nodes.
+* `tensor_color` is a string to specify the default color of tensor nodes.
 * `tensor_size` is a real number to specify the size of tensor nodes.
 * `tensor_text_color` is a color strings to specify tensor text color.
 * `annotate_tensors` is a boolean switch for annotate different tensors by integers.
@@ -48,6 +49,7 @@ function show_einsum(ein::AbstractEinsum;
         label_color="black",
         open_label_color="red",
         tensor_size=0.3,
+        tensor_colors=nothing,
         tensor_color="black",
         tensor_text_color="white",
         annotate_labels=true,
@@ -64,7 +66,7 @@ function show_einsum(ein::AbstractEinsum;
     m = length(labels)
     n = length(ixs)
     labelmap = Dict(zip(labels, 1:m))
-    colors = [["transparent" for l in labels]..., fill(tensor_color, n)...]
+    colors = [["transparent" for l in labels]..., [LuxorGraphPlot._get(tensor_colors, i, tensor_color) for i=1:n]...]
     sizes = [fill(label_size, m)..., fill(tensor_size, n)...]
     texts = [[annotate_labels ? "$(labels[i])" : "" for i=1:m]..., [annotate_tensors ? "$i" : "" for i=1:n]...]
     vertex_text_colors = [[l ∈ iy ? open_label_color : label_color for l in labels]..., [tensor_text_color for ix in ixs]...]

@@ -69,6 +69,9 @@ md"
 # ╔═╡ 17f2adf0-b393-4973-9342-804bae26bd55
 md"![](https://images-na.ssl-images-amazon.com/images/I/51pOfel10TL._SX380_BO1,204,203,200_.jpg)"
 
+# ╔═╡ 40d8f94e-2635-4455-ab3b-c043c8c7ef13
+md"## ForwardDiff"
+
 # ╔═╡ 4dd0ad27-8ddd-46c3-bd5b-daf60a70b1c6
 md"The most impressive use of generic programming: [ForwardDiff.jl](https://github.com/JuliaDiff/ForwardDiff.jl) - a package for forward mode automatic differentiation.
 
@@ -91,7 +94,10 @@ md"The nuts have a finite size, so neighbouring and diagonal sites can not be bo
 md"![](https://user-images.githubusercontent.com/6257240/178902932-72075ff8-7c36-4481-9e8e-886bc1d8cfc7.png)"
 
 # ╔═╡ 87a6e16d-c1d5-4d5a-b4a7-73e264028e9c
-md"This problem is **NP-hard**! i.e. unlikely to be solved in polynomial time in the worst case by any classical algorithm."
+md"This problem is **NP-hard**! i.e. unlikely to be solved in polynomial time in the worst case by any classical algorithm. If you can solve this problem in polynomial time, you can:
+1. prove Riemann hypothesis by converting a proving system to a SAT problem,
+2. steal money from the bank by reducing the factoring problem to this problem.
+"
 
 # ╔═╡ 913f86a8-bd37-43f4-8d4b-60a8e55bd956
 mask = Bool[1 1 1 1 0;
@@ -107,7 +113,7 @@ graph = diagonal_coupled_graph(mask)
 show_graph(graph; locs=map(x->x.I, findall(!iszero, mask)))
 
 # ╔═╡ 2d3b6407-03e3-43d4-8382-b2256776641f
-md"Mr. Squirrel's problem is the same as: the **independent set** (A set of vertices in a graph, no two of which are adjacent.) problem on a diagonal coupled grid graph."
+md"Mr. Squirrel's problem is the same as: the maximum **independent set** (A set of vertices in a graph, no two of which are adjacent.) problem on a diagonal coupled grid graph."
 
 # ╔═╡ 455ca886-f3ab-4d43-bc65-a6662a2f453d
 md"## Our solution"
@@ -115,6 +121,13 @@ md"## Our solution"
 # ╔═╡ b052da1c-fc3a-4725-bb9a-8cd2c776bebd
 md"""
 ![](https://user-images.githubusercontent.com/6257240/178902121-9d4ad76a-59f6-4eda-b5b0-645c5559a44f.png)
+"""
+
+# ╔═╡ b9f7a9bd-d121-40a3-b9c8-d7000fb5943f
+md"""
+* The same program: Tensor network contraction
+* Different data types for different purposes: different data types being commutative semiring for computing different solution space properties
+* Without loss of efficiency: Julia JIT, `CUDA.jl` and Chris Elrod's help.
 """
 
 # ╔═╡ a0836040-48f4-4a7f-bb93-3a0a46518c12
@@ -126,7 +139,7 @@ md"""
 """
 
 # ╔═╡ 03c80485-97f2-4c10-913a-4b7930f6c6b6
-md"Ask a question about solution space:"
+md"## Ask a question about solution space"
 
 # ╔═╡ bc7caf0d-8f83-417a-b301-9a477d87f30b
 @bind property Select([
@@ -142,14 +155,14 @@ let
 	p = IndependentSet(graph)
 	res = solve(p, property)[]
 	docstr = Base.Docs.doc(typeof(res))
-	md"""Computing with data type: $(typeof(res)), 
-
----
+	md"""
 
 Result: $res.
 
 ---
-	
+
+Computing with data type: $(typeof(res)), 
+
 $docstr
 """
 end
@@ -157,17 +170,10 @@ end
 # ╔═╡ 56a1e8ef-1164-4ec8-8b59-619ce1340cda
 md"## Make Tensor Network Generic!"
 
-# ╔═╡ b9f7a9bd-d121-40a3-b9c8-d7000fb5943f
-md"""
-* The same program: Tensor network contraction
-* Different data types for different purposes: different data types being commutative semiring for computing different solution space properties
-* Without loss of efficiency: Julia JIT, `CUDA.jl` and Chris Elrod's help.
-"""
-
 # ╔═╡ 9e42d7ef-02ad-42de-adca-ee49b4a5394f
-md"**Before our work**: Without real numbers, the most fancy work of using tensor network for combinatorial optimization is: counting the number of valid coloring. [arXiv:1708.00006]
+md"**Pre-Julia tensor networks**: Only works with real numbers, the most fancy work of using tensor network for combinatorial optimization is: counting the number of valid coloring. [arXiv:1708.00006]
 
-**Our work**: With generic data types, we can extract everything from the solution space of a class of combinatorial optimization problem!
+**Post-Julia tensor networks**: With generic data types, we can extract everything from the solution space of a class of combinatorial optimization problem!
 "
 
 # ╔═╡ f7fc9135-05f2-47da-bec0-d3581949eb44
@@ -178,18 +184,18 @@ md"""
 # ╔═╡ fc44aba0-2d95-4a18-b5dc-923520714dc0
 md"## Our contribution to Julia community
 * A better `OMEinsum`,
-* The state of the art tensor network contraction order optimization,
-* World's fastest Tropical matrix multiplication (Chris Elrod plays a critical role),
+* The state of the art tensor network contraction order optimization (I am submitting a PR to `ITensors` too),
+* World's fastest Tropical matrix multiplication based on `LoopVectorization.jl` (Chris Elrod plays a critical role),
 * Better `permutedims` in both Julia base and CUDA.
 "
+
+# ╔═╡ b45ef978-9187-471b-b8c6-80dd59cece1e
+md"# Why do we limit our imagination on floating point numbers?"
 
 # ╔═╡ 1efd09bb-f920-4f11-a21d-60406a484939
 md"
 ![](https://docs.julialang.org/en/v1/assets/logo.svg)
 "
-
-# ╔═╡ b45ef978-9187-471b-b8c6-80dd59cece1e
-md"# Why do we limit our imagination on floating point numbers?"
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -210,7 +216,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0-rc1"
 manifest_format = "2.0"
-project_hash = "c8789670b091f5a108b4d895d278c0fc39095460"
+project_hash = "08a17d7fd11b760345fae16d6b08ee200182550e"
 
 [[deps.AbstractFFTs]]
 deps = ["ChainRulesCore", "LinearAlgebra"]
@@ -389,10 +395,10 @@ uuid = "c87230d0-a227-11e9-1b43-d7ebe4e7570a"
 version = "0.4.1"
 
 [[deps.FFMPEG_jll]]
-deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "Pkg", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
-git-tree-sha1 = "ccd479984c7838684b3ac204b716c89955c76623"
+deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "Pkg", "Zlib_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
+git-tree-sha1 = "d8a578692e3077ac998b50c0217dfd67f21d1e5f"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
-version = "4.4.2+0"
+version = "4.4.0+0"
 
 [[deps.FFTW]]
 deps = ["AbstractFFTs", "FFTW_jll", "LinearAlgebra", "MKL_jll", "Preferences", "Reexport"]
@@ -696,9 +702,9 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[deps.Luxor]]
 deps = ["Base64", "Cairo", "Colors", "Dates", "FFMPEG", "FileIO", "Juno", "LaTeXStrings", "Random", "Requires", "Rsvg"]
-git-tree-sha1 = "b579f08ed67097b91be0673402b41a1a78ce82f6"
+git-tree-sha1 = "590db54191f99a5016274784480fabf92ae7a034"
 uuid = "ae8d54c2-7ccd-5906-9d76-62fc9837b5bc"
-version = "3.4.0"
+version = "3.3.0"
 
 [[deps.LuxorGraphPlot]]
 deps = ["Graphs", "Luxor"]
@@ -774,9 +780,9 @@ version = "0.7.1"
 
 [[deps.OMEinsumContractionOrders]]
 deps = ["AbstractTrees", "BetterExp", "JSON", "Requires", "SparseArrays", "Suppressor"]
-git-tree-sha1 = "d1efdca5b4556689d115f44b7039f32300379f1c"
+git-tree-sha1 = "313062c2b81c4ff383747786e29e86a2574423ba"
 uuid = "6f22d1fd-8eed-4bb7-9776-e7d684900715"
-version = "0.7.1"
+version = "0.7.0"
 
 [[deps.Ogg_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -963,9 +969,9 @@ version = "2.1.7"
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "Random", "StaticArraysCore", "Statistics"]
-git-tree-sha1 = "e972716025466461a3dc1588d9168334b71aafff"
+git-tree-sha1 = "9f8a5dc5944dc7fbbe6eb4180660935653b0a9d9"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.5.1"
+version = "1.5.0"
 
 [[deps.StaticArraysCore]]
 git-tree-sha1 = "66fe9eb253f910fe8cf161953880cfdaef01cdf0"
@@ -1112,12 +1118,6 @@ git-tree-sha1 = "c23323cd30d60941f8c68419a70905d9bdd92808"
 uuid = "da03df04-f53b-5353-a52f-6a8b0620ced0"
 version = "2.42.6+1"
 
-[[deps.libaom_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "3a2ea60308f0996d26f1e5354e10c24e9ef905d4"
-uuid = "a4ae2306-e953-59d6-aa16-d00cac43593b"
-version = "3.4.0+0"
-
 [[deps.libass_jll]]
 deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "HarfBuzz_jll", "JLLWrappers", "Libdl", "Pkg", "Zlib_jll"]
 git-tree-sha1 = "5982a94fcba20f02f42ace44b9894ee2b140fe47"
@@ -1178,6 +1178,7 @@ version = "3.5.0+0"
 # ╟─684f82c5-5b17-4e57-9032-29aa97cd8c17
 # ╟─e0bdbbea-a049-469a-b74c-ffc3da876185
 # ╟─17f2adf0-b393-4973-9342-804bae26bd55
+# ╟─40d8f94e-2635-4455-ab3b-c043c8c7ef13
 # ╟─4dd0ad27-8ddd-46c3-bd5b-daf60a70b1c6
 # ╟─ea092a33-8e53-4278-88ac-ab86ddb5644d
 # ╟─d87cafe5-a40a-40ca-ab86-871371946eff
@@ -1191,17 +1192,17 @@ version = "3.5.0+0"
 # ╟─2d3b6407-03e3-43d4-8382-b2256776641f
 # ╟─455ca886-f3ab-4d43-bc65-a6662a2f453d
 # ╟─b052da1c-fc3a-4725-bb9a-8cd2c776bebd
+# ╟─b9f7a9bd-d121-40a3-b9c8-d7000fb5943f
 # ╟─a0836040-48f4-4a7f-bb93-3a0a46518c12
 # ╟─8fec590d-d30e-4ce0-b255-ca4ff914a376
 # ╟─03c80485-97f2-4c10-913a-4b7930f6c6b6
 # ╟─bc7caf0d-8f83-417a-b301-9a477d87f30b
 # ╟─32b46972-13da-4553-9daa-7107439fbf7f
 # ╟─56a1e8ef-1164-4ec8-8b59-619ce1340cda
-# ╟─b9f7a9bd-d121-40a3-b9c8-d7000fb5943f
 # ╟─9e42d7ef-02ad-42de-adca-ee49b4a5394f
 # ╟─f7fc9135-05f2-47da-bec0-d3581949eb44
 # ╟─fc44aba0-2d95-4a18-b5dc-923520714dc0
-# ╟─1efd09bb-f920-4f11-a21d-60406a484939
 # ╟─b45ef978-9187-471b-b8c6-80dd59cece1e
+# ╟─1efd09bb-f920-4f11-a21d-60406a484939
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

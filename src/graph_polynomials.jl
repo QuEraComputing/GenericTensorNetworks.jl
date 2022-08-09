@@ -53,7 +53,7 @@ function graph_polynomial(gp::GraphProblem, ::Val{:laurent}; usecuda=false, T=Fl
     contractx(gp::GraphProblem, LaurentPolynomial(T[1], 1))
 end
 
-function _polynomial_single(f, ::Type{T}; maxorder) where T
+function _polynomial_fit(f, ::Type{T}; maxorder) where T
 	xs = 0:maxorder
     ys = [f(T(x)) for x in xs]  # download to CPU
     res = fill(T[], size(ys[1]))  # contraction result can be a tensor
@@ -70,7 +70,7 @@ end
 # T is not used in finitefield approach
 function graph_polynomial(gp::GraphProblem, ::Val{:finitefield}; usecuda=false, T=BigInt,
         maxorder=max_size(gp; usecuda), max_iter=100)
-    f = T->_polynomial_single(x->Array(contractx(gp, x; usecuda)), T; maxorder)
+    f = T->_polynomial_fit(x->Array(contractx(gp, x; usecuda)), T; maxorder)
     return map(Polynomial, big_integer_solve(f, Int32, max_iter))
 end
 

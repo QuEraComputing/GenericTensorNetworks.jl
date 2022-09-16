@@ -5,7 +5,7 @@
             fixedvertices=Dict()
         )
 
-The [Vertex Coloring](https://psychic-meme-f4d866f8.pages.github.io/dev/generated/Coloring.html) problem.
+The [Vertex Coloring](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/Coloring/) problem.
 
 Positional arguments
 -------------------------------

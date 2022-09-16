@@ -353,29 +353,29 @@ function has_noninteger_weights(problem::GraphProblem)
 end
 
 """
-    max_size(problem; usecuda=false)
+$TYPEDSIGNATURES
 
 Returns the maximum size of the graph problem. 
 A shorthand of `solve(problem, SizeMax(); usecuda=false)`.
 """
-max_size(m::GraphProblem; usecuda=false) = Int(sum(solve(m, SizeMax(); usecuda=usecuda)).n)  # floating point number is faster (BLAS)
+max_size(m::GraphProblem; usecuda=false)::Int = Int(sum(solve(m, SizeMax(); usecuda=usecuda)).n)  # floating point number is faster (BLAS)
 
 """
-    max_size_count(problem; usecuda=false)
+$TYPEDSIGNATURES
 
 Returns the maximum size and the counting of the graph problem.
 It is a shorthand of `solve(problem, CountingMax(); usecuda=false)`.
 """
-max_size_count(m::GraphProblem; usecuda=false) = (r = sum(solve(m, CountingMax(); usecuda=usecuda)); (Int(r.n), Int(r.c)))
+max_size_count(m::GraphProblem; usecuda=false)::Tuple{Int,Int} = (r = sum(solve(m, CountingMax(); usecuda=usecuda)); (Int(r.n), Int(r.c)))
 
 ########## memory estimation ###############
 """
-    estimate_memory(problem, property; T=Float64)
+$TYPEDSIGNATURES
 
 Memory estimation in number of bytes to compute certain `property` of a `problem`.
 `T` is the base type.
 """
-function estimate_memory(problem::GraphProblem, property::AbstractProperty; T=Float64)
+function estimate_memory(problem::GraphProblem, property::AbstractProperty; T=Float64)::Real
     _estimate_memory(tensor_element_type(T, length(labels(problem)), nflavor(problem), property), problem)
 end
 function estimate_memory(problem::GraphProblem, property::Union{SingleConfigMax{K,BOUNDED},SingleConfigMin{K,BOUNDED}}; T=Float64) where {K, BOUNDED}

@@ -135,6 +135,7 @@ include("SetCovering.jl")
 include("OpenPitMining.jl")
 include("Reduced.jl")
 include("SpinGlass.jl")
+include("HyperSpinGlass.jl")
 
 # forward the time, space and readwrite complexity
 OMEinsum.timespacereadwrite_complexity(gp::GraphProblem) = timespacereadwrite_complexity(gp.code, uniformsize(gp.code, nflavor(gp)))
@@ -193,7 +194,7 @@ function _pow(x::LaurentPolynomial{BS,X}, i) where {BS,X}
         return x^i
     else
         @assert length(x.coeffs) == 1
-        return LaurentPolynomial(x.coeffs .^ i, x.m[]+i)
+        return LaurentPolynomial(x.coeffs .^ i, x.m[]*i)
     end
 end
 

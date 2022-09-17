@@ -57,11 +57,12 @@ makedocs(;
             "Satisfiability problem" => "generated/Satisfiability.md",
             "Set covering problem" => "generated/SetCovering.md",
             "Set packing problem" => "generated/SetPacking.md",
+            "Hyper Spin glass problem" => "generated/HyperSpinGlass.md",
             #"Other problems" => "generated/Others.md",
         ],
         "Topics" => [
             "Gist" => "gist.md",
-            "Save and load solutions" => "generated/saveload.md",
+            #"Save and load solutions" => "generated/saveload.md",
             "Sum product tree representation" => "sumproduct.md",
             "Weighted problems" => "generated/weighted.md",
             "Open and fixed degrees of freedom" => "generated/open.md"

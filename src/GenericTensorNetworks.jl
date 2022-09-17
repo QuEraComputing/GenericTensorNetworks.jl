@@ -54,7 +54,7 @@ export SetCovering, is_set_covering
 export OpenPitMining, is_valid_mining, print_mining
 
 # Interfaces
-export solve, SizeMax, SizeMin, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin, Single
+export solve, SizeMax, SizeMin, PartitionFunction, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin, Single
 
 # Utilities
 export save_configs, load_configs, hamming_distribution, save_sumproduct, load_sumproduct

@@ -45,6 +45,18 @@ Counting the total number of sets. e.g. for the [`IndependentSet`](@ref) problem
 struct CountingAll <: AbstractProperty end
 
 """
+$TYPEDEF
+$FIELDS
+
+Compute the partition function for the target problem.
+
+* The corresponding tensor element type is `T`.
+"""
+struct PartitionFunction{T} <: AbstractProperty
+    beta::T
+end
+
+"""
     CountingMax{K} <: AbstractProperty
     CountingMax(K=Single)
 
@@ -213,12 +225,15 @@ Positional Arguments
 * `problem` is the graph problem with tensor network information,
 * `property` is string specifying the task. Using the maximum independent set problem as an example, it can be one of
 
+    * [`PartitionFunction`](@ref)`()` for computing the partition function,
+
     * [`SizeMax`](@ref)`(k=Single)` for finding maximum-``k`` set sizes,
     * [`SizeMin`](@ref)`(k=Single)` for finding minimum-``k`` set sizes,
 
     * [`CountingMax`](@ref)`(k=Single)` for counting configurations with maximum-``k`` sizes,
     * [`CountingMin`](@ref)`(k=Single)` for counting configurations with minimum-``k`` sizes,
     * [`CountingAll`](@ref)`()` for counting all configurations,
+    * [`PartitionFunction`](@ref)`()` for counting all configurations,
     * [`GraphPolynomial`](@ref)`(; method=:finitefield, kwargs...)` for evaluating the graph polynomial,
 
     * [`SingleConfigMax`](@ref)`(k=Single; bounded=false)` for finding one maximum-``k`` configuration for each size,
@@ -247,6 +262,8 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
         return asarray(post_invert_exponent.(res), res)
     elseif property isa CountingAll
         return contractx(gp, one(T); usecuda=usecuda)
+    elseif property isa PartitionFunction
+        return contractx(gp, exp(property.beta); usecuda=usecuda)
     elseif property isa CountingMax{Single}
         return contractx(gp, _x(CountingTropical{T,T}; invert=false); usecuda=usecuda)
     elseif property isa CountingMin{Single}
@@ -419,6 +436,7 @@ function _estimate_memory(::Type{ET}, problem::GraphProblem) where ET
 end
 
 for (PROP, ET) in [
+        (:(PartitionFunction{T}), :(T)),
         (:(SizeMax{Single}), :(Tropical{T})), (:(SizeMin{Single}), :(Tropical{T})),
         (:(SizeMax{K}), :(ExtendedTropical{K,Tropical{T}})), (:(SizeMin{K}), :(ExtendedTropical{K,Tropical{T}})),
         (:(CountingAll), :T), (:(CountingMax{Single}), :(CountingTropical{T,T})), (:(CountingMin{Single}), :(CountingTropical{T,T})),

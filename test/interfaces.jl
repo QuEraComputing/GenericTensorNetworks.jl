@@ -22,6 +22,7 @@ using Graphs, Test
         res15 = solve(gp, ConfigsMax(3))[]
         res16 = solve(gp, ConfigsMax(2; bounded=true))[]
         res17 = solve(gp, ConfigsMax(3; bounded=true))[]
+        res18 = solve(gp, PartitionFunction(0.0))[]
         @test res1.n == 4
         @test res2 == 76
         @test res3.n == 4 && res3.c == 5
@@ -41,6 +42,8 @@ using Graphs, Test
         @test all(x->sum(x) == 3, res16.coeffs[1].data) && all(x->sum(x) == 4, res16.coeffs[2].data) && length(res16.coeffs[1].data) == 30 && length(res16.coeffs[2].data) == 5
         @test all(x->sum(x) == 2, res17.coeffs[1].data) && all(x->sum(x) == 3, res17.coeffs[2].data) && all(x->sum(x) == 4, res17.coeffs[3].data) &&
                 length(res17.coeffs[1].data) == 30 && length(res17.coeffs[2].data) == 30 && length(res17.coeffs[3].data) == 5
+
+        @test res18 ≈ res2  
     end
 end
 
@@ -174,6 +177,7 @@ end
     @test GenericTensorNetworks.tensor_element_type(Float32, 10, 2, SingleConfigMin(;bounded=true)) == Tropical{Float32}
 
     @test estimate_memory(gp, SizeMax()) * 2 == estimate_memory(gp, CountingMax())
+    @test estimate_memory(gp, SizeMax()) == estimate_memory(gp, PartitionFunction(1.0))
     @test estimate_memory(gp, SingleConfigMax(bounded=true)) > estimate_memory(gp, SingleConfigMax(bounded=false))
     @test estimate_memory(gp, ConfigsMax(bounded=true)) == estimate_memory(gp, SingleConfigMax(bounded=false))
     @test estimate_memory(gp, GraphPolynomial(method=:fitting); T=Float32) * 4 == estimate_memory(gp, GraphPolynomial(method=:fft))

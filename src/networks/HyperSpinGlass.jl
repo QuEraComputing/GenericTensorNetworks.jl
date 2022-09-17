@@ -35,7 +35,7 @@ end
 
 flavors(::Type{<:HyperSpinGlass}) = [0, 1]
 # first `ne` indices are for edge weights, last `n` indices are for vertex weights.
-terms(gp::HyperSpinGlass) = getixsv(gp.code)
+terms(gp::HyperSpinGlass) = gp.cliques
 labels(gp::HyperSpinGlass) = collect(1:gp.n)
 fixedvertices(gp::HyperSpinGlass) = gp.fixedvertices
 

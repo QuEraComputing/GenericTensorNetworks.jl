@@ -9,6 +9,7 @@ Matching
 Coloring
 DominatingSet
 SpinGlass
+HyperSpinGlass
 MaxCut
 PaintShop
 Satisfiability
@@ -46,6 +47,7 @@ is_set_packing
 
 cut_size
 spinglass_energy
+hyperspinglass_energy
 num_paint_shop_color_switch
 paint_shop_coloring_from_config
 mis_compactify!
@@ -65,6 +67,7 @@ print_mining
 
 ## Properties
 ```@docs
+PartitionFunction
 SizeMax
 SizeMin
 CountingAll
@@ -117,6 +120,7 @@ hamming_distribution
 optimize_code
 getixsv
 getiyv
+contraction_complexity
 timespace_complexity
 timespacereadwrite_complexity
 estimate_memory

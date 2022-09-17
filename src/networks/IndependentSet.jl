@@ -5,7 +5,7 @@
             fixedvertices=Dict()
         )
 
-The [independent set problem](https://psychic-meme-f4d866f8.pages.github.io/dev/generated/IndependentSet.html) in graph theory.
+The [independent set problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/IndependentSet/) in graph theory.
 
 Positional arguments
 -------------------------------

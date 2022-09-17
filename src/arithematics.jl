@@ -198,7 +198,7 @@ This algebra maps
 
 Fields
 ------------------------
-* `orders` is a vector of [`Tropical`](@ref) ([`CoutingTropical`](@ref)) numbers as the largest-K solution sizes (solutions).
+* `orders` is a vector of [`Tropical`](@ref) ([`CountingTropical`](@ref)) numbers as the largest-K solution sizes (solutions).
 
 Examples
 ------------------------------

@@ -45,6 +45,18 @@ Counting the total number of sets. e.g. for the [`IndependentSet`](@ref) problem
 struct CountingAll <: AbstractProperty end
 
 """
+$TYPEDEF
+$FIELDS
+
+Compute the partition function for the target problem.
+
+* The corresponding tensor element type is `T`.
+"""
+struct PartitionFunction{T} <: AbstractProperty
+    beta::T
+end
+
+"""
     CountingMax{K} <: AbstractProperty
     CountingMax(K=Single)
 
@@ -213,12 +225,15 @@ Positional Arguments
 * `problem` is the graph problem with tensor network information,
 * `property` is string specifying the task. Using the maximum independent set problem as an example, it can be one of
 
+    * [`PartitionFunction`](@ref)`()` for computing the partition function,
+
     * [`SizeMax`](@ref)`(k=Single)` for finding maximum-``k`` set sizes,
     * [`SizeMin`](@ref)`(k=Single)` for finding minimum-``k`` set sizes,
 
     * [`CountingMax`](@ref)`(k=Single)` for counting configurations with maximum-``k`` sizes,
     * [`CountingMin`](@ref)`(k=Single)` for counting configurations with minimum-``k`` sizes,
     * [`CountingAll`](@ref)`()` for counting all configurations,
+    * [`PartitionFunction`](@ref)`()` for counting all configurations,
     * [`GraphPolynomial`](@ref)`(; method=:finitefield, kwargs...)` for evaluating the graph polynomial,
 
     * [`SingleConfigMax`](@ref)`(k=Single; bounded=false)` for finding one maximum-``k`` configuration for each size,
@@ -247,6 +262,8 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
         return asarray(post_invert_exponent.(res), res)
     elseif property isa CountingAll
         return contractx(gp, one(T); usecuda=usecuda)
+    elseif property isa PartitionFunction
+        return contractx(gp, exp(property.beta); usecuda=usecuda)
     elseif property isa CountingMax{Single}
         return contractx(gp, _x(CountingTropical{T,T}; invert=false); usecuda=usecuda)
     elseif property isa CountingMin{Single}
@@ -353,29 +370,29 @@ function has_noninteger_weights(problem::GraphProblem)
 end
 
 """
-    max_size(problem; usecuda=false)
+$TYPEDSIGNATURES
 
 Returns the maximum size of the graph problem. 
 A shorthand of `solve(problem, SizeMax(); usecuda=false)`.
 """
-max_size(m::GraphProblem; usecuda=false) = Int(sum(solve(m, SizeMax(); usecuda=usecuda)).n)  # floating point number is faster (BLAS)
+max_size(m::GraphProblem; usecuda=false)::Int = Int(sum(solve(m, SizeMax(); usecuda=usecuda)).n)  # floating point number is faster (BLAS)
 
 """
-    max_size_count(problem; usecuda=false)
+$TYPEDSIGNATURES
 
 Returns the maximum size and the counting of the graph problem.
 It is a shorthand of `solve(problem, CountingMax(); usecuda=false)`.
 """
-max_size_count(m::GraphProblem; usecuda=false) = (r = sum(solve(m, CountingMax(); usecuda=usecuda)); (Int(r.n), Int(r.c)))
+max_size_count(m::GraphProblem; usecuda=false)::Tuple{Int,Int} = (r = sum(solve(m, CountingMax(); usecuda=usecuda)); (Int(r.n), Int(r.c)))
 
 ########## memory estimation ###############
 """
-    estimate_memory(problem, property; T=Float64)
+$TYPEDSIGNATURES
 
 Memory estimation in number of bytes to compute certain `property` of a `problem`.
 `T` is the base type.
 """
-function estimate_memory(problem::GraphProblem, property::AbstractProperty; T=Float64)
+function estimate_memory(problem::GraphProblem, property::AbstractProperty; T=Float64)::Real
     _estimate_memory(tensor_element_type(T, length(labels(problem)), nflavor(problem), property), problem)
 end
 function estimate_memory(problem::GraphProblem, property::Union{SingleConfigMax{K,BOUNDED},SingleConfigMin{K,BOUNDED}}; T=Float64) where {K, BOUNDED}
@@ -419,6 +436,7 @@ function _estimate_memory(::Type{ET}, problem::GraphProblem) where ET
 end
 
 for (PROP, ET) in [
+        (:(PartitionFunction{T}), :(T)),
         (:(SizeMax{Single}), :(Tropical{T})), (:(SizeMin{Single}), :(Tropical{T})),
         (:(SizeMax{K}), :(ExtendedTropical{K,Tropical{T}})), (:(SizeMin{K}), :(ExtendedTropical{K,Tropical{T}})),
         (:(CountingAll), :T), (:(CountingMax{Single}), :(CountingTropical{T,T})), (:(CountingMin{Single}), :(CountingTropical{T,T})),

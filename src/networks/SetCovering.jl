@@ -5,7 +5,7 @@
             fixedvertices=Dict()
         )
 
-The [set covering problem](https://psychic-meme-f4d866f8.pages.github.io/dev/generated/SetCovering.html).
+The [set covering problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/SetCovering/).
 
 Positional arguments
 -------------------------------

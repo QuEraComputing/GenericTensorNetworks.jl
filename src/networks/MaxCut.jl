@@ -5,7 +5,7 @@
             fixedvertices=Dict()
         )
 
-The [cutting](https://psychic-meme-f4d866f8.pages.github.io/dev/generated/MaxCut.html) problem (or spin glass problem).
+The [cutting](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/MaxCut/) problem.
 
 Positional arguments
 -------------------------------

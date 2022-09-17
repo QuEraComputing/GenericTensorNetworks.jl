@@ -71,7 +71,8 @@ maximum_independent_set_size.n
 # We can count all independent sets with the [`CountingAll`](@ref) property.
 count_all_independent_sets = solve(problem, CountingAll())[]
 
-# The return value has type `Float64`.
+# The return value has type `Float64`. The counting of all independent sets is equivalent to the infinite temperature partition function
+solve(problem, PartitionFunction(0.0))[]
 
 # We can count the maximum independent sets with [`CountingMax`](@ref).
 count_maximum_independent_sets = solve(problem, CountingMax())[]

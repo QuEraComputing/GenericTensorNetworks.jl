@@ -11,6 +11,7 @@ import Polynomials
 using Polynomials: Polynomial, LaurentPolynomial, printpoly, fit
 using FFTW
 using Mods, Primes
+using DocStringExtensions
 using Base.Cartesian
 import AbstractTrees: children, printnode, print_tree
 import StatsBase
@@ -42,6 +43,7 @@ export IndependentSet, mis_compactify!, is_independent_set
 export MaximalIS, is_maximal_independent_set
 export cut_size, MaxCut
 export spinglass_energy, SpinGlass
+export hyperspinglass_energy, HyperSpinGlass
 export PaintShop, paintshop_from_pairs, num_paint_shop_color_switch, paint_shop_coloring_from_config
 export Coloring, is_vertex_coloring
 export Satisfiability, CNF, CNFClause, BoolVar, satisfiable, @bools, ∨, ¬, ∧
@@ -52,7 +54,7 @@ export SetCovering, is_set_covering
 export OpenPitMining, is_valid_mining, print_mining
 
 # Interfaces
-export solve, SizeMax, SizeMin, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin, Single
+export solve, SizeMax, SizeMin, PartitionFunction, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin, Single
 
 # Utilities
 export save_configs, load_configs, hamming_distribution, save_sumproduct, load_sumproduct

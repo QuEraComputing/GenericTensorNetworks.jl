@@ -6,7 +6,7 @@
         )
     SpinGlass(M::AbstractMatrix, h::AbstractVector; kwargs...)
 
-The [spin glass](https://psychic-meme-f4d866f8.pages.github.io/dev/generated/SpinGlass.html) problem (or cutting problem).
+The [spin glass](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/SpinGlass/) problem (or cutting problem).
 In the output, the spin ↑ is mapped to configuration 0, while spin ↓ is mapped to configuration 1.
 
 Positional arguments

@@ -37,7 +37,7 @@ weights = [-1, 1, -1, 1, -1, 1, -1, 1];
 problem = HyperSpinGlass(num_vertices, hyperedges; weights);
 
 # ### Theory (can skip)
-# Let ``H = (V, E)`` be a hypergraph. The tensor network for the partition function of the energy model for ``H`` can be defined as the following tiple of (alphabet of labels, input tensors, output labels).
+# Let ``H = (V, E)`` be a hypergraph. The tensor network for the partition function of the energy model for ``H`` can be defined as the following triple of (alphabet of labels, input tensors, output labels).
 # ```math
 # \begin{cases}
 # \Lambda &= \{s_v \mid v \in V\}\\
@@ -66,7 +66,7 @@ Emin = solve(problem, SizeMin())[]
 # While the state correspond to the highest energy has the ferromagnetic order.
 Emax = solve(problem, SizeMax())[]
 
-# In this example, the spin configurations can be choosen to make all hyperedges having even or odd spin parity.
+# In this example, the spin configurations can be chosen to make all hyperedges having even or odd spin parity.
 
 # ### Counting properties
 # ##### partition function and graph polynomial

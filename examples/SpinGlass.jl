@@ -67,4 +67,4 @@ Emin_verify = spinglass_energy(graph, ground_state)
 show_graph(graph; locs=locations, vertex_colors=[
         iszero(ground_state[i]) ? "white" : "red" for i=1:nv(graph)], format=:svg)
 
-# where a red vertice and a white vertice correspond to a spin having value 1 and 0 respectively.
+# where a red vertex and a white vertex correspond to a spin having value 1 and 0 respectively.

@@ -116,7 +116,7 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
  10
  30
  30
-  5</code></pre><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="Find-one-best-solution"><a class="docs-heading-anchor" href="#Find-one-best-solution">Find one best solution</a><a id="Find-one-best-solution-1"></a><a class="docs-heading-anchor-permalink" href="#Find-one-best-solution" title="Permalink"></a></h5><p>We can use the bounded or unbounded <a href="../../ref/#GenericTensorNetworks.SingleConfigMax"><code>SingleConfigMax</code></a> to find one of the solutions with largest size. The unbounded (default) version uses a joint type of <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a> and <a href="../../ref/#GenericTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> in computation, where <code>CountingTropical</code> finds the maximum size and <code>ConfigSampler</code> samples one of the best solutions. The bounded version uses the binary gradient back-propagation (see our paper) to compute the gradients. It requires caching intermediate states, but is often faster (on CPU) because it can use <a href="https://github.com/TensorBFS/TropicalGEMM.jl"><code>TropicalGEMM</code></a> (see <a href="../../performancetips/#Performance-Tips">Performance Tips</a>).</p><pre><code class="language-julia hljs">max_config = solve(problem, SingleConfigMax(; bounded=false))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, ConfigSampler{10, 1, 1}(0101010001))ₜ</code></pre><p>The return value has type <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a> with its counting field having <a href="../../ref/#GenericTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> type. The <code>data</code> field of <a href="../../ref/#GenericTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> is a bit string that corresponds to the solution</p><pre><code class="language-julia hljs">single_solution = max_config.c.data</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0101010001</code></pre><p>This bit string should be read from left to right, with the i-th bit being 1 (0) to indicate the i-th vertex is present (absent) in the set. We can visualize this MIS with the following function.</p><pre><code class="language-julia hljs">show_graph(graph; locs=locations, format=:svg, vertex_colors=
+  5</code></pre><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="Find-one-best-solution"><a class="docs-heading-anchor" href="#Find-one-best-solution">Find one best solution</a><a id="Find-one-best-solution-1"></a><a class="docs-heading-anchor-permalink" href="#Find-one-best-solution" title="Permalink"></a></h5><p>We can use the bounded or unbounded <a href="../../ref/#GenericTensorNetworks.SingleConfigMax"><code>SingleConfigMax</code></a> to find one of the solutions with largest size. The unbounded (default) version uses a joint type of <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a> and <a href="../../ref/#GenericTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> in computation, where <code>CountingTropical</code> finds the maximum size and <code>ConfigSampler</code> samples one of the best solutions. The bounded version uses the binary gradient back-propagation (see our paper) to compute the gradients. It requires caching intermediate states, but is often faster (on CPU) because it can use <a href="https://github.com/TensorBFS/TropicalGEMM.jl"><code>TropicalGEMM</code></a> (see <a href="../../performancetips/#Performance-Tips">Performance Tips</a>).</p><pre><code class="language-julia hljs">max_config = solve(problem, SingleConfigMax(; bounded=false))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, ConfigSampler{10, 1, 1}(1001001100))ₜ</code></pre><p>The return value has type <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a> with its counting field having <a href="../../ref/#GenericTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> type. The <code>data</code> field of <a href="../../ref/#GenericTensorNetworks.ConfigSampler"><code>ConfigSampler</code></a> is a bit string that corresponds to the solution</p><pre><code class="language-julia hljs">single_solution = max_config.c.data</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1001001100</code></pre><p>This bit string should be read from left to right, with the i-th bit being 1 (0) to indicate the i-th vertex is present (absent) in the set. We can visualize this MIS with the following function.</p><pre><code class="language-julia hljs">show_graph(graph; locs=locations, format=:svg, vertex_colors=
     [iszero(single_solution[i]) ? &quot;white&quot; : &quot;red&quot; for i=1:nv(graph)])</code></pre><img src='data:image/svg+xml;utf-8,<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="290pt" height="281pt" viewBox="0 0 290 281" version="1.1">
 <defs>
@@ -173,11 +173,11 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 186.589844 141.945312 L 121.785156 94.859375 "/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 185.160156 146.351562 L 105.054688 146.351562 "/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 168.425781 94.859375 L 103.621094 141.945312 "/>
-<path style="fill-rule:nonzero;fill:rgb(100%25,100%25,100%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 152.605469 230.902344 C 152.605469 235.042969 149.246094 238.402344 145.105469 238.402344 C 140.964844 238.402344 137.605469 235.042969 137.605469 230.902344 C 137.605469 226.757812 140.964844 223.402344 145.105469 223.402344 C 149.246094 223.402344 152.605469 226.757812 152.605469 230.902344 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 152.605469 230.902344 C 152.605469 235.042969 149.246094 238.402344 145.105469 238.402344 C 140.964844 238.402344 137.605469 235.042969 137.605469 230.902344 C 137.605469 226.757812 140.964844 223.402344 145.105469 223.402344 C 149.246094 223.402344 152.605469 226.757812 152.605469 230.902344 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="141.625652" y="235.215699"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 247.710938 161.804688 C 247.710938 165.945312 244.351562 169.304688 240.210938 169.304688 C 236.070312 169.304688 232.710938 165.945312 232.710938 161.804688 C 232.710938 157.660156 236.070312 154.304688 240.210938 154.304688 C 244.351562 154.304688 247.710938 157.660156 247.710938 161.804688 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,100%25,100%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 247.710938 161.804688 C 247.710938 165.945312 244.351562 169.304688 240.210938 169.304688 C 236.070312 169.304688 232.710938 165.945312 232.710938 161.804688 C 232.710938 157.660156 236.070312 154.304688 240.210938 154.304688 C 244.351562 154.304688 247.710938 157.660156 247.710938 161.804688 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-2" x="236.731303" y="166.156399"/>
 </g>
@@ -193,15 +193,15 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-5" x="46.52" y="166.108399"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 152.605469 180.902344 C 152.605469 185.042969 149.246094 188.402344 145.105469 188.402344 C 140.964844 188.402344 137.605469 185.042969 137.605469 180.902344 C 137.605469 176.757812 140.964844 173.402344 145.105469 173.402344 C 149.246094 173.402344 152.605469 176.757812 152.605469 180.902344 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,100%25,100%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 152.605469 180.902344 C 152.605469 185.042969 149.246094 188.402344 145.105469 188.402344 C 140.964844 188.402344 137.605469 185.042969 137.605469 180.902344 C 137.605469 176.757812 140.964844 173.402344 145.105469 173.402344 C 149.246094 173.402344 152.605469 176.757812 152.605469 180.902344 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-6" x="141.625652" y="185.206699"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,100%25,100%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 200.160156 146.351562 C 200.160156 150.496094 196.800781 153.851562 192.660156 153.851562 C 188.515625 153.851562 185.160156 150.496094 185.160156 146.351562 C 185.160156 142.210938 188.515625 138.851562 192.660156 138.851562 C 196.800781 138.851562 200.160156 142.210938 200.160156 146.351562 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 200.160156 146.351562 C 200.160156 150.496094 196.800781 153.851562 192.660156 153.851562 C 188.515625 153.851562 185.160156 150.496094 185.160156 146.351562 C 185.160156 142.210938 188.515625 138.851562 192.660156 138.851562 C 196.800781 138.851562 200.160156 142.210938 200.160156 146.351562 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-7" x="189.178477" y="150.657549"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,100%25,100%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 181.996094 90.449219 C 181.996094 94.59375 178.636719 97.949219 174.496094 97.949219 C 170.351562 97.949219 166.996094 94.59375 166.996094 90.449219 C 166.996094 86.308594 170.351562 82.949219 174.496094 82.949219 C 178.636719 82.949219 181.996094 86.308594 181.996094 90.449219 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 181.996094 90.449219 C 181.996094 94.59375 178.636719 97.949219 174.496094 97.949219 C 170.351562 97.949219 166.996094 94.59375 166.996094 90.449219 C 166.996094 86.308594 170.351562 82.949219 174.496094 82.949219 C 178.636719 82.949219 181.996094 86.308594 181.996094 90.449219 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-8" x="171.014914" y="94.80385"/>
 </g>
@@ -209,19 +209,19 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-9" x="112.236389" y="94.80385"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 105.054688 146.351562 C 105.054688 150.496094 101.695312 153.851562 97.554688 153.851562 C 93.410156 153.851562 90.054688 150.496094 90.054688 146.351562 C 90.054688 142.210938 93.410156 138.851562 97.554688 138.851562 C 101.695312 138.851562 105.054688 142.210938 105.054688 146.351562 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,100%25,100%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 105.054688 146.351562 C 105.054688 150.496094 101.695312 153.851562 97.554688 153.851562 C 93.410156 153.851562 90.054688 150.496094 90.054688 146.351562 C 90.054688 142.210938 93.410156 138.851562 97.554688 138.851562 C 101.695312 138.851562 105.054688 142.210938 105.054688 146.351562 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="90.592826" y="150.705549"/>
   <use xlink:href="%23glyph0-10" x="97.552826" y="150.705549"/>
 </g>
 </g>
 </svg>
-'/><h5 id="Enumerate-all-solutions-and-best-several-solutions"><a class="docs-heading-anchor" href="#Enumerate-all-solutions-and-best-several-solutions">Enumerate all solutions and best several solutions</a><a id="Enumerate-all-solutions-and-best-several-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Enumerate-all-solutions-and-best-several-solutions" title="Permalink"></a></h5><p>We can use bounded or unbounded <a href="../../ref/#GenericTensorNetworks.ConfigsMax"><code>ConfigsMax</code></a> to find all solutions with largest-K set sizes. In most cases, the bounded (default) version is preferred because it can reduce the memory usage significantly.</p><pre><code class="language-julia hljs">all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, {0100100110, 1001001100, 0010111000, 1010000011, 0101010001})ₜ</code></pre><p>The return value has type <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a>, while its counting field having type <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a>. The <code>data</code> field of a <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a> instance contains a vector of bit strings.</p><pre><code class="language-julia hljs">all_max_configs.c.data</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5-element Vector{StaticBitVector{10, 1}}:
- 0100100110
- 1001001100
- 0010111000
+'/><h5 id="Enumerate-all-solutions-and-best-several-solutions"><a class="docs-heading-anchor" href="#Enumerate-all-solutions-and-best-several-solutions">Enumerate all solutions and best several solutions</a><a id="Enumerate-all-solutions-and-best-several-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Enumerate-all-solutions-and-best-several-solutions" title="Permalink"></a></h5><p>We can use bounded or unbounded <a href="../../ref/#GenericTensorNetworks.ConfigsMax"><code>ConfigsMax</code></a> to find all solutions with largest-K set sizes. In most cases, the bounded (default) version is preferred because it can reduce the memory usage significantly.</p><pre><code class="language-julia hljs">all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, {0101010001, 1010000011, 0010111000, 0100100110, 1001001100})ₜ</code></pre><p>The return value has type <a href="../../ref/#TropicalNumbers.CountingTropical"><code>CountingTropical</code></a>, while its counting field having type <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a>. The <code>data</code> field of a <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a> instance contains a vector of bit strings.</p><pre><code class="language-julia hljs">all_max_configs.c.data</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5-element Vector{StaticBitVector{10, 1}}:
+ 0101010001
  1010000011
- 0101010001</code></pre><p>These solutions can be visualized with the <a href="../../ref/#LuxorGraphPlot.show_gallery"><code>show_gallery</code></a> function.</p><pre><code class="language-julia hljs">show_gallery(graph, (1, length(all_max_configs.c)); locs=locations, vertex_configs=all_max_configs.c, format=:svg)</code></pre><img src='data:image/svg+xml;utf-8,<?xml version="1.0" encoding="UTF-8"?>
+ 0010111000
+ 0100100110
+ 1001001100</code></pre><p>These solutions can be visualized with the <a href="../../ref/#LuxorGraphPlot.show_gallery"><code>show_gallery</code></a> function.</p><pre><code class="language-julia hljs">show_gallery(graph, (1, length(all_max_configs.c)); locs=locations, vertex_configs=all_max_configs.c, format=:svg)</code></pre><img src='data:image/svg+xml;utf-8,<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1451pt" height="281pt" viewBox="0 0 1451 281" version="1.1">
 <defs>
 <g>
@@ -289,15 +289,15 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-3" x="200.404177" y="54.353"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 93.828125 50 C 93.828125 54.140625 90.46875 57.5 86.328125 57.5 C 82.183594 57.5 78.828125 54.140625 78.828125 50 C 78.828125 45.859375 82.183594 42.5 86.328125 42.5 C 90.46875 42.5 93.828125 45.859375 93.828125 50 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 93.828125 50 C 93.828125 54.140625 90.46875 57.5 86.328125 57.5 C 82.183594 57.5 78.828125 54.140625 78.828125 50 C 78.828125 45.859375 82.183594 42.5 86.328125 42.5 C 90.46875 42.5 93.828125 45.859375 93.828125 50 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-4" x="82.847126" y="54.308"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 57.5 161.804688 C 57.5 165.945312 54.140625 169.304688 50 169.304688 C 45.859375 169.304688 42.5 165.945312 42.5 161.804688 C 42.5 157.660156 45.859375 154.304688 50 154.304688 C 54.140625 154.304688 57.5 157.660156 57.5 161.804688 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 57.5 161.804688 C 57.5 165.945312 54.140625 169.304688 50 169.304688 C 45.859375 169.304688 42.5 165.945312 42.5 161.804688 C 42.5 157.660156 45.859375 154.304688 50 154.304688 C 54.140625 154.304688 57.5 157.660156 57.5 161.804688 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-5" x="46.52" y="166.108399"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 152.605469 180.902344 C 152.605469 185.042969 149.246094 188.402344 145.105469 188.402344 C 140.964844 188.402344 137.605469 185.042969 137.605469 180.902344 C 137.605469 176.757812 140.964844 173.402344 145.105469 173.402344 C 149.246094 173.402344 152.605469 176.757812 152.605469 180.902344 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 152.605469 180.902344 C 152.605469 185.042969 149.246094 188.402344 145.105469 188.402344 C 140.964844 188.402344 137.605469 185.042969 137.605469 180.902344 C 137.605469 176.757812 140.964844 173.402344 145.105469 173.402344 C 149.246094 173.402344 152.605469 176.757812 152.605469 180.902344 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-6" x="141.625652" y="185.206699"/>
 </g>
@@ -305,15 +305,15 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-7" x="189.178477" y="150.657549"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 181.996094 90.449219 C 181.996094 94.59375 178.636719 97.949219 174.496094 97.949219 C 170.351562 97.949219 166.996094 94.59375 166.996094 90.449219 C 166.996094 86.308594 170.351562 82.949219 174.496094 82.949219 C 178.636719 82.949219 181.996094 86.308594 181.996094 90.449219 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 181.996094 90.449219 C 181.996094 94.59375 178.636719 97.949219 174.496094 97.949219 C 170.351562 97.949219 166.996094 94.59375 166.996094 90.449219 C 166.996094 86.308594 170.351562 82.949219 174.496094 82.949219 C 178.636719 82.949219 181.996094 86.308594 181.996094 90.449219 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-8" x="171.014914" y="94.80385"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 123.214844 90.449219 C 123.214844 94.59375 119.859375 97.949219 115.714844 97.949219 C 111.574219 97.949219 108.214844 94.59375 108.214844 90.449219 C 108.214844 86.308594 111.574219 82.949219 115.714844 82.949219 C 119.859375 82.949219 123.214844 86.308594 123.214844 90.449219 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 123.214844 90.449219 C 123.214844 94.59375 119.859375 97.949219 115.714844 97.949219 C 111.574219 97.949219 108.214844 94.59375 108.214844 90.449219 C 108.214844 86.308594 111.574219 82.949219 115.714844 82.949219 C 119.859375 82.949219 123.214844 86.308594 123.214844 90.449219 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-9" x="112.236389" y="94.80385"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 105.054688 146.351562 C 105.054688 150.496094 101.695312 153.851562 97.554688 153.851562 C 93.410156 153.851562 90.054688 150.496094 90.054688 146.351562 C 90.054688 142.210938 93.410156 138.851562 97.554688 138.851562 C 101.695312 138.851562 105.054688 142.210938 105.054688 146.351562 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 105.054688 146.351562 C 105.054688 150.496094 101.695312 153.851562 97.554688 153.851562 C 93.410156 153.851562 90.054688 150.496094 90.054688 146.351562 C 90.054688 142.210938 93.410156 138.851562 97.554688 138.851562 C 101.695312 138.851562 105.054688 142.210938 105.054688 146.351562 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="90.592826" y="150.705549"/>
   <use xlink:href="%23glyph0-10" x="97.552826" y="150.705549"/>
@@ -341,11 +341,11 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-2" x="526.942607" y="166.156399"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 501.59375 50 C 501.59375 54.140625 498.238281 57.5 494.09375 57.5 C 489.953125 57.5 486.59375 54.140625 486.59375 50 C 486.59375 45.859375 489.953125 42.5 494.09375 42.5 C 498.238281 42.5 501.59375 45.859375 501.59375 50 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 501.59375 50 C 501.59375 54.140625 498.238281 57.5 494.09375 57.5 C 489.953125 57.5 486.59375 54.140625 486.59375 50 C 486.59375 45.859375 489.953125 42.5 494.09375 42.5 C 498.238281 42.5 501.59375 45.859375 501.59375 50 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-3" x="490.61548" y="54.353"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 384.039062 50 C 384.039062 54.140625 380.679688 57.5 376.539062 57.5 C 372.394531 57.5 369.039062 54.140625 369.039062 50 C 369.039062 45.859375 372.394531 42.5 376.539062 42.5 C 380.679688 42.5 384.039062 45.859375 384.039062 50 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 384.039062 50 C 384.039062 54.140625 380.679688 57.5 376.539062 57.5 C 372.394531 57.5 369.039062 54.140625 369.039062 50 C 369.039062 45.859375 372.394531 42.5 376.539062 42.5 C 380.679688 42.5 384.039062 45.859375 384.039062 50 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-4" x="373.05843" y="54.308"/>
 </g>
@@ -357,19 +357,19 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-6" x="431.836955" y="185.206699"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 490.371094 146.351562 C 490.371094 150.496094 487.011719 153.851562 482.871094 153.851562 C 478.726562 153.851562 475.371094 150.496094 475.371094 146.351562 C 475.371094 142.210938 478.726562 138.851562 482.871094 138.851562 C 487.011719 138.851562 490.371094 142.210938 490.371094 146.351562 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 490.371094 146.351562 C 490.371094 150.496094 487.011719 153.851562 482.871094 153.851562 C 478.726562 153.851562 475.371094 150.496094 475.371094 146.351562 C 475.371094 142.210938 478.726562 138.851562 482.871094 138.851562 C 487.011719 138.851562 490.371094 142.210938 490.371094 146.351562 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-7" x="479.389781" y="150.657549"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 472.207031 90.449219 C 472.207031 94.59375 468.847656 97.949219 464.707031 97.949219 C 460.5625 97.949219 457.207031 94.59375 457.207031 90.449219 C 457.207031 86.308594 460.5625 82.949219 464.707031 82.949219 C 468.847656 82.949219 472.207031 86.308594 472.207031 90.449219 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 472.207031 90.449219 C 472.207031 94.59375 468.847656 97.949219 464.707031 97.949219 C 460.5625 97.949219 457.207031 94.59375 457.207031 90.449219 C 457.207031 86.308594 460.5625 82.949219 464.707031 82.949219 C 468.847656 82.949219 472.207031 86.308594 472.207031 90.449219 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-8" x="461.226218" y="94.80385"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 413.425781 90.449219 C 413.425781 94.59375 410.070312 97.949219 405.925781 97.949219 C 401.785156 97.949219 398.425781 94.59375 398.425781 90.449219 C 398.425781 86.308594 401.785156 82.949219 405.925781 82.949219 C 410.070312 82.949219 413.425781 86.308594 413.425781 90.449219 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 413.425781 90.449219 C 413.425781 94.59375 410.070312 97.949219 405.925781 97.949219 C 401.785156 97.949219 398.425781 94.59375 398.425781 90.449219 C 398.425781 86.308594 401.785156 82.949219 405.925781 82.949219 C 410.070312 82.949219 413.425781 86.308594 413.425781 90.449219 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-9" x="402.447692" y="94.80385"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 395.265625 146.351562 C 395.265625 150.496094 391.90625 153.851562 387.765625 153.851562 C 383.621094 153.851562 380.265625 150.496094 380.265625 146.351562 C 380.265625 142.210938 383.621094 138.851562 387.765625 138.851562 C 391.90625 138.851562 395.265625 142.210938 395.265625 146.351562 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 395.265625 146.351562 C 395.265625 150.496094 391.90625 153.851562 387.765625 153.851562 C 383.621094 153.851562 380.265625 150.496094 380.265625 146.351562 C 380.265625 142.210938 383.621094 138.851562 387.765625 138.851562 C 391.90625 138.851562 395.265625 142.210938 395.265625 146.351562 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="380.804129" y="150.705549"/>
   <use xlink:href="%23glyph0-10" x="387.764129" y="150.705549"/>
@@ -445,15 +445,15 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1057.226562 141.945312 L 992.417969 94.859375 "/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1055.792969 146.351562 L 975.6875 146.351562 "/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1039.0625 94.859375 L 974.253906 141.945312 "/>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1023.238281 230.902344 C 1023.238281 235.042969 1019.882812 238.402344 1015.738281 238.402344 C 1011.597656 238.402344 1008.238281 235.042969 1008.238281 230.902344 C 1008.238281 226.757812 1011.597656 223.402344 1015.738281 223.402344 C 1019.882812 223.402344 1023.238281 226.757812 1023.238281 230.902344 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1023.238281 230.902344 C 1023.238281 235.042969 1019.882812 238.402344 1015.738281 238.402344 C 1011.597656 238.402344 1008.238281 235.042969 1008.238281 230.902344 C 1008.238281 226.757812 1011.597656 223.402344 1015.738281 223.402344 C 1019.882812 223.402344 1023.238281 226.757812 1023.238281 230.902344 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="1012.259561" y="235.215699"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1118.34375 161.804688 C 1118.34375 165.945312 1114.988281 169.304688 1110.84375 169.304688 C 1106.703125 169.304688 1103.34375 165.945312 1103.34375 161.804688 C 1103.34375 157.660156 1106.703125 154.304688 1110.84375 154.304688 C 1114.988281 154.304688 1118.34375 157.660156 1118.34375 161.804688 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1118.34375 161.804688 C 1118.34375 165.945312 1114.988281 169.304688 1110.84375 169.304688 C 1106.703125 169.304688 1103.34375 165.945312 1103.34375 161.804688 C 1103.34375 157.660156 1106.703125 154.304688 1110.84375 154.304688 C 1114.988281 154.304688 1118.34375 157.660156 1118.34375 161.804688 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-2" x="1107.365213" y="166.156399"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1082.019531 50 C 1082.019531 54.140625 1078.660156 57.5 1074.519531 57.5 C 1070.375 57.5 1067.019531 54.140625 1067.019531 50 C 1067.019531 45.859375 1070.375 42.5 1074.519531 42.5 C 1078.660156 42.5 1082.019531 45.859375 1082.019531 50 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1082.019531 50 C 1082.019531 54.140625 1078.660156 57.5 1074.519531 57.5 C 1070.375 57.5 1067.019531 54.140625 1067.019531 50 C 1067.019531 45.859375 1070.375 42.5 1074.519531 42.5 C 1078.660156 42.5 1082.019531 45.859375 1082.019531 50 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-3" x="1071.038087" y="54.353"/>
 </g>
@@ -461,7 +461,7 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-4" x="953.481036" y="54.308"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 928.132812 161.804688 C 928.132812 165.945312 924.777344 169.304688 920.632812 169.304688 C 916.492188 169.304688 913.132812 165.945312 913.132812 161.804688 C 913.132812 157.660156 916.492188 154.304688 920.632812 154.304688 C 924.777344 154.304688 928.132812 157.660156 928.132812 161.804688 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 928.132812 161.804688 C 928.132812 165.945312 924.777344 169.304688 920.632812 169.304688 C 916.492188 169.304688 913.132812 165.945312 913.132812 161.804688 C 913.132812 157.660156 916.492188 154.304688 920.632812 154.304688 C 924.777344 154.304688 928.132812 157.660156 928.132812 161.804688 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-5" x="917.15391" y="166.108399"/>
 </g>
@@ -473,7 +473,7 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-7" x="1059.812387" y="150.657549"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1052.628906 90.449219 C 1052.628906 94.59375 1049.269531 97.949219 1045.128906 97.949219 C 1040.988281 97.949219 1037.628906 94.59375 1037.628906 90.449219 C 1037.628906 86.308594 1040.988281 82.949219 1045.128906 82.949219 C 1049.269531 82.949219 1052.628906 86.308594 1052.628906 90.449219 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1052.628906 90.449219 C 1052.628906 94.59375 1049.269531 97.949219 1045.128906 97.949219 C 1040.988281 97.949219 1037.628906 94.59375 1037.628906 90.449219 C 1037.628906 86.308594 1040.988281 82.949219 1045.128906 82.949219 C 1049.269531 82.949219 1052.628906 86.308594 1052.628906 90.449219 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-8" x="1041.648824" y="94.80385"/>
 </g>
@@ -481,7 +481,7 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-9" x="982.870299" y="94.80385"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 975.6875 146.351562 C 975.6875 150.496094 972.328125 153.851562 968.1875 153.851562 C 964.042969 153.851562 960.6875 150.496094 960.6875 146.351562 C 960.6875 142.210938 964.042969 138.851562 968.1875 138.851562 C 972.328125 138.851562 975.6875 142.210938 975.6875 146.351562 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 975.6875 146.351562 C 975.6875 150.496094 972.328125 153.851562 968.1875 153.851562 C 964.042969 153.851562 960.6875 150.496094 960.6875 146.351562 C 960.6875 142.210938 964.042969 138.851562 968.1875 138.851562 C 972.328125 138.851562 975.6875 142.210938 975.6875 146.351562 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="961.226736" y="150.705549"/>
   <use xlink:href="%23glyph0-10" x="968.186736" y="150.705549"/>
@@ -501,11 +501,11 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1347.4375 141.945312 L 1282.628906 94.859375 "/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1346.003906 146.351562 L 1265.898438 146.351562 "/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1329.273438 94.859375 L 1264.464844 141.945312 "/>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1313.449219 230.902344 C 1313.449219 235.042969 1310.09375 238.402344 1305.949219 238.402344 C 1301.808594 238.402344 1298.449219 235.042969 1298.449219 230.902344 C 1298.449219 226.757812 1301.808594 223.402344 1305.949219 223.402344 C 1310.09375 223.402344 1313.449219 226.757812 1313.449219 230.902344 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1313.449219 230.902344 C 1313.449219 235.042969 1310.09375 238.402344 1305.949219 238.402344 C 1301.808594 238.402344 1298.449219 235.042969 1298.449219 230.902344 C 1298.449219 226.757812 1301.808594 223.402344 1305.949219 223.402344 C 1310.09375 223.402344 1313.449219 226.757812 1313.449219 230.902344 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="1302.470865" y="235.215699"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1408.554688 161.804688 C 1408.554688 165.945312 1405.199219 169.304688 1401.054688 169.304688 C 1396.914062 169.304688 1393.554688 165.945312 1393.554688 161.804688 C 1393.554688 157.660156 1396.914062 154.304688 1401.054688 154.304688 C 1405.199219 154.304688 1408.554688 157.660156 1408.554688 161.804688 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1408.554688 161.804688 C 1408.554688 165.945312 1405.199219 169.304688 1401.054688 169.304688 C 1396.914062 169.304688 1393.554688 165.945312 1393.554688 161.804688 C 1393.554688 157.660156 1396.914062 154.304688 1401.054688 154.304688 C 1405.199219 154.304688 1408.554688 157.660156 1408.554688 161.804688 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-2" x="1397.576516" y="166.156399"/>
 </g>
@@ -521,15 +521,15 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-5" x="1207.365213" y="166.108399"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1313.449219 180.902344 C 1313.449219 185.042969 1310.09375 188.402344 1305.949219 188.402344 C 1301.808594 188.402344 1298.449219 185.042969 1298.449219 180.902344 C 1298.449219 176.757812 1301.808594 173.402344 1305.949219 173.402344 C 1310.09375 173.402344 1313.449219 176.757812 1313.449219 180.902344 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1313.449219 180.902344 C 1313.449219 185.042969 1310.09375 188.402344 1305.949219 188.402344 C 1301.808594 188.402344 1298.449219 185.042969 1298.449219 180.902344 C 1298.449219 176.757812 1301.808594 173.402344 1305.949219 173.402344 C 1310.09375 173.402344 1313.449219 176.757812 1313.449219 180.902344 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-6" x="1302.470865" y="185.206699"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1361.003906 146.351562 C 1361.003906 150.496094 1357.644531 153.851562 1353.503906 153.851562 C 1349.363281 153.851562 1346.003906 150.496094 1346.003906 146.351562 C 1346.003906 142.210938 1349.363281 138.851562 1353.503906 138.851562 C 1357.644531 138.851562 1361.003906 142.210938 1361.003906 146.351562 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1361.003906 146.351562 C 1361.003906 150.496094 1357.644531 153.851562 1353.503906 153.851562 C 1349.363281 153.851562 1346.003906 150.496094 1346.003906 146.351562 C 1346.003906 142.210938 1349.363281 138.851562 1353.503906 138.851562 C 1357.644531 138.851562 1361.003906 142.210938 1361.003906 146.351562 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-7" x="1350.02369" y="150.657549"/>
 </g>
-<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1342.839844 90.449219 C 1342.839844 94.59375 1339.480469 97.949219 1335.339844 97.949219 C 1331.199219 97.949219 1327.839844 94.59375 1327.839844 90.449219 C 1327.839844 86.308594 1331.199219 82.949219 1335.339844 82.949219 C 1339.480469 82.949219 1342.839844 86.308594 1342.839844 90.449219 "/>
+<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1342.839844 90.449219 C 1342.839844 94.59375 1339.480469 97.949219 1335.339844 97.949219 C 1331.199219 97.949219 1327.839844 94.59375 1327.839844 90.449219 C 1327.839844 86.308594 1331.199219 82.949219 1335.339844 82.949219 C 1339.480469 82.949219 1342.839844 86.308594 1342.839844 90.449219 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-8" x="1331.860127" y="94.80385"/>
 </g>
@@ -537,86 +537,90 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-9" x="1273.081602" y="94.80385"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(100%25,0%25,0%25);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1265.898438 146.351562 C 1265.898438 150.496094 1262.539062 153.851562 1258.398438 153.851562 C 1254.257812 153.851562 1250.898438 150.496094 1250.898438 146.351562 C 1250.898438 142.210938 1254.257812 138.851562 1258.398438 138.851562 C 1262.539062 138.851562 1265.898438 142.210938 1265.898438 146.351562 "/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%25,0%25,0%25);stroke-opacity:1;stroke-miterlimit:10;" d="M 1265.898438 146.351562 C 1265.898438 150.496094 1262.539062 153.851562 1258.398438 153.851562 C 1254.257812 153.851562 1250.898438 150.496094 1250.898438 146.351562 C 1250.898438 142.210938 1254.257812 138.851562 1258.398438 138.851562 C 1262.539062 138.851562 1265.898438 142.210938 1265.898438 146.351562 "/>
 <g style="fill:rgb(0%25,0%25,0%25);fill-opacity:1;">
   <use xlink:href="%23glyph0-1" x="1251.438039" y="150.705549"/>
   <use xlink:href="%23glyph0-10" x="1258.398039" y="150.705549"/>
 </g>
 </g>
 </svg>
-'/><p>We can use <a href="../../ref/#GenericTensorNetworks.ConfigsAll"><code>ConfigsAll</code></a> to enumerate all sets satisfying the independence constraint.</p><pre><code class="language-julia hljs">all_independent_sets = solve(problem, ConfigsAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0000000010, 0000010000, 0010000000, 0010000010, 0010010000, 0100000000, 0100000010, 0100010000, 1000000000, 1000000010, 1010000000, 1010000010, 0001000000, 0001010000, 0101000000, 0101010000, 1001000000, 0000000100, 0000000110, 0100000100, 0100000110, 1000000100, 1000000110, 0001000100, 0101000100, 1001000100, 0000100000, 0000100010, 0000110000, 0010100000, 0010100010, 0010110000, 0100100000, 0100100010, 0100110000, 0000100100, 0000100110, 0100100100, 0100100110, 0000001000, 0000011000, 0010001000, 0010011000, 1000001000, 1010001000, 0001001000, 0001011000, 1001001000, 0000001100, 1000001100, 0001001100, 1001001100, 0000101000, 0000111000, 0010101000, 0010111000, 0000101100, 0000000001, 0000000011, 0000010001, 0010000001, 0010000011, 0010010001, 0100000001, 0100000011, 0100010001, 1000000001, 1000000011, 1010000001, 1010000011, 0001000001, 0001010001, 0101000001, 0101010001, 1001000001}</code></pre><p>The return value has type <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a>.</p><h5 id="Sample-solutions"><a class="docs-heading-anchor" href="#Sample-solutions">Sample solutions</a><a id="Sample-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Sample-solutions" title="Permalink"></a></h5><p>It is often difficult to store all configurations in a vector. A more clever way to store the data is using the sum product tree format.</p><pre><code class="language-julia hljs">all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (count = 76.0)
+'/><p>We can use <a href="../../ref/#GenericTensorNetworks.ConfigsAll"><code>ConfigsAll</code></a> to enumerate all sets satisfying the independence constraint.</p><pre><code class="language-julia hljs">all_independent_sets = solve(problem, ConfigsAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{0000000000, 0000000010, 0000010000, 0000000001, 0000000011, 0000010001, 0000100000, 0000100010, 0000110000, 0100000000, 0100000010, 0100010000, 0100000001, 0100000011, 0100010001, 0100100000, 0100100010, 0100110000, 1000000000, 1000000010, 1000000001, 1000000011, 0000001000, 0000011000, 0000101000, 0000111000, 1000001000, 0001000000, 0001010000, 0001000001, 0001010001, 0101000000, 0101010000, 0101000001, 0101010001, 1001000000, 1001000001, 0001001000, 0001011000, 1001001000, 0010000000, 0010000010, 0010010000, 0010000001, 0010000011, 0010010001, 0010100000, 0010100010, 0010110000, 1010000000, 1010000010, 1010000001, 1010000011, 0010001000, 0010011000, 0010101000, 0010111000, 1010001000, 0000000100, 0000000110, 0000100100, 0000100110, 0100000100, 0100000110, 0100100100, 0100100110, 1000000100, 1000000110, 0000001100, 0000101100, 1000001100, 0001000100, 0101000100, 1001000100, 0001001100, 1001001100}</code></pre><p>The return value has type <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a>.</p><h5 id="Sample-solutions"><a class="docs-heading-anchor" href="#Sample-solutions">Sample solutions</a><a id="Sample-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#Sample-solutions" title="Permalink"></a></h5><p>It is often difficult to store all configurations in a vector. A more clever way to store the data is using the sum product tree format.</p><pre><code class="language-julia hljs">all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (count = 76.0)
 ├─ + (count = 58.0)
 │  ├─ + (count = 40.0)
 │  │  ├─ + (count = 27.0)
-│  │  │  ├─ + (count = 18.0)
-│  │  │  │  ├─ + (count = 17.0)
+│  │  │  ├─ + (count = 26.0)
+│  │  │  │  ├─ + (count = 22.0)
 │  │  │  │  │  ⋮
 │  │  │  │  │  
-│  │  │  │  └─ * (count = 1.0)
+│  │  │  │  └─ * (count = 4.0)
 │  │  │  │     ⋮
 │  │  │  │     
-│  │  │  └─ + (count = 9.0)
-│  │  │     ├─ + (count = 8.0)
-│  │  │     │  ⋮
-│  │  │     │  
-│  │  │     └─ * (count = 1.0)
-│  │  │        ⋮
-│  │  │        
-│  │  └─ * (count = 13.0)
-│  │     ├─ + (count = 13.0)
-│  │     │  ├─ * (count = 9.0)
+│  │  │  └─ * (count = 1.0)
+│  │  │     ├─ OnehotVec{10, 2}(1, 1)
+│  │  │     └─ OnehotVec{10, 2}(7, 1)
+│  │  └─ + (count = 13.0)
+│  │     ├─ + (count = 12.0)
+│  │     │  ├─ + (count = 10.0)
 │  │     │  │  ⋮
 │  │     │  │  
-│  │     │  └─ * (count = 4.0)
+│  │     │  └─ * (count = 2.0)
 │  │     │     ⋮
 │  │     │     
-│  │     └─ OnehotVec{10, 2}(5, 1)
+│  │     └─ * (count = 1.0)
+│  │        ├─ * (count = 1.0)
+│  │        │  ⋮
+│  │        │  
+│  │        └─ OnehotVec{10, 2}(7, 1)
 │  └─ * (count = 18.0)
-│     ├─ OnehotVec{10, 2}(7, 1)
-│     └─ + (count = 18.0)
-│        ├─ + (count = 13.0)
-│        │  ├─ + (count = 9.0)
-│        │  │  ⋮
-│        │  │  
-│        │  └─ + (count = 4.0)
-│        │     ⋮
-│        │     
-│        └─ * (count = 5.0)
-│           ├─ + (count = 5.0)
-│           │  ⋮
-│           │  
-│           └─ OnehotVec{10, 2}(5, 1)
+│     ├─ + (count = 18.0)
+│     │  ├─ + (count = 17.0)
+│     │  │  ├─ + (count = 13.0)
+│     │  │  │  ⋮
+│     │  │  │  
+│     │  │  └─ * (count = 4.0)
+│     │  │     ⋮
+│     │  │     
+│     │  └─ * (count = 1.0)
+│     │     ├─ OnehotVec{10, 2}(1, 1)
+│     │     └─ OnehotVec{10, 2}(7, 1)
+│     └─ OnehotVec{10, 2}(3, 1)
 └─ * (count = 18.0)
-   ├─ OnehotVec{10, 2}(10, 1)
+   ├─ OnehotVec{10, 2}(8, 1)
    └─ + (count = 18.0)
-      ├─ + (count = 17.0)
-      │  ├─ + (count = 13.0)
-      │  │  ├─ * (count = 9.0)
+      ├─ + (count = 13.0)
+      │  ├─ + (count = 12.0)
+      │  │  ├─ + (count = 10.0)
       │  │  │  ⋮
       │  │  │  
-      │  │  └─ * (count = 4.0)
+      │  │  └─ * (count = 2.0)
       │  │     ⋮
       │  │     
-      │  └─ * (count = 4.0)
-      │     ├─ + (count = 2.0)
-      │     │  ⋮
-      │     │  
-      │     └─ + (count = 2.0)
-      │        ⋮
-      │        
-      └─ * (count = 1.0)
-         ├─ OnehotVec{10, 2}(4, 1)
-         └─ OnehotVec{10, 2}(1, 1)
+      │  └─ * (count = 1.0)
+      │     ├─ OnehotVec{10, 2}(1, 1)
+      │     └─ OnehotVec{10, 2}(7, 1)
+      └─ + (count = 5.0)
+         ├─ + (count = 4.0)
+         │  ├─ + (count = 3.0)
+         │  │  ⋮
+         │  │  
+         │  └─ * (count = 1.0)
+         │     ⋮
+         │     
+         └─ * (count = 1.0)
+            ├─ * (count = 1.0)
+            │  ⋮
+            │  
+            └─ OnehotVec{10, 2}(7, 1)
 </code></pre><p>The return value has the <a href="../../ref/#GenericTensorNetworks.SumProductTree"><code>SumProductTree</code></a> type. Its length corresponds to the number of configurations.</p><pre><code class="language-julia hljs">length(all_independent_sets_tree)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">76.0</code></pre><p>We can use <code>Base.collect</code> function to create a <a href="../../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a> or use <a href="../../ref/#GenericTensorNetworks.generate_samples"><code>generate_samples</code></a> to generate samples from it.</p><pre><code class="language-julia hljs">collect(all_independent_sets_tree)
 
 generate_samples(all_independent_sets_tree, 10)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{StaticBitVector{10, 1}}:
- 0010000000
- 0100000000
- 0010000000
- 0100100000
- 0000100010
- 0010100010
- 0000101000
- 0000111000
- 0100000001
- 1010000011</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../MaximalIS/">Maximal independent set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Tuesday 27 September 2022 01:50">Tuesday 27 September 2022</span>. Using Julia version 1.8.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 1000000001
+ 1000001000
+ 1000001000
+ 0101000001
+ 0101010000
+ 1001000001
+ 1010000011
+ 0010111000
+ 0000000100
+ 1000000110</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../MaximalIS/">Maximal independent set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Sunday 6 November 2022 01:42">Sunday 6 November 2022</span>. Using Julia version 1.8.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

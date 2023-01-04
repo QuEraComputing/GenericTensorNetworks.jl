@@ -138,10 +138,10 @@ end
             return TruncatedPoly(a.coeffs .+ b.coeffs, a.maxorder)
         elseif a.maxorder > b.maxorder
             offset = a.maxorder - b.maxorder
-            return TruncatedPoly((@ntuple $K i->i+offset <= $K ? a.coeffs[i] + b.coeffs[i+offset] : a.coeffs[i]), a.maxorder)
+            return TruncatedPoly((@ntuple $K i->i+offset <= $K ? a.coeffs[convert(Int, i)] + b.coeffs[convert(Int, i+offset)] : a.coeffs[convert(Int, i)]), a.maxorder)
         else
             offset = b.maxorder - a.maxorder
-            return TruncatedPoly((@ntuple $K i->i+offset <= $K ? b.coeffs[i] + a.coeffs[i+offset] : b.coeffs[i]), b.maxorder)
+            return TruncatedPoly((@ntuple $K i->i+offset <= $K ? b.coeffs[convert(Int, i)] + a.coeffs[convert(Int, i+offset)] : b.coeffs[convert(Int, i)]), b.maxorder)
         end
     end
 end
@@ -796,7 +796,7 @@ for F in [:set_type, :sampler_type, :treeset_type]
         function $F(::Type{T}, n::Int, nflavor::Int) where {TV, T<:CountingTropical{TV}}
             CountingTropical{TV, $F(n,nflavor)}
         end
-        function $F(::Type{Real}, n::Int, nflavor::Int) where {TV}
+        function $F(::Type{Real}, n::Int, nflavor::Int)
             $F(n, nflavor)
         end
     end

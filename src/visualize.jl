@@ -54,7 +54,7 @@ function show_einsum(ein::AbstractEinsum;
         annotate_tensors=false,
         tensor_locs=nothing,
         label_locs=nothing,  # dict
-        spring::Bool=true,
+        layout::Symbol=:auto,
         optimal_distance=1.0,
         kwargs...
         )
@@ -75,7 +75,7 @@ function show_einsum(ein::AbstractEinsum;
         end
     end
     if label_locs === nothing && tensor_locs === nothing
-        locs = LuxorGraphPlot.autolocs(graph, nothing, spring, optimal_distance, trues(nv(graph)))
+        locs = LuxorGraphPlot.autolocs(graph, nothing, layout, optimal_distance, trues(nv(graph)))
     elseif label_locs === nothing
         # infer label locs from tensor locs
         label_locs = [(lst = [iloc for (iloc,ix) in zip(tensor_locs, ixs) if l ∈ ix]; reduce((x,y)->x .+ y, lst) ./ length(lst)) for l in labels]

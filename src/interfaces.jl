@@ -438,14 +438,18 @@ end
 for (PROP, ET) in [
         (:(PartitionFunction{T}), :(T)),
         (:(SizeMax{Single}), :(Tropical{T})), (:(SizeMin{Single}), :(Tropical{T})),
-        (:(SizeMax{K}), :(ExtendedTropical{K,Tropical{T}})), (:(SizeMin{K}), :(ExtendedTropical{K,Tropical{T}})),
         (:(CountingAll), :T), (:(CountingMax{Single}), :(CountingTropical{T,T})), (:(CountingMin{Single}), :(CountingTropical{T,T})),
-        (:(CountingMax{K}), :(TruncatedPoly{K,T,T})), (:(CountingMin{K}), :(TruncatedPoly{K,T,T})),
-        (:(GraphPolynomial{:finitefield}), :(Mod{N,Int32} where N)), (:(GraphPolynomial{:fft}), :(Complex{T})), 
         (:(GraphPolynomial{:polynomial}), :(Polynomial{T, :x})), (:(GraphPolynomial{:fitting}), :T),
-        (:(GraphPolynomial{:laurent}), :(LaurentPolynomial{T, :x}))
+        (:(GraphPolynomial{:laurent}), :(LaurentPolynomial{T, :x})), (:(GraphPolynomial{:fft}), :(Complex{T})), 
+        (:(GraphPolynomial{:finitefield}), :(Mod{N,Int32} where N))
     ]
-    @eval tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T,K} = $ET
+    @eval tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T} = $ET
+end
+for (PROP, ET) in [
+        (:(SizeMax{K}), :(ExtendedTropical{K,Tropical{T}})), (:(SizeMin{K}), :(ExtendedTropical{K,Tropical{T}})),
+        (:(CountingMax{K}), :(TruncatedPoly{K,T,T})), (:(CountingMin{K}), :(TruncatedPoly{K,T,T})),
+    ]
+    @eval tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T, K} = $ET
 end
 
 function tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::PROP) where {T, K, BOUNDED, PROP<:Union{SingleConfigMax{K,BOUNDED},SingleConfigMin{K,BOUNDED}}}
@@ -461,10 +465,17 @@ end
 
 for (PROP, ET) in [
         (:(ConfigsMax{Single}), :(CountingTropical{T,T})), (:(ConfigsMin{Single}), :(CountingTropical{T,T})),
-        (:(ConfigsMax{K}), :(TruncatedPoly{K,T,T})), (:(ConfigsMin{K}), :(TruncatedPoly{K,T,T})),
         (:(ConfigsAll), :(Real))
     ]
-    @eval function tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T,K}
+    @eval function tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T}
+        set_type($ET, n, nflavor)
+    end
+end
+
+for (PROP, ET) in [
+        (:(ConfigsMax{K}), :(TruncatedPoly{K,T,T})), (:(ConfigsMin{K}), :(TruncatedPoly{K,T,T})),
+    ]
+    @eval function tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T, K}
         set_type($ET, n, nflavor)
     end
 end

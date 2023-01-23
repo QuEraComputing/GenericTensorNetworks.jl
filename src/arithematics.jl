@@ -662,9 +662,29 @@ function Base.collect(::Type{T}, x::SumProductTree{ET}) where {T, ET}
     elseif x.tag == LEAF
         return [convert(T, x.data)]
     elseif x.tag == SUM
-        return vcat(collect(T, x.left), collect(T, x.right))
+        if x.left.tag == ZERO
+            return collect(T, x.right)
+        elseif x.right.tag == ZERO
+            return collect(T, x.left)
+        else
+            return append!(collect(T, x.left), collect(T, x.right))
+        end
     else   # PROD
-        return vec([reduce(_data_mul, si) for si in Iterators.product(collect(T, x.left), collect(T, x.right))])
+        if x.left.tag == ONE
+            return collect(T, x.right)
+        elseif x.left.tag == LEAF
+            v = collect(T, x.right)
+            v .= _data_mul.(Ref(convert(T, x.left.data)), v)
+            return v
+        elseif x.right == ONE
+            return collect(T, x.left)
+        elseif x.right.tag == LEAF
+            v = collect(T, x.left)
+            v .= _data_mul.(v, Ref(convert(T, x.right.data)))
+            return v
+        else
+            return vec([_data_mul(l, r) for l in collect(T, x.left), r in collect(T, x.right)])
+        end
     end
 end
 

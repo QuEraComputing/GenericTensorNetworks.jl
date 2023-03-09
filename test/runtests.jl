@@ -45,6 +45,13 @@ end
     include("multiprocessing.jl")
 end
 
+using CUDA
+if CUDA.functional()
+    @testset "cuda" begin
+        include("cuda.jl")
+    end
+end
+
 # --------------
 # doctests
 # --------------

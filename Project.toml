@@ -38,7 +38,7 @@ Polynomials = "2.0, 3"
 Primes = "0.5"
 Requires = "1"
 SIMDTypes = "0.1"
-StatsBase = "0.33"
+StatsBase = "0.33, 0.34"
 TropicalNumbers = "0.4, 0.5"
 julia = "1"
 

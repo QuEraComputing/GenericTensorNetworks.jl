@@ -59,3 +59,32 @@ end
         end
     end
 end
+
+@testset "random counting tropical" begin
+    a = CountingTropical(randn()
+end
+
+@testset "configs bug fix" begin
+    subgraph = let
+        g = SimpleGraph(5)
+        vertices = "cdefg"
+        for (w, v) in ["cd", "ce", "cf", "de", "ef", "fg"]
+            add_edge!(g, findfirst(==(w), vertices), findfirst(==(v), vertices))
+        end
+        g
+    end
+    problem = IndependentSet(subgraph, openvertices=[1,4,5])
+    res1 = solve(problem, SizeMax(), T=Float64)
+    @test res1 == Tropical.(reshape([1, 1, 2, -Inf, 2, 2, -Inf, -Inf], 2, 2, 2))
+    res2 = solve(problem, CountingMax(); T=Float64)
+    res3 = solve(problem, ConfigsMax(; bounded=true); T=Float64)
+    @test getfield.(res2, :n) == getfield.(res1, :n)
+    @test getfield.(res3, :n) == getfield.(res1, :n)
+end
+
+@testset "einsum bug" begin
+    code = ein"abc,bc->ba"
+    #y = [1.0ₜ 2.0ₜ; 1.0ₜ -Infₜ;;; 2.0ₜ -Infₜ; 2.0ₜ -Infₜ]
+    nxs = (Tropical.([-1.0 -2.0; -1.0 Inf;;; -2.0 Inf; -2.0 Inf]), TropicalF64.([0.0 1.0; 0.0 -Inf]))
+    @show code(nxs...)
+end

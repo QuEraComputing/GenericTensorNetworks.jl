@@ -14,7 +14,11 @@ The backward rule for tropical einsum.
 * `size_dict` is a key-value map from tensor label to dimension size.
 """
 function backward_tropical(mode, ixs, @nospecialize(xs::Tuple), iy, @nospecialize(y), @nospecialize(ymask), size_dict)
-    y .= inv.(y) .* ymask
+    # remove float to improve the stability of the algorithm
+    removeinf(x::CountingTropical{<:AbstractFloat}) = isinf(x.n) ? typeof(x)(prevfloat(x.n), x.c) : x
+    removeinf(x::Tropical{<:AbstractFloat}) = isinf(x.n) ? typeof(x)(prevfloat(x.n)) : x
+    removeinf(x) = x
+    y .= removeinf.(inv.(y) .* ymask)
     masks = []
     for i=1:length(ixs)
         nixs = OMEinsum._insertat(ixs, i, iy)

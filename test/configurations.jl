@@ -60,10 +60,6 @@ end
     end
 end
 
-@testset "random counting tropical" begin
-    a = CountingTropical(randn()
-end
-
 @testset "configs bug fix" begin
     subgraph = let
         g = SimpleGraph(5)
@@ -80,11 +76,4 @@ end
     res3 = solve(problem, ConfigsMax(; bounded=true); T=Float64)
     @test getfield.(res2, :n) == getfield.(res1, :n)
     @test getfield.(res3, :n) == getfield.(res1, :n)
-end
-
-@testset "einsum bug" begin
-    code = ein"abc,bc->ba"
-    #y = [1.0ₜ 2.0ₜ; 1.0ₜ -Infₜ;;; 2.0ₜ -Infₜ; 2.0ₜ -Infₜ]
-    nxs = (Tropical.([-1.0 -2.0; -1.0 Inf;;; -2.0 Inf; -2.0 Inf]), TropicalF64.([0.0 1.0; 0.0 -Inf]))
-    @show code(nxs...)
 end

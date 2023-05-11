@@ -36,3 +36,19 @@ using GenericTensorNetworks, Test, Graphs
     @test poly.m[] == sorted_energies[1]
     @test poly.n[] == sorted_energies[end]
 end
+
+@testset "auto laurent" begin
+    hyperDim = 2
+    blockDim = 3
+    graph = [[2, 12], [3, 11], [1, 5], [2, 4], [4, 5], [4, 8], [5, 7], [1, 9], [3, 7], [5, 9], [6, 8], [4, 9], [6, 7], [7, 12], [9, 10], [10, 12], [4, 6], [5, 6], [10, 11], [1, 2, 12], [1, 3, 11], [1, 11, 12], [2, 3, 10], [2, 10, 12], [3, 10, 11], [4, 8, 12], [4, 9, 11], [5, 7, 12], [7, 8, 12], [6, 7, 11], [7, 9, 11], [7, 11, 12], [5, 9, 10], [6, 8, 10], [8, 9, 10], [8, 10, 12], [9, 10, 11], [1, 2, 9], [1, 3, 8], [1, 8, 9], [2, 3, 7], [2, 7, 9], [3, 7, 8], [1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    num_vertices = blockDim* 2^hyperDim
+    weights = ones(Int, length(graph));
+    problem = HyperSpinGlass(num_vertices, graph; weights);
+    poly = solve(problem, GraphPolynomial())[]
+    @test poly isa LaurentPolynomial
+
+    weights = ones(length(graph));
+    problem = HyperSpinGlass(num_vertices, graph; weights);
+    poly = solve(problem, GraphPolynomial())[]
+    @test poly isa LaurentPolynomial
+end

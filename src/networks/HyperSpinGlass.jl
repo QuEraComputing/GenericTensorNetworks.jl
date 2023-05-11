@@ -29,6 +29,7 @@ $(TYPEDSIGNATURES)
 function HyperSpinGlass(n::Int, cliques::AbstractVector; weights=NoWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
     clqs = collect(collect.(cliques))
     @assert weights isa NoWeight || length(weights) == length(clqs)
+    @assert all(c->all(b->1<=b<=n, c), cliques) "vertex index out of bound 1-$n, got: $cliques"
     rawcode = EinCode([clqs..., [[i] for i=1:n]...], collect(Int, openvertices))  # labels for edge tensors
     HyperSpinGlass(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), n, clqs, weights, Dict{Int,Int}(fixedvertices))
 end
@@ -42,7 +43,7 @@ fixedvertices(gp::HyperSpinGlass) = gp.fixedvertices
 # weights interface
 get_weights(c::HyperSpinGlass) = c.weights
 get_weights(gp::HyperSpinGlass, i::Int) = [-gp.weights[i], gp.weights[i]]
-chweights(c::HyperSpinGlass, weights) = HyperSpinGlass(c.code, c.cliques, weights, c.fixedvertices)
+chweights(c::HyperSpinGlass, weights) = HyperSpinGlass(c.code, c.n, c.cliques, weights, c.fixedvertices)
 
 function generate_tensors(x::T, gp::HyperSpinGlass) where T
     ixs = getixsv(gp.code)

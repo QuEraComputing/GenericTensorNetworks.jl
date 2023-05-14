@@ -276,9 +276,15 @@ function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=
         return asarray(post_invert_exponent.(res), res)
     elseif property isa GraphPolynomial
         ws = get_weights(gp)
-        if ws isa NoWeight || ws isa ZeroWeight || all(>=(0), ws)
+        if !(eltype(ws) <: Integer)
+            @warn "Input weights are not Integer types, try casting to weights of `Int64` type..."
+            gp = chweights(gp, Int.(ws))
+            ws = get_weights(gp)
+        end
+        n = length(terms(gp))
+        if ws isa NoWeight || ws isa ZeroWeight || all(i->all(>=(0), get_weights(gp, i)), 1:n)
             return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
-        elseif all(<=(0), ws)
+        elseif all(i->all(<=(0), get_weights(gp, i)), 1:n)
             res = graph_polynomial(chweights(gp, -ws), Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
             return asarray(invert_polynomial.(res), res)
         else

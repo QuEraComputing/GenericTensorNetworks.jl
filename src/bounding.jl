@@ -3,7 +3,7 @@ largest_k(::AllConfigs{K}) where K = K
 struct SingleConfig end
 
 """
-    backward_tropical(mode, ixs, xs, iy, y, ymask, size_dict)
+    backward_tropical!(mode, ixs, xs, iy, y, ymask, size_dict)
 
 The backward rule for tropical einsum.
 
@@ -13,7 +13,7 @@ The backward rule for tropical einsum.
 * `ymask` is the boolean mask for gradients,
 * `size_dict` is a key-value map from tensor label to dimension size.
 """
-function backward_tropical(mode, ixs, @nospecialize(xs::Tuple), iy, @nospecialize(y), @nospecialize(ymask), size_dict)
+function backward_tropical!(mode, ixs, @nospecialize(xs::Tuple), iy, @nospecialize(y), @nospecialize(ymask), size_dict)
     # remove float to improve the stability of the algorithm
     removeinf(x::CountingTropical{<:AbstractFloat}) = isinf(x.n) ? typeof(x)(prevfloat(x.n), x.c) : x
     removeinf(x::Tropical{<:AbstractFloat}) = isinf(x.n) ? typeof(x)(prevfloat(x.n)) : x
@@ -31,7 +31,7 @@ function backward_tropical(mode, ixs, @nospecialize(xs::Tuple), iy, @nospecializ
             push!(masks, mask)
         elseif mode isa SingleConfig
             A = einsum(EinCode(nixs, niy), nxs, size_dict)
-            push!(masks, onehotmask(A, xs[i]))
+            push!(masks, onehotmask!(A, xs[i]))
         else
             error("unkown mode: $mod")
         end
@@ -40,7 +40,7 @@ function backward_tropical(mode, ixs, @nospecialize(xs::Tuple), iy, @nospecializ
 end
 
 # one of the entry in `A` that equal to the corresponding entry in `X` is masked to true.
-function onehotmask(A::AbstractArray{T}, X::AbstractArray{T}) where T
+function onehotmask!(A::AbstractArray{T}, X::AbstractArray{T}) where T
     @assert length(A) == length(X)
     mask = falses(size(A)...)
     found = false
@@ -89,7 +89,7 @@ function generate_masktree(mode, code::NestedEinsum, cache, mask, size_dict)
         return CacheTree(mask, CacheTree{Bool}[])
     else
         eins = OMEinsum.rootcode(code)
-        submasks = backward_tropical(mode, getixs(eins), (getfield.(cache.siblings, :content)...,), OMEinsum.getiy(eins), cache.content, mask, size_dict)
+        submasks = backward_tropical!(mode, getixs(eins), (getfield.(cache.siblings, :content)...,), OMEinsum.getiy(eins), cache.content, mask, size_dict)
         return CacheTree(mask, generate_masktree.(Ref(mode), OMEinsum.siblings(code), cache.siblings, submasks, Ref(size_dict)))
     end
 end

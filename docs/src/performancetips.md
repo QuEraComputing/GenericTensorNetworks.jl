@@ -28,11 +28,13 @@ It can remove all vertex tensors (vectors) before entering the contraction order
 
 The returned object `problem` contains a field `code` that specifies the tensor network with optimized contraction order.
 For an independent set problem, the optimal contraction time/space complexity is ``\sim 2^{{\rm tw}(G)}``, where ``{\rm tw(G)}`` is the [tree-width](https://en.wikipedia.org/wiki/Treewidth) of ``G``.
-One can check the time, space and read-write complexity with the [`timespacereadwrite_complexity`](@ref) function.
+One can check the time, space and read-write complexity with the [`contraction_complexity`](@ref) function.
 
 ```julia
-julia> timespacereadwrite_complexity(problem)
-(21.90683335864693, 17.0, 20.03588509836998)
+julia> contraction_complexity(problem)
+Time complexity (number of element-wise multiplications) = 2^20.568850503058382
+Space complexity (number of elements in the largest intermediate tensor) = 2^16.0
+Read-write complexity (number of element-wise read and write) = 2^18.70474460304404
 ```
 
 The return values are `log2` values of the number of multiplications, the number elements in the largest tensor during contraction and the number of read-write operations to tensor elements.
@@ -81,13 +83,17 @@ julia> graph = random_regular_graph(120, 3)
 
 julia> problem = IndependentSet(graph; optimizer=TreeSA(βs=0.01:0.1:25.0, ntrials=10, niters=10));
 
-julia> timespacereadwrite_complexity(problem)
-(20.856518235241687, 16.0, 18.88208476145812)
+julia> contraction_complexity(problem)
+Time complexity (number of element-wise multiplications) = 2^20.53277253647484
+Space complexity (number of elements in the largest intermediate tensor) = 2^16.0
+Read-write complexity (number of element-wise read and write) = 2^19.34699193791874
 
 julia> problem = IndependentSet(graph; optimizer=TreeSA(βs=0.01:0.1:25.0, ntrials=10, niters=10, nslices=5));
 
-julia> timespacereadwrite_complexity(problem)
-(21.134967710592804, 11.0, 19.84529401927876)
+julia> contraction_complexity(problem)
+Time complexity (number of element-wise multiplications) = 2^21.117277836449578
+Space complexity (number of elements in the largest intermediate tensor) = 2^11.0
+Read-write complexity (number of element-wise read and write) = 2^19.854965754099602
 ```
 
 In the second `IndependentSet` constructor, we slice over 5 degrees of freedom, which can reduce the space complexity by at most 5.

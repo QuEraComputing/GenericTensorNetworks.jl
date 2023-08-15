@@ -3,7 +3,7 @@ module GenericTensorNetworks
 using Core: Argument
 using TropicalNumbers
 using OMEinsum
-using OMEinsum: timespace_complexity, getixsv, NestedEinsum, getixs, getiy, DynamicEinCode
+using OMEinsum: contraction_complexity, timespace_complexity, timespacereadwrite_complexity, getixsv, NestedEinsum, getixs, getiy, DynamicEinCode
 using Graphs, Random
 using DelimitedFiles, Serialization, Printf
 using LuxorGraphPlot
@@ -17,7 +17,7 @@ import AbstractTrees: children, printnode, print_tree
 import StatsBase
 
 # OMEinsum
-export timespace_complexity, timespacereadwrite_complexity, @ein_str, getixsv, getiyv
+export timespace_complexity, timespacereadwrite_complexity, contraction_complexity, @ein_str, getixsv, getiyv
 export GreedyMethod, TreeSA, SABipartite, KaHyParBipartite, MergeVectors, MergeGreedy
 
 # estimate memory

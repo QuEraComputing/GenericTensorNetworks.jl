@@ -402,7 +402,7 @@ function estimate_memory(problem::GraphProblem, property::AbstractProperty; T=Fl
     _estimate_memory(tensor_element_type(T, length(labels(problem)), nflavor(problem), property), problem)
 end
 function estimate_memory(problem::GraphProblem, property::Union{SingleConfigMax{K,BOUNDED},SingleConfigMin{K,BOUNDED}}; T=Float64) where {K, BOUNDED}
-    tc, sc, rw = timespacereadwrite_complexity(problem.code, _size_dict(problem))
+    tc, sc, rw = contraction_complexity(problem.code, _size_dict(problem))
     # caching all tensors is equivalent to counting the total number of writes
     if K === Single && BOUNDED
         return ceil(Int, exp2(rw - 1)) * sizeof(Tropical{T})

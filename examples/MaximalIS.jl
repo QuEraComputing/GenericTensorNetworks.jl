@@ -41,9 +41,7 @@ problem = MaximalIS(graph; optimizer=TreeSA());
 # Its contraction time space complexity of a [`MaximalIS`](@ref) instance is no longer determined by the tree-width of the original graph ``G``.
 # It is often harder to contract this tensor network than to contract the one for regular independent set problem.
 
-timespacereadwrite_complexity(problem)
-
-# Results are `log2` values.
+contraction_complexity(problem)
 
 # ## Solving properties
 

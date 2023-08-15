@@ -5,6 +5,9 @@ using Graphs, Test
     g = Graphs.smallgraph("petersen")
     for optimizer in (GreedyMethod(), TreeSA(ntrials=1))
         gp = IndependentSet(g; optimizer=optimizer)
+        @test contraction_complexity(gp).sc == 4
+        @test timespacereadwrite_complexity(gp)[2] == 4
+        @test timespace_complexity(gp)[2] == 4
         res1 = solve(gp, SizeMax())[]
         res2 = solve(gp, CountingAll())[]
         res3 = solve(gp, CountingMax(Single))[]

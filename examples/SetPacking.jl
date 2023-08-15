@@ -43,7 +43,7 @@ problem = SetPacking(sets);
 # This tensor means if in a configuration, two sets contain the element ``a``, then this configuration is forbidden,
 # One can check the contraction time space complexity of a [`SetPacking`](@ref) instance by typing:
 
-timespacereadwrite_complexity(problem)
+contraction_complexity(problem)
 
 # ## Solving properties
 

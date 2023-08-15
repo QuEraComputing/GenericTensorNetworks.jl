@@ -42,7 +42,7 @@ problem = SetCovering(sets);
 # This tensor means if none of the sets containing element ``a`` are included, then this configuration is forbidden,
 # One can check the contraction time space complexity of a [`SetCovering`](@ref) instance by typing:
 
-timespacereadwrite_complexity(problem)
+contraction_complexity(problem)
 
 # ## Solving properties
 

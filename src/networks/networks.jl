@@ -138,6 +138,9 @@ include("SpinGlass.jl")
 include("HyperSpinGlass.jl")
 
 # forward the time, space and readwrite complexity
+OMEinsum.contraction_complexity(gp::GraphProblem) = contraction_complexity(gp.code, uniformsize(gp.code, nflavor(gp)))
+# the following two interfaces will be deprecated
+OMEinsum.timespace_complexity(gp::GraphProblem) = timespace_complexity(gp.code, uniformsize(gp.code, nflavor(gp)))
 OMEinsum.timespacereadwrite_complexity(gp::GraphProblem) = timespacereadwrite_complexity(gp.code, uniformsize(gp.code, nflavor(gp)))
 
 # contract the graph tensor network

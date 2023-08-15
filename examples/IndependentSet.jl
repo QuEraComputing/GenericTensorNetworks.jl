@@ -51,9 +51,8 @@ problem = IndependentSet(graph; optimizer=TreeSA());
 # where ``{\rm tw(G)}`` is the [tree-width](https://en.wikipedia.org/wiki/Treewidth) of ``G`` (or `graph` in the code).
 # We can check the time, space and read-write complexities by typing
 
-timespacereadwrite_complexity(problem)
+contraction_complexity(problem)
 
-# The three return values are `log2` values of the the number of element-wise multiplication operations, the number elements in the largest tensor during contraction and the number of tensor element read-write operations.
 # For more information about how to improve the contraction order, please check the [Performance Tips](@ref).
 
 # ## Solution space properties

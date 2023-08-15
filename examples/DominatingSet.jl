@@ -42,7 +42,7 @@ problem = DominatingSet(graph; optimizer=TreeSA());
 # otherwise, if ``v`` is in ``D``, it has a contribution ``x_v^{w_v}`` to the final result.
 # One can check the contraction time space complexity of a [`DominatingSet`](@ref) instance by typing:
 
-timespacereadwrite_complexity(problem)
+contraction_complexity(problem)
 
 # ## Solving properties
 

@@ -52,6 +52,7 @@ export Matching, is_matching
 export SetPacking, is_set_packing
 export SetCovering, is_set_covering
 export OpenPitMining, is_valid_mining, print_mining
+export ReducedProblem, target_problem, extract_result
 
 # Interfaces
 export solve, SizeMax, SizeMin, PartitionFunction, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin, Single

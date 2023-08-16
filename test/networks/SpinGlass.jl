@@ -37,6 +37,6 @@ using GenericTensorNetworks, Test, Graphs
     @test solve(gp, ConfigsMin())[].n ≈ sorted_energies[1]
     @test solve(gp, CountingAll())[] ≈ 1024
     poly = solve(gp, GraphPolynomial())[]
-    @test poly.m[] == sorted_energies[1]
-    @test poly.n[] == sorted_energies[end]
+    @test poly.order[] == sorted_energies[1]
+    @test poly.order[] + length(poly.coeffs) == sorted_energies[end]
 end

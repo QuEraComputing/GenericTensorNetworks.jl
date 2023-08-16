@@ -898,7 +898,7 @@ function invert_polynomial(poly::Polynomial{BS,X}) where {BS,X}
     return LaurentPolynomial{BS,X}(poly.coeffs[end:-1:1], -length(poly.coeffs)+1)
 end
 function invert_polynomial(poly::LaurentPolynomial{BS,X}) where {BS,X}
-    return LaurentPolynomial{BS,X}(poly.coeffs[end:-1:1], -poly.m[]-length(poly.coeffs)+1)
+    return LaurentPolynomial{BS,X}(poly.coeffs[end:-1:1], -poly.order[]-length(poly.coeffs)+1)
 end
 
 # for finding all solutions

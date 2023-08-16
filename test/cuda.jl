@@ -55,3 +55,12 @@ end
     @test res14.maxorder == 4 && res14.coeffs[1]==30 && res14.coeffs[2] == 30 && res14.coeffs[3]==5
     @test res18 ≈ res2  
 end
+
+@testset "spinglass" begin
+    g = Graphs.smallgraph("petersen")
+    gp = SpinGlass(g)
+    usecuda=true
+    @test solve(gp, CountingMax(); usecuda) isa CuArray
+    gp2 = SpinGlass(g; openvertices=(2,))
+    @test solve(gp2, CountingMax(); usecuda) isa CuArray
+end

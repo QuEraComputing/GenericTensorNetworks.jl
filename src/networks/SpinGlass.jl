@@ -43,25 +43,21 @@ end
 target_problem(sg::SpinGlass) = sg.target
 
 # the energy should be shifted by sum(J)/2 - sum(h)
-for ET in [:Tropical, :ExtendedTropical, :TruncatedPoly, :CountingTropical]
-    @eval function extract_result(sg::SpinGlass, res::T) where T <: $(ET)
-        sumJ = sum(i->sg.J[i], 1:ne(sg.target.graph))
-        sumh = sum(i->sg.h[i], 1:nv(sg.target.graph))
+function extract_result(sg::SpinGlass)
+    sumJ = sum(i->sg.J[i], 1:ne(sg.target.graph))
+    sumh = sum(i->sg.h[i], 1:nv(sg.target.graph))
+    function extractor(res::T) where T <: Union{Tropical, ExtendedTropical, TruncatedPoly, CountingTropical}
         # the cut size is always even if the input J is integer
         return res * _x(T; invert=false) ^ (-sumJ + sumh)
     end
-end
-function extract_result(sg::SpinGlass, res::Union{Polynomial{BS,X}, LaurentPolynomial{BS,X}}) where {BS,X}
-    sumJ = sum(i->sg.J[i], 1:ne(sg.target.graph))
-    sumh = sum(i->sg.h[i], 1:nv(sg.target.graph))
-    # the cut size is always even if the input J is integer
-    lres = LaurentPolynomial{BS,X}(res)
-    return lres * LaurentPolynomial{BS,X}([one(eltype(res.coeffs))], -sumJ + sumh)
-end
-
-# the configurations are not changed, vectors are treated as configurations
-for ET in [:SumProductTree, :ConfigSampler, :ConfigEnumerator, :Real, :AbstractVector]
-    @eval extract_result(sg::SpinGlass, res::T) where T <: $(ET) = res
+    function extractor(res::T) where {BS, X, T <: Union{Polynomial{BS,X}, LaurentPolynomial{BS,X}}}
+        lres = LaurentPolynomial{BS,X}(res)
+        return lres * LaurentPolynomial{BS,X}([one(eltype(res.coeffs))], -sumJ + sumh)
+    end
+    function extractor(res::T) where T<:Union{SumProductTree, ConfigSampler, ConfigEnumerator, Real, AbstractVector}
+        return res
+    end
+    return extractor
 end
 
 """

@@ -198,7 +198,7 @@ function _pow(x::LaurentPolynomial{BS,X}, i) where {BS,X}
         return x^i
     else
         @assert length(x.coeffs) == 1
-        return LaurentPolynomial(x.coeffs .^ i, x.m[]*i)
+        return LaurentPolynomial(x.coeffs .^ i, x.order[]*i)
     end
 end
 

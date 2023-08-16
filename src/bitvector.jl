@@ -129,6 +129,9 @@ function StaticBitVector(x::AbstractVector)
     N = length(x)
     StaticBitVector{N,_nints(N,1)}((convert(BitVector, x).chunks...,))
 end
+# to void casting StaticBitVector itself
+StaticBitVector(x::StaticBitVector) = x
+
 function Base.convert(::Type{StaticBitVector{N,C}}, x::AbstractVector) where {N,C}
     @assert length(x) == N
     StaticBitVector(x)

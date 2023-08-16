@@ -59,8 +59,8 @@ function extract_result(sg::SpinGlass, res::Union{Polynomial{BS,X}, LaurentPolyn
     return lres * LaurentPolynomial{BS,X}([one(eltype(res.coeffs))], -sumJ + sumh)
 end
 
-# the configurations are not changed
-for ET in [:SumProductTree, :ConfigSampler, :ConfigEnumerator, :Real]
+# the configurations are not changed, vectors are treated as configurations
+for ET in [:SumProductTree, :ConfigSampler, :ConfigEnumerator, :Real, :AbstractVector]
     @eval extract_result(sg::SpinGlass, res::T) where T <: $(ET) = res
 end
 

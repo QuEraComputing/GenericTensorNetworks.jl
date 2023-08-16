@@ -1,3 +1,10 @@
+"""
+$TYPEDEF
+
+Graph problem that solved by reducing to another one. Interfaces are
+- [`target_problem`](@ref), get the target problem to be reduced to.
+- [`extract_result`](@ref), extract the result from the returned value of the target problem solver.
+"""
 abstract type ReducedProblem <: GraphProblem end
 
 """

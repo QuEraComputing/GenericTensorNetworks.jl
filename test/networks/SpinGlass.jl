@@ -5,6 +5,7 @@ using GenericTensorNetworks, Test, Graphs
     J = rand(15)
     h = randn(10) .* 0.5
     gp = SpinGlass(g; h, J)
+    @test contraction_complexity(gp).sc <= 5
     M = zeros(10, 10)
     for (e,j) in zip(edges(g), J)
         M[e.src, e.dst] = j

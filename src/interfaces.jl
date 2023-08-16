@@ -336,7 +336,7 @@ end
 
 function solve(gp::ReducedProblem, property::AbstractProperty; T=Float64, usecuda=false)
     res = solve(target_problem(gp), property; T, usecuda)
-    return asarray(extract_result.(Ref(gp), res), res)
+    return asarray(extract_result(gp).(res), res)
 end
 
 # raise an error if the property for problem can not be computed

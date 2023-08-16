@@ -16,10 +16,20 @@ function target_problem end
 
 """
     extract_result(p::ReducedProblem, output)
+    extract_result(p::ReducedProblem)
 
 Post process the output of the target problem to get an output to the source problem.
+If the output is not provided, it will return a function instead.
+The result extraction rule is determined by the output type.
+e.g. If the output type is `Tropical`, it will be interpreted as the energy.
+If the output is a `Vector`, it will be interpreted as a configuration.
 """
 function extract_result end
+
+# the fallback, this interface is designed for GPU compatibility
+function extract_result(r::ReducedProblem, res)
+    return extract_result(r)(res)
+end
 
 # fixedvertices(r::ReducedProblem) = fixedvertices(target_problem(r))
 # labels(r::ReducedProblem) = labels(target_problem(r))

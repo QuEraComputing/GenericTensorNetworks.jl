@@ -14,3 +14,6 @@ end
 # a unified interface to optimize the contraction code
 _optimize_code(code, size_dict, optimizer::Nothing, simplifier) = code
 _optimize_code(code, size_dict, optimizer, simplifier) = optimize_code(code, size_dict, optimizer, simplifier)
+
+# upload tensors to GPU
+function togpu end

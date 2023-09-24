@@ -150,7 +150,7 @@ function contractx(gp::GraphProblem, x; usecuda=false)
     xs = generate_tensors(x, gp)
     @debug "contracting tensors ..."
     if usecuda
-        gp.code([CuArray(x) for x in xs]...)
+        gp.code([togpu(x) for x in xs]...)
     else
         gp.code(xs...)
     end

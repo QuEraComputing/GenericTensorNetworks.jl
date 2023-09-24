@@ -27,8 +27,8 @@ function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false
     xst = generate_tensors(_x(Tropical{T}; invert), gp)
     ymask = trues(fill(2, length(getiyv(gp.code)))...)
     if usecuda
-        xst = CuArray.(xst)
-        ymask = CuArray(ymask)
+        xst = togpu.(xst)
+        ymask = togpu(ymask)
     end
     if all
         # we use `Float64` as default because we want to support weighted graphs.

@@ -33,6 +33,8 @@ get_weights
 chweights
 nflavor
 fixedvertices
+
+extract_result
 ```
 
 #### Graph Problem Utilities
@@ -121,8 +123,6 @@ optimize_code
 getixsv
 getiyv
 contraction_complexity
-timespace_complexity
-timespacereadwrite_complexity
 estimate_memory
 @ein_str
 GreedyMethod

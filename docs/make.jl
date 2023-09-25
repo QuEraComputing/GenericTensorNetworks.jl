@@ -54,6 +54,7 @@ makedocs(;
         "References" => "ref.md",
     ],
     doctest=false,
+    warnonly = :missing_docs,
 )
 
 deploydocs(;

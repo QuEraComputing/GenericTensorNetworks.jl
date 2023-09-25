@@ -204,22 +204,22 @@ Examples
 ------------------------------
 ```jldoctest; setup=(using GenericTensorNetworks)
 julia> x = ExtendedTropical{3}(Tropical.([1.0, 2, 3]))
-ExtendedTropical{3, TropicalF64}(TropicalF64[1.0ₜ, 2.0ₜ, 3.0ₜ])
+ExtendedTropical{3, Tropical{Float64}}(Tropical{Float64}[1.0ₜ, 2.0ₜ, 3.0ₜ])
 
 julia> y = ExtendedTropical{3}(Tropical.([-Inf, 2, 5]))
-ExtendedTropical{3, TropicalF64}(TropicalF64[-Infₜ, 2.0ₜ, 5.0ₜ])
+ExtendedTropical{3, Tropical{Float64}}(Tropical{Float64}[-Infₜ, 2.0ₜ, 5.0ₜ])
 
 julia> x * y
-ExtendedTropical{3, TropicalF64}(TropicalF64[6.0ₜ, 7.0ₜ, 8.0ₜ])
+ExtendedTropical{3, Tropical{Float64}}(Tropical{Float64}[6.0ₜ, 7.0ₜ, 8.0ₜ])
 
 julia> x + y
-ExtendedTropical{3, TropicalF64}(TropicalF64[2.0ₜ, 3.0ₜ, 5.0ₜ])
+ExtendedTropical{3, Tropical{Float64}}(Tropical{Float64}[2.0ₜ, 3.0ₜ, 5.0ₜ])
 
 julia> one(x)
-ExtendedTropical{3, TropicalF64}(TropicalF64[-Infₜ, -Infₜ, 0.0ₜ])
+ExtendedTropical{3, Tropical{Float64}}(Tropical{Float64}[-Infₜ, -Infₜ, 0.0ₜ])
 
 julia> zero(x)
-ExtendedTropical{3, TropicalF64}(TropicalF64[-Infₜ, -Infₜ, -Infₜ])
+ExtendedTropical{3, Tropical{Float64}}(Tropical{Float64}[-Infₜ, -Infₜ, -Infₜ])
 ```
 """
 struct ExtendedTropical{K,TO} <: Number

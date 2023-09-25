@@ -55,4 +55,4 @@ end
 # --------------
 # doctests
 # --------------
-doctest(GenericTensorNetworks)
+doctest(GenericTensorNetworks; fix=true)

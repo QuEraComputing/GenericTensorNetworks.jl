@@ -40,7 +40,7 @@ Primes = "0.5"
 Requires = "1"
 SIMDTypes = "0.1"
 StatsBase = "0.33, 0.34"
-TropicalNumbers = "0.4, 0.5"
+TropicalNumbers = "0.4, 0.5, 0.6"
 julia = "1"
 
 [extras]

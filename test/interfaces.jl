@@ -1,9 +1,10 @@
 using GenericTensorNetworks
-using Graphs, Test
+using Graphs, Test, Random
 
 @testset "independent set problem" begin
     g = Graphs.smallgraph("petersen")
     for optimizer in (GreedyMethod(), TreeSA(ntrials=1))
+        Random.seed!(3)
         gp = IndependentSet(g; optimizer=optimizer)
         @test contraction_complexity(gp).sc == 4
         @test timespacereadwrite_complexity(gp)[2] == 4

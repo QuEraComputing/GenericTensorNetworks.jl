@@ -1,6 +1,10 @@
 using GenericTensorNetworks
 using Test, Documenter
 
+@testset "mods.jl" begin
+    include(pkgdir(GenericTensorNetworks, "src", "Mods.jl", "test", "runtests.jl"))
+end
+
 @testset "bitvector" begin
     include("bitvector.jl")
 end

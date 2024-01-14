@@ -1,5 +1,5 @@
 using GenericTensorNetworks, Test, OMEinsum
-using Mods, Polynomials, TropicalNumbers
+using GenericTensorNetworks.Mods, Polynomials, TropicalNumbers
 using Graphs, Random
 using GenericTensorNetworks: StaticBitVector, graph_polynomial
 

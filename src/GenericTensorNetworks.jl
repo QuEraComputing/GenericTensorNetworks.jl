@@ -10,7 +10,7 @@ using LuxorGraphPlot
 import Polynomials
 using Polynomials: Polynomial, LaurentPolynomial, printpoly, fit
 using FFTW
-using Mods, Primes
+using Primes
 using DocStringExtensions
 using Base.Cartesian
 import AbstractTrees: children, printnode, print_tree
@@ -64,6 +64,10 @@ export save_configs, load_configs, hamming_distribution, save_sumproduct, load_s
 export show_graph, spring_layout!, show_gallery, show_einsum
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
+
+# Mods.jl fixed to v1.3.4
+include("Mods.jl/src/Mods.jl")
+using .Mods
 
 include("utils.jl")
 include("bitvector.jl")

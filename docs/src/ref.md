@@ -92,7 +92,7 @@ is_commutative_semiring
 TropicalNumbers.Tropical
 TropicalNumbers.CountingTropical
 ExtendedTropical
-Mods.Mod
+GenericTensorNetworks.Mods.Mod
 TruncatedPoly
 Max2Poly
 ConfigEnumerator

@@ -25,7 +25,7 @@ function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
     xst = generate_tensors(_x(Tropical{T}; invert), gp)
-    ymask = trues(fill(2, length(getiyv(gp.code)))...)
+    ymask = trues(fill(nflavor(gp), length(getiyv(gp.code)))...)
     if usecuda
         xst = togpu.(xst)
         ymask = togpu(ymask)

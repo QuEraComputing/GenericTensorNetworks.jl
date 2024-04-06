@@ -47,12 +47,10 @@ problem = GenericTensorNetwork(matching)
 #
 
 # ## Solving properties
-# ### Maximum matching
-# ### Configuration properties
+# The maximum matching size can be obtained by
 max_matching = solve(problem, SizeMax())[]
 # The largest number of matching is 5, which means we have a perfect matching (vertices are all paired).
 
-# ##### matching polynomial
 # The graph polynomial defined for the matching problem is known as the matching polynomial.
 # Here, we adopt the first definition in the [wiki page](https://en.wikipedia.org/wiki/Matching_polynomial).
 # ```math
@@ -62,7 +60,7 @@ max_matching = solve(problem, SizeMax())[]
 
 matching_poly = solve(problem, GraphPolynomial())[]
 
-# ## Configuration properties
+# ### Configuration properties
 
 # ##### one of the perfect matches
 match_config = solve(problem, SingleConfigMax())[]

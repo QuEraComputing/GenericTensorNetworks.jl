@@ -22,7 +22,7 @@ show_graph(graph; locs=locations, format=:svg)
 
 # ## Generic tensor network representation
 # We can define the cutting problem with the [`MaxCut`](@ref) type as
-maxcut = MaxCut(graph);
+maxcut = MaxCut(graph)
 
 # The tensor network representation of the cutting problem can be obtained by
 problem = GenericTensorNetwork(maxcut)

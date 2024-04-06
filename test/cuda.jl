@@ -27,7 +27,7 @@ end
     item(x::AbstractArray) = Array(x)[]
     #optimizer = TreeSA(ntrials=1)
     optimizer = GreedyMethod()
-    gp = independent_set_network(g; optimizer=optimizer)
+    gp = GenericTensorNetwork(IndependentSet(g); optimizer=optimizer)
     @test contraction_complexity(gp).sc == 4
     @test timespacereadwrite_complexity(gp)[2] == 4
     @test timespace_complexity(gp)[2] == 4

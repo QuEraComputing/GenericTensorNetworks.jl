@@ -191,7 +191,6 @@ include("DominatingSet.jl")
 include("SetPacking.jl")
 include("SetCovering.jl")
 include("OpenPitMining.jl")
-include("SpinGlass.jl")
 include("HyperSpinGlass.jl")
 
 # forward the time, space and readwrite complexity

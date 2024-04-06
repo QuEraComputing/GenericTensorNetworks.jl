@@ -45,7 +45,7 @@ end
 
 @testset "save load tree" begin
     fname = tempname()
-    tree = solve(independent_set_network(smallgraph(:petersen)), ConfigsAll(; tree_storage=true))[]
+    tree = solve(GenericTensorNetwork(IndependentSet(smallgraph(:petersen))), ConfigsAll(; tree_storage=true))[]
     save_sumproduct(fname, tree)
     ma = load_sumproduct(fname)
     @test ma == tree

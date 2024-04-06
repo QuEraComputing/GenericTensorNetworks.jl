@@ -13,7 +13,7 @@ end
 
 @testset "einsum" begin
     graph = smallgraph(:petersen)
-    pb = independent_set_network(graph)
+    pb = GenericTensorNetwork(IndependentSet(graph))
     @test show_einsum(pb.code; optimal_distance=2, annotate_tensors=true) isa Any
     @test show_einsum(pb.code; tensor_locs=[(randn(), randn()) .* 2 for i=1:25]) isa Any
     @test show_einsum(pb.code; label_locs=[(randn(), randn()) .* 2 for i=1:10]) isa Any

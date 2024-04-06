@@ -5,7 +5,7 @@ using Graphs, Test, Random
     g = Graphs.smallgraph("petersen")
     for optimizer in (GreedyMethod(), TreeSA(ntrials=1))
         Random.seed!(3)
-        gp = independent_set_network(g; optimizer=optimizer)
+        gp = GenericTensorNetwork(IndependentSet(g); optimizer=optimizer)
         @test contraction_complexity(gp).sc == 4
         @test timespacereadwrite_complexity(gp)[2] == 4
         @test timespace_complexity(gp)[2] == 4
@@ -53,7 +53,7 @@ end
 
 @testset "slicing" begin
     g = Graphs.smallgraph("petersen")
-    gp = independent_set_network(g; optimizer=TreeSA(nslices=5, ntrials=1))
+    gp = GenericTensorNetwork(IndependentSet(g), optimizer=TreeSA(nslices=5, ntrials=1))
     res1 = solve(gp, SizeMax())[]
     res2 = solve(gp, CountingAll())[]
     res3 = solve(gp, CountingMax(Single))[]
@@ -94,7 +94,7 @@ end
 
 @testset "Weighted" begin
     g = Graphs.smallgraph("petersen")
-    gp = independent_set_network(g; weights=collect(1:10))
+    gp = IndependentSet(g, collect(1:10)) |> GenericTensorNetwork
     res1 = solve(gp, SizeMax())[]
     @test res1 == Tropical(24.0)
     res2 = solve(gp, CountingMax(Single))[]
@@ -111,7 +111,7 @@ end
     @test res4.c.data[] == res3.c.data
 
     g = Graphs.smallgraph("petersen")
-    gp = independent_set_network(g; weights=fill(0.5, 10))
+    gp = IndependentSet(g, fill(0.5, 10)) |> GenericTensorNetwork
     res5 = solve(gp, SizeMax(6))[]
     @test res5.orders == Tropical.([3.0,4,4,4,4,4] ./ 2)
     res6 = solve(gp, SingleConfigMax(6))[]
@@ -123,7 +123,7 @@ end
 
 @testset "tree storage" begin
     g = smallgraph(:petersen)
-    gp = independent_set_network(g)
+    gp = IndependentSet(g) |> GenericTensorNetwork
     res1 = solve(gp, ConfigsAll(; tree_storage=true))[]
     res2 = solve(gp, ConfigsAll(; tree_storage=false))[]
     @test res1 isa SumProductTree && res2 isa ConfigEnumerator
@@ -160,7 +160,7 @@ end
 end
 
 @testset "memory estimation" begin
-    gp = independent_set_network(smallgraph(:petersen))
+    gp = IndependentSet(smallgraph(:petersen)) |> GenericTensorNetwork
     for property in [
             SizeMax(), SizeMin(), SizeMax(3), SizeMin(3), CountingMax(), CountingMin(), CountingMax(2), CountingMin(2),
             ConfigsMax(;bounded=true), ConfigsMin(;bounded=true), ConfigsMax(2;bounded=true), ConfigsMin(2;bounded=true), 
@@ -189,9 +189,9 @@ end
 end
 
 @testset "error on not solvable problems" begin
-    gp = independent_set_network(smallgraph(:petersen); weights=rand(1:3, 10))
+    gp = GenericTensorNetwork(IndependentSet(smallgraph(:petersen), rand(1:3, 10)))
     @test !GenericTensorNetworks.has_noninteger_weights(gp)
-    gp = independent_set_network(smallgraph(:petersen); weights=rand(10))
+    gp = GenericTensorNetwork(IndependentSet(smallgraph(:petersen), rand(10)))
     @test GenericTensorNetworks.has_noninteger_weights(gp)
     @test_throws ArgumentError solve(gp, GraphPolynomial())
     @test_throws ArgumentError solve(gp, CountingMax(2))

@@ -27,27 +27,29 @@ struct SetPacking{ET,WT<:Union{UnitWeight, Vector}} <: GraphProblem
         new{ET, typeof(weights)}(sets, weights)
     end
 end
-function GenericTensorNetwork(cfg::SetPacking; openvertices=(), fixedvertices=Dict{Int,Int}())
-    rawcode = EinCode(vcat([[i] for i=1:length(cfg.sets)], [[i,j] for i=1:length(cfg.sets),j=1:length(cfg.sets) if j>i && !isempty(cfg.sets[i] ∩ cfg.sets[j])]), collect(Int,openvertices))
-    return GenericTensorNetwork(cfg, rawcode, Dict{Int,Int}(fixedvertices))
+function set_packing_network(sets; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
+    cfg = SetPacking(sets, weights)
+    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
+    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
 end
 
 flavors(::Type{<:SetPacking}) = [0, 1]
-terms(gp::SetPacking) = getixsv(gp.code)[1:length(gp.sets)]
+energy_terms(gp::SetPacking) = [[i] for i=1:length(gp.sets)]
+extra_terms(gp::SetPacking) = [[i,j] for i=1:length(gp.sets),j=1:length(gp.sets) if j>i && !isempty(gp.sets[i] ∩ gp.sets[j])]
 labels(gp::SetPacking) = [1:length(gp.sets)...]
 
 # weights interface
 get_weights(c::SetPacking) = c.weights
 get_weights(gp::SetPacking, i::Int) = [0, gp.weights[i]]
-chweights(c::SetPacking, weights) = SetPacking(c.code, c.sets, weights, c.fixedvertices)
+chweights(c::SetPacking, weights) = SetPacking(c.sets, weights)
 
 # generate tensors
-function generate_tensors(x::T, gp::SetPacking) where T
-    length(gp.sets) == 0 && return []
+function generate_tensors(x::T, gp::GenericTensorNetwork{<:SetPacking}) where T
+    length(gp.problem.sets) == 0 && return []
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors
     return select_dims([
-        add_labels!(Array{T}[misv(_pow.(Ref(x), get_weights(gp, i))) for i=1:length(gp.sets)], ixs[1:length(gp.sets)], labels(gp))...,
+        add_labels!(Array{T}[misv(_pow.(Ref(x), get_weights(gp, i))) for i=1:length(gp.problem.sets)], ixs[1:length(gp.problem.sets)], labels(gp))...,
         Array{T}[misb(T, length(ix)) for ix in ixs[length(gp.sets)+1:end]]...], ixs, fixedvertices(gp),
     )
 end

@@ -145,25 +145,26 @@ julia> solve(gp, SizeMax())[]
 struct Satisfiability{T,WT<:Union{UnitWeight, Vector}} <: GraphProblem
     cnf::CNF{T}
     weights::WT
-    function Satisfiability(cnf::CNF{T}, weights::WT=UnitWeight()) where {T}
+    function Satisfiability(cnf::CNF{T}, weights::WT=UnitWeight()) where {T, WT}
         @assert weights isa UnitWeight || length(weights) == length(cnf) "weights size inconsistent! should be $(length(cnf)), got: $(length(weights))"
         new{T, typeof(weights)}(cnf, weights)
     end
 end
-
-function GenericTensorNetwork(cfg::Satisfiability{CT,T,WT}; openvertices=(), fixedvertices=Dict{T,Int}())
-    rawcode = EinCode([[getfield.(c.vars, :name)...] for c in cfg.cnf.clauses], collect(T, openvertices))
-    return GenericTensorNetwork(cfg, rawcode, Dict{T,Int}(fixedvertices))
+function satisfiability_network(cnf::CNF; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
+    cfg = Satisfiability(cnf, weights)
+    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
+    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
 end
 
 flavors(::Type{<:Satisfiability}) = [0, 1]  # false, true
-terms(gp::Satisfiability) = getixsv(gp.code)
-labels(gp::Satisfiability) = unique!(vcat(getixsv(gp.code)...))
+energy_terms(gp::Satisfiability) = [[getfield.(c.vars, :name)...] for c in gp.cnf.clauses]
+extra_terms(::Satisfiability{T}) where T = Vector{T}[]
+labels(gp::Satisfiability) = unique!(vcat(energy_terms(gp)...))
 
 # weights interface
 get_weights(c::Satisfiability) = c.weights
 get_weights(s::Satisfiability, i::Int) = [0, s.weights[i]]
-chweights(c::Satisfiability, weights) = Satisfiability(c.code, c.cnf, weights, c.fixedvertices)
+chweights(c::Satisfiability, weights) = Satisfiability(c.cnf, weights)
 
 """
     satisfiable(cnf::CNF, config::AbstractDict)
@@ -181,8 +182,8 @@ function satisfiable(v::BoolVar{T}, config::AbstractDict{T}) where T
 end
 
 # the first argument is a function of variables
-function generate_tensors(x::VT, sa::Satisfiability{CT,T}) where {CT,T,VT}
-    cnf = sa.cnf
+function generate_tensors(x::VT, sa::GenericTensorNetwork{<:Satisfiability{CT,T}}) where {CT,T,VT}
+    cnf = sa.problem.cnf
     ixs = getixsv(sa.code)
     isempty(cnf.clauses) && return []
 	return select_dims(

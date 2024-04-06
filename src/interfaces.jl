@@ -281,7 +281,7 @@ function solve(gp::GenericTensorNetwork, property::AbstractProperty; T=Float64, 
             gp = chweights(gp, Int.(ws))
             ws = get_weights(gp)
         end
-        n = length(terms(gp))
+        n = length(energy_terms(gp))
         if ws isa UnitWeight || ws isa ZeroWeight || all(i->all(>=(0), get_weights(gp, i)), 1:n)
             return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
         elseif all(i->all(<=(0), get_weights(gp, i)), 1:n)
@@ -334,11 +334,6 @@ function solve(gp::GenericTensorNetwork, property::AbstractProperty; T=Float64, 
     end
 end
 
-function solve(gp::ReducedProblem, property::AbstractProperty; T=Float64, usecuda=false)
-    res = solve(target_problem(gp), property; T, usecuda)
-    return asarray(extract_result(gp).(res), res)
-end
-
 # raise an error if the property for problem can not be computed
 assert_solvable(::Any, ::Any) = nothing
 function assert_solvable(problem, property::GraphPolynomial)
@@ -367,7 +362,7 @@ function assert_solvable(problem, property::CountingMin)
     end
 end
 function has_noninteger_weights(problem::GenericTensorNetwork)
-    for i in 1:length(terms(problem))
+    for i in 1:length(energy_terms(problem))
         if any(!isinteger, get_weights(problem, i))
             return true
         end

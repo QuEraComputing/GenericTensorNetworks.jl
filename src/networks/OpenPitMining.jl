@@ -41,27 +41,25 @@ You will the the mining is printed as green in an colored REPL.
 struct OpenPitMining{ET} <: GraphProblem
     rewards::Matrix{ET}
     blocks::Vector{Tuple{Int,Int}}  # non-zero locations
-    function OpenPitMining(rewards::Matrix{ET}) where ET
-        # compute block locations
-        blocks = Tuple{Int,Int}[]
-        for i=1:size(rewards, 1), j=i:size(rewards,2)-i+1
-            push!(blocks, (i,j))
+    function OpenPitMining(rewards::Matrix{ET}, blocks::Vector{Tuple{Int,Int}}) where ET
+        for (i, j) in blocks
+            checkbounds(rewards, i, j)
         end
         new{ET}(rewards, blocks)
     end
 end
-function GenericTensorNetwork(cfg::OpenPitMining; openvertices=(), fixedvertices=Dict{Tuple{Int,Int},Int}())
-    depends = Pair{Tuple{Int,Int},Tuple{Int,Int}}[]
-    for i=1:size(cfg.rewards, 1), j=i:size(cfg.rewards,2)-i+1
-        if i!=1
-            push!(depends, (i,j)=>(i-1,j-1))
-            push!(depends, (i,j)=>(i-1,j))
-            push!(depends, (i,j)=>(i-1,j+1))
-        end
+function OpenPitMining(rewards::Matrix{ET}) where ET
+    # compute block locations
+    blocks = Tuple{Int,Int}[]
+    for i=1:size(rewards, 1), j=i:size(rewards,2)-i+1
+        push!(blocks, (i,j))
     end
-    rawcode = EinCode([[[block] for block in cfg.blocks]...,
-        [[dep.first, dep.second] for dep in depends]...], collect(Tuple{Int,Int},openvertices))
-    return GenericTensorNetwork(cfg, rawcode, Dict{Tuple{Int,Int},Int}(fixedvertices))
+    OpenPitMining(rewards, blocks)
+end
+function open_pit_mining_network(rewards::Matrix{ET}; openvertices=(), fixedvertices=Dict{Tuple{Int,Int},Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors()) where ET
+    cfg = OpenPitMining(rewards)
+    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
+    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
 end
 
 function mining_tensor(::Type{T}) where T
@@ -71,9 +69,20 @@ function mining_tensor(::Type{T}) where T
 end
 
 flavors(::Type{<:OpenPitMining}) = [0, 1]
-terms(gp::OpenPitMining) = [[r] for r in gp.blocks]
+energy_terms(gp::OpenPitMining) = [[r] for r in gp.blocks]
+function extra_terms(gp::OpenPitMining)
+    depends = Pair{Tuple{Int,Int},Tuple{Int,Int}}[]
+    for i=1:size(gp.rewards, 1), j=i:size(gp.rewards,2)-i+1
+        if i!=1
+            push!(depends, (i,j)=>(i-1,j-1))
+            push!(depends, (i,j)=>(i-1,j))
+            push!(depends, (i,j)=>(i-1,j+1))
+        end
+    end
+    return [[dep.first, dep.second] for dep in depends]
+end
+
 labels(gp::OpenPitMining) = gp.blocks
-fixedvertices(gp::OpenPitMining) = gp.fixedvertices
 
 # weights interface
 get_weights(c::OpenPitMining) = [c.rewards[b...] for b in c.blocks]
@@ -83,12 +92,12 @@ function chweights(c::OpenPitMining, weights)
     for (w, b) in zip(weights, c.blocks)
         rewards[b...] = w
     end
-    OpenPitMining(c.code, rewards, c.blocks, c.fixedvertices)
+    OpenPitMining(rewards, c.blocks)
 end
 
 # generate tensors
-function generate_tensors(x::T, gp::OpenPitMining) where T
-    nblocks = length(gp.blocks)
+function generate_tensors(x::T, gp::GenericTensorNetwork{<:OpenPitMining}) where T
+    nblocks = length(gp.problem.blocks)
     nblocks == 0 && return []
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors

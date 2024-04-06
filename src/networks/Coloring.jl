@@ -13,23 +13,27 @@ struct Coloring{K, WT<:Union{UnitWeight, Vector}} <: GraphProblem
     graph::SimpleGraph{Int}
     weights::WT
     function Coloring{K}(graph::SimpleGraph, weights::Union{UnitWeight, Vector}=UnitWeight()) where {K}
-        @assert weights isa UnitWeight || length(weights) == ne(g)
+        @assert weights isa UnitWeight || length(weights) == ne(graph)
         new{K, typeof(weights)}(graph, weights)
     end
 end
-function GenericTensorNetwork(problem::Coloring{K}; openvertices=(), fixedvertices=Dict{Int,Int}()) where K
-    rawcode = EinCode(([[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
-                       [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...), collect(Int, openvertices))  # labels for edge tensors
-    return GenericTensorNetwork(problem, rawcode, Dict{Int,Int}(fixedvertices))
+function coloring_network(K::Int, graph::SimpleGraph; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
+    cfg = Coloring{K}(graph, weights)
+    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
+    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
 end
+
 flavors(::Type{<:Coloring{K}}) where K = collect(0:K-1)
-terms(gp::Coloring) = [[i] for i in 1:nv(gp.graph)]
+energy_terms(gp::Coloring) = [[i] for i in 1:nv(gp.graph)]
+energy_tensors(::Type{T}, c::Coloring{K}) where {K,T} = [coloringv(T, K) for i=1:nv(c.graph)]
+extra_terms(gp::Coloring) = [[minmax(e.src,e.dst)...] for e in Graphs.edges(gp.graph)]
 labels(gp::Coloring) = [1:nv(gp.graph)...]
 
 # weights interface
 get_weights(c::Coloring) = c.weights
 get_weights(c::Coloring{K}, i::Int) where K = fill(c.weights[i], K)
-chweights(c::Coloring{K}, weights) where K = Coloring{K}(c.code, c.graph, weights, c.fixedvertices)
+chweights(c::Coloring{K}, weights) where K = Coloring{K}(c.graph, weights)
+
 
 function generate_tensors(x::T, c::GenericTensorNetwork{<:Coloring{K}}) where {K,T}
     ixs = getixsv(c.code)

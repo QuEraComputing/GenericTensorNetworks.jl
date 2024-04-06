@@ -30,11 +30,23 @@ end
 
 function GenericTensorNetwork(cfg::SetCovering; openvertices=(), fixedvertices=Dict{Int,Int}())
     elements, count = cover_count(cfg.sets)
-    rawcode = EinCode([[[i] for i=1:length(cfg.sets)]...,
+    rawcode = EinCode([energy_terms(cfg)...,
         [count[e] for e in elements]...], collect(Int,openvertices))
     return GenericTensorNetwork(cfg, rawcode, Dict{Int,Int}(fixedvertices))
 end
 
+function set_covering_network(sets; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
+    cfg = SetCovering(sets, weights)
+    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
+    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
+end
+
+flavors(::Type{<:SetCovering}) = [0, 1]
+energy_terms(gp::SetCovering) = [[i] for i=1:length(gp.sets)]
+function extra_terms(::SetCovering)
+    elements, count = cover_count(cfg.sets)
+    return [count[e] for e in elements]
+end
 function cover_count(sets)
     elements = vcat(sets...)
     count = Dict{eltype(elements), Vector{Int}}()
@@ -49,6 +61,12 @@ function cover_count(sets)
     end
     return elements, count
 end
+labels(gp::SetCovering) = [1:length(gp.sets)...]
+
+# weights interface
+get_weights(c::SetCovering) = c.weights
+get_weights(gp::SetCovering, i::Int) = [0, gp.weights[i]]
+chweights(c::SetCovering, weights) = SetCovering(c.sets, weights)
 
 function cover_tensor(::Type{T}, set_indices::AbstractVector{Int}) where T
     n = length(set_indices)
@@ -57,18 +75,9 @@ function cover_tensor(::Type{T}, set_indices::AbstractVector{Int}) where T
     return t
 end
 
-flavors(::Type{<:SetCovering}) = [0, 1]
-terms(gp::SetCovering) = getixsv(gp.code)[1:length(gp.sets)]
-labels(gp::SetCovering) = [1:length(gp.sets)...]
-
-# weights interface
-get_weights(c::SetCovering) = c.weights
-get_weights(gp::SetCovering, i::Int) = [0, gp.weights[i]]
-chweights(c::SetCovering, weights) = SetCovering(c.code, c.sets, weights, c.fixedvertices)
-
 # generate tensors
-function generate_tensors(x::T, gp::SetCovering) where T
-    nsets = length(gp.sets)
+function generate_tensors(x::T, gp::GenericTensorNetwork{<:SetCovering}) where T
+    nsets = length(gp.problem.sets)
     nsets == 0 && return []
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors

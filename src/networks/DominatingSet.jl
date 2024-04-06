@@ -17,19 +17,23 @@ struct DominatingSet{WT<:Union{UnitWeight, Vector}} <: GraphProblem
         new{typeof(weights)}(g, weights)
     end
 end
-
-function GenericTensorNetwork(problem::DominatingSet; openvertices=(), fixedvertices=Dict{Int,Int}())
-    rawcode = EinCode(([[Graphs.neighbors(g, v)..., v] for v in Graphs.vertices(g)]...,), collect(Int, openvertices))
-    return GenericTensorNetwork(problem, rawcode, Dict{Int,Int}(fixedvertices))
+function dominating_set_network(g::SimpleGraph; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
+    cfg = DominatingSet(g, weights)
+    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
+    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
 end
+
 flavors(::Type{<:DominatingSet}) = [0, 1]
-terms(gp::DominatingSet) = getixsv(gp.code)
-labels(gp::DominatingSet) = [1:length(getixsv(gp.code))...]
+energy_terms(gp::DominatingSet) = [[Graphs.neighbors(gp.graph, v)..., v] for v in Graphs.vertices(gp.graph)]
+energy_tensors(x::T, c::DominatingSet) where T = [dominating_set_tensor(_pow.(Ref(x), get_weights(c, i))...) for i=1:nv(c.graph)]
+extra_terms(::DominatingSet) = Vector{Int}[]
+extra_tensors(::Type{T}, ::DominatingSet) where T = Array{T}[]
+labels(gp::DominatingSet) = [1:nv(gp.graph)...]
 
 # weights interface
 get_weights(c::DominatingSet) = c.weights
 get_weights(gp::DominatingSet, i::Int) = [0, gp.weights[i]]
-chweights(c::DominatingSet, weights) = DominatingSet(c.code, c.graph, weights, c.fixedvertices)
+chweights(c::DominatingSet, weights) = DominatingSet(c.graph, weights)
 
 function generate_tensors(x::T, mi::GenericTensorNetwork{<:DominatingSet}) where T
     ixs = getixsv(mi.code)

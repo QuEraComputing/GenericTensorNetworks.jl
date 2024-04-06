@@ -13,15 +13,37 @@ struct ZeroWeight end
 Base.getindex(::ZeroWeight, i) = 0
 Base.eltype(::ZeroWeight) = Int
 
-struct GenericTensorNetwork{CFG, CT}
+"""
+$TYPEDEF
+
+The generic tensor network.
+
+Positional arguments
+-------------------------------
+* `problem` is the graph problem.
+* `code` is the tensor network contraction code.
+* `fixedvertices` is a dictionary specifying the fixed dimensions.
+"""
+struct GenericTensorNetwork{CFG, CT, LT}
     problem::CFG
     code::CT
-    fixedvertices::Dict{Int,Int}
+    fixedvertices::Dict{LT,Int}
 end
-
+function GenericTensorNetwork(problem::GraphProblem; openvertices=(), fixedvertices=Dict()) where K
+    ixs = [energy_terms(problem)..., extra_terms(problem)...]
+    LT = eltype(eltype(ixs))
+    rawcode = DynamicEinCode(ixs, collect(LT, openvertices))  # labels for edge tensors
+    return GenericTensorNetwork(problem, rawcode, Dict{LT,Int}(fixedvertices))
+end
 function OMEinsum.optimize_code(gtn::GenericTensorNetwork; optimizer=GreedyMethod(), simplifier=MergeVectors())
     code = _optimize_code(gtn.code, uniformsize_fix(gtn.code, nflavor(gtn.problem), gtn.fixedvertices), optimizer, simplifier)
     return GenericTensorNetwork(gtn.problem, code, gtn.fixedvertices)
+end
+function generate_tensors(x::T, tn::GenericTensorNetwork) where {T}
+    ixs = getixsv(tn.code)
+    isempty(ixs) && return Array{T}[]
+    tensors = generate_tensors(x, tn.problem)
+    return select_dims(tensors, ixs, fixedvertices(tn))
 end
 
 ######## Interfaces for graph problems ##########
@@ -30,7 +52,7 @@ end
     get_weights(problem::GenericTensorNetwork[, i::Int]) -> Vector
 
 The weights for the `problem` or the weights for the degree of freedom specified by the `i`-th term if a second argument is provided.
-Weights are associated with [`terms`](@ref) in the graph problem.
+Weights are associated with [`energy_terms`](@ref) in the graph problem.
 In graph polynomial, integer weights can be the exponents.
 """
 function get_weights end
@@ -42,7 +64,7 @@ get_weights(gp::GenericTensorNetwork, i::Int) = get_weights(gp.problem, i)
     chweights(problem::GenericTensorNetwork, weights) -> GenericTensorNetwork
 
 Change the weights for the `problem` and return a new problem instance.
-Weights are associated with [`terms`](@ref) in the graph problem.
+Weights are associated with [`energy_terms`](@ref) in the graph problem.
 In graph polynomial, integer weights can be the exponents.
 """
 function chweights end
@@ -59,15 +81,22 @@ while for the max cut problem, they are the edges.
 labels(gp::GenericTensorNetwork) = labels(gp.problem)
 
 """
-    terms(problem::GraphProblem) -> Vector
-    terms(problem::GenericTensorNetwork) -> Vector
+    energy_terms(problem::GraphProblem) -> Vector
+    energy_terms(problem::GenericTensorNetwork) -> Vector
 
-The terms of a graph problem is defined as the tensor labels that defining local energies (or weights) in the graph problem.
-e.g. for the maximum independent set problems, they are the vertex-tensor labels: [1], [2], [3]...
-The weight of a term is same as the exponents in the graph polynomial.
+The energy terms of a graph problem is defined as the tensor labels that carrying local energies (or weights) in the graph problem.
 """
-function terms end
-terms(gp::GenericTensorNetwork) = terms(gp.problem)
+function energy_terms end
+energy_terms(gp::GenericTensorNetwork) = energy_terms(gp.problem)
+
+"""
+    extra_terms(problem::GraphProblem) -> Vector
+    extra_terms(problem::GenericTensorNetwork) -> Vector
+
+The extra terms of a graph problem is defined as the tensor labels that not carrying local energies (or weights) in the graph problem.
+"""
+function extra_terms end
+extra_terms(gp::GenericTensorNetwork) = extra_terms(gp.problem)
 
 """
     fixedvertices(tnet::GenericTensorNetwork) -> Dict
@@ -157,7 +186,6 @@ include("DominatingSet.jl")
 include("SetPacking.jl")
 include("SetCovering.jl")
 include("OpenPitMining.jl")
-include("Reduced.jl")
 include("SpinGlass.jl")
 include("HyperSpinGlass.jl")
 

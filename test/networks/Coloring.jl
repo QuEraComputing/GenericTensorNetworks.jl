@@ -5,11 +5,11 @@ using Test, GenericTensorNetworks, Graphs
     for (i,j) in [(1,2),(2,3),(3,4),(4,1),(1,5),(2,4)]
         add_edge!(g, i, j)
     end
-    code = Coloring{3}(g; optimizer=GreedyMethod())
+    code = coloring_network(3, g; optimizer=GreedyMethod())
     res = GenericTensorNetworks.best_solutions(code; all=true)[]
     @test length(res.c.data) == 12
     g = smallgraph(:petersen)
-    code = Coloring{3}(g; optimizer=GreedyMethod())
+    code = coloring_network(3, g; optimizer=GreedyMethod())
     res = GenericTensorNetworks.best_solutions(code; all=true)[]
     @test length(res.c.data) == 120
 
@@ -21,7 +21,7 @@ end
 
 @testset "weighted coloring" begin
     g = smallgraph(:petersen)
-    problem = Coloring{3}(g; weights=fill(2, 15))
+    problem = coloring_network(3, g; weights=fill(2, 15))
     @test get_weights(problem) == fill(2, 15)
     @test get_weights(chweights(problem, fill(3, 15))) == fill(3, 15)
     @test solve(problem, SizeMax())[].n == 30
@@ -31,7 +31,7 @@ end
 
 @testset "empty graph" begin
     g = SimpleGraph(4)
-    pb = Coloring{3}(g)
+    pb = coloring_network(3, g)
     @test solve(pb, SizeMax()) !== 4
 end
 
@@ -52,7 +52,7 @@ end
     end
 
     g = graph_crossing_gadget()
-    problem = Coloring{3}(g; openvertices=[3, 5])
+    problem = coloring_network(3, g; openvertices=[3, 5])
     res = solve(problem, ConfigsMax())
     for i=1:3
         for ci in res[i,i].c

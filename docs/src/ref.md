@@ -27,7 +27,7 @@ Interfaces [`GenericTensorNetworks.generate_tensors`](@ref), [`labels`](@ref), [
 ```@docs
 GenericTensorNetworks.generate_tensors
 labels
-terms
+energy_terms
 flavors
 get_weights
 chweights

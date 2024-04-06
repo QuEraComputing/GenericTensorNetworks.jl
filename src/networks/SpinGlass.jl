@@ -10,7 +10,7 @@ Positional arguments
 * `J` is a vector of coupling strengths associated with the edges of the `graph`.
 * `h` is a vector of onsite energy terms associated with the vertices of the `graph`.
 """
-struct SpinGlass{WT1<:Union{UnitWeight, Vector}, WT2<:Union{ZeroWeight, Vector}} <: ReducedProblem
+struct SpinGlass{WT1<:Union{UnitWeight, Vector}, WT2<:Union{ZeroWeight, Vector}} <: GraphProblem
     graph::SimpleGraph{Int}
     J::WT1
     h::WT2
@@ -33,7 +33,16 @@ function SpinGlass(M::AbstractMatrix, h::AbstractVector; kwargs...)
     return SpinGlass(g; J, h, kwargs...)
 end
 
-target_problem(sg::SpinGlass) = sg.target
+function spin_glass_network(g::SimpleGraph; J=UnitWeight(), h=ZeroWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
+    cfg = SpinGlass(g, J, h)
+    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
+    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
+end
+function spin_glass_network_from_matrix(M::AbstractMatrix, h::AbstractVector; kwargs...)
+    g = SimpleGraph((!iszero).(M))
+    J = [M[e.src, e.dst] for e in edges(g)]
+    return spinglass_network(g; J, h, kwargs...)
+end
 
 # the energy should be shifted by sum(J)/2 - sum(h)
 function extract_result(sg::SpinGlass)
@@ -78,3 +87,9 @@ function spinglass_energy(g::SimpleGraph, config; J, h=ZeroWeight())
     end
     return eng
 end
+
+# function solve(gp::ReducedProblem, property::AbstractProperty; T=Float64, usecuda=false)
+#     res = solve(target_problem(gp), property; T, usecuda)
+#     return asarray(extract_result(gp).(res), res)
+# end
+

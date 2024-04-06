@@ -2,7 +2,7 @@ using GenericTensorNetworks, Test, Graphs
 
 @testset "set packing" begin
     sets = [[1, 2, 5], [1, 3], [2, 4], [3, 6], [2, 3, 6]]  # each set is a vertex
-    gp = SetPacking(sets; optimizer=GreedyMethod())
+    gp = set_packing_network(sets; optimizer=GreedyMethod())
     @test get_weights(gp) == UnitWeight()
     @test get_weights(chweights(gp, fill(3, 6))) == fill(3,6)
     res = GenericTensorNetworks.best_solutions(gp; all=true)[]

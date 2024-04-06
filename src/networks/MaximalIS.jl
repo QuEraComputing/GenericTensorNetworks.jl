@@ -8,7 +8,7 @@ Positional arguments
 * `graph` is the problem graph.
 * `weights` are associated with the vertices of the `graph`.
 """
-struct MaximalIS{CT<:AbstractEinsum,WT<:Union{UnitWeight, Vector}} <: GraphProblem
+struct MaximalIS{WT<:Union{UnitWeight, Vector}} <: GraphProblem
     graph::SimpleGraph
     weights::WT
     function MaximalIS(g::SimpleGraph, weights::Union{UnitWeight, Vector}=UnitWeight())
@@ -17,21 +17,23 @@ struct MaximalIS{CT<:AbstractEinsum,WT<:Union{UnitWeight, Vector}} <: GraphProbl
     end
 end
 
-function GenericTensorNetwork(problem::MaximalIS; openvertices=(), fixedvertices=Dict{Int,Int}())
-    rawcode = EinCode(([[Graphs.neighbors(problem.graph, v)..., v] for v in Graphs.vertices(problem.graph)]...,), collect(Int, openvertices))
-    return GenericTensorNetwork(problem, rawcode, Dict{Int,Int}(fixedvertices))
+function maximal_independent_set_network(g::SimpleGraph; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
+    cfg = MaximalIS(g, weights)
+    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
+    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
 end
 
 flavors(::Type{<:MaximalIS}) = [0, 1]
-terms(gp::MaximalIS) = getixsv(gp.code)
-labels(gp::MaximalIS) = [1:length(getixsv(gp.code))...]
+energy_terms(gp::MaximalIS) = [[Graphs.neighbors(gp.graph, v)..., v] for v in Graphs.vertices(gp.graph)]
+extra_terms(::MaximalIS) = Vector{Int}[]
+labels(gp::MaximalIS) = [1:nv(gp.graph)...]
 
 # weights interface
 get_weights(c::MaximalIS) = c.weights
 get_weights(gp::MaximalIS, i::Int) = [0, gp.weights[i]]
-chweights(c::MaximalIS, weights) = MaximalIS(c.code, c.graph, weights, c.fixedvertices)
+chweights(c::MaximalIS, weights) = MaximalIS(c.graph, weights)
 
-function generate_tensors(x::T, mi::MaximalIS) where T
+function generate_tensors(x::T, mi::GenericTensorNetwork{<:MaximalIS}) where T
     ixs = getixsv(mi.code)
     isempty(ixs) && return []
 	return select_dims(add_labels!(map(enumerate(ixs)) do (i, ix)

@@ -39,16 +39,12 @@ struct PaintShop{LT} <: GraphProblem
         new{eltype(sequence)}(sequence, isfirst)
     end
 end
-function GenericTensorNetwork(cfg::PaintShop{LT}; openvertices=(), fixedvertices=Dict{Int,Int}()) where LT
-    rawcode = EinCode([[cfg.sequence[i], cfg.sequence[i+1]] for i in 1:length(cfg.sequence)-1], collect(LT, openvertices))
-    return GenericTensorNetwork(cfg, rawcode, Dict{Int,Int}(fixedvertices))
-end
-function paintshop_network(syms::AbstractVector{LT}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{Int,Int}()) where LT
+function paint_shop_network(syms::AbstractVector{LT}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{Int,Int}()) where LT
     cfg = PaintShop(syms)
     gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
     return OMEinsum.optimize_code(gtn; optimizer, simplifier)
 end
-function paintshop_network_from_pairs(pairs::AbstractVector{Tuple{Int,Int}}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict())
+function paint_shop_network_from_pairs(pairs::AbstractVector{Tuple{Int,Int}}; openvertices=(), optimizer=GreedyMethod(), simplifier=MergeVectors(), fixedvertices=Dict())
     n = length(pairs)
     @assert sort!(vcat(collect.(pairs)...)) == collect(1:2n)
     sequence = zeros(Int, 2*n)
@@ -59,19 +55,19 @@ function paintshop_network_from_pairs(pairs::AbstractVector{Tuple{Int,Int}}; ope
 end
 
 flavors(::Type{<:PaintShop}) = [0, 1]
-terms(gp::PaintShop) = getixsv(gp.code)
+energy_terms(gp::PaintShop) = [[gp.sequence[i], gp.sequence[i+1]] for i in 1:length(gp.sequence)-1]
+extra_terms(::PaintShop{LT}) where LT = Vector{LT}[]
 labels(gp::PaintShop) = unique(gp.sequence)
-fixedvertices(gp::PaintShop) = gp.fixedvertices
 
 # weights interface
 get_weights(c::PaintShop) = UnitWeight()
 get_weights(::PaintShop, i::Int) = [0, 1]
 chweights(c::PaintShop, weights) = c
 
-function generate_tensors(x::T, c::PaintShop) where T
+function generate_tensors(x::T, c::GenericTensorNetwork{<:PaintShop}) where T
     ixs = getixsv(c.code)
     tensors = [paintshop_bond_tensor(_pow.(Ref(x), get_weights(c, i))...) for i=1:length(ixs)]
-    return select_dims(add_labels!(Array{T}[flip_labels(tensors[i], c.isfirst[i], c.isfirst[i+1]) for i=1:length(ixs)], ixs, labels(c)), ixs, fixedvertices(c))
+    return select_dims(add_labels!(Array{T}[flip_labels(tensors[i], c.problem.isfirst[i], c.problem.isfirst[i+1]) for i=1:length(ixs)], ixs, labels(c)), ixs, fixedvertices(c))
 end
 
 function paintshop_bond_tensor(a::T, b::T) where T
@@ -99,7 +95,7 @@ end
 Returns a valid painting from the paint shop configuration (given by the configuration solvers).
 The `config` is a sequence of 0 and 1, where 0 means painting the first appearence of a car in blue, 1 otherwise.
 """
-function paint_shop_coloring_from_config(p::PaintShop{CT,LT}, config) where {CT, LT}
+function paint_shop_coloring_from_config(p::PaintShop{LT}, config) where {LT}
     d = Dict{LT,Bool}(zip(labels(p), config))
     return map(1:length(p.sequence)) do i
         p.isfirst[i] ? d[p.sequence[i]] : ~d[p.sequence[i]]

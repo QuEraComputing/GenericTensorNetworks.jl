@@ -21,20 +21,24 @@ struct HyperSpinGlass{WT<:Union{UnitWeight, Vector}} <: GraphProblem
     end
 end
 
-function GenericTensorNetwork(problem::HyperSpinGlass; openvertices=(), fixedvertices=Dict{Int,Int}())
-    rawcode = EinCode([problem.cliques..., [[i] for i=1:problem.n]...], collect(Int, openvertices))  # labels for edge tensors
-    return GenericTensorNetwork(problem, rawcode, Dict{Int,Int}(fixedvertices))
+function hyper_spin_glass_network(n::Int, cliques; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
+    cfg = HyperSpinGlass(n, cliques, weights)
+    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
+    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
 end
 
 flavors(::Type{<:HyperSpinGlass}) = [0, 1]
 # first `ne` indices are for edge weights, last `n` indices are for vertex weights.
-terms(gp::HyperSpinGlass) = gp.cliques
+energy_terms(gp::HyperSpinGlass) = gp.cliques
+energy_tensors(x::T, c::HyperSpinGlass) where T = [clique_tensor(length(c.cliques[i]), _pow.(Ref(x), get_weights(c, i))...) for i=1:length(c.cliques)]
+extra_terms(::HyperSpinGlass) = [[i] for i=1:problem.n]
+extra_tensors(::Type{T}, c::HyperSpinGlass) where T = [Array{T}[one(T), one(T)] for i=1:c.n]
 labels(gp::HyperSpinGlass) = collect(1:gp.n)
 
 # weights interface
 get_weights(c::HyperSpinGlass) = c.weights
 get_weights(gp::HyperSpinGlass, i::Int) = [-gp.weights[i], gp.weights[i]]
-chweights(c::HyperSpinGlass, weights) = HyperSpinGlass(c.code, c.n, c.cliques, weights, c.fixedvertices)
+chweights(c::HyperSpinGlass, weights) = HyperSpinGlass(c.n, c.cliques, weights)
 
 function generate_tensors(x::T, gp::GenericTensorNetwork{<:HyperSpinGlass}) where T
     ixs = getixsv(gp.code)

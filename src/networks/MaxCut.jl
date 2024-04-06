@@ -13,7 +13,7 @@ struct MaxCut{WT1<:Union{UnitWeight, Vector},WT2<:Union{ZeroWeight, Vector}} <: 
     graph::SimpleGraph{Int}
     edge_weights::WT1
     vertex_weights::WT2
-    function MaxCut(g::SimpleGraph;
+    function MaxCut(g::SimpleGraph,
             edge_weights::Union{UnitWeight, Vector}=UnitWeight(),
             vertex_weights::Union{ZeroWeight, Vector}=ZeroWeight())
         @assert edge_weights isa UnitWeight || length(edge_weights) == ne(g)
@@ -21,31 +21,30 @@ struct MaxCut{WT1<:Union{UnitWeight, Vector},WT2<:Union{ZeroWeight, Vector}} <: 
         new{typeof(edge_weights), typeof(vertex_weights)}(g, edge_weights, vertex_weights)
     end
 end
-function GenericTensorNetwork(problem::MaxCut; openvertices=(), fixedvertices=Dict{Int,Int}())
-    rawcode = EinCode([
-        map(e->[minmax(e.src,e.dst)...], Graphs.edges(problem.graph))...,
-        map(v->[v], Graphs.vertices(problem.graph))...,
-    ], collect(Int, openvertices))  # labels for edge tensors
-    return GenericTensorNetwork(problem, rawcode, Dict{Int,Int}(fixedvertices))
+function max_cut_network(g::SimpleGraph; edge_weights=UnitWeight(), vertex_weights=ZeroWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
+    cfg = MaxCut(g, edge_weights, vertex_weights)
+    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
+    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
 end
 
 flavors(::Type{<:MaxCut}) = [0, 1]
 # first `ne` indices are for edge weights, last `nv` indices are for vertex weights.
-terms(gp::MaxCut) = getixsv(gp.code)
+energy_terms(gp::MaxCut) = [[[minmax(e.src,e.dst)...] for e in Graphs.edges(gp.graph)]...,
+                            [[v] for v in Graphs.vertices(gp.graph)]...]
+extra_terms(::MaxCut) = Vector{Int}[]
 labels(gp::MaxCut) = [1:nv(gp.graph)...]
-fixedvertices(gp::MaxCut) = gp.fixedvertices
 
 # weights interface
 get_weights(c::MaxCut) = [[c.edge_weights[i] for i=1:ne(c.graph)]..., [c.vertex_weights[i] for i=1:nv(c.graph)]...]
 get_weights(gp::MaxCut, i::Int) = i <= ne(gp.graph) ? [0, gp.edge_weights[i]] : [0, gp.vertex_weights[i-ne(gp.graph)]]
-chweights(c::MaxCut, weights) = MaxCut(c.code, c.graph, weights[1:ne(c.graph)], weights[ne(c.graph)+1:end], c.fixedvertices)
+chweights(c::MaxCut, weights) = MaxCut(c.graph, weights[1:ne(c.graph)], weights[ne(c.graph)+1:end])
 
-function generate_tensors(x::T, gp::MaxCut) where T
+function generate_tensors(x::T, gp::GenericTensorNetwork{<:MaxCut}) where T
     ixs = getixsv(gp.code)
-    l = ne(gp.graph)
+    l = ne(gp.problem.graph)
     tensors = [
         Array{T}[maxcutb(_pow.(Ref(x), get_weights(gp, i))...) for i=1:l]...,
-        add_labels!(Array{T}[Ref(x) .^ get_weights(gp, i+l) for i=1:nv(gp.graph)], ixs[l+1:end], labels(gp))...
+        add_labels!(Array{T}[Ref(x) .^ get_weights(gp, i+l) for i=1:nv(gp.problem.graph)], ixs[l+1:end], labels(gp))...
     ]
     return select_dims(tensors, ixs, fixedvertices(gp))
 end

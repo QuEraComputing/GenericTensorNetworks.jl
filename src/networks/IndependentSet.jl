@@ -28,18 +28,16 @@ struct IndependentSet{WT} <: GraphProblem
         new{WT}(graph, weights)
     end
 end
-function GenericTensorNetwork(cfg::IndependentSet; openvertices=(), fixedvertices=Dict{Int,Int}())
-    rawcode = EinCode([[[i] for i in Graphs.vertices(cfg.graph)]..., # labels for vertex tensors
-                       [[minmax(e.src,e.dst)...] for e in Graphs.edges(cfg.graph)]...], collect(Int, openvertices))  # labels for edge tensors
-    return GenericTensorNetwork(cfg, rawcode, Dict{Int,Int}(fixedvertices))
-end
 function independent_set_network(g::SimpleGraph; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
     cfg = IndependentSet(g, weights)
     gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
     return OMEinsum.optimize_code(gtn; optimizer, simplifier)
 end
 flavors(::Type{<:IndependentSet}) = [0, 1]
-terms(gp::IndependentSet) = [[i] for i in 1:nv(gp.graph)]
+energy_terms(gp::IndependentSet) = [[i] for i in 1:nv(gp.graph)]
+energy_tensors(x::T, c::IndependentSet) where T = [misv(_pow.(Ref(x), get_weights(c, i))) for i=1:nv(c.graph)]
+extra_terms(gp::IndependentSet) = [[minmax(e.src,e.dst)...] for e in Graphs.edges(gp.graph)]
+extra_tensors(::Type{T}, ::IndependentSet) where T = [misb(T) for i=1:ne(gp.graph)]
 labels(gp::IndependentSet) = [1:nv(gp.graph)...]
 
 # weights interface

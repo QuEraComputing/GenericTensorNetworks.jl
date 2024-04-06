@@ -158,7 +158,9 @@ end
 
 flavors(::Type{<:Satisfiability}) = [0, 1]  # false, true
 energy_terms(gp::Satisfiability) = [[getfield.(c.vars, :name)...] for c in gp.cnf.clauses]
+energy_tensors(x::T, c::Satisfiability) where T = [tensor_for_clause(c.cnf.clauses[i], _pow.(Ref(x), get_weights(c, i))...) for i=1:length(c.cnf.clauses)]
 extra_terms(::Satisfiability{T}) where T = Vector{T}[]
+extra_tensors(::Type{T}, c::Satisfiability) where T = Array{T}[]
 labels(gp::Satisfiability) = unique!(vcat(energy_terms(gp)...))
 
 # weights interface
@@ -179,21 +181,6 @@ function satisfiable(c::CNFClause{T}, config::AbstractDict{T}) where T
 end
 function satisfiable(v::BoolVar{T}, config::AbstractDict{T}) where T
     config[v.name] == ~v.neg
-end
-
-# the first argument is a function of variables
-function generate_tensors(x::VT, sa::GenericTensorNetwork{<:Satisfiability{CT,T}}) where {CT,T,VT}
-    cnf = sa.problem.cnf
-    ixs = getixsv(sa.code)
-    isempty(cnf.clauses) && return []
-	return select_dims(
-        add_labels!(
-            map(1:length(cnf.clauses)) do i
-                tensor_for_clause(cnf.clauses[i], _pow.(Ref(x), get_weights(sa, i))...)
-            end,
-            ixs, labels(sa))
-        , ixs, fixedvertices(sa)
-    )
 end
 
 function tensor_for_clause(c::CNFClause{T}, a, b) where T

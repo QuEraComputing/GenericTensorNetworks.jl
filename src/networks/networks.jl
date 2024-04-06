@@ -45,6 +45,11 @@ function generate_tensors(x::T, tn::GenericTensorNetwork) where {T}
     tensors = generate_tensors(x, tn.problem)
     return select_dims(tensors, ixs, fixedvertices(tn))
 end
+function generate_tensors(x::T, m::GraphProblem) where T
+    tensors = [energy_tensors(x, m)..., extra_tensors(T, m)...]
+    ixs = [energy_terms(m)..., extra_terms(m)...]
+    return add_labels!(tensors, ixs, labels(m))
+end
 
 ######## Interfaces for graph problems ##########
 """

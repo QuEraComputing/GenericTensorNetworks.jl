@@ -37,26 +37,13 @@ flavors(::Type{<:IndependentSet}) = [0, 1]
 energy_terms(gp::IndependentSet) = [[i] for i in 1:nv(gp.graph)]
 energy_tensors(x::T, c::IndependentSet) where T = [misv(_pow.(Ref(x), get_weights(c, i))) for i=1:nv(c.graph)]
 extra_terms(gp::IndependentSet) = [[minmax(e.src,e.dst)...] for e in Graphs.edges(gp.graph)]
-extra_tensors(::Type{T}, ::IndependentSet) where T = [misb(T) for i=1:ne(gp.graph)]
+extra_tensors(::Type{T}, gp::IndependentSet) where T = [misb(T) for i=1:ne(gp.graph)]
 labels(gp::IndependentSet) = [1:nv(gp.graph)...]
 
 # weights interface
 get_weights(c::IndependentSet) = c.weights
 get_weights(gp::IndependentSet, i::Int) = [0, gp.weights[i]]
 chweights(c::IndependentSet, weights) = IndependentSet(c.graph, weights)
-
-# generate tensors
-function generate_tensors(x::T, gp::GenericTensorNetwork{<:IndependentSet}) where T
-    graph = gp.problem.graph
-    nv(graph) == 0 && return []
-    ixs = getixsv(gp.code)
-    # we only add labels at vertex tensors
-    tensors = select_dims([
-            add_labels!(Array{T}[misv(_pow.(Ref(x), get_weights(gp, i))) for i=1:nv(graph)], ixs[1:nv(graph)], labels(gp))...,
-            Array{T}[misb(T, length(ix)) for ix in ixs[nv(graph)+1:end]]... # if n!=2, it corresponds to set packing problem.
-    ], ixs, fixedvertices(gp))
-    return tensors
-end
 
 function misb(::Type{T}, n::Integer=2) where T
     res = zeros(T, fill(2, n)...)

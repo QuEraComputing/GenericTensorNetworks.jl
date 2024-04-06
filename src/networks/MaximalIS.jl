@@ -25,7 +25,9 @@ end
 
 flavors(::Type{<:MaximalIS}) = [0, 1]
 energy_terms(gp::MaximalIS) = [[Graphs.neighbors(gp.graph, v)..., v] for v in Graphs.vertices(gp.graph)]
+energy_tensors(x::T, c::MaximalIS) where T = [maximal_independent_set_tensor(_pow.(Ref(x), get_weights(c, i))..., degree(c.graph, i)+1) for i=1:nv(c.graph)]
 extra_terms(::MaximalIS) = Vector{Int}[]
+extra_tensors(::Type{T}, ::MaximalIS) where T = Array{T}[]
 labels(gp::MaximalIS) = [1:nv(gp.graph)...]
 
 # weights interface
@@ -33,13 +35,6 @@ get_weights(c::MaximalIS) = c.weights
 get_weights(gp::MaximalIS, i::Int) = [0, gp.weights[i]]
 chweights(c::MaximalIS, weights) = MaximalIS(c.graph, weights)
 
-function generate_tensors(x::T, mi::GenericTensorNetwork{<:MaximalIS}) where T
-    ixs = getixsv(mi.code)
-    isempty(ixs) && return []
-	return select_dims(add_labels!(map(enumerate(ixs)) do (i, ix)
-        maximal_independent_set_tensor(_pow.(Ref(x), get_weights(mi, i))..., length(ix))
-    end, ixs, labels(mi)), ixs, fixedvertices(mi))
-end
 function maximal_independent_set_tensor(a::T, b::T, d::Int) where T
     t = zeros(T, fill(2, d)...)
     for i = 2:1<<(d-1)

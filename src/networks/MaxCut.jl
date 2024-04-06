@@ -31,23 +31,16 @@ flavors(::Type{<:MaxCut}) = [0, 1]
 # first `ne` indices are for edge weights, last `nv` indices are for vertex weights.
 energy_terms(gp::MaxCut) = [[[minmax(e.src,e.dst)...] for e in Graphs.edges(gp.graph)]...,
                             [[v] for v in Graphs.vertices(gp.graph)]...]
+energy_tensors(x::T, c::MaxCut) where T = [[maxcutb(_pow.(Ref(x), get_weights(c, i))...) for i=1:ne(c.graph)]...,
+                                            [Ref(x) .^ get_weights(c, i+ne(c.graph)) for i=1:nv(c.graph)]...]
 extra_terms(::MaxCut) = Vector{Int}[]
+extra_tensors(::Type{T}, ::MaxCut) where T = Array{T}[]
 labels(gp::MaxCut) = [1:nv(gp.graph)...]
 
 # weights interface
 get_weights(c::MaxCut) = [[c.edge_weights[i] for i=1:ne(c.graph)]..., [c.vertex_weights[i] for i=1:nv(c.graph)]...]
 get_weights(gp::MaxCut, i::Int) = i <= ne(gp.graph) ? [0, gp.edge_weights[i]] : [0, gp.vertex_weights[i-ne(gp.graph)]]
 chweights(c::MaxCut, weights) = MaxCut(c.graph, weights[1:ne(c.graph)], weights[ne(c.graph)+1:end])
-
-function generate_tensors(x::T, gp::GenericTensorNetwork{<:MaxCut}) where T
-    ixs = getixsv(gp.code)
-    l = ne(gp.problem.graph)
-    tensors = [
-        Array{T}[maxcutb(_pow.(Ref(x), get_weights(gp, i))...) for i=1:l]...,
-        add_labels!(Array{T}[Ref(x) .^ get_weights(gp, i+l) for i=1:nv(gp.problem.graph)], ixs[l+1:end], labels(gp))...
-    ]
-    return select_dims(tensors, ixs, fixedvertices(gp))
-end
 
 function maxcutb(a, b)
     return [a b; b a]

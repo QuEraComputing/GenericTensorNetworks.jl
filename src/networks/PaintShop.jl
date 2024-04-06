@@ -56,19 +56,15 @@ end
 
 flavors(::Type{<:PaintShop}) = [0, 1]
 energy_terms(gp::PaintShop) = [[gp.sequence[i], gp.sequence[i+1]] for i in 1:length(gp.sequence)-1]
+energy_tensors(x::T, c::PaintShop) where T = [flip_labels(paintshop_bond_tensor(_pow.(Ref(x), get_weights(c, i))...), c.isfirst[i], c.isfirst[i+1]) for i=1:length(c.sequence)-1]
 extra_terms(::PaintShop{LT}) where LT = Vector{LT}[]
+extra_tensors(::Type{T}, ::PaintShop) where T = Array{T}[]
 labels(gp::PaintShop) = unique(gp.sequence)
 
 # weights interface
 get_weights(c::PaintShop) = UnitWeight()
 get_weights(::PaintShop, i::Int) = [0, 1]
 chweights(c::PaintShop, weights) = c
-
-function generate_tensors(x::T, c::GenericTensorNetwork{<:PaintShop}) where T
-    ixs = getixsv(c.code)
-    tensors = [paintshop_bond_tensor(_pow.(Ref(x), get_weights(c, i))...) for i=1:length(ixs)]
-    return select_dims(add_labels!(Array{T}[flip_labels(tensors[i], c.problem.isfirst[i], c.problem.isfirst[i+1]) for i=1:length(ixs)], ixs, labels(c)), ixs, fixedvertices(c))
-end
 
 function paintshop_bond_tensor(a::T, b::T) where T
     m = T[a b; b a]

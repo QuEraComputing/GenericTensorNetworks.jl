@@ -43,24 +43,12 @@ end
 
 flavors(::Type{<:SetCovering}) = [0, 1]
 energy_terms(gp::SetCovering) = [[i] for i=1:length(gp.sets)]
-function extra_terms(::SetCovering)
-    elements, count = cover_count(cfg.sets)
+energy_tensors(x::T, c::SetCovering) where T = [misv(_pow.(Ref(x), get_weights(c, i))) for i=1:length(c.sets)]
+function extra_terms(sc::SetCovering)
+    elements, count = cover_count(sc.sets)
     return [count[e] for e in elements]
 end
-function cover_count(sets)
-    elements = vcat(sets...)
-    count = Dict{eltype(elements), Vector{Int}}()
-    for (iset, set) in enumerate(sets)
-        for e in set
-            if haskey(count, e)
-                push!(count[e], iset)
-            else
-                count[e] = [iset]
-            end
-        end
-    end
-    return elements, count
-end
+extra_tensors(::Type{T}, cfg::SetCovering) where T = [cover_tensor(T, ix) for ix in extra_terms(cfg)]
 labels(gp::SetCovering) = [1:length(gp.sets)...]
 
 # weights interface
@@ -75,16 +63,19 @@ function cover_tensor(::Type{T}, set_indices::AbstractVector{Int}) where T
     return t
 end
 
-# generate tensors
-function generate_tensors(x::T, gp::GenericTensorNetwork{<:SetCovering}) where T
-    nsets = length(gp.problem.sets)
-    nsets == 0 && return []
-    ixs = getixsv(gp.code)
-    # we only add labels at vertex tensors
-    return select_dims([
-        add_labels!(Array{T}[misv(_pow.(Ref(x), get_weights(gp, i))) for i=1:nsets], ixs[1:nsets], labels(gp))...,
-            Array{T}[cover_tensor(T, ix) for ix in ixs[nsets+1:end]]...], ixs, fixedvertices(gp)
-    )
+function cover_count(sets)
+    elements = vcat(sets...)
+    count = Dict{eltype(elements), Vector{Int}}()
+    for (iset, set) in enumerate(sets)
+        for e in set
+            if haskey(count, e)
+                push!(count[e], iset)
+            else
+                count[e] = [iset]
+            end
+        end
+    end
+    return elements, count
 end
 
 """

@@ -70,6 +70,7 @@ end
 
 flavors(::Type{<:OpenPitMining}) = [0, 1]
 energy_terms(gp::OpenPitMining) = [[r] for r in gp.blocks]
+energy_tensors(x::T, c::OpenPitMining) where T = [_pow.(Ref(x), get_weights(c, i)) for i=1:length(c.blocks)]
 function extra_terms(gp::OpenPitMining)
     depends = Pair{Tuple{Int,Int},Tuple{Int,Int}}[]
     for i=1:size(gp.rewards, 1), j=i:size(gp.rewards,2)-i+1
@@ -81,6 +82,7 @@ function extra_terms(gp::OpenPitMining)
     end
     return [[dep.first, dep.second] for dep in depends]
 end
+extra_tensors(::Type{T}, gp::OpenPitMining) where T = [mining_tensor(T) for _ in extra_terms(gp)]
 
 labels(gp::OpenPitMining) = gp.blocks
 
@@ -93,19 +95,6 @@ function chweights(c::OpenPitMining, weights)
         rewards[b...] = w
     end
     OpenPitMining(rewards, c.blocks)
-end
-
-# generate tensors
-function generate_tensors(x::T, gp::GenericTensorNetwork{<:OpenPitMining}) where T
-    nblocks = length(gp.problem.blocks)
-    nblocks == 0 && return []
-    ixs = getixsv(gp.code)
-    # we only add labels at vertex tensors
-    return select_dims([
-        add_labels!(Array{T}[_pow.(Ref(x), get_weights(gp, i)) for i=1:nblocks], ixs[1:nblocks], labels(gp))...,
-        Array{T}[mining_tensor(T) for ix in ixs[nblocks+1:end]]...
-        ], ixs, fixedvertices(gp)
-    )
 end
 
 """

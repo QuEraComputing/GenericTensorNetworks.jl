@@ -26,29 +26,13 @@ flavors(::Type{<:Matching}) = [0, 1]
 energy_terms(gp::Matching) = [[minmax(src(s), dst(s))] for s in edges(gp.graph)] # edge tensors
 energy_tensors(x::T, c::Matching) where T = [_pow.(Ref(x), get_weights(c, i)) for i=1:ne(c.graph)]
 extra_terms(gp::Matching) = [[minmax(i, j) for j in neighbors(gp.graph, i)] for i in Graphs.vertices(gp.graph)]
-extra_tensors(::Type{T}, ::Matching) where T = [match_tensor(T, degree(gp.graph, i)) for i=1:nv(gp.graph)]
+extra_tensors(::Type{T}, gp::Matching) where T = [match_tensor(T, degree(gp.graph, i)) for i=1:nv(gp.graph)]
 labels(gp::Matching) = getindex.(energy_terms(gp))
 
 # weights interface
 get_weights(c::Matching) = c.weights
 get_weights(m::Matching, i::Int) = [0, m.weights[i]]
 chweights(c::Matching, weights) = Matching(c.graph, weights)
-
-function generate_tensors(x::T, m::GraphProblem) where T
-    ixs = getixsv(m.code)
-    tensors = Array{T}[]
-    for i=1:length(ixs)
-        ix = ixs[i]
-        if i<=ne(m.problem.graph)
-            @assert length(ix) == 1
-            t = _pow.(Ref(x), get_weights(m, i)) # x is defined on edges.
-        else
-            t = match_tensor(T, length(ix))
-        end
-        push!(tensors, t)
-    end
-    return select_dims(add_labels!(tensors, ixs, labels(m)), ixs, fixedvertices(m))
-end
 
 function match_tensor(::Type{T}, n::Int) where T
     t = zeros(T, fill(2, n)...)

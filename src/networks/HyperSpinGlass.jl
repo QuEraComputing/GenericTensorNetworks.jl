@@ -40,16 +40,6 @@ get_weights(c::HyperSpinGlass) = c.weights
 get_weights(gp::HyperSpinGlass, i::Int) = [-gp.weights[i], gp.weights[i]]
 chweights(c::HyperSpinGlass, weights) = HyperSpinGlass(c.n, c.cliques, weights)
 
-function generate_tensors(x::T, gp::GenericTensorNetwork{<:HyperSpinGlass}) where T
-    ixs = getixsv(gp.code)
-    l = length(gp.problem.cliques)
-    tensors = [
-               Array{T}[clique_tensor(length(gp.cliques[i]), _pow.(Ref(x), get_weights(gp, i))...) for i=1:l]...,
-               add_labels!(Array{T}[[one(T), one(T)] for i in labels(gp)], ixs[l+1:end], labels(gp))...
-    ]
-    return select_dims(tensors, ixs, fixedvertices(gp))
-end
-
 function clique_tensor(rank, a::T, b::T) where T
     res = zeros(T, fill(2, rank)...)
     for i=0:(1<<rank-1)

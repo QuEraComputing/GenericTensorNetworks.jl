@@ -24,25 +24,16 @@ function coloring_network(K::Int, graph::SimpleGraph; weights=UnitWeight(), open
 end
 
 flavors(::Type{<:Coloring{K}}) where K = collect(0:K-1)
-energy_terms(gp::Coloring) = [[i] for i in 1:nv(gp.graph)]
-energy_tensors(::Type{T}, c::Coloring{K}) where {K,T} = [coloringv(T, K) for i=1:nv(c.graph)]
-extra_terms(gp::Coloring) = [[minmax(e.src,e.dst)...] for e in Graphs.edges(gp.graph)]
+energy_terms(gp::Coloring) = [[minmax(e.src,e.dst)...] for e in Graphs.edges(gp.graph)]
+energy_tensors(x::T, c::Coloring{K}) where {K, T} = [_pow.(coloringb(x, K), get_weights(c, i)) for i=1:ne(c.graph)]
+extra_terms(gp::Coloring) = [[i] for i in 1:nv(gp.graph)]
+extra_tensors(::Type{T}, c::Coloring{K}) where {K,T} = [coloringv(T, K) for i=1:nv(c.graph)]
 labels(gp::Coloring) = [1:nv(gp.graph)...]
 
 # weights interface
 get_weights(c::Coloring) = c.weights
 get_weights(c::Coloring{K}, i::Int) where K = fill(c.weights[i], K)
 chweights(c::Coloring{K}, weights) where K = Coloring{K}(c.graph, weights)
-
-
-function generate_tensors(x::T, c::GenericTensorNetwork{<:Coloring{K}}) where {K,T}
-    ixs = getixsv(c.code)
-    graph = c.problem.graph
-    return select_dims([
-        add_labels!(Array{T}[coloringv(T, K) for i=1:nv(graph)], ixs[1:nv(graph)], labels(c))...,
-        Array{T}[_pow.(coloringb(x, K), get_weights(c, i)) for i=1:ne(graph)]...
-    ], ixs, fixedvertices(c))
-end
 
 # coloring bond tensor
 function coloringb(x::T, k::Int) where T

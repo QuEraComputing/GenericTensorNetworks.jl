@@ -35,24 +35,15 @@ end
 
 flavors(::Type{<:SetPacking}) = [0, 1]
 energy_terms(gp::SetPacking) = [[i] for i=1:length(gp.sets)]
+energy_tensors(x::T, c::SetPacking) where T = [misv(_pow.(Ref(x), get_weights(c, i))) for i=1:length(c.sets)]
 extra_terms(gp::SetPacking) = [[i,j] for i=1:length(gp.sets),j=1:length(gp.sets) if j>i && !isempty(gp.sets[i] ∩ gp.sets[j])]
+extra_tensors(::Type{T}, gp::SetPacking) where T = [misb(T, length(ix)) for ix in extra_terms(gp)]
 labels(gp::SetPacking) = [1:length(gp.sets)...]
 
 # weights interface
 get_weights(c::SetPacking) = c.weights
 get_weights(gp::SetPacking, i::Int) = [0, gp.weights[i]]
 chweights(c::SetPacking, weights) = SetPacking(c.sets, weights)
-
-# generate tensors
-function generate_tensors(x::T, gp::GenericTensorNetwork{<:SetPacking}) where T
-    length(gp.problem.sets) == 0 && return []
-    ixs = getixsv(gp.code)
-    # we only add labels at vertex tensors
-    return select_dims([
-        add_labels!(Array{T}[misv(_pow.(Ref(x), get_weights(gp, i))) for i=1:length(gp.problem.sets)], ixs[1:length(gp.problem.sets)], labels(gp))...,
-        Array{T}[misb(T, length(ix)) for ix in ixs[length(gp.sets)+1:end]]...], ixs, fixedvertices(gp),
-    )
-end
 
 """
     is_set_packing(sets::AbstractVector, config)

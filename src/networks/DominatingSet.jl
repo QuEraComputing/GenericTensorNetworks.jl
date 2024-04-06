@@ -25,7 +25,7 @@ end
 
 flavors(::Type{<:DominatingSet}) = [0, 1]
 energy_terms(gp::DominatingSet) = [[Graphs.neighbors(gp.graph, v)..., v] for v in Graphs.vertices(gp.graph)]
-energy_tensors(x::T, c::DominatingSet) where T = [dominating_set_tensor(_pow.(Ref(x), get_weights(c, i))...) for i=1:nv(c.graph)]
+energy_tensors(x::T, c::DominatingSet) where T = [dominating_set_tensor(_pow.(Ref(x), get_weights(c, i))..., degree(c.graph, i)+1) for i=1:nv(c.graph)]
 extra_terms(::DominatingSet) = Vector{Int}[]
 extra_tensors(::Type{T}, ::DominatingSet) where T = Array{T}[]
 labels(gp::DominatingSet) = [1:nv(gp.graph)...]
@@ -35,13 +35,6 @@ get_weights(c::DominatingSet) = c.weights
 get_weights(gp::DominatingSet, i::Int) = [0, gp.weights[i]]
 chweights(c::DominatingSet, weights) = DominatingSet(c.graph, weights)
 
-function generate_tensors(x::T, mi::GenericTensorNetwork{<:DominatingSet}) where T
-    ixs = getixsv(mi.code)
-    isempty(ixs) && return []
-	return select_dims(add_labels!(map(enumerate(ixs)) do (i, ix)
-        dominating_set_tensor(_pow.(Ref(x), get_weights(mi, i))..., length(ix))
-    end, ixs, labels(mi)), ixs, fixedvertices(mi))
-end
 function dominating_set_tensor(a::T, b::T, d::Int) where T
     t = zeros(T, fill(2, d)...)
     for i = 2:1<<(d-1)

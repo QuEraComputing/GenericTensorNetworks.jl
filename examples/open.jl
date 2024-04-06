@@ -8,7 +8,7 @@ using GenericTensorNetworks, Graphs
 graph = Graphs.smallgraph(:petersen)
 
 # The following code computes the MIS tropical tensor (reference to be added) with open vertices 1, 2 and 3.
-problem = IndependentSet(graph; openvertices=[1,2,3]);
+problem = GenericTensorNetwork(IndependentSet(graph); openvertices=[1,2,3]);
 
 marginal = solve(problem, SizeMax())
 
@@ -17,7 +17,7 @@ marginal = solve(problem, SizeMax())
 
 # One can also specify the fixed degrees of freedom by providing the `fixedvertices` keyword argument as a `Dict`, which can be used to get conditioned probability.
 # For example, we can use the following code to do the same calculation as using `openvertices`.
-problem = IndependentSet(graph; fixedvertices=Dict(1=>0, 2=>0, 3=>0));
+problem = GenericTensorNetwork(IndependentSet(graph); fixedvertices=Dict(1=>0, 2=>0, 3=>0));
 
 output = zeros(TropicalF64,2,2,2);
 

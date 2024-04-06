@@ -38,12 +38,11 @@ export line_graph
 
 # Tensor Networks (Graph problems)
 export GraphProblem, GenericTensorNetwork, optimize_code, UnitWeight, ZeroWeight
-export flavors, labels, nflavor, get_weights, fixedvertices, chweights
+export flavors, labels, nflavor, get_weights, fixedvertices, chweights, energy_terms
 export IndependentSet, mis_compactify!, is_independent_set
 export MaximalIS, is_maximal_independent_set
 export cut_size, MaxCut
-export spinglass_energy, SpinGlass, spin_glass_from_matrix
-export hyperspinglass_energy, HyperSpinGlass
+export spinglass_energy, spin_glass_from_matrix, SpinGlass
 export PaintShop, paintshop_from_pairs, num_paint_shop_color_switch, paint_shop_coloring_from_config, paint_shop_from_pairs
 export Coloring, is_vertex_coloring
 export Satisfiability, CNF, CNFClause, BoolVar, satisfiable, @bools, ∨, ¬, ∧

@@ -40,7 +40,6 @@ makedocs(;
             "Satisfiability problem" => "generated/Satisfiability.md",
             "Set covering problem" => "generated/SetCovering.md",
             "Set packing problem" => "generated/SetPacking.md",
-            "Hyper Spin glass problem" => "generated/HyperSpinGlass.md",
             #"Other problems" => "generated/Others.md",
         ],
         "Topics" => [

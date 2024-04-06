@@ -14,14 +14,16 @@ graph = Graphs.smallgraph(:petersen)
 
 # We can visualize this graph using the following function
 rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
-
 locations = [[rot15(0.0, 2.0, i) for i=0:4]..., [rot15(0.0, 1.0, i) for i=0:4]...]
-
 show_graph(graph; locs=locations, format=:svg)
 
 # ## Generic tensor network representation
-# We construct the tensor network for the matching problem by typing
-problem = Matching(graph);
+# We can define the matching problem with the [`Matching`](@ref) type as
+matching = Matching(graph)
+
+# The tensor network representation of the matching problem can be obtained by
+problem = GenericTensorNetwork(matching)
+
 # ### Theory (can skip)
 #
 # Type [`Matching`](@ref) can be used for constructing the tensor network with optimized contraction order for a matching problem.

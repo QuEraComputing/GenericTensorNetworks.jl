@@ -23,8 +23,12 @@ show_graph(graph; locs=locations, format=:svg)
 # * or a [Pluto](https://github.com/fonsp/Pluto.jl) notebook,
 
 # ## Generic tensor network representation
-# The generic tensor network representation of the independent set problem can be constructed with [`IndependentSet`](@ref).
-problem = IndependentSet(graph; optimizer=TreeSA());
+# The independent set problem can be constructed with [`IndependentSet`](@ref) type as
+iset = IndependentSet(graph)
+
+# The tensor network representation of the independent set problem can be obtained by
+problem = GenericTensorNetwork(iset; optimizer=TreeSA())
+# where the key word argument `optimizer` specifies the tensor network contraction order optimizer as a local search based optimizer [`TreeSA`](@ref).
 
 # Here, the key word argument `optimizer` specifies the tensor network contraction order optimizer as a local search based optimizer [`TreeSA`](@ref).
 # The resulting contraction order optimized tensor network is contained in the `code` field of `problem`.

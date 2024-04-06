@@ -4,7 +4,7 @@
 
 using GenericTensorNetworks, Graphs
 
-problem = IndependentSet(Graphs.smallgraph(:petersen))
+problem = GenericTensorNetwork(IndependentSet(Graphs.smallgraph(:petersen)))
 
 all_independent_sets = solve(problem, ConfigsAll())[]
 

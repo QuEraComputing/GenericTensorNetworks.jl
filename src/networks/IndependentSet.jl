@@ -19,7 +19,7 @@ julia> net = GenericTensorNetwork(problem);
 
 julia> solve(net, ConfigsMax())
 0-dimensional Array{CountingTropical{Float64, ConfigEnumerator{10, 1, 1}}, 0}:
-(4.0, {0101010001, 1010000011, 0100100110, 0010111000, 1001001100})ₜ
+(4.0, {1010000011, 1001001100, 0100100110, 0101010001, 0010111000})ₜ
 ```
 """
 struct IndependentSet{WT} <: GraphProblem

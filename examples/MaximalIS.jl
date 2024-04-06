@@ -15,14 +15,15 @@ graph = Graphs.smallgraph(:petersen)
 
 # We can visualize this graph using the following function
 rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
-
 locations = [[rot15(0.0, 2.0, i) for i=0:4]..., [rot15(0.0, 1.0, i) for i=0:4]...]
-
 show_graph(graph; locs=locations, format=:svg)
 
 # ## Generic tensor network representation
 # We can use [`MaximalIS`](@ref) to construct the tensor network for solving the maximal independent set problem as
-problem = MaximalIS(graph; optimizer=TreeSA());
+maximalis = MaximalIS(graph)
+
+# The tensor network representation of the maximal independent set problem can be obtained by
+problem = GenericTensorNetwork(maximalis)
 
 # ### Theory (can skip)
 # Let ``G=(V,E)`` be the target graph that we want to solve.

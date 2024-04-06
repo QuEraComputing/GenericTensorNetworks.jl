@@ -16,7 +16,7 @@ end
 include("IndependentSet.jl")
 include("MaximalIS.jl")
 include("MaxCut.jl")
-include("HyperSpinGlass.jl")
+include("SpinGlass.jl")
 include("PaintShop.jl")
 include("Coloring.jl")
 include("Matching.jl")

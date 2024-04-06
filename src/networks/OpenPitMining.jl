@@ -56,11 +56,6 @@ function OpenPitMining(rewards::Matrix{ET}) where ET
     end
     OpenPitMining(rewards, blocks)
 end
-function open_pit_mining_network(rewards::Matrix{ET}; openvertices=(), fixedvertices=Dict{Tuple{Int,Int},Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors()) where ET
-    cfg = OpenPitMining(rewards)
-    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
-    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
-end
 
 function mining_tensor(::Type{T}) where T
     t = ones(T,2,2)

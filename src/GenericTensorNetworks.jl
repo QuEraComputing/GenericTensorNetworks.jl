@@ -39,19 +39,19 @@ export line_graph
 # Tensor Networks (Graph problems)
 export GraphProblem, GenericTensorNetwork, optimize_code, UnitWeight, ZeroWeight
 export flavors, labels, nflavor, get_weights, fixedvertices, chweights
-export IndependentSet, mis_compactify!, is_independent_set, independent_set_network
-export MaximalIS, is_maximal_independent_set, maximal_independent_set_network
-export cut_size, MaxCut, max_cut_network
-export spinglass_energy, SpinGlass, spin_glass_network, spin_glass_network_from_matrix
-export hyperspinglass_energy, HyperSpinGlass, hyper_spin_glass_network
-export PaintShop, paintshop_from_pairs, num_paint_shop_color_switch, paint_shop_coloring_from_config, paint_shop_network, paint_shop_network_from_pairs
-export Coloring, is_vertex_coloring, coloring_network
-export Satisfiability, CNF, CNFClause, BoolVar, satisfiable, @bools, ∨, ¬, ∧, satisfiability_network
-export DominatingSet, is_dominating_set, dominating_set_network
-export Matching, is_matching, matching_network
-export SetPacking, is_set_packing, set_packing_network
-export SetCovering, is_set_covering, set_covering_network
-export OpenPitMining, is_valid_mining, print_mining, open_pit_mining_network
+export IndependentSet, mis_compactify!, is_independent_set
+export MaximalIS, is_maximal_independent_set
+export cut_size, MaxCut
+export spinglass_energy, SpinGlass, spin_glass_from_matrix
+export hyperspinglass_energy, HyperSpinGlass
+export PaintShop, paintshop_from_pairs, num_paint_shop_color_switch, paint_shop_coloring_from_config, paint_shop_from_pairs
+export Coloring, is_vertex_coloring
+export Satisfiability, CNF, CNFClause, BoolVar, satisfiable, @bools, ∨, ¬, ∧
+export DominatingSet, is_dominating_set
+export Matching, is_matching
+export SetPacking, is_set_packing
+export SetCovering, is_set_covering
+export OpenPitMining, is_valid_mining, print_mining
 
 # Interfaces
 export solve, SizeMax, SizeMin, PartitionFunction, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin, Single

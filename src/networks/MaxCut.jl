@@ -21,11 +21,6 @@ struct MaxCut{WT1<:Union{UnitWeight, Vector},WT2<:Union{ZeroWeight, Vector}} <: 
         new{typeof(edge_weights), typeof(vertex_weights)}(g, edge_weights, vertex_weights)
     end
 end
-function max_cut_network(g::SimpleGraph; edge_weights=UnitWeight(), vertex_weights=ZeroWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
-    cfg = MaxCut(g, edge_weights, vertex_weights)
-    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
-    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
-end
 
 flavors(::Type{<:MaxCut}) = [0, 1]
 # first `ne` indices are for edge weights, last `nv` indices are for vertex weights.

@@ -27,11 +27,6 @@ struct SetPacking{ET,WT<:Union{UnitWeight, Vector}} <: GraphProblem
         new{ET, typeof(weights)}(sets, weights)
     end
 end
-function set_packing_network(sets; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
-    cfg = SetPacking(sets, weights)
-    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
-    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
-end
 
 flavors(::Type{<:SetPacking}) = [0, 1]
 energy_terms(gp::SetPacking) = [[i] for i=1:length(gp.sets)]

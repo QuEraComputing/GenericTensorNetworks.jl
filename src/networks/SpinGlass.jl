@@ -20,28 +20,16 @@ struct SpinGlass{WT1<:Union{UnitWeight, Vector}, WT2<:Union{ZeroWeight, Vector}}
         new{WT1, WT2}(g, J, h)
     end
 end
+function spin_glass_from_matrix(M::AbstractMatrix, h::AbstractVector)
+    g = SimpleGraph((!iszero).(M))
+    J = [M[e.src, e.dst] for e in edges(g)]
+    return SpinGlass(g, J, h)
+end
 
 function GenericTensorNetwork(cfg::SpinGlass; openvertices=(), fixedvertices=Dict{Int,Int}())
     g, J, h = cfg.graph, cfg.J, cfg.h
     reducedto = MaxCut(g, edge_weights=[2*J[i] for i=1:ne(g)], vertex_weights=[-2*h[i] for i=1:nv(g)])
     return GenericTensorNetwork(reducedto; openvertices, fixedvertices)
-end
-
-function SpinGlass(M::AbstractMatrix, h::AbstractVector; kwargs...)
-    g = SimpleGraph((!iszero).(M))
-    J = [M[e.src, e.dst] for e in edges(g)]
-    return SpinGlass(g; J, h, kwargs...)
-end
-
-function spin_glass_network(g::SimpleGraph; J=UnitWeight(), h=ZeroWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
-    cfg = SpinGlass(g, J, h)
-    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
-    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
-end
-function spin_glass_network_from_matrix(M::AbstractMatrix, h::AbstractVector; kwargs...)
-    g = SimpleGraph((!iszero).(M))
-    J = [M[e.src, e.dst] for e in edges(g)]
-    return spinglass_network(g; J, h, kwargs...)
 end
 
 # the energy should be shifted by sum(J)/2 - sum(h)

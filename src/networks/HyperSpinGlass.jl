@@ -21,12 +21,6 @@ struct HyperSpinGlass{WT<:Union{UnitWeight, Vector}} <: GraphProblem
     end
 end
 
-function hyper_spin_glass_network(n::Int, cliques; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
-    cfg = HyperSpinGlass(n, cliques, weights)
-    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
-    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
-end
-
 flavors(::Type{<:HyperSpinGlass}) = [0, 1]
 # first `ne` indices are for edge weights, last `n` indices are for vertex weights.
 energy_terms(gp::HyperSpinGlass) = gp.cliques

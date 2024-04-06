@@ -28,11 +28,6 @@ struct IndependentSet{WT} <: GraphProblem
         new{WT}(graph, weights)
     end
 end
-function independent_set_network(g::SimpleGraph; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
-    cfg = IndependentSet(g, weights)
-    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
-    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
-end
 flavors(::Type{<:IndependentSet}) = [0, 1]
 energy_terms(gp::IndependentSet) = [[i] for i in 1:nv(gp.graph)]
 energy_tensors(x::T, c::IndependentSet) where T = [misv(_pow.(Ref(x), get_weights(c, i))) for i=1:nv(c.graph)]

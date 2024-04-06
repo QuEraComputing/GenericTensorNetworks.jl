@@ -17,11 +17,6 @@ struct Coloring{K, WT<:Union{UnitWeight, Vector}} <: GraphProblem
         new{K, typeof(weights)}(graph, weights)
     end
 end
-function coloring_network(K::Int, graph::SimpleGraph; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
-    cfg = Coloring{K}(graph, weights)
-    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
-    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
-end
 
 flavors(::Type{<:Coloring{K}}) where K = collect(0:K-1)
 energy_terms(gp::Coloring) = [[minmax(e.src,e.dst)...] for e in Graphs.edges(gp.graph)]

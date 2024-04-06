@@ -18,12 +18,12 @@ using GenericTensorNetworks
     @test (c1 ∧ c4) ∧ (c2 ∧ c3) == CNF([c1, c4, c2, c3])
     cnf = (c1 ∧ c4) ∧ (c2 ∧ c3)
     println(cnf)
-    gp = satisfiability_network(cnf)
+    gp = GenericTensorNetwork(Satisfiability(cnf))
     @test satisfiable(cnf, Dict(:x=>true, :y=>true, :z=>true, :a=>false, :b=>false, :c=>true))
     @test !satisfiable(cnf, Dict(:x=>false, :y=>true, :z=>true, :a=>false, :b=>false, :c=>true))
     @test get_weights(gp) == UnitWeight()
     @test get_weights(chweights(gp, fill(3, 4))) == fill(3,4)
-    @test_throws AssertionError satisfiability_network(cnf; weights=fill(3, 9))
+    @test_throws AssertionError Satisfiability(cnf, fill(3, 9))
 end
 
 @testset "enumeration - sat" begin
@@ -33,7 +33,7 @@ end
     c3 = (z ∨ ¬a) ∨ y
     c4 = (c ∨ z) ∨ ¬b
     cnf = (c1 ∧ c4) ∧ (c2 ∧ c3)
-    gp = satisfiability_network(cnf)
+    gp = GenericTensorNetwork(Satisfiability(cnf))
 
     @test solve(gp, SizeMax())[].n == 4.0
     res = GenericTensorNetworks.best_solutions(gp; all=true)[].c.data
@@ -54,7 +54,7 @@ end
     c3 = (z ∨ ¬a) ∨ y
     c4 = (c ∨ z) ∨ ¬b
     cnf = (c1 ∧ c4) ∧ (c2 ∧ c3)
-    gp = satisfiability_network(cnf; weights=fill(2, length(cnf)))
+    gp = GenericTensorNetwork(Satisfiability(cnf, fill(2, length(cnf))))
 
     @test solve(gp, SizeMax())[].n == 8.0
     res = GenericTensorNetworks.best_solutions(gp; all=true)[].c.data

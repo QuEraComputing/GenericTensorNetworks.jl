@@ -39,19 +39,14 @@ struct PaintShop{LT} <: GraphProblem
         new{eltype(sequence)}(sequence, isfirst)
     end
 end
-function paint_shop_network(syms::AbstractVector{LT}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{Int,Int}()) where LT
-    cfg = PaintShop(syms)
-    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
-    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
-end
-function paint_shop_network_from_pairs(pairs::AbstractVector{Tuple{Int,Int}}; openvertices=(), optimizer=GreedyMethod(), simplifier=MergeVectors(), fixedvertices=Dict())
+function paint_shop_from_pairs(pairs::AbstractVector{Tuple{Int,Int}})
     n = length(pairs)
     @assert sort!(vcat(collect.(pairs)...)) == collect(1:2n)
     sequence = zeros(Int, 2*n)
     @inbounds for i=1:n
         sequence[pairs[i]] .= i
     end
-    return paintshop_network(sequence; openvertices, optimizer, simplifier, fixedvertices)
+    return PaintShop(sequence)
 end
 
 flavors(::Type{<:PaintShop}) = [0, 1]

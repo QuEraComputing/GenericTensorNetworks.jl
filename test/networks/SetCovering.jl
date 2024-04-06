@@ -2,7 +2,7 @@ using GenericTensorNetworks, Test, Graphs
 
 @testset "set covering" begin
     sets = [[1, 2, 5], [1, 3], [2, 4], [3, 6], [2, 3, 6]]  # each set is a vertex
-    gp = set_covering_network(sets; optimizer=GreedyMethod())
+    gp = GenericTensorNetwork(SetCovering(sets); optimizer=GreedyMethod())
     @test get_weights(gp) == UnitWeight()
     @test get_weights(chweights(gp, fill(3, 5))) == fill(3,5)
     res = solve(gp, ConfigsMin())[]

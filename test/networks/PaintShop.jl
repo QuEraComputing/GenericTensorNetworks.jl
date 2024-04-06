@@ -2,7 +2,7 @@ using GenericTensorNetworks, Test
 
 @testset "paint shop" begin
     syms = collect("abaccb")
-    pb = paint_shop_network(syms)
+    pb = GenericTensorNetwork(PaintShop(syms))
     @test get_weights(pb) == UnitWeight()
     @test get_weights(chweights(pb, fill(3, 15))) == UnitWeight()
     @test solve(pb, SizeMin())[] == Tropical(2.0)

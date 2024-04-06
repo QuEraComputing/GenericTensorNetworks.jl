@@ -150,11 +150,6 @@ struct Satisfiability{T,WT<:Union{UnitWeight, Vector}} <: GraphProblem
         new{T, typeof(weights)}(cnf, weights)
     end
 end
-function satisfiability_network(cnf::CNF; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
-    cfg = Satisfiability(cnf, weights)
-    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
-    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
-end
 
 flavors(::Type{<:Satisfiability}) = [0, 1]  # false, true
 energy_terms(gp::Satisfiability) = [[getfield.(c.vars, :name)...] for c in gp.cnf.clauses]

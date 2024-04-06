@@ -28,19 +28,6 @@ struct SetCovering{ET, WT<:Union{UnitWeight, Vector}} <: GraphProblem
     end
 end
 
-function GenericTensorNetwork(cfg::SetCovering; openvertices=(), fixedvertices=Dict{Int,Int}())
-    elements, count = cover_count(cfg.sets)
-    rawcode = EinCode([energy_terms(cfg)...,
-        [count[e] for e in elements]...], collect(Int,openvertices))
-    return GenericTensorNetwork(cfg, rawcode, Dict{Int,Int}(fixedvertices))
-end
-
-function set_covering_network(sets; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
-    cfg = SetCovering(sets, weights)
-    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
-    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
-end
-
 flavors(::Type{<:SetCovering}) = [0, 1]
 energy_terms(gp::SetCovering) = [[i] for i=1:length(gp.sets)]
 energy_tensors(x::T, c::SetCovering) where T = [misv(_pow.(Ref(x), get_weights(c, i))) for i=1:length(c.sets)]

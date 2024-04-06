@@ -4,13 +4,13 @@ using GenericTensorNetworks, Test, Graphs
     g = smallgraph(:petersen)
     J = rand(15)
     h = randn(10) .* 0.5
-    gp = spin_glass_network(g; h, J)
+    gp = GenericTensorNetwork(SpinGlass(g, J, h))
     @test contraction_complexity(gp).sc <= 5
     M = zeros(10, 10)
     for (e,j) in zip(edges(g), J)
         M[e.src, e.dst] = j
     end; M += M'
-    gp2 = spin_glass_network_from_matrix(M, h)
+    gp2 = spin_glass_from_matrix(M, h)
     @test gp2.target.vertex_weights ≈ gp.target.vertex_weights
     @test gp2.target.edge_weights ≈ gp.target.edge_weights
     cfg(x) = [(x>>i & 1) for i=0:9]
@@ -28,7 +28,7 @@ using GenericTensorNetworks, Test, Graphs
     # integer weights
     J = UnitWeight()
     h = ZeroWeight()
-    gp = spin_glass_network(g; h, J)
+    gp = GenericTensorNetwork(SpinGlass(g, J, h))
     energies = [spinglass_energy(g, cfg(b); J=J, h) for b=0:1<<nv(g)-1]
     sorted_energies = sort(energies)
     @test solve(gp, CountingMax(2))[].maxorder ≈ sorted_energies[end]

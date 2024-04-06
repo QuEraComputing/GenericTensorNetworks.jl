@@ -17,12 +17,6 @@ struct MaximalIS{WT<:Union{UnitWeight, Vector}} <: GraphProblem
     end
 end
 
-function maximal_independent_set_network(g::SimpleGraph; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
-    cfg = MaximalIS(g, weights)
-    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
-    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
-end
-
 flavors(::Type{<:MaximalIS}) = [0, 1]
 energy_terms(gp::MaximalIS) = [[Graphs.neighbors(gp.graph, v)..., v] for v in Graphs.vertices(gp.graph)]
 energy_tensors(x::T, c::MaximalIS) where T = [maximal_independent_set_tensor(_pow.(Ref(x), get_weights(c, i))..., degree(c.graph, i)+1) for i=1:nv(c.graph)]

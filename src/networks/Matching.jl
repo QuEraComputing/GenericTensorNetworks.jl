@@ -16,11 +16,6 @@ struct Matching{WT<:Union{UnitWeight,Vector}} <: GraphProblem
         new{typeof(weights)}(g, weights)
     end
 end
-function matching_network(g::SimpleGraph; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
-    cfg = Matching(g, weights)
-    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
-    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
-end
 
 flavors(::Type{<:Matching}) = [0, 1]
 energy_terms(gp::Matching) = [[minmax(src(s), dst(s))] for s in edges(gp.graph)] # edge tensors

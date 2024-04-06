@@ -4,6 +4,16 @@
 The abstract base type of graph problems.
 """
 abstract type GraphProblem end
+function generate_tensors(x::T, m::GraphProblem) where T
+    tensors = [energy_tensors(x, m)..., extra_tensors(T, m)...]
+    ixs = [energy_terms(m)..., extra_terms(m)...]
+    return add_labels!(tensors, ixs, labels(m))
+end
+function rawcode(problem::GraphProblem; openvertices=())
+    ixs = [energy_terms(problem)..., extra_terms(problem)...]
+    LT = eltype(eltype(ixs))
+    return DynamicEinCode(ixs, collect(LT, openvertices))  # labels for edge tensors
+end
 
 struct UnitWeight end
 Base.getindex(::UnitWeight, i) = 1
@@ -29,26 +39,16 @@ struct GenericTensorNetwork{CFG, CT, LT}
     code::CT
     fixedvertices::Dict{LT,Int}
 end
-function GenericTensorNetwork(problem::GraphProblem; openvertices=(), fixedvertices=Dict()) where K
-    ixs = [energy_terms(problem)..., extra_terms(problem)...]
-    LT = eltype(eltype(ixs))
-    rawcode = DynamicEinCode(ixs, collect(LT, openvertices))  # labels for edge tensors
-    return GenericTensorNetwork(problem, rawcode, Dict{LT,Int}(fixedvertices))
-end
-function OMEinsum.optimize_code(gtn::GenericTensorNetwork; optimizer=GreedyMethod(), simplifier=MergeVectors())
-    code = _optimize_code(gtn.code, uniformsize_fix(gtn.code, nflavor(gtn.problem), gtn.fixedvertices), optimizer, simplifier)
-    return GenericTensorNetwork(gtn.problem, code, gtn.fixedvertices)
+function GenericTensorNetwork(problem::GraphProblem; openvertices=(), fixedvertices=Dict(), optimizer=GreedyMethod())
+    rcode = rawcode(problem; openvertices)
+    code = _optimize_code(rcode, uniformsize_fix(rcode, nflavor(problem), fixedvertices), optimizer, MergeVectors())
+    return GenericTensorNetwork(problem, code, Dict{labeltype(code),Int}(fixedvertices))
 end
 function generate_tensors(x::T, tn::GenericTensorNetwork) where {T}
     ixs = getixsv(tn.code)
     isempty(ixs) && return Array{T}[]
     tensors = generate_tensors(x, tn.problem)
     return select_dims(tensors, ixs, fixedvertices(tn))
-end
-function generate_tensors(x::T, m::GraphProblem) where T
-    tensors = [energy_tensors(x, m)..., extra_tensors(T, m)...]
-    ixs = [energy_terms(m)..., extra_terms(m)...]
-    return add_labels!(tensors, ixs, labels(m))
 end
 
 ######## Interfaces for graph problems ##########

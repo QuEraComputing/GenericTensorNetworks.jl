@@ -17,11 +17,6 @@ struct DominatingSet{WT<:Union{UnitWeight, Vector}} <: GraphProblem
         new{typeof(weights)}(g, weights)
     end
 end
-function dominating_set_network(g::SimpleGraph; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=MergeVectors())
-    cfg = DominatingSet(g, weights)
-    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
-    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
-end
 
 flavors(::Type{<:DominatingSet}) = [0, 1]
 energy_terms(gp::DominatingSet) = [[Graphs.neighbors(gp.graph, v)..., v] for v in Graphs.vertices(gp.graph)]

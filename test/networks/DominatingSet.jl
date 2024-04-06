@@ -14,12 +14,12 @@ end
 
 @testset "dominating set v.s. maximal IS" begin
     g = smallgraph(:petersen)
-    gp1 = dominating_set_network(g)
+    gp1 = GenericTensorNetwork(DominatingSet(g))
     @test get_weights(gp1) == UnitWeight()
     @test get_weights(chweights(gp1, fill(3, 10))) == fill(3, 10)
     @test solve(gp1, SizeMax())[].n == 10
     res1 = solve(gp1, ConfigsMin())[].c
-    gp2 = maximal_independent_set_network(g)
+    gp2 = GenericTensorNetwork(MaximalIS(g))
     res2 = solve(gp2, ConfigsMin())[].c
     @test res1 == res2
     configs = solve(gp2, ConfigsAll())[]
@@ -30,6 +30,6 @@ end
 
 @testset "empty graph" begin
     g = SimpleGraph(4)
-    pb = dominating_set_network(g)
+    pb = GenericTensorNetwork(DominatingSet(g))
     @test solve(pb, SizeMax()) !== 4
 end

@@ -1,19 +1,19 @@
 """
 $(TYPEDEF)
-    Coloring{K}(graph; weights=NoWeight())
+    Coloring{K}(graph; weights=UnitWeight())
 
 The [Vertex Coloring](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/Coloring/) problem.
 
 Positional arguments
 -------------------------------
 * `graph` is the problem graph.
-* `weights` are associated with the edges of the `graph`, default to `NoWeight()`.
+* `weights` are associated with the edges of the `graph`, default to `UnitWeight()`.
 """
-struct Coloring{K, WT<:Union{NoWeight, Vector}} <: GraphProblem
+struct Coloring{K, WT<:Union{UnitWeight, Vector}} <: GraphProblem
     graph::SimpleGraph{Int}
     weights::WT
-    function Coloring{K}(graph::SimpleGraph, weights::Union{NoWeight, Vector}=NoWeight()) where {K}
-        @assert weights isa NoWeight || length(weights) == ne(g)
+    function Coloring{K}(graph::SimpleGraph, weights::Union{UnitWeight, Vector}=UnitWeight()) where {K}
+        @assert weights isa UnitWeight || length(weights) == ne(g)
         new{K, typeof(weights)}(graph, weights)
     end
 end

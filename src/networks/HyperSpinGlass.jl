@@ -7,15 +7,15 @@ Positional arguments
 -------------------------------
 * `n` is the number of spins.
 * `cliques` is a vector of cliques, each being a vector of vertices (integers).
-* `weights` are associated with the cliques, default to `NoWeight()`.
+* `weights` are associated with the cliques, default to `UnitWeight()`.
 """
-struct HyperSpinGlass{WT<:Union{NoWeight, Vector}} <: GraphProblem
+struct HyperSpinGlass{WT<:Union{UnitWeight, Vector}} <: GraphProblem
     n::Int
     cliques::Vector{Vector{Int}}
     weights::WT
-    function HyperSpinGlass(n::Int, cliques::AbstractVector, weights::Union{NoWeight, Vector}=NoWeight())
+    function HyperSpinGlass(n::Int, cliques::AbstractVector, weights::Union{UnitWeight, Vector}=UnitWeight())
         clqs = collect(collect.(cliques))
-        @assert weights isa NoWeight || length(weights) == length(clqs)
+        @assert weights isa UnitWeight || length(weights) == length(clqs)
         @assert all(c->all(b->1<=b<=n, c), cliques) "vertex index out of bound 1-$n, got: $cliques"
         return new{typeof(weights)}(n, clqs, weights)
     end
@@ -59,7 +59,7 @@ $(TYPEDSIGNATURES)
 
 Compute the energy for spin configuration `config` (an iterator).
 """
-function hyperspinglass_energy(cliques, config; weights=NoWeight())::Real
+function hyperspinglass_energy(cliques, config; weights=UnitWeight())::Real
     size = zero(eltype(weights))
     s = 1 .- 2 .* Int.(config)  # 0 -> spin 1, 1 -> spin -1
     for (i, spins) in enumerate(cliques)

@@ -8,7 +8,7 @@ graph = Graphs.smallgraph(:petersen)
 # The following code constructs a weighted MIS problem instance.
 problem = IndependentSet(graph; weights=collect(1:10));
 
-# Here, the `weights` keyword argument can be a vector for weighted graphs or `NoWeight()` for unweighted graphs.
+# Here, the `weights` keyword argument can be a vector for weighted graphs or `UnitWeight()` for unweighted graphs.
 # Most solution space properties work for unweighted graphs also work for the weighted graphs.
 # For example, the maximum independent set can be found as follows.
 

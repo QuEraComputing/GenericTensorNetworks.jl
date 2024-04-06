@@ -142,11 +142,11 @@ julia> solve(gp, SizeMax())[]
 4.0ₜ
 ```
 """
-struct Satisfiability{T,WT<:Union{NoWeight, Vector}} <: GraphProblem
+struct Satisfiability{T,WT<:Union{UnitWeight, Vector}} <: GraphProblem
     cnf::CNF{T}
     weights::WT
-    function Satisfiability(cnf::CNF{T}, weights::WT=NoWeight()) where {T}
-        @assert weights isa NoWeight || length(weights) == length(cnf) "weights size inconsistent! should be $(length(cnf)), got: $(length(weights))"
+    function Satisfiability(cnf::CNF{T}, weights::WT=UnitWeight()) where {T}
+        @assert weights isa UnitWeight || length(weights) == length(cnf) "weights size inconsistent! should be $(length(cnf)), got: $(length(weights))"
         new{T, typeof(weights)}(cnf, weights)
     end
 end

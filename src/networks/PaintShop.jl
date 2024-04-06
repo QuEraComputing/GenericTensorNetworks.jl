@@ -64,7 +64,7 @@ labels(gp::PaintShop) = unique(gp.sequence)
 fixedvertices(gp::PaintShop) = gp.fixedvertices
 
 # weights interface
-get_weights(c::PaintShop) = NoWeight()
+get_weights(c::PaintShop) = UnitWeight()
 get_weights(::PaintShop, i::Int) = [0, 1]
 chweights(c::PaintShop, weights) = c
 

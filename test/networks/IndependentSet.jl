@@ -11,7 +11,7 @@ using GenericTensorNetworks, Test, Graphs
     @test count(!iszero, m) == 12
     mis_compactify!(m)
     @test count(!iszero, m) == 3
-    @test get_weights(g) == NoWeight()
+    @test get_weights(g) == UnitWeight()
     @test get_weights(chweights(g, fill(3, 6))) == fill(3, 6)
 end
 

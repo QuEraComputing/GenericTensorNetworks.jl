@@ -282,7 +282,7 @@ function solve(gp::GenericTensorNetwork, property::AbstractProperty; T=Float64, 
             ws = get_weights(gp)
         end
         n = length(terms(gp))
-        if ws isa NoWeight || ws isa ZeroWeight || all(i->all(>=(0), get_weights(gp, i)), 1:n)
+        if ws isa UnitWeight || ws isa ZeroWeight || all(i->all(>=(0), get_weights(gp, i)), 1:n)
             return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
         elseif all(i->all(<=(0), get_weights(gp, i)), 1:n)
             res = graph_polynomial(chweights(gp, -ws), Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)

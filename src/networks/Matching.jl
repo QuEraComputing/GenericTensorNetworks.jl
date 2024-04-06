@@ -8,11 +8,11 @@ Positional arguments
 * `graph` is the problem graph.
 * `weights` are associated with the edges of the `graph`.
 """
-struct Matching{WT<:Union{NoWeight,Vector}} <: GraphProblem
+struct Matching{WT<:Union{UnitWeight,Vector}} <: GraphProblem
     graph::SimpleGraph{Int}
     weights::WT
-    function Matching(g::SimpleGraph, weights::Union{NoWeight, Vector}=NoWeight())
-        @assert weights isa NoWeight || length(weights) == ne(g)
+    function Matching(g::SimpleGraph, weights::Union{UnitWeight, Vector}=UnitWeight())
+        @assert weights isa UnitWeight || length(weights) == ne(g)
         new{typeof(weights)}(g, weights)
     end
 end

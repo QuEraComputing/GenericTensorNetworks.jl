@@ -23,7 +23,7 @@ using GenericTensorNetworks, Test, Graphs
     val, ind = findmax(energies)
 
     # integer weights
-    weights = NoWeight()
+    weights = UnitWeight()
     gp = HyperSpinGlass(10, ecliques; weights)
     energies = [hyperspinglass_energy(ecliques, cfg(b); weights) for b=0:1<<nv(g)-1]
     sorted_energies = sort(energies)

@@ -19,11 +19,11 @@ julia> res = solve(gp, ConfigsMax())[]
 (2.0, {00110, 10010, 01100})ₜ
 ```
 """
-struct SetPacking{ET,WT<:Union{NoWeight, Vector}} <: GraphProblem
+struct SetPacking{ET,WT<:Union{UnitWeight, Vector}} <: GraphProblem
     sets::Vector{Vector{ET}}
     weights::WT
-    function SetPacking(sets::Vector{Vector{ET}}, weights::Union{NoWeight, Vector}=NoWeight()) where {ET}
-        @assert weights isa NoWeight || length(weights) == length(sets)
+    function SetPacking(sets::Vector{Vector{ET}}, weights::Union{UnitWeight, Vector}=UnitWeight()) where {ET}
+        @assert weights isa UnitWeight || length(weights) == length(sets)
         new{ET, typeof(weights)}(sets, weights)
     end
 end

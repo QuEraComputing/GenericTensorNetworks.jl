@@ -6,7 +6,7 @@ The [independent set problem](https://queracomputing.github.io/GenericTensorNetw
 Positional arguments
 -------------------------------
 * `graph` is the problem graph.
-* `weights` are associated with the vertices of the `graph`, default to `NoWeight()`.
+* `weights` are associated with the vertices of the `graph`, default to `UnitWeight()`.
 
 Examples
 -------------------------------
@@ -23,8 +23,8 @@ julia> solve(problem, ConfigsMax())
 struct IndependentSet{WT} <: GraphProblem
     graph::SimpleGraph{Int}
     weights::WT
-    function IndependentSet(graph::SimpleGraph{Int}, weights::WT=NoWeight()) where WT
-        @assert weights isa NoWeight || length(weights) == nv(graph) "got unexpected weights for $(nv(graph))-vertex graph: $weights"
+    function IndependentSet(graph::SimpleGraph{Int}, weights::WT=UnitWeight()) where WT
+        @assert weights isa UnitWeight || length(weights) == nv(graph) "got unexpected weights for $(nv(graph))-vertex graph: $weights"
         new{WT}(graph, weights)
     end
 end
@@ -33,7 +33,7 @@ function GenericTensorNetwork(cfg::IndependentSet; openvertices=(), fixedvertice
                        [[minmax(e.src,e.dst)...] for e in Graphs.edges(cfg.graph)]...], collect(Int, openvertices))  # labels for edge tensors
     return GenericTensorNetwork(cfg, rawcode, Dict{Int,Int}(fixedvertices))
 end
-function independent_set_network(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
+function independent_set_network(g::SimpleGraph; weights=UnitWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
     cfg = IndependentSet(g, weights)
     gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
     return OMEinsum.optimize_code(gtn; optimizer, simplifier)

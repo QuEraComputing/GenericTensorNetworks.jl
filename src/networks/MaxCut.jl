@@ -9,14 +9,14 @@ Positional arguments
 * `edge_weights` are associated with the edges of the `graph`.
 * `vertex_weights` are associated with the vertices of the `graph`.
 """
-struct MaxCut{WT1<:Union{NoWeight, Vector},WT2<:Union{ZeroWeight, Vector}} <: GraphProblem
+struct MaxCut{WT1<:Union{UnitWeight, Vector},WT2<:Union{ZeroWeight, Vector}} <: GraphProblem
     graph::SimpleGraph{Int}
     edge_weights::WT1
     vertex_weights::WT2
     function MaxCut(g::SimpleGraph;
-            edge_weights::Union{NoWeight, Vector}=NoWeight(),
+            edge_weights::Union{UnitWeight, Vector}=UnitWeight(),
             vertex_weights::Union{ZeroWeight, Vector}=ZeroWeight())
-        @assert edge_weights isa NoWeight || length(edge_weights) == ne(g)
+        @assert edge_weights isa UnitWeight || length(edge_weights) == ne(g)
         @assert vertex_weights isa ZeroWeight || length(vertex_weights) == nv(g)
         new{typeof(edge_weights), typeof(vertex_weights)}(g, edge_weights, vertex_weights)
     end
@@ -55,11 +55,11 @@ function maxcutb(a, b)
 end
 
 """
-    cut_size(g::SimpleGraph, config; edge_weights=NoWeight(), vertex_weights=ZeroWeight())
+    cut_size(g::SimpleGraph, config; edge_weights=UnitWeight(), vertex_weights=ZeroWeight())
 
 Compute the cut size for the vertex configuration `config` (an iterator).
 """
-function cut_size(g::SimpleGraph, config; edge_weights=NoWeight(), vertex_weights=ZeroWeight())
+function cut_size(g::SimpleGraph, config; edge_weights=UnitWeight(), vertex_weights=ZeroWeight())
     size = zero(promote_type(eltype(vertex_weights), eltype(edge_weights)))
     for (i, e) in enumerate(edges(g))
         size += (config[e.src] != config[e.dst]) * edge_weights[i]

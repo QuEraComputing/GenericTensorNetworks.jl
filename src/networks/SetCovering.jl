@@ -19,11 +19,11 @@ julia> res = solve(gp, ConfigsMin())[]
 (3.0, {10110, 10101})ₜ
 ```
 """
-struct SetCovering{ET, WT<:Union{NoWeight, Vector}} <: GraphProblem
+struct SetCovering{ET, WT<:Union{UnitWeight, Vector}} <: GraphProblem
     sets::Vector{Vector{ET}}
     weights::WT
-    function SetCovering(sets::Vector{Vector{ET}}, weights::Union{NoWeight, Vector}=NoWeight()) where {ET}
-        @assert weights isa NoWeight || length(weights) == length(sets)
+    function SetCovering(sets::Vector{Vector{ET}}, weights::Union{UnitWeight, Vector}=UnitWeight()) where {ET}
+        @assert weights isa UnitWeight || length(weights) == length(sets)
         new{ET, typeof(weights)}(sets, weights)
     end
 end

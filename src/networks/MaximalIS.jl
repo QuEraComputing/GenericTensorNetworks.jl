@@ -8,11 +8,11 @@ Positional arguments
 * `graph` is the problem graph.
 * `weights` are associated with the vertices of the `graph`.
 """
-struct MaximalIS{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
+struct MaximalIS{CT<:AbstractEinsum,WT<:Union{UnitWeight, Vector}} <: GraphProblem
     graph::SimpleGraph
     weights::WT
-    function MaximalIS(g::SimpleGraph, weights::Union{NoWeight, Vector}=NoWeight())
-        @assert weights isa NoWeight || length(weights) == nv(g)
+    function MaximalIS(g::SimpleGraph, weights::Union{UnitWeight, Vector}=UnitWeight())
+        @assert weights isa UnitWeight || length(weights) == nv(g)
         new{typeof(weights)}(g, weights)
     end
 end

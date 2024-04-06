@@ -15,7 +15,7 @@ end
 @testset "dominating set v.s. maximal IS" begin
     g = smallgraph(:petersen)
     gp1 = DominatingSet(g)
-    @test get_weights(gp1) == NoWeight()
+    @test get_weights(gp1) == UnitWeight()
     @test get_weights(chweights(gp1, fill(3, 10))) == fill(3, 10)
     @test solve(gp1, SizeMax())[].n == 10
     res1 = solve(gp1, ConfigsMin())[].c

@@ -5,9 +5,9 @@ The abstract base type of graph problems.
 """
 abstract type GraphProblem end
 
-struct NoWeight end
-Base.getindex(::NoWeight, i) = 1
-Base.eltype(::NoWeight) = Int
+struct UnitWeight end
+Base.getindex(::UnitWeight, i) = 1
+Base.eltype(::UnitWeight) = Int
 
 struct ZeroWeight end
 Base.getindex(::ZeroWeight, i) = 0

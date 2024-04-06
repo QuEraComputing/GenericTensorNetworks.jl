@@ -1,19 +1,19 @@
 """
 $TYPEDEF
-    DominatingSet(graph; weights=NoWeight())
+    DominatingSet(graph; weights=UnitWeight())
 
 The [dominating set](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/DominatingSet/) problem.
 
 Positional arguments
 -------------------------------
 * `graph` is the problem graph.
-* `weights` are associated with the vertices of the `graph`, default to `NoWeight()`.
+* `weights` are associated with the vertices of the `graph`, default to `UnitWeight()`.
 """
-struct DominatingSet{WT<:Union{NoWeight, Vector}} <: GraphProblem
+struct DominatingSet{WT<:Union{UnitWeight, Vector}} <: GraphProblem
     graph::SimpleGraph{Int}
     weights::WT
-    function DominatingSet(g::SimpleGraph, weights::Union{NoWeight, Vector}=NoWeight())
-        @assert weights isa NoWeight || length(weights) == nv(g)
+    function DominatingSet(g::SimpleGraph, weights::Union{UnitWeight, Vector}=UnitWeight())
+        @assert weights isa UnitWeight || length(weights) == nv(g)
         new{typeof(weights)}(g, weights)
     end
 end

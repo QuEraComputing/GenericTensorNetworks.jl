@@ -26,7 +26,7 @@ using GenericTensorNetworks, Test, Graphs
     val, ind = findmax(energies)
 
     # integer weights
-    J = NoWeight()
+    J = UnitWeight()
     h = ZeroWeight()
     gp = SpinGlass(g; h, J)
     energies = [spinglass_energy(g, cfg(b); J=J, h) for b=0:1<<nv(g)-1]

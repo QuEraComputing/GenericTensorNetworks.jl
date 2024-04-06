@@ -248,7 +248,7 @@ Keyword arguments
 * `usecuda` is a switch to use CUDA (if possible), user need to call statement `using CUDA` before turning on this switch.
 * `T` is the "base" element type, sometimes can be used to reduce the memory cost.
 """
-function solve(gp::GraphProblem, property::AbstractProperty; T=Float64, usecuda=false)
+function solve(gp::GenericTensorNetwork, property::AbstractProperty; T=Float64, usecuda=false)
     assert_solvable(gp, property)
     if property isa SizeMax{Single}
         return contractx(gp, _x(Tropical{T}; invert=false); usecuda=usecuda)
@@ -366,7 +366,7 @@ function assert_solvable(problem, property::CountingMin)
         throw(ArgumentError("Graph property `$(typeof(property))` is not computable due to having non-integer weights. Maybe you wanted `SizeMin($(min_k(property)))`?"))
     end
 end
-function has_noninteger_weights(problem::GraphProblem)
+function has_noninteger_weights(problem::GenericTensorNetwork)
     for i in 1:length(terms(problem))
         if any(!isinteger, get_weights(problem, i))
             return true
@@ -381,7 +381,7 @@ $TYPEDSIGNATURES
 Returns the maximum size of the graph problem. 
 A shorthand of `solve(problem, SizeMax(); usecuda=false)`.
 """
-max_size(m::GraphProblem; usecuda=false)::Int = Int(sum(solve(m, SizeMax(); usecuda=usecuda)).n)  # floating point number is faster (BLAS)
+max_size(m::GenericTensorNetwork; usecuda=false)::Int = Int(sum(solve(m, SizeMax(); usecuda=usecuda)).n)  # floating point number is faster (BLAS)
 
 """
 $TYPEDSIGNATURES
@@ -389,7 +389,7 @@ $TYPEDSIGNATURES
 Returns the maximum size and the counting of the graph problem.
 It is a shorthand of `solve(problem, CountingMax(); usecuda=false)`.
 """
-max_size_count(m::GraphProblem; usecuda=false)::Tuple{Int,Int} = (r = sum(solve(m, CountingMax(); usecuda=usecuda)); (Int(r.n), Int(r.c)))
+max_size_count(m::GenericTensorNetwork; usecuda=false)::Tuple{Int,Int} = (r = sum(solve(m, CountingMax(); usecuda=usecuda)); (Int(r.n), Int(r.c)))
 
 ########## memory estimation ###############
 """
@@ -398,10 +398,10 @@ $TYPEDSIGNATURES
 Memory estimation in number of bytes to compute certain `property` of a `problem`.
 `T` is the base type.
 """
-function estimate_memory(problem::GraphProblem, property::AbstractProperty; T=Float64)::Real
+function estimate_memory(problem::GenericTensorNetwork, property::AbstractProperty; T=Float64)::Real
     _estimate_memory(tensor_element_type(T, length(labels(problem)), nflavor(problem), property), problem)
 end
-function estimate_memory(problem::GraphProblem, property::Union{SingleConfigMax{K,BOUNDED},SingleConfigMin{K,BOUNDED}}; T=Float64) where {K, BOUNDED}
+function estimate_memory(problem::GenericTensorNetwork, property::Union{SingleConfigMax{K,BOUNDED},SingleConfigMin{K,BOUNDED}}; T=Float64) where {K, BOUNDED}
     tc, sc, rw = contraction_complexity(problem.code, _size_dict(problem))
     # caching all tensors is equivalent to counting the total number of writes
     if K === Single && BOUNDED
@@ -416,15 +416,15 @@ function estimate_memory(problem::GraphProblem, property::Union{SingleConfigMax{
         return peak_memory(problem.code, _size_dict(problem)) * (sizeof(tensor_element_type(T, n, nf, SingleConfigMax{Single,BOUNDED}())) * K + sizeof(TT))
     end
 end
-function estimate_memory(problem::GraphProblem, ::GraphPolynomial{:polynomial}; T=Float64)
+function estimate_memory(problem::GenericTensorNetwork, ::GraphPolynomial{:polynomial}; T=Float64)
     # this is the upper bound
     return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * length(labels(problem)))
 end
-function estimate_memory(problem::GraphProblem, ::GraphPolynomial{:laurent}; T=Float64)
+function estimate_memory(problem::GenericTensorNetwork, ::GraphPolynomial{:laurent}; T=Float64)
     # this is the upper bound
     return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * length(labels(problem)))
 end
-function estimate_memory(problem::GraphProblem, ::Union{SizeMax{K},SizeMin{K}}; T=Float64) where K
+function estimate_memory(problem::GenericTensorNetwork, ::Union{SizeMax{K},SizeMin{K}}; T=Float64) where K
     return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * _asint(K))
 end
 
@@ -434,7 +434,7 @@ function _size_dict(problem)
     return Dict([lb=>nf for lb in lbs])
 end
 
-function _estimate_memory(::Type{ET}, problem::GraphProblem) where ET
+function _estimate_memory(::Type{ET}, problem::GenericTensorNetwork) where ET
     if !isbitstype(ET) && !(ET <: Mod)
         @warn "Target tensor element type `$ET` is not a bits type, the estimation of memory might be unreliable."
     end

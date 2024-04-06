@@ -37,9 +37,9 @@ export square_lattice_graph, unit_disk_graph, random_diagonal_coupled_graph, ran
 export line_graph
 
 # Tensor Networks (Graph problems)
-export GraphProblem, optimize_code, NoWeight, ZeroWeight
+export GraphProblem, GenericTensorNetwork, optimize_code, NoWeight, ZeroWeight
 export flavors, labels, terms, nflavor, get_weights, fixedvertices, chweights
-export IndependentSet, mis_compactify!, is_independent_set
+export IndependentSet, mis_compactify!, is_independent_set, independent_set_network
 export MaximalIS, is_maximal_independent_set
 export cut_size, MaxCut
 export spinglass_energy, SpinGlass

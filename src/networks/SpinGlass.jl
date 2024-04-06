@@ -61,7 +61,7 @@ function extract_result(sg::SpinGlass)
 end
 
 """
-    spinglass_energy(g::SimpleGraph, config; J=NoWeight(), h=ZeroWeight())
+    spinglass_energy(g::SimpleGraph, config; J, h=ZeroWeight())
 
 Compute the spin glass state energy for the vertex configuration `config`.
 In the configuration, the spin ↑ is mapped to configuration 0, while spin ↓ is mapped to configuration 1.
@@ -71,7 +71,7 @@ H = - \\sum_{ij \\in E} J_{ij} s_i s_j + \\sum_{i \\in V} h_i s_i,
 ```
 where ``s_i \\in \\{-1, 1\\}`` stands for spin ↓ and spin ↑.
 """
-function spinglass_energy(g::SimpleGraph, config; J=NoWeight(), h=ZeroWeight())
+function spinglass_energy(g::SimpleGraph, config; J, h=ZeroWeight())
     eng = zero(promote_type(eltype(J), eltype(h)))
     # NOTE: cast to Int to avoid using unsigned :nt
     s = 1 .- 2 .* Int.(config)  # 0 -> spin 1, 1 -> spin -1

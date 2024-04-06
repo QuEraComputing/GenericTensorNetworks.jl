@@ -30,39 +30,42 @@ julia> solve(problem, ConfigsMax())
 (4.0, {0101010001, 1010000011, 0100100110, 0010111000, 1001001100})ₜ
 ```
 """
-struct IndependentSet{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    code::CT
+struct IndependentSet{WT} <: GraphProblem
     graph::SimpleGraph{Int}
     weights::WT
-    fixedvertices::Dict{Int,Int}
+    function IndependentSet(graph::SimpleGraph{Int}, weights::WT=NoWeight()) where WT
+        @assert weights isa NoWeight || length(weights) == nv(graph) "got unexpected weights for $(nv(graph))-vertex graph: $weights"
+        new{WT}(graph, weights)
+    end
 end
-
-function IndependentSet(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
-    @assert weights isa NoWeight || length(weights) == nv(g)
-    rawcode = EinCode([[[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
-                       [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...], collect(Int, openvertices))  # labels for edge tensors
-    code = _optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier)
-    IndependentSet(code, g, weights, Dict{Int,Int}(fixedvertices))
+function GenericTensorNetwork(cfg::IndependentSet; openvertices=(), fixedvertices=Dict{Int,Int}())
+    rawcode = EinCode([[[i] for i in Graphs.vertices(cfg.graph)]..., # labels for vertex tensors
+                       [[minmax(e.src,e.dst)...] for e in Graphs.edges(cfg.graph)]...], collect(Int, openvertices))  # labels for edge tensors
+    return GenericTensorNetwork(cfg, rawcode, Dict{Int,Int}(fixedvertices))
 end
-
+function independent_set_network(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
+    cfg = IndependentSet(g, weights)
+    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
+    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
+end
 flavors(::Type{<:IndependentSet}) = [0, 1]
-terms(gp::IndependentSet) = getixsv(gp.code)[1:nv(gp.graph)]
+terms(gp::IndependentSet) = [[i] for i in 1:nv(gp.graph)]
 labels(gp::IndependentSet) = [1:nv(gp.graph)...]
-fixedvertices(gp::IndependentSet) = gp.fixedvertices
 
 # weights interface
 get_weights(c::IndependentSet) = c.weights
 get_weights(gp::IndependentSet, i::Int) = [0, gp.weights[i]]
-chweights(c::IndependentSet, weights) = IndependentSet(c.code, c.graph, weights, c.fixedvertices)
+chweights(c::IndependentSet, weights) = IndependentSet(c.graph, weights)
 
 # generate tensors
-function generate_tensors(x::T, gp::IndependentSet) where T
-    nv(gp.graph) == 0 && return []
+function generate_tensors(x::T, gp::GenericTensorNetwork{<:IndependentSet}) where T
+    graph = gp.problem.graph
+    nv(graph) == 0 && return []
     ixs = getixsv(gp.code)
     # we only add labels at vertex tensors
     tensors = select_dims([
-            add_labels!(Array{T}[misv(_pow.(Ref(x), get_weights(gp, i))) for i=1:nv(gp.graph)], ixs[1:nv(gp.graph)], labels(gp))...,
-            Array{T}[misb(T, length(ix)) for ix in ixs[nv(gp.graph)+1:end]]... # if n!=2, it corresponds to set packing problem.
+            add_labels!(Array{T}[misv(_pow.(Ref(x), get_weights(gp, i))) for i=1:nv(graph)], ixs[1:nv(graph)], labels(gp))...,
+            Array{T}[misb(T, length(ix)) for ix in ixs[nv(graph)+1:end]]... # if n!=2, it corresponds to set packing problem.
     ], ixs, fixedvertices(gp))
     return tensors
 end

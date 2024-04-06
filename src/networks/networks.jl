@@ -256,10 +256,3 @@ function _pow(x::LaurentPolynomial{BS,X}, i) where {BS,X}
         return LaurentPolynomial(x.coeffs .^ i, x.order[]*i)
     end
 end
-
-# TODOs:
-# 1. Dominating set
-# \exists x_i,\ldots,x_K \forall y\left[\bigwedge_{i=1}^{K}(y=x_i\wedge \textbf{adj}(y, x_i))\right]
-# 2. Polish reading data
-#     * consistent configuration assign of max-cut
-# 3. Support transverse field in max-cut

@@ -23,32 +23,29 @@ If you find our paper or software useful in your work, we would be grateful if y
 You can find a set up guide in our [README](https://github.com/QuEraComputing/GenericTensorNetworks.jl).
 To get started, open a Julia REPL and type the following code.
 
-```julia
-julia> using GenericTensorNetworks, Graphs
-
-julia> # using CUDA
-
-julia> solve(
-           IndependentSet(
-               Graphs.random_regular_graph(20, 3);
+```@repl
+using GenericTensorNetworks, Graphs#, CUDA
+solve(
+           GenericTensorNetwork(IndependentSet(
+                   Graphs.random_regular_graph(20, 3),
+                   UnitWeight());    # default: uniform weight 1
                optimizer = TreeSA(),
-               weights = UnitWeight(),    # default: uniform weight 1
                openvertices = (),       # default: no open vertices
                fixedvertices = Dict()   # default: no fixed vertices
            ),
            GraphPolynomial();
            usecuda=false              # the default value
        )
-0-dimensional Array{Polynomial{BigInt, :x}, 0}:
-Polynomial(1 + 20*x + 160*x^2 + 659*x^3 + 1500*x^4 + 1883*x^5 + 1223*x^6 + 347*x^7 + 25*x^8)
 ```
 
 Here the main function [`solve`](@ref) takes three input arguments, the problem instance of type [`IndependentSet`](@ref), the property instance of type [`GraphPolynomial`](@ref) and an optional key word argument `usecuda` to decide use GPU or not.
-If one wants to use GPU to accelerate the computation, the `using CUDA` statement must uncommented.
+If one wants to use GPU to accelerate the computation, the `, CUDA` should be uncommented.
 
-The problem instance takes four arguments to initialize, the only positional argument is the graph instance that one wants to solve, the key word argument `optimizer` is for specifying the tensor network optimization algorithm, the key word argument `weights` is for specifying the weights of vertices as either a vector or `UnitWeight()`.
+An [`IndependentSet`](@ref) instance takes two positional arguments to initialize, the graph instance that one wants to solve and the weights for each vertex. Here, we use a random regular graph with 20 vertices and degree 3, and the default uniform weight 1.
+
+The [`GenericTensorNetwork`](@ref) function is a constructor for the problem instance, which takes the problem instance as the first argument and optional key word arguments. The key word argument `optimizer` is for specifying the tensor network optimization algorithm.
 The keyword argument `openvertices` is a tuple of labels for specifying the degrees of freedom not summed over, and `fixedvertices` is a label-value dictionary for specifying the fixed values of the degree of freedoms.
-Here, we use [`TreeSA`](@ref) method as the tensor network optimizer, and leave `weights` and `openvertices` the default values.
+Here, we use [`TreeSA`](@ref) method as the tensor network optimizer, and leave `openvertices` the default values.
 The [`TreeSA`](@ref) method finds the best contraction order in most of our applications, while the default [`GreedyMethod`](@ref) runs the fastest.
 
 The first execution of this function will be a bit slow due to Julia's just in time compiling.

@@ -15,7 +15,7 @@ One can encode the paint shop problem `abaccb` as the following
 ```jldoctest; setup=:(using GenericTensorNetworks)
 julia> syms = collect("abaccb");
 
-julia> pb = paintshop_network(syms);
+julia> pb = GenericTensorNetwork(PaintShop(syms));
 
 julia> solve(pb, SizeMin())[]
 2.0ₜ

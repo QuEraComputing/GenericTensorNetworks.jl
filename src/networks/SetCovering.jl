@@ -13,7 +13,7 @@ Examples
 ```jldoctest; setup=:(using GenericTensorNetworks)
 julia> sets = [[1, 2, 5], [1, 3], [2, 4], [3, 6], [2, 3, 6]];  # each set is a vertex
 
-julia> gp = SetCovering(sets);
+julia> gp = GenericTensorNetwork(SetCovering(sets));
 
 julia> res = solve(gp, ConfigsMin())[]
 (3.0, {10110, 10101})ₜ

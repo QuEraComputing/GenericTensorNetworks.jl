@@ -2,6 +2,7 @@
 ## Graph problems
 ```@docs
 solve
+GenericTensorNetwork
 GraphProblem
 IndependentSet
 MaximalIS

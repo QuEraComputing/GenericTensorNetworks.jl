@@ -19,7 +19,7 @@ julia> rewards =  [-4  -7  -7  -17  -7  -26;
          0   0   0    0   0    0;
          0   0   0    0   0    0];
 
-julia> gp = open_pit_mining_network(rewards);
+julia> gp = GenericTensorNetwork(OpenPitMining(rewards));
 
 julia> res = solve(gp, SingleConfigMax())[]
 (21.0, ConfigSampler{12, 1, 1}(111000100000))ₜ

@@ -136,7 +136,7 @@ c ∨ z ∨ ¬b
 julia> cnf = (c1 ∧ c4) ∧ (c2 ∧ c3)
 (x ∨ ¬y) ∧ (c ∨ z ∨ ¬b) ∧ (c ∨ ¬a ∨ b) ∧ (z ∨ ¬a ∨ y)
 
-julia> gp = Satisfiability(cnf);
+julia> gp = GenericTensorNetwork(Satisfiability(cnf));
 
 julia> solve(gp, SizeMax())[]
 4.0ₜ

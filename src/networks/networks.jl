@@ -25,8 +25,9 @@ Base.eltype(::ZeroWeight) = Int
 
 """
 $TYPEDEF
+    GenericTensorNetwork(problem::GraphProblem; openvertices=(), fixedvertices=Dict(), optimizer=GreedyMethod())
 
-The generic tensor network.
+The generic tensor network that generated from a [`GraphProblem`](@ref).
 
 Positional arguments
 -------------------------------
@@ -146,7 +147,7 @@ The following code gives your the maximum independent set size
 ```jldoctest
 julia> using Graphs, GenericTensorNetworks
 
-julia> gp = independent_set_network(smallgraph(:petersen));
+julia> gp = GenericTensorNetwork(IndependentSet(smallgraph(:petersen)));
 
 julia> getixsv(gp.code)
 25-element Vector{Vector{Int64}}:

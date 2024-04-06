@@ -1,22 +1,12 @@
 """
-    SetPacking{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    SetPacking(sets; weights=NoWeight(), openvertices=(),
-            optimizer=GreedyMethod(), simplifier=nothing,
-            fixedvertices=Dict()
-        )
+$TYPEDEF
 
 The [set packing problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/SetPacking/), a generalization of independent set problem to hypergraphs.
 
 Positional arguments
 -------------------------------
 * `sets` is a vector of vectors, each set is associated with a weight specified in `weights`.
-
-Keyword arguments
--------------------------------
 * `weights` are associated with sets.
-* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
-* `fixedvertices` is a dict to specify the values of degree of freedoms, where a value can be `0` (absent in the set) or `1` (present in the set).
-* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
 
 Examples
 -------------------------------
@@ -29,24 +19,22 @@ julia> res = solve(gp, ConfigsMax())[]
 (2.0, {00110, 10010, 01100})ₜ
 ```
 """
-struct SetPacking{ET, CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    code::CT
+struct SetPacking{ET,WT<:Union{NoWeight, Vector}} <: GraphProblem
     sets::Vector{Vector{ET}}
     weights::WT
-    fixedvertices::Dict{ET,Int}
+    function SetPacking(sets::Vector{Vector{ET}}, weights::Union{NoWeight, Vector}=NoWeight()) where {ET}
+        @assert weights isa NoWeight || length(weights) == length(sets)
+        new{ET, typeof(weights)}(sets, weights)
+    end
 end
-
-function SetPacking(sets::AbstractVector{Vector{ET}}; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{ET,Int}()) where ET
-    nsets = length(sets)
-    @assert weights isa NoWeight || length(weights) == nsets
-    code = EinCode(vcat([[i] for i=1:nsets], [[i,j] for i=1:nsets,j=1:nsets if j>i && !isempty(sets[i] ∩ sets[j])]), collect(Int,openvertices))
-    SetPacking(_optimize_code(code, uniformsize_fix(code, 2, openvertices), optimizer, simplifier), sets, weights, Dict{ET,Int}(fixedvertices))
+function GenericTensorNetwork(cfg::SetPacking; openvertices=(), fixedvertices=Dict{Int,Int}())
+    rawcode = EinCode(vcat([[i] for i=1:length(cfg.sets)], [[i,j] for i=1:length(cfg.sets),j=1:length(cfg.sets) if j>i && !isempty(cfg.sets[i] ∩ cfg.sets[j])]), collect(Int,openvertices))
+    return GenericTensorNetwork(cfg, rawcode, Dict{Int,Int}(fixedvertices))
 end
 
 flavors(::Type{<:SetPacking}) = [0, 1]
 terms(gp::SetPacking) = getixsv(gp.code)[1:length(gp.sets)]
 labels(gp::SetPacking) = [1:length(gp.sets)...]
-fixedvertices(gp::SetPacking) = gp.fixedvertices
 
 # weights interface
 get_weights(c::SetPacking) = c.weights

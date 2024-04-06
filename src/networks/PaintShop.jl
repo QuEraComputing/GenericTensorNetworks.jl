@@ -1,20 +1,12 @@
 """
-    PaintShop{CT<:AbstractEinsum} <: GraphProblem
-    PaintShop(sequence::AbstractVector; openvertices=(),
-            optimizer=GreedyMethod(), simplifier=nothing,
-            fixedvertices=Dict()
-        )
+$TYPEDEF
 
 The [binary paint shop problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/PaintShop/).
 
 Positional arguments
 -------------------------------
-
-Keyword arguments
--------------------------------
-* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
-* `fixedvertices` is a dict to specify the values of degree of freedoms, where a value can be `0` (the first appearence in blue) or `1` (the first appearence in red).
-* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
+* `sequence` is a vector of symbols, each symbol is associated with a color.
+* `isfirst` is a vector of boolean numbers, indicating whether the symbol is the first appearance in the sequence.
 
 Examples
 -------------------------------
@@ -23,7 +15,7 @@ One can encode the paint shop problem `abaccb` as the following
 ```jldoctest; setup=:(using GenericTensorNetworks)
 julia> syms = collect("abaccb");
 
-julia> pb = PaintShop(syms);
+julia> pb = paintshop_network(syms);
 
 julia> solve(pb, SizeMin())[]
 2.0ₜ
@@ -37,30 +29,33 @@ In our definition, we find the maximum number of unchanged color in this sequenc
 In the output of maximum configurations, the two configurations are defined on 5 bonds i.e. pairs of (i, i+1), `0` means color changed, while `1` means color not changed.
 If we denote two "colors" as `r` and `b`, then the optimal painting is `rbbbrr` or `brrrbb`, both change the colors twice.
 """
-struct PaintShop{CT<:AbstractEinsum,LT} <: GraphProblem
-    code::CT
+struct PaintShop{LT} <: GraphProblem
     sequence::Vector{LT}
     isfirst::Vector{Bool}
-    fixedvertices::Dict{LT,Int}
+    function PaintShop(sequence::AbstractVector{T}) where T
+        @assert all(l->count(==(l), sequence)==2, sequence)
+        n = length(sequence)
+        isfirst = [findfirst(==(sequence[i]), sequence) == i for i=1:n]
+        new{eltype(sequence)}(sequence, isfirst)
+    end
 end
-
-function paintshop_from_pairs(pairs::AbstractVector{Tuple{Int,Int}}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict())
+function GenericTensorNetwork(cfg::PaintShop{LT}; openvertices=(), fixedvertices=Dict{Int,Int}()) where LT
+    rawcode = EinCode([[cfg.sequence[i], cfg.sequence[i+1]] for i in 1:length(cfg.sequence)-1], collect(LT, openvertices))
+    return GenericTensorNetwork(cfg, rawcode, Dict{Int,Int}(fixedvertices))
+end
+function paintshop_network(syms::AbstractVector{LT}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{Int,Int}()) where LT
+    cfg = PaintShop(syms)
+    gtn = GenericTensorNetwork(cfg; openvertices, fixedvertices)
+    return OMEinsum.optimize_code(gtn; optimizer, simplifier)
+end
+function paintshop_network_from_pairs(pairs::AbstractVector{Tuple{Int,Int}}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict())
     n = length(pairs)
     @assert sort!(vcat(collect.(pairs)...)) == collect(1:2n)
     sequence = zeros(Int, 2*n)
     @inbounds for i=1:n
         sequence[pairs[i]] .= i
     end
-    return PaintShop(pairs; openvertices, optimizer, simplifier, fixedvertices)
-end
-function PaintShop(sequence::AbstractVector{T}; openvertices=(), fixedvertices=Dict{T,Int}(), optimizer=GreedyMethod(), simplifier=nothing) where T
-    @assert all(l->count(==(l), sequence)==2, sequence)
-    n = length(sequence)
-    isfirst = [findfirst(==(sequence[i]), sequence) == i for i=1:n]
-    rawcode = EinCode(
-                [[sequence[i], sequence[i+1]] for i=1:n-1], # labels for edge tensors
-                collect(T, openvertices))
-    PaintShop(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), sequence, isfirst, Dict{T,Int}(fixedvertices))
+    return paintshop_network(sequence; openvertices, optimizer, simplifier, fixedvertices)
 end
 
 flavors(::Type{<:PaintShop}) = [0, 1]

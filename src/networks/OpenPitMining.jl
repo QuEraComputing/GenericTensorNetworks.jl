@@ -1,8 +1,5 @@
 """
-    OpenPitMining{ET, CT<:AbstractEinsum} <: GraphProblem
-    OpenPitMining(rewards; openvertices=(),
-                 optimizer=GreedyMethod(), simplifier=nothing,
-                 fixedvertices=Dict())
+$TYPEDEF
 
 The open pit mining problem.
 This problem can be solved in polynomial time with the pseudoflow algorithm.
@@ -10,13 +7,7 @@ This problem can be solved in polynomial time with the pseudoflow algorithm.
 Positional arguments
 -------------------------------
 * `rewards` is a matrix of rewards.
-
-Keyword arguments
--------------------------------
-* `openvertices` specifies labels of the output tensor.
-* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
-* `fixedvertices` is a dict to specify the values of labels, where a value can be `0` (not mined) or `1` (mined)
-* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
+* `blocks` are the locations of the blocks.
 
 Example
 -----------------------------------
@@ -28,7 +19,7 @@ julia> rewards =  [-4  -7  -7  -17  -7  -26;
          0   0   0    0   0    0;
          0   0   0    0   0    0];
 
-julia> gp = OpenPitMining(rewards);
+julia> gp = open_pit_mining_network(rewards);
 
 julia> res = solve(gp, SingleConfigMax())[]
 (21.0, ConfigSampler{12, 1, 1}(111000100000))ₜ
@@ -47,37 +38,30 @@ julia> print_mining(rewards, res.c.data)
 
 You will the the mining is printed as green in an colored REPL.
 """
-struct OpenPitMining{ET, CT<:AbstractEinsum} <: GraphProblem
-    code::CT
+struct OpenPitMining{ET} <: GraphProblem
     rewards::Matrix{ET}
     blocks::Vector{Tuple{Int,Int}}  # non-zero locations
-    fixedvertices::Dict{Tuple{Int,Int},Int}
-end
-
-function get_blocks(rewards)
-    blocks = Tuple{Int,Int}[]
-    for i=1:size(rewards, 1), j=i:size(rewards,2)-i+1
-        push!(blocks, (i,j))
+    function OpenPitMining(rewards::Matrix{ET}) where ET
+        # compute block locations
+        blocks = Tuple{Int,Int}[]
+        for i=1:size(rewards, 1), j=i:size(rewards,2)-i+1
+            push!(blocks, (i,j))
+        end
+        new{ET}(rewards, blocks)
     end
-    return blocks
 end
- 
-
-function OpenPitMining(rewards::Matrix{ET}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{Tuple{Int,Int},Int}()) where ET
-    # compute block locations
-    blocks = Tuple{Int,Int}[]
+function GenericTensorNetwork(cfg::OpenPitMining; openvertices=(), fixedvertices=Dict{Tuple{Int,Int},Int}())
     depends = Pair{Tuple{Int,Int},Tuple{Int,Int}}[]
-    for i=1:size(rewards, 1), j=i:size(rewards,2)-i+1
-        push!(blocks, (i,j))
+    for i=1:size(cfg.rewards, 1), j=i:size(cfg.rewards,2)-i+1
         if i!=1
             push!(depends, (i,j)=>(i-1,j-1))
             push!(depends, (i,j)=>(i-1,j))
             push!(depends, (i,j)=>(i-1,j+1))
         end
     end
-    code = EinCode([[[block] for block in blocks]...,
+    rawcode = EinCode([[[block] for block in cfg.blocks]...,
         [[dep.first, dep.second] for dep in depends]...], collect(Tuple{Int,Int},openvertices))
-    OpenPitMining(_optimize_code(code, uniformsize_fix(code, 2, fixedvertices), optimizer, simplifier), rewards, blocks, fixedvertices)
+    return GenericTensorNetwork(cfg, rawcode, Dict{Tuple{Int,Int},Int}(fixedvertices))
 end
 
 function mining_tensor(::Type{T}) where T
@@ -134,7 +118,14 @@ function is_valid_mining(rewards::AbstractMatrix, config)
     end
     return true
 end
-
+function get_blocks(rewards)
+    blocks = Tuple{Int,Int}[]
+    for i=1:size(rewards, 1), j=i:size(rewards,2)-i+1
+        push!(blocks, (i,j))
+    end
+    return blocks
+end
+ 
 """
     print_mining(rewards::AbstractMatrix, config)
 

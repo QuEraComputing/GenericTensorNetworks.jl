@@ -1,39 +1,32 @@
 """
-    MaxCut{CT<:AbstractEinsum,WT1<:Union{NoWeight, Vector},WT2<:Union{ZeroWeight, Vector}} <: GraphProblem
-    MaxCut(graph; edge_weights=NoWeight(), vertex_weights=ZeroWeight(), openvertices=(),
-            optimizer=GreedyMethod(), simplifier=nothing,
-            fixedvertices=Dict()
-        )
+$TYPEDEF
 
 The [cutting](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/MaxCut/) problem.
 
 Positional arguments
 -------------------------------
 * `graph` is the problem graph.
-
-Keyword arguments
--------------------------------
 * `edge_weights` are associated with the edges of the `graph`.
 * `vertex_weights` are associated with the vertices of the `graph`.
-* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
-* `fixedvertices` is a dict to specify the values of degree of freedoms, where a value can be `0` (in one side of the cut) or `1` (in the other side of the cut).
-* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
 """
-struct MaxCut{CT<:AbstractEinsum,WT1<:Union{NoWeight, Vector},WT2<:Union{ZeroWeight, Vector}} <: GraphProblem
-    code::CT
+struct MaxCut{WT1<:Union{NoWeight, Vector},WT2<:Union{ZeroWeight, Vector}} <: GraphProblem
     graph::SimpleGraph{Int}
     edge_weights::WT1
     vertex_weights::WT2
-    fixedvertices::Dict{Int,Int}
+    function MaxCut(g::SimpleGraph;
+            edge_weights::Union{NoWeight, Vector}=NoWeight(),
+            vertex_weights::Union{ZeroWeight, Vector}=ZeroWeight())
+        @assert edge_weights isa NoWeight || length(edge_weights) == ne(g)
+        @assert vertex_weights isa ZeroWeight || length(vertex_weights) == nv(g)
+        new{typeof(edge_weights), typeof(vertex_weights)}(g, edge_weights, vertex_weights)
+    end
 end
-function MaxCut(g::SimpleGraph; edge_weights=NoWeight(), vertex_weights=ZeroWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
-    @assert edge_weights isa NoWeight || length(edge_weights) == ne(g)
-    @assert vertex_weights isa ZeroWeight || length(vertex_weights) == nv(g)
+function GenericTensorNetwork(problem::MaxCut; openvertices=(), fixedvertices=Dict{Int,Int}())
     rawcode = EinCode([
-        map(e->[minmax(e.src,e.dst)...], Graphs.edges(g))...,
-        map(v->[v], Graphs.vertices(g))...,
+        map(e->[minmax(e.src,e.dst)...], Graphs.edges(problem.graph))...,
+        map(v->[v], Graphs.vertices(problem.graph))...,
     ], collect(Int, openvertices))  # labels for edge tensors
-    MaxCut(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), g, edge_weights, vertex_weights, Dict{Int,Int}(fixedvertices))
+    return GenericTensorNetwork(problem, rawcode, Dict{Int,Int}(fixedvertices))
 end
 
 flavors(::Type{<:MaxCut}) = [0, 1]

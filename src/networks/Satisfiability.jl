@@ -107,24 +107,14 @@ macro bools(syms::Symbol...)
 end
 
 """
-    Satisfiability{CT<:AbstractEinsum,T,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    Satisfiability(cnf::CNF; weights=NoWeight(), openvertices=(),
-            optimizer=GreedyMethod(), simplifier=nothing,
-            fixedvertices=Dict()
-        )
+$TYPEDEF
 
 The [satisfiability](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/Satisfiability/) problem.
 
 Positional arguments
 -------------------------------
 * `cnf` is a conjunctive normal form ([`CNF`](@ref)) for specifying the satisfiability problems.
-
-Keyword arguments
--------------------------------
 * `weights` are associated with clauses.
-* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
-* `fixedvertices` is a dict to specify the values of boolean variables, where a value can be `0` or `1`.
-* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
 
 Examples
 -------------------------------
@@ -152,23 +142,23 @@ julia> solve(gp, SizeMax())[]
 4.0ₜ
 ```
 """
-struct Satisfiability{CT<:AbstractEinsum,T,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    code::CT
+struct Satisfiability{T,WT<:Union{NoWeight, Vector}} <: GraphProblem
     cnf::CNF{T}
     weights::WT
-    fixedvertices::Dict{T,Int}
+    function Satisfiability(cnf::CNF{T}, weights::WT=NoWeight()) where {T}
+        @assert weights isa NoWeight || length(weights) == length(cnf) "weights size inconsistent! should be $(length(cnf)), got: $(length(weights))"
+        new{T, typeof(weights)}(cnf, weights)
+    end
 end
 
-function Satisfiability(cnf::CNF{T}; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{T,Int}()) where T
-    @assert weights isa NoWeight || length(weights) == length(cnf) "weights size inconsistent! should be $(length(cnf)), got: $(length(weights))"
-    rawcode = EinCode([[getfield.(c.vars, :name)...] for c in cnf.clauses], collect(T, openvertices))
-    Satisfiability(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), cnf, weights, Dict{T,Int}(fixedvertices))
+function GenericTensorNetwork(cfg::Satisfiability{CT,T,WT}; openvertices=(), fixedvertices=Dict{T,Int}())
+    rawcode = EinCode([[getfield.(c.vars, :name)...] for c in cfg.cnf.clauses], collect(T, openvertices))
+    return GenericTensorNetwork(cfg, rawcode, Dict{T,Int}(fixedvertices))
 end
 
 flavors(::Type{<:Satisfiability}) = [0, 1]  # false, true
 terms(gp::Satisfiability) = getixsv(gp.code)
 labels(gp::Satisfiability) = unique!(vcat(getixsv(gp.code)...))
-fixedvertices(gp::Satisfiability) = gp.fixedvertices
 
 # weights interface
 get_weights(c::Satisfiability) = c.weights

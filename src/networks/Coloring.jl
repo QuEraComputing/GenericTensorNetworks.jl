@@ -1,54 +1,42 @@
 """
-    Coloring{K,CT<:AbstractEinsum, WT<:Union{NoWeight, Vector}} <: GraphProblem
-    Coloring{K}(graph; weights=NoWeight(), openvertices=(),
-            optimizer=GreedyMethod(), simplifier=nothing,
-            fixedvertices=Dict()
-        )
+$(TYPEDEF)
+    Coloring{K}(graph; weights=NoWeight())
 
 The [Vertex Coloring](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/Coloring/) problem.
 
 Positional arguments
 -------------------------------
 * `graph` is the problem graph.
-
-Keyword arguments
--------------------------------
-* `weights` are associated with the edges of the `graph`.
-* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
-* `fixedvertices` is a dict to specify the values of degree of freedoms on vertices, where a value can be in ``0,...,K-1`` (different colors).
-* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
+* `weights` are associated with the edges of the `graph`, default to `NoWeight()`.
 """
-struct Coloring{K,CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    code::CT
+struct Coloring{K, WT<:Union{NoWeight, Vector}} <: GraphProblem
     graph::SimpleGraph{Int}
     weights::WT
-    fixedvertices::Dict{Int,Int}
+    function Coloring{K}(graph::SimpleGraph, weights::Union{NoWeight, Vector}=NoWeight()) where {K}
+        @assert weights isa NoWeight || length(weights) == ne(g)
+        new{K, typeof(weights)}(graph, weights)
+    end
 end
-Coloring{K}(code::ET, graph::SimpleGraph, weights::Union{NoWeight, Vector}, fixedvertices::Dict{Int,Int}) where {K,ET<:AbstractEinsum} = Coloring{K,ET,typeof(weights)}(code, graph, weights, fixedvertices)
-# same network layout as independent set.
-function Coloring{K}(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing) where K
-    @assert weights isa NoWeight || length(weights) == ne(g)
+function GenericTensorNetwork(problem::Coloring{K}; openvertices=(), fixedvertices=Dict{Int,Int}()) where K
     rawcode = EinCode(([[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
                        [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...), collect(Int, openvertices))  # labels for edge tensors
-    code = _optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier)
-    Coloring{K}(code, g, weights, Dict{Int,Int}(fixedvertices))
+    return GenericTensorNetwork(problem, rawcode, Dict{Int,Int}(fixedvertices))
 end
-
 flavors(::Type{<:Coloring{K}}) where K = collect(0:K-1)
-terms(gp::Coloring) = getixsv(gp.code)[1:nv(gp.graph)]
+terms(gp::Coloring) = [[i] for i in 1:nv(gp.graph)]
 labels(gp::Coloring) = [1:nv(gp.graph)...]
-fixedvertices(gp::Coloring) = gp.fixedvertices
 
 # weights interface
 get_weights(c::Coloring) = c.weights
 get_weights(c::Coloring{K}, i::Int) where K = fill(c.weights[i], K)
 chweights(c::Coloring{K}, weights) where K = Coloring{K}(c.code, c.graph, weights, c.fixedvertices)
 
-function generate_tensors(x::T, c::Coloring{K}) where {K,T}
+function generate_tensors(x::T, c::GenericTensorNetwork{<:Coloring{K}}) where {K,T}
     ixs = getixsv(c.code)
+    graph = c.problem.graph
     return select_dims([
-        add_labels!(Array{T}[coloringv(T, K) for i=1:nv(c.graph)], ixs[1:nv(c.graph)], labels(c))...,
-        Array{T}[_pow.(coloringb(x, K), get_weights(c, i)) for i=1:ne(c.graph)]...
+        add_labels!(Array{T}[coloringv(T, K) for i=1:nv(graph)], ixs[1:nv(graph)], labels(c))...,
+        Array{T}[_pow.(coloringb(x, K), get_weights(c, i)) for i=1:ne(graph)]...
     ], ixs, fixedvertices(c))
 end
 

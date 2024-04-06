@@ -1,22 +1,12 @@
 """
-    SetCovering{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    SetCovering(sets; weights=NoWeight(), openvertices=(),
-            optimizer=GreedyMethod(), simplifier=nothing,
-            fixedvertices=Dict()
-        )
+$TYPEDEF
 
 The [set covering problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/SetCovering/).
 
 Positional arguments
 -------------------------------
 * `sets` is a vector of vectors, each set is associated with a weight specified in `weights`.
-
-Keyword arguments
--------------------------------
 * `weights` are associated with sets.
-* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
-* `fixedvertices` is a dict to specify the values of degree of freedoms, where a value can be `0` (absent in the set) or `1` (present in the set).
-* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
 
 Examples
 -------------------------------
@@ -29,22 +19,20 @@ julia> res = solve(gp, ConfigsMin())[]
 (3.0, {10110, 10101})ₜ
 ```
 """
-struct SetCovering{ET, CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    code::CT
+struct SetCovering{ET, WT<:Union{NoWeight, Vector}} <: GraphProblem
     sets::Vector{Vector{ET}}
     weights::WT
-    fixedvertices::Dict{ET,Int}
+    function SetCovering(sets::Vector{Vector{ET}}, weights::Union{NoWeight, Vector}=NoWeight()) where {ET}
+        @assert weights isa NoWeight || length(weights) == length(sets)
+        new{ET, typeof(weights)}(sets, weights)
+    end
 end
 
-function SetCovering(sets::AbstractVector{Vector{ET}}; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{ET,Int}()) where ET
-    nsets = length(sets)
-    @assert weights isa NoWeight || length(weights) == nsets
-    # get constraints
-    elements, count = cover_count(sets)
-
-    code = EinCode([[[i] for i=1:nsets]...,
+function GenericTensorNetwork(cfg::SetCovering; openvertices=(), fixedvertices=Dict{Int,Int}())
+    elements, count = cover_count(cfg.sets)
+    rawcode = EinCode([[[i] for i=1:length(cfg.sets)]...,
         [count[e] for e in elements]...], collect(Int,openvertices))
-    SetCovering(_optimize_code(code, uniformsize_fix(code, 2, fixedvertices), optimizer, simplifier), sets, weights, Dict{ET,Int}(fixedvertices))
+    return GenericTensorNetwork(cfg, rawcode, Dict{Int,Int}(fixedvertices))
 end
 
 function cover_count(sets)
@@ -72,7 +60,6 @@ end
 flavors(::Type{<:SetCovering}) = [0, 1]
 terms(gp::SetCovering) = getixsv(gp.code)[1:length(gp.sets)]
 labels(gp::SetCovering) = [1:length(gp.sets)...]
-fixedvertices(gp::SetCovering) = gp.fixedvertices
 
 # weights interface
 get_weights(c::SetCovering) = c.weights

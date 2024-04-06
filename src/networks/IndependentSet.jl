@@ -1,29 +1,19 @@
 """
-    IndependentSet{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    IndependentSet(graph; weights=NoWeight(), openvertices=(),
-            optimizer=GreedyMethod(), simplifier=nothing,
-            fixedvertices=Dict()
-        )
+$TYPEDEF
 
 The [independent set problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/IndependentSet/) in graph theory.
 
 Positional arguments
 -------------------------------
 * `graph` is the problem graph.
-
-Keyword arguments
--------------------------------
-* `weights` are associated with the vertices of the `graph`.
-* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
-* `fixedvertices` is a dict to specify the values of degree of freedoms on vertices, where a value can be `0` (absent in the set) or `1` (present in the set).
-* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
+* `weights` are associated with the vertices of the `graph`, default to `NoWeight()`.
 
 Examples
 -------------------------------
 ```jldoctest; setup=:(using Random; Random.seed!(2))
 julia> using GenericTensorNetworks, Graphs
 
-julia> problem = IndependentSet(smallgraph(:petersen));
+julia> problem = independent_set_network(smallgraph(:petersen));
 
 julia> solve(problem, ConfigsMax())
 0-dimensional Array{CountingTropical{Float64, ConfigEnumerator{10, 1, 1}}, 0}:

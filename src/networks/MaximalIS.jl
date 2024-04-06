@@ -1,40 +1,30 @@
 """
-    MaximalIS{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    MaximalIS(graph; weights=NoWeight(), openvertices=(),
-            optimizer=GreedyMethod(), simplifier=nothing,
-            fixedvertices=Dict()
-        )
+$TYPEDEF
 
 The [maximal independent set](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/MaximalIS/) problem. In the constructor, `weights` are the weights of vertices.
 
 Positional arguments
 -------------------------------
 * `graph` is the problem graph.
-
-Keyword arguments
--------------------------------
 * `weights` are associated with the vertices of the `graph`.
-* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
-* `fixedvertices` is a dict to specify the values of degree of freedoms, where a value can be `0` (absent in the set) or `1` (present in the set).
-* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
 """
 struct MaximalIS{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    code::CT
     graph::SimpleGraph
     weights::WT
-    fixedvertices::Dict{Int,Int}
+    function MaximalIS(g::SimpleGraph, weights::Union{NoWeight, Vector}=NoWeight())
+        @assert weights isa NoWeight || length(weights) == nv(g)
+        new{typeof(weights)}(g, weights)
+    end
 end
 
-function MaximalIS(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{Int,Int}())
-    @assert weights isa NoWeight || length(weights) == nv(g)
-    rawcode = EinCode(([[Graphs.neighbors(g, v)..., v] for v in Graphs.vertices(g)]...,), collect(Int, openvertices))
-    MaximalIS(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), g, weights, Dict{Int,Int}(fixedvertices))
+function GenericTensorNetwork(problem::MaximalIS; openvertices=(), fixedvertices=Dict{Int,Int}())
+    rawcode = EinCode(([[Graphs.neighbors(problem.graph, v)..., v] for v in Graphs.vertices(problem.graph)]...,), collect(Int, openvertices))
+    return GenericTensorNetwork(problem, rawcode, Dict{Int,Int}(fixedvertices))
 end
 
 flavors(::Type{<:MaximalIS}) = [0, 1]
 terms(gp::MaximalIS) = getixsv(gp.code)
 labels(gp::MaximalIS) = [1:length(getixsv(gp.code))...]
-fixedvertices(gp::MaximalIS) = gp.fixedvertices
 
 # weights interface
 get_weights(c::MaximalIS) = c.weights

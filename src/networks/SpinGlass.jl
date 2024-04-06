@@ -1,10 +1,5 @@
 """
-    SpinGlass{TT<:MaxCut,WT1<:Union{NoWeight, Vector},WT2<:Union{ZeroWeight, Vector}} <: ReducedProblem
-    SpinGlass(graph; J=NoWeight(), h=ZeroWeight(), openvertices=(),
-            optimizer=GreedyMethod(), simplifier=nothing,
-            fixedvertices=Dict()
-        )
-    SpinGlass(M::AbstractMatrix, h::AbstractVector; kwargs...)
+$TYPEDEF
 
 The [spin glass](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/SpinGlass/) problem (or cutting problem).
 In the output, the spin ↑ is mapped to configuration 0, while spin ↓ is mapped to configuration 1.
@@ -12,26 +7,24 @@ In the output, the spin ↑ is mapped to configuration 0, while spin ↓ is mapp
 Positional arguments
 -------------------------------
 * `graph` is the problem graph.
-
-Keyword arguments
--------------------------------
-* `M` is a symmetric matrix of the coupling strengths.
 * `J` is a vector of coupling strengths associated with the edges of the `graph`.
 * `h` is a vector of onsite energy terms associated with the vertices of the `graph`.
-* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
-* `fixedvertices` is a dict to specify the values of degree of freedoms, where a value can be `0` (in one side of the cut) or `1` (in the other side of the cut).
-* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
 """
-struct SpinGlass{TT<:MaxCut,WT1<:Union{NoWeight, Vector},WT2<:Union{ZeroWeight, Vector}} <: ReducedProblem
-    target::TT
+struct SpinGlass{WT1<:Union{UnitWeight, Vector}, WT2<:Union{ZeroWeight, Vector}} <: ReducedProblem
+    graph::SimpleGraph{Int}
     J::WT1
     h::WT2
+    function SpinGlass(g::SimpleGraph, J::WT1=UnitWeight(), h::WT2=ZeroWeight()) where {WT1, WT2}
+        @assert J isa UnitWeight || length(J) == ne(g)
+        @assert h isa ZeroWeight || length(h) == nv(g)
+        new{WT1, WT2}(g, J, h)
+    end
 end
 
-function SpinGlass(g::SimpleGraph; J=NoWeight(), h=ZeroWeight(), kwargs...)
-    @assert J isa NoWeight || length(J) == ne(g)
-    @assert h isa ZeroWeight || length(h) == nv(g)
-    SpinGlass(MaxCut(g; edge_weights=[2*J[i] for i=1:ne(g)], vertex_weights=[-2*h[i] for i=1:nv(g)], kwargs...), J, h)
+function GenericTensorNetwork(cfg::SpinGlass; openvertices=(), fixedvertices=Dict{Int,Int}())
+    g, J, h = cfg.graph, cfg.J, cfg.h
+    reducedto = MaxCut(g, edge_weights=[2*J[i] for i=1:ne(g)], vertex_weights=[-2*h[i] for i=1:nv(g)])
+    return GenericTensorNetwork(reducedto; openvertices, fixedvertices)
 end
 
 function SpinGlass(M::AbstractMatrix, h::AbstractVector; kwargs...)

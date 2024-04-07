@@ -30,74 +30,78 @@ show_graph(graph; locs=locations, format=:svg)</code></pre><img src='data:image/
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 123.214844 90.449219 C 123.214844 94.59375 119.859375 97.949219 115.714844 97.949219 C 111.574219 97.949219 108.214844 94.59375 108.214844 90.449219 C 108.214844 86.308594 111.574219 82.949219 115.714844 82.949219 C 119.859375 82.949219 123.214844 86.308594 123.214844 90.449219 Z M 123.214844 90.449219 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 105.054688 146.351562 C 105.054688 150.496094 101.695312 153.851562 97.554688 153.851562 C 93.410156 153.851562 90.054688 150.496094 90.054688 146.351562 C 90.054688 142.210938 93.410156 138.851562 97.554688 138.851562 C 101.695312 138.851562 105.054688 142.210938 105.054688 146.351562 Z M 105.054688 146.351562 "/>
 </svg>
-'/><h2 id="Generic-tensor-network-representation"><a class="docs-heading-anchor" href="#Generic-tensor-network-representation">Generic tensor network representation</a><a id="Generic-tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Generic-tensor-network-representation" title="Permalink"></a></h2><p>We can define the matching problem with the <a href="../../ref/#GenericTensorNetworks.Matching"><code>Matching</code></a> type as</p><pre><code class="language-julia hljs">matching = Matching(graph)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Matching{UnitWeight}(Graphs.SimpleGraphs.SimpleGraph{Int64}(15, [[2, 5, 6], [1, 3, 7], [2, 4, 8], [3, 5, 9], [1, 4, 10], [1, 8, 9], [2, 9, 10], [3, 6, 10], [4, 6, 7], [5, 7, 8]]), UnitWeight())</code></pre><p>The tensor network representation of the matching problem can be obtained by</p><pre><code class="language-julia hljs">problem = GenericTensorNetwork(matching)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">GenericTensorNetwork{Matching{UnitWeight}, OMEinsum.DynamicNestedEinsum{Tuple{Int64, Int64}}, Tuple{Int64, Int64}}(Matching{UnitWeight}(Graphs.SimpleGraphs.SimpleGraph{Int64}(15, [[2, 5, 6], [1, 3, 7], [2, 4, 8], [3, 5, 9], [1, 4, 10], [1, 8, 9], [2, 9, 10], [3, 6, 10], [4, 6, 7], [5, 7, 8]]), UnitWeight()), (1, 6)-(3, 8)-(8, 10)-(6, 9), (1, 6)-(6, 9)-(3, 8)-(8, 10) -&gt; 
-├─ (1, 6)-(2, 7)-(3, 8)-(4, 9)-(5, 10), (2, 7)-(5, 10)-(8, 10)-(4, 9)-(6, 9) -&gt; (1, 6)-(3, 8)-(8, 10)-(6, 9)
-│  ├─ (1, 5)-(1, 6)-(2, 7)-(3, 4)-(3, 8), (3, 4)-(4, 9)-(1, 5)-(5, 10) -&gt; (1, 6)-(2, 7)-(3, 8)-(4, 9)-(5, 10)
-│  │  ├─ (1, 2)-(1, 5)-(1, 6), (1, 2)-(2, 7)-(3, 4)-(3, 8) -&gt; (1, 5)-(1, 6)-(2, 7)-(3, 4)-(3, 8)
-│  │  │  ├─ (1, 6), (1, 6)-(1, 2)-(1, 5) -&gt; (1, 2)-(1, 5)-(1, 6)
-│  │  │  │  ├─ (1, 6)
-│  │  │  │  └─ (1, 5), (1, 5)-(1, 6)-(1, 2) -&gt; (1, 6)-(1, 2)-(1, 5)
-│  │  │  │     ⋮
-│  │  │  │     
-│  │  │  └─ (1, 2)-(2, 3)-(2, 7), (2, 3)-(3, 4)-(3, 8) -&gt; (1, 2)-(2, 7)-(3, 4)-(3, 8)
-│  │  │     ├─ (2, 7), (1, 2)-(2, 7)-(2, 3) -&gt; (1, 2)-(2, 3)-(2, 7)
-│  │  │     │  ⋮
-│  │  │     │  
-│  │  │     └─ (3, 8), (2, 3)-(3, 8)-(3, 4) -&gt; (2, 3)-(3, 4)-(3, 8)
-│  │  │        ⋮
-│  │  │        
-│  │  └─ (3, 4)-(4, 5)-(4, 9), (1, 5)-(4, 5)-(5, 10) -&gt; (3, 4)-(4, 9)-(1, 5)-(5, 10)
-│  │     ├─ (4, 9), (3, 4)-(4, 9)-(4, 5) -&gt; (3, 4)-(4, 5)-(4, 9)
-│  │     │  ├─ (4, 9)
-│  │     │  └─ (4, 5), (3, 4)-(4, 5)-(4, 9) -&gt; (3, 4)-(4, 9)-(4, 5)
-│  │     │     ⋮
-│  │     │     
-│  │     └─ (5, 10), (1, 5)-(4, 5)-(5, 10) -&gt; (1, 5)-(4, 5)-(5, 10)
-│  │        ├─ (5, 10)
-│  │        └─ (1, 5)-(4, 5)-(5, 10)
-│  └─ (2, 7)-(7, 9)-(5, 10)-(8, 10), (4, 9)-(6, 9)-(7, 9) -&gt; (2, 7)-(5, 10)-(8, 10)-(4, 9)-(6, 9)
-│     ├─ (2, 7)-(7, 9)-(7, 10), (5, 10)-(7, 10)-(8, 10) -&gt; (2, 7)-(7, 9)-(5, 10)-(8, 10)
-│     │  ├─ (7, 10), (2, 7)-(7, 10)-(7, 9) -&gt; (2, 7)-(7, 9)-(7, 10)
-│     │  │  ├─ (7, 10)
-│     │  │  └─ (7, 9), (2, 7)-(7, 9)-(7, 10) -&gt; (2, 7)-(7, 10)-(7, 9)
-│     │  │     ⋮
-│     │  │     
-│     │  └─ (5, 10)-(7, 10)-(8, 10)
-│     └─ (4, 9)-(6, 9)-(7, 9)
-└─ (1, 6)-(6, 8)-(6, 9), (3, 8)-(6, 8)-(8, 10) -&gt; (1, 6)-(6, 9)-(3, 8)-(8, 10)
-   ├─ (6, 9), (1, 6)-(6, 9)-(6, 8) -&gt; (1, 6)-(6, 8)-(6, 9)
-   │  ├─ (6, 9)
-   │  └─ (6, 8), (1, 6)-(6, 8)-(6, 9) -&gt; (1, 6)-(6, 9)-(6, 8)
-   │     ├─ (6, 8)
-   │     └─ (1, 6)-(6, 8)-(6, 9)
-   └─ (8, 10), (3, 8)-(6, 8)-(8, 10) -&gt; (3, 8)-(6, 8)-(8, 10)
-      ├─ (8, 10)
-      └─ (3, 8)-(6, 8)-(8, 10)
+'/><h2 id="Generic-tensor-network-representation"><a class="docs-heading-anchor" href="#Generic-tensor-network-representation">Generic tensor network representation</a><a id="Generic-tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Generic-tensor-network-representation" title="Permalink"></a></h2><p>We can define the matching problem with the <a href="../../ref/#GenericTensorNetworks.Matching"><code>Matching</code></a> type as</p><pre><code class="language-julia hljs">matching = Matching(graph)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Matching{UnitWeight}(Graphs.SimpleGraphs.SimpleGraph{Int64}(15, [[2, 5, 6], [1, 3, 7], [2, 4, 8], [3, 5, 9], [1, 4, 10], [1, 8, 9], [2, 9, 10], [3, 6, 10], [4, 6, 7], [5, 7, 8]]), UnitWeight())</code></pre><p>The tensor network representation of the matching problem can be obtained by</p><pre><code class="language-julia hljs">problem = GenericTensorNetwork(matching)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">GenericTensorNetwork{Matching{UnitWeight}, OMEinsum.DynamicNestedEinsum{Tuple{Int64, Int64}}, Tuple{Int64, Int64}}(Matching{UnitWeight}(Graphs.SimpleGraphs.SimpleGraph{Int64}(15, [[2, 5, 6], [1, 3, 7], [2, 4, 8], [3, 5, 9], [1, 4, 10], [1, 8, 9], [2, 9, 10], [3, 6, 10], [4, 6, 7], [5, 7, 8]]), UnitWeight()), (1, 5)-(1, 6)-(2, 3)-(2, 7), (2, 3)-(1, 5)-(1, 6)-(2, 7) -&gt; 
+├─ (1, 2)-(1, 5)-(1, 6), (1, 2)-(2, 3)-(2, 7) -&gt; (1, 5)-(1, 6)-(2, 3)-(2, 7)
+│  ├─ (1, 6), (1, 6)-(1, 2)-(1, 5) -&gt; (1, 2)-(1, 5)-(1, 6)
+│  │  ├─ (1, 6)
+│  │  └─ (1, 5), (1, 5)-(1, 6)-(1, 2) -&gt; (1, 6)-(1, 2)-(1, 5)
+│  │     ├─ (1, 5)
+│  │     └─ (1, 2), (1, 2)-(1, 5)-(1, 6) -&gt; (1, 5)-(1, 6)-(1, 2)
+│  │        ├─ (1, 2)
+│  │        └─ (1, 2)-(1, 5)-(1, 6)
+│  └─ (2, 7), (1, 2)-(2, 7)-(2, 3) -&gt; (1, 2)-(2, 3)-(2, 7)
+│     ├─ (2, 7)
+│     └─ (2, 3), (1, 2)-(2, 3)-(2, 7) -&gt; (1, 2)-(2, 7)-(2, 3)
+│        ├─ (2, 3)
+│        └─ (1, 2)-(2, 3)-(2, 7)
+└─ (2, 3)-(6, 8)-(4, 9)-(1, 5)-(7, 10), (1, 6)-(6, 8)-(4, 9)-(2, 7)-(7, 10) -&gt; (2, 3)-(1, 5)-(1, 6)-(2, 7)
+   ├─ (2, 3)-(6, 8)-(8, 10)-(4, 5)-(4, 9), (1, 5)-(4, 5)-(7, 10)-(8, 10) -&gt; (2, 3)-(6, 8)-(4, 9)-(1, 5)-(7, 10)
+   │  ├─ (2, 3)-(3, 4)-(6, 8)-(8, 10), (3, 4)-(4, 5)-(4, 9) -&gt; (2, 3)-(6, 8)-(8, 10)-(4, 5)-(4, 9)
+   │  │  ├─ (2, 3)-(3, 4)-(3, 8), (3, 8)-(6, 8)-(8, 10) -&gt; (2, 3)-(3, 4)-(6, 8)-(8, 10)
+   │  │  │  ├─ (3, 8), (2, 3)-(3, 8)-(3, 4) -&gt; (2, 3)-(3, 4)-(3, 8)
+   │  │  │  │  ⋮
+   │  │  │  │  
+   │  │  │  └─ (8, 10), (3, 8)-(6, 8)-(8, 10) -&gt; (3, 8)-(6, 8)-(8, 10)
+   │  │  │     ⋮
+   │  │  │     
+   │  │  └─ (4, 9), (3, 4)-(4, 9)-(4, 5) -&gt; (3, 4)-(4, 5)-(4, 9)
+   │  │     ├─ (4, 9)
+   │  │     └─ (4, 5), (3, 4)-(4, 5)-(4, 9) -&gt; (3, 4)-(4, 9)-(4, 5)
+   │  │        ⋮
+   │  │        
+   │  └─ (1, 5)-(4, 5)-(5, 10), (5, 10)-(7, 10)-(8, 10) -&gt; (1, 5)-(4, 5)-(7, 10)-(8, 10)
+   │     ├─ (5, 10), (1, 5)-(4, 5)-(5, 10) -&gt; (1, 5)-(4, 5)-(5, 10)
+   │     │  ├─ (5, 10)
+   │     │  └─ (1, 5)-(4, 5)-(5, 10)
+   │     └─ (5, 10)-(7, 10)-(8, 10)
+   └─ (1, 6)-(6, 8)-(4, 9)-(7, 9), (2, 7)-(7, 9)-(7, 10) -&gt; (1, 6)-(6, 8)-(4, 9)-(2, 7)-(7, 10)
+      ├─ (1, 6)-(6, 8)-(6, 9), (4, 9)-(6, 9)-(7, 9) -&gt; (1, 6)-(6, 8)-(4, 9)-(7, 9)
+      │  ├─ (6, 9), (1, 6)-(6, 9)-(6, 8) -&gt; (1, 6)-(6, 8)-(6, 9)
+      │  │  ├─ (6, 9)
+      │  │  └─ (6, 8), (1, 6)-(6, 8)-(6, 9) -&gt; (1, 6)-(6, 9)-(6, 8)
+      │  │     ⋮
+      │  │     
+      │  └─ (4, 9)-(6, 9)-(7, 9)
+      └─ (7, 10), (2, 7)-(7, 10)-(7, 9) -&gt; (2, 7)-(7, 9)-(7, 10)
+         ├─ (7, 10)
+         └─ (7, 9), (2, 7)-(7, 9)-(7, 10) -&gt; (2, 7)-(7, 10)-(7, 9)
+            ├─ (7, 9)
+            └─ (2, 7)-(7, 9)-(7, 10)
 , Dict{Tuple{Int64, Int64}, Int64}())</code></pre><h3 id="Theory-(can-skip)"><a class="docs-heading-anchor" href="#Theory-(can-skip)">Theory (can skip)</a><a id="Theory-(can-skip)-1"></a><a class="docs-heading-anchor-permalink" href="#Theory-(can-skip)" title="Permalink"></a></h3><p>Type <a href="../../ref/#GenericTensorNetworks.Matching"><code>Matching</code></a> can be used for constructing the tensor network with optimized contraction order for a matching problem. We map an edge <span>$(u, v) \in E$</span> to a label <span>$\langle u, v\rangle \in \{0, 1\}$</span> in a tensor network, where 1 means two vertices of an edge are matched, 0 means otherwise. Then we define a tensor of rank <span>$d(v) = |N(v)|$</span> on vertex <span>$v$</span> such that,</p><p class="math-container">\[W_{\langle v, n_1\rangle, \langle v, n_2 \rangle, \ldots, \langle v, n_{d(v)}\rangle} = \begin{cases}
     1, &amp; \sum_{i=1}^{d(v)} \langle v, n_i \rangle \leq 1,\\
     0, &amp; \text{otherwise},
 \end{cases}\]</p><p>and a tensor of rank 1 on the bond</p><p class="math-container">\[B_{\langle v, w\rangle} = \begin{cases}
 1, &amp; \langle v, w \rangle = 0 \\
 x, &amp; \langle v, w \rangle = 1,
-\end{cases}\]</p><p>where label <span>$\langle v, w \rangle$</span> is equivalent to <span>$\langle w,v\rangle$</span>.</p><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><p>The maximum matching size can be obtained by</p><pre><code class="language-julia hljs">max_matching = solve(problem, SizeMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5.0ₜ</code></pre><p>The largest number of matching is 5, which means we have a perfect matching (vertices are all paired).</p><p>The graph polynomial defined for the matching problem is known as the matching polynomial. Here, we adopt the first definition in the <a href="https://en.wikipedia.org/wiki/Matching_polynomial">wiki page</a>.</p><p class="math-container">\[M(G, x) = \sum\limits_{k=1}^{|V|/2} c_k x^k,\]</p><p>where <span>$k$</span> is the number of matches, and coefficients <span>$c_k$</span> are the corresponding counting.</p><pre><code class="language-julia hljs">matching_poly = solve(problem, GraphPolynomial())[]</code></pre>1 &#43; 15&#8729;x &#43; 75&#8729;x<sup>2</sup> &#43; 145&#8729;x<sup>3</sup> &#43; 90&#8729;x<sup>4</sup> &#43; 6&#8729;x<sup>5</sup><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="one-of-the-perfect-matches"><a class="docs-heading-anchor" href="#one-of-the-perfect-matches">one of the perfect matches</a><a id="one-of-the-perfect-matches-1"></a><a class="docs-heading-anchor-permalink" href="#one-of-the-perfect-matches" title="Permalink"></a></h5><pre><code class="language-julia hljs">match_config = solve(problem, SingleConfigMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(5.0, ConfigSampler{15, 1, 1}(100000110001010))ₜ</code></pre><p>Let us show the result by coloring the matched edges to red</p><pre><code class="language-julia hljs">show_graph(graph; locs=locations, format=:svg, edge_colors=
+\end{cases}\]</p><p>where label <span>$\langle v, w \rangle$</span> is equivalent to <span>$\langle w,v\rangle$</span>.</p><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><p>The maximum matching size can be obtained by</p><pre><code class="language-julia hljs">max_matching = solve(problem, SizeMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5.0ₜ</code></pre><p>The largest number of matching is 5, which means we have a perfect matching (vertices are all paired).</p><p>The graph polynomial defined for the matching problem is known as the matching polynomial. Here, we adopt the first definition in the <a href="https://en.wikipedia.org/wiki/Matching_polynomial">wiki page</a>.</p><p class="math-container">\[M(G, x) = \sum\limits_{k=1}^{|V|/2} c_k x^k,\]</p><p>where <span>$k$</span> is the number of matches, and coefficients <span>$c_k$</span> are the corresponding counting.</p><pre><code class="language-julia hljs">matching_poly = solve(problem, GraphPolynomial())[]</code></pre>1 &#43; 15&#8729;x &#43; 75&#8729;x<sup>2</sup> &#43; 145&#8729;x<sup>3</sup> &#43; 90&#8729;x<sup>4</sup> &#43; 6&#8729;x<sup>5</sup><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="one-of-the-perfect-matches"><a class="docs-heading-anchor" href="#one-of-the-perfect-matches">one of the perfect matches</a><a id="one-of-the-perfect-matches-1"></a><a class="docs-heading-anchor-permalink" href="#one-of-the-perfect-matches" title="Permalink"></a></h5><pre><code class="language-julia hljs">match_config = solve(problem, SingleConfigMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(5.0, ConfigSampler{15, 1, 1}(010011000001001))ₜ</code></pre><p>Let us show the result by coloring the matched edges to red</p><pre><code class="language-julia hljs">show_graph(graph; locs=locations, format=:svg, edge_colors=
     [isone(match_config.c.data[i]) ? &quot;red&quot; : &quot;black&quot; for i=1:ne(graph)])</code></pre><img src='data:image/svg+xml;utf-8,<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="290" height="281" viewBox="0 0 290 281">
 <rect x="-29" y="-28.1" width="348" height="337.2" fill="rgb(100%25, 100%25, 100%25)" fill-opacity="1"/>
-<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(100%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 151.171875 226.492188 L 234.144531 166.210938 "/>
-<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 139.039062 226.492188 L 56.066406 166.210938 "/>
+<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 151.171875 226.492188 L 234.144531 166.210938 "/>
+<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(100%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 139.039062 226.492188 L 56.066406 166.210938 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 145.105469 223.402344 L 145.105469 188.402344 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 237.894531 154.671875 L 206.203125 57.132812 "/>
-<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 233.078125 159.484375 L 199.792969 148.671875 "/>
-<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 196.382812 50 L 93.828125 50 "/>
-<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(100%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 199.476562 56.066406 L 178.902344 84.382812 "/>
-<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(100%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 84.007812 57.132812 L 52.316406 154.671875 "/>
+<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(100%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 233.078125 159.484375 L 199.792969 148.671875 "/>
+<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(100%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 196.382812 50 L 93.828125 50 "/>
+<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 199.476562 56.066406 L 178.902344 84.382812 "/>
+<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 84.007812 57.132812 L 52.316406 154.671875 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 90.734375 56.066406 L 111.308594 84.382812 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 57.132812 159.484375 L 90.417969 148.671875 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 147.421875 173.769531 L 172.175781 97.582031 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(100%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 142.789062 173.769531 L 118.035156 97.582031 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 186.589844 141.945312 L 121.785156 94.859375 "/>
-<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(100%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 185.160156 146.351562 L 105.054688 146.351562 "/>
-<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 168.425781 94.859375 L 103.621094 141.945312 "/>
+<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 185.160156 146.351562 L 105.054688 146.351562 "/>
+<path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(100%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 168.425781 94.859375 L 103.621094 141.945312 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 152.605469 230.902344 C 152.605469 235.042969 149.246094 238.402344 145.105469 238.402344 C 140.964844 238.402344 137.605469 235.042969 137.605469 230.902344 C 137.605469 226.757812 140.964844 223.402344 145.105469 223.402344 C 149.246094 223.402344 152.605469 226.757812 152.605469 230.902344 Z M 152.605469 230.902344 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 247.710938 161.804688 C 247.710938 165.945312 244.351562 169.304688 240.210938 169.304688 C 236.070312 169.304688 232.710938 165.945312 232.710938 161.804688 C 232.710938 157.660156 236.070312 154.304688 240.210938 154.304688 C 244.351562 154.304688 247.710938 157.660156 247.710938 161.804688 Z M 247.710938 161.804688 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 211.382812 50 C 211.382812 54.140625 208.027344 57.5 203.882812 57.5 C 199.742188 57.5 196.382812 54.140625 196.382812 50 C 196.382812 45.859375 199.742188 42.5 203.882812 42.5 C 208.027344 42.5 211.382812 45.859375 211.382812 50 Z M 211.382812 50 "/>
@@ -109,4 +113,4 @@ x, &amp; \langle v, w \rangle = 1,
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 123.214844 90.449219 C 123.214844 94.59375 119.859375 97.949219 115.714844 97.949219 C 111.574219 97.949219 108.214844 94.59375 108.214844 90.449219 C 108.214844 86.308594 111.574219 82.949219 115.714844 82.949219 C 119.859375 82.949219 123.214844 86.308594 123.214844 90.449219 Z M 123.214844 90.449219 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 105.054688 146.351562 C 105.054688 150.496094 101.695312 153.851562 97.554688 153.851562 C 93.410156 153.851562 90.054688 150.496094 90.054688 146.351562 C 90.054688 142.210938 93.410156 138.851562 97.554688 138.851562 C 101.695312 138.851562 105.054688 142.210938 105.054688 146.351562 Z M 105.054688 146.351562 "/>
 </svg>
-'/><p>where we use edges with red color to related pairs of matched vertices.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../MaxCut/">« Cutting problem</a><a class="docs-footer-nextpage" href="../PaintShop/">Binary paint shop problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.3.0 on <span class="colophon-date" title="Sunday 7 April 2024 02:40">Sunday 7 April 2024</span>. Using Julia version 1.10.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+'/><p>where we use edges with red color to related pairs of matched vertices.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../MaxCut/">« Cutting problem</a><a class="docs-footer-nextpage" href="../PaintShop/">Binary paint shop problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.3.0 on <span class="colophon-date" title="Sunday 7 April 2024 04:20">Sunday 7 April 2024</span>. Using Julia version 1.10.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

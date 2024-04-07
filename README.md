@@ -1,6 +1,6 @@
 # GenericTensorNetworks
 
-[![Build Status](https://github.com/QuEraComputing/GenericTensorNetworks.jl/workflows/CI/badge.svg)](https://github.com/QuEraComputing/GenericTensorNetworks.jl/actions)
+[![CI](https://github.com/QuEraComputing/GenericTensorNetworks.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/QuEraComputing/GenericTensorNetworks.jl/actions/workflows/CI.yml)
 [![codecov](https://codecov.io/gh/QuEraComputing/GenericTensorNetworks.jl/branch/master/graph/badge.svg?token=vwWQntOxvG)](https://codecov.io/gh/QuEraComputing/GenericTensorNetworks.jl)
 [![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/)
 

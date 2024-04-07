@@ -12,7 +12,7 @@ This project depends on multiple open source packages in the Julia ecosystem:
 They can be installed in a similar way to `GenericTensorNetworks`.
 After installing the required packages, one can open a Julia REPL, and copy-paste the following code snippet into it.
 
-```@example
+```julia
 using OMEinsum
 using Graphs
 using Random

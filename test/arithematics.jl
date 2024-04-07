@@ -186,7 +186,7 @@ end
 @testset "generate samples" begin
     Random.seed!(2)
     g = smallgraph(:petersen)
-    gp = IndependentSet(g)
+    gp = GenericTensorNetwork(IndependentSet(g))
     t = solve(gp, ConfigsAll(tree_storage=true))[]
     cs = solve(gp, ConfigsAll())[]
     @test length(t) == 76

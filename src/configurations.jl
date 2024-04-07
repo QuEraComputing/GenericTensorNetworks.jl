@@ -20,7 +20,7 @@ Find optimal solutions with bounding.
 * If `invert` is true, find the minimum.
 * If `tree_storage` is true, use [`SumProductTree`](@ref) as the storage of solutions.
 """
-function best_solutions(gp::GraphProblem; all=false, usecuda=false, invert=false, tree_storage::Bool=false, T=Float64)
+function best_solutions(gp::GenericTensorNetwork; all=false, usecuda=false, invert=false, tree_storage::Bool=false, T=Float64)
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
@@ -57,7 +57,7 @@ General routine to find solutions without bounding,
 * `usecuda` can not be true if you want to use set to enumerate all possible solutions.
 * If `tree_storage` is true, use [`SumProductTree`](@ref) as the storage of solutions.
 """
-function solutions(gp::GraphProblem, ::Type{BT}; all::Bool, usecuda::Bool=false, invert::Bool=false, tree_storage::Bool=false) where BT
+function solutions(gp::GenericTensorNetwork, ::Type{BT}; all::Bool, usecuda::Bool=false, invert::Bool=false, tree_storage::Bool=false) where BT
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
@@ -71,9 +71,9 @@ end
 
 Finding optimal and suboptimal solutions.
 """
-best2_solutions(gp::GraphProblem; all=true, usecuda=false, invert::Bool=false, T=Float64) = solutions(gp, Max2Poly{T,T}; all, usecuda, invert)
+best2_solutions(gp::GenericTensorNetwork; all=true, usecuda=false, invert::Bool=false, T=Float64) = solutions(gp, Max2Poly{T,T}; all, usecuda, invert)
 
-function bestk_solutions(gp::GraphProblem, k::Int; invert::Bool=false, tree_storage::Bool=false, T=Float64)
+function bestk_solutions(gp::GenericTensorNetwork, k::Int; invert::Bool=false, tree_storage::Bool=false, T=Float64)
     xst = generate_tensors(_x(Tropical{T}; invert), gp)
     ymask = trues(fill(2, length(getiyv(gp.code)))...)
     T = config_type(TruncatedPoly{k,T,T}, length(labels(gp)), nflavor(gp); all=true, tree_storage)
@@ -88,7 +88,7 @@ end
 Finding all solutions grouped by size.
 e.g. when the problem is [`MaximalIS`](@ref), it computes all maximal independent sets, or the maximal cliques of it complement.
 """
-all_solutions(gp::GraphProblem; T=Float64) = solutions(gp, Polynomial{T,:x}, all=true, usecuda=false, tree_storage=false)
+all_solutions(gp::GenericTensorNetwork; T=Float64) = solutions(gp, Polynomial{T,:x}, all=true, usecuda=false, tree_storage=false)
 
 # NOTE: do we have more efficient way to compute it?
 # NOTE: doing pair-wise Hamming distance might be biased?

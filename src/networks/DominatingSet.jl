@@ -1,53 +1,35 @@
 """
-    DominatingSet{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    DominatingSet(graph; weights=NoWeight(), openvertices=(),
-            optimizer=GreedyMethod(), simplifier=nothing,
-            fixedvertices=Dict()
-        )
+$TYPEDEF
+    DominatingSet(graph; weights=UnitWeight())
 
 The [dominating set](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/DominatingSet/) problem.
 
 Positional arguments
 -------------------------------
 * `graph` is the problem graph.
-
-Keyword arguments
--------------------------------
-* `weights` are associated with the vertices of the `graph`.
-* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
-* `fixedvertices` is a dict to specify the values of degree of freedoms on vertices, where a value can be `0` (absent in the set) or `1` (present in the set).
-* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
+* `weights` are associated with the vertices of the `graph`, default to `UnitWeight()`.
 """
-struct DominatingSet{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    code::CT
+struct DominatingSet{WT<:Union{UnitWeight, Vector}} <: GraphProblem
     graph::SimpleGraph{Int}
     weights::WT
-    fixedvertices::Dict{Int,Int}
-end
-
-function DominatingSet(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
-    @assert weights isa NoWeight || length(weights) == nv(g)
-    rawcode = EinCode(([[Graphs.neighbors(g, v)..., v] for v in Graphs.vertices(g)]...,), collect(Int, openvertices))
-    DominatingSet(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), g, weights, Dict{Int,Int}(fixedvertices))
+    function DominatingSet(g::SimpleGraph, weights::Union{UnitWeight, Vector}=UnitWeight())
+        @assert weights isa UnitWeight || length(weights) == nv(g)
+        new{typeof(weights)}(g, weights)
+    end
 end
 
 flavors(::Type{<:DominatingSet}) = [0, 1]
-terms(gp::DominatingSet) = getixsv(gp.code)
-labels(gp::DominatingSet) = [1:length(getixsv(gp.code))...]
-fixedvertices(gp::DominatingSet) = gp.fixedvertices
+energy_terms(gp::DominatingSet) = [[Graphs.neighbors(gp.graph, v)..., v] for v in Graphs.vertices(gp.graph)]
+energy_tensors(x::T, c::DominatingSet) where T = [dominating_set_tensor(_pow.(Ref(x), get_weights(c, i))..., degree(c.graph, i)+1) for i=1:nv(c.graph)]
+extra_terms(::DominatingSet) = Vector{Int}[]
+extra_tensors(::Type{T}, ::DominatingSet) where T = Array{T}[]
+labels(gp::DominatingSet) = [1:nv(gp.graph)...]
 
 # weights interface
 get_weights(c::DominatingSet) = c.weights
 get_weights(gp::DominatingSet, i::Int) = [0, gp.weights[i]]
-chweights(c::DominatingSet, weights) = DominatingSet(c.code, c.graph, weights, c.fixedvertices)
+chweights(c::DominatingSet, weights) = DominatingSet(c.graph, weights)
 
-function generate_tensors(x::T, mi::DominatingSet) where T
-    ixs = getixsv(mi.code)
-    isempty(ixs) && return []
-	return select_dims(add_labels!(map(enumerate(ixs)) do (i, ix)
-        dominating_set_tensor(_pow.(Ref(x), get_weights(mi, i))..., length(ix))
-    end, ixs, labels(mi)), ixs, fixedvertices(mi))
-end
 function dominating_set_tensor(a::T, b::T, d::Int) where T
     t = zeros(T, fill(2, d)...)
     for i = 2:1<<(d-1)

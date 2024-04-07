@@ -17,8 +17,11 @@ sets = [[1,3,4,6,7], [4,7,8,12], [2,5,9,11,13],
     [1,2,6,11], [1,2,4,6,8,12]]
 
 # ## Generic tensor network representation
-# We create a [`SetCovering`] instance that contains a generic tensor network as its `code` field.
-problem = SetCovering(sets);
+# We can define the set covering problem with the [`SetCovering`](@ref) type as
+setcover = SetCovering(sets)
+
+# The tensor network representation of the set covering problem can be obtained by
+problem = GenericTensorNetwork(setcover)
 
 # ### Theory (can skip)
 # Let ``S`` be the target set covering problem that we want to solve.

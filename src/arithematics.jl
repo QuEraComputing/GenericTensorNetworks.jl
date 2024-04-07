@@ -722,7 +722,7 @@ julia> using Graphs
 julia> g= smallgraph(:petersen)
 {10, 15} undirected simple Int64 graph
 
-julia> t = solve(IndependentSet(g), ConfigsAll(; tree_storage=true))[];
+julia> t = solve(GenericTensorNetwork(IndependentSet(g)), ConfigsAll(; tree_storage=true))[];
 
 julia> samples = generate_samples(t, 1000);
 

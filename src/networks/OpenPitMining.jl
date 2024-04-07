@@ -1,8 +1,5 @@
 """
-    OpenPitMining{ET, CT<:AbstractEinsum} <: GraphProblem
-    OpenPitMining(rewards; openvertices=(),
-                 optimizer=GreedyMethod(), simplifier=nothing,
-                 fixedvertices=Dict())
+$TYPEDEF
 
 The open pit mining problem.
 This problem can be solved in polynomial time with the pseudoflow algorithm.
@@ -10,13 +7,7 @@ This problem can be solved in polynomial time with the pseudoflow algorithm.
 Positional arguments
 -------------------------------
 * `rewards` is a matrix of rewards.
-
-Keyword arguments
--------------------------------
-* `openvertices` specifies labels of the output tensor.
-* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
-* `fixedvertices` is a dict to specify the values of labels, where a value can be `0` (not mined) or `1` (mined)
-* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
+* `blocks` are the locations of the blocks.
 
 Example
 -----------------------------------
@@ -28,7 +19,7 @@ julia> rewards =  [-4  -7  -7  -17  -7  -26;
          0   0   0    0   0    0;
          0   0   0    0   0    0];
 
-julia> gp = OpenPitMining(rewards);
+julia> gp = GenericTensorNetwork(OpenPitMining(rewards));
 
 julia> res = solve(gp, SingleConfigMax())[]
 (21.0, ConfigSampler{12, 1, 1}(111000100000))ₜ
@@ -47,37 +38,23 @@ julia> print_mining(rewards, res.c.data)
 
 You will the the mining is printed as green in an colored REPL.
 """
-struct OpenPitMining{ET, CT<:AbstractEinsum} <: GraphProblem
-    code::CT
+struct OpenPitMining{ET} <: GraphProblem
     rewards::Matrix{ET}
     blocks::Vector{Tuple{Int,Int}}  # non-zero locations
-    fixedvertices::Dict{Tuple{Int,Int},Int}
-end
-
-function get_blocks(rewards)
-    blocks = Tuple{Int,Int}[]
-    for i=1:size(rewards, 1), j=i:size(rewards,2)-i+1
-        push!(blocks, (i,j))
+    function OpenPitMining(rewards::Matrix{ET}, blocks::Vector{Tuple{Int,Int}}) where ET
+        for (i, j) in blocks
+            checkbounds(rewards, i, j)
+        end
+        new{ET}(rewards, blocks)
     end
-    return blocks
 end
- 
-
-function OpenPitMining(rewards::Matrix{ET}; openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{Tuple{Int,Int},Int}()) where ET
+function OpenPitMining(rewards::Matrix{ET}) where ET
     # compute block locations
     blocks = Tuple{Int,Int}[]
-    depends = Pair{Tuple{Int,Int},Tuple{Int,Int}}[]
     for i=1:size(rewards, 1), j=i:size(rewards,2)-i+1
         push!(blocks, (i,j))
-        if i!=1
-            push!(depends, (i,j)=>(i-1,j-1))
-            push!(depends, (i,j)=>(i-1,j))
-            push!(depends, (i,j)=>(i-1,j+1))
-        end
     end
-    code = EinCode([[[block] for block in blocks]...,
-        [[dep.first, dep.second] for dep in depends]...], collect(Tuple{Int,Int},openvertices))
-    OpenPitMining(_optimize_code(code, uniformsize_fix(code, 2, fixedvertices), optimizer, simplifier), rewards, blocks, fixedvertices)
+    OpenPitMining(rewards, blocks)
 end
 
 function mining_tensor(::Type{T}) where T
@@ -87,9 +64,22 @@ function mining_tensor(::Type{T}) where T
 end
 
 flavors(::Type{<:OpenPitMining}) = [0, 1]
-terms(gp::OpenPitMining) = [[r] for r in gp.blocks]
+energy_terms(gp::OpenPitMining) = [[r] for r in gp.blocks]
+energy_tensors(x::T, c::OpenPitMining) where T = [_pow.(Ref(x), get_weights(c, i)) for i=1:length(c.blocks)]
+function extra_terms(gp::OpenPitMining)
+    depends = Pair{Tuple{Int,Int},Tuple{Int,Int}}[]
+    for i=1:size(gp.rewards, 1), j=i:size(gp.rewards,2)-i+1
+        if i!=1
+            push!(depends, (i,j)=>(i-1,j-1))
+            push!(depends, (i,j)=>(i-1,j))
+            push!(depends, (i,j)=>(i-1,j+1))
+        end
+    end
+    return [[dep.first, dep.second] for dep in depends]
+end
+extra_tensors(::Type{T}, gp::OpenPitMining) where T = [mining_tensor(T) for _ in extra_terms(gp)]
+
 labels(gp::OpenPitMining) = gp.blocks
-fixedvertices(gp::OpenPitMining) = gp.fixedvertices
 
 # weights interface
 get_weights(c::OpenPitMining) = [c.rewards[b...] for b in c.blocks]
@@ -99,20 +89,7 @@ function chweights(c::OpenPitMining, weights)
     for (w, b) in zip(weights, c.blocks)
         rewards[b...] = w
     end
-    OpenPitMining(c.code, rewards, c.blocks, c.fixedvertices)
-end
-
-# generate tensors
-function generate_tensors(x::T, gp::OpenPitMining) where T
-    nblocks = length(gp.blocks)
-    nblocks == 0 && return []
-    ixs = getixsv(gp.code)
-    # we only add labels at vertex tensors
-    return select_dims([
-        add_labels!(Array{T}[_pow.(Ref(x), get_weights(gp, i)) for i=1:nblocks], ixs[1:nblocks], labels(gp))...,
-        Array{T}[mining_tensor(T) for ix in ixs[nblocks+1:end]]...
-        ], ixs, fixedvertices(gp)
-    )
+    OpenPitMining(rewards, c.blocks)
 end
 
 """
@@ -134,7 +111,14 @@ function is_valid_mining(rewards::AbstractMatrix, config)
     end
     return true
 end
-
+function get_blocks(rewards)
+    blocks = Tuple{Int,Int}[]
+    for i=1:size(rewards, 1), j=i:size(rewards,2)-i+1
+        push!(blocks, (i,j))
+    end
+    return blocks
+end
+ 
 """
     print_mining(rewards::AbstractMatrix, config)
 

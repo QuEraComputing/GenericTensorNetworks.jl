@@ -6,9 +6,13 @@ using GenericTensorNetworks, Graphs
 graph = Graphs.smallgraph(:petersen)
 
 # The following code constructs a weighted MIS problem instance.
-problem = IndependentSet(graph; weights=collect(1:10));
+problem = GenericTensorNetwork(IndependentSet(graph, collect(1:10)));
+GenericTensorNetworks.get_weights(problem)
 
-# Here, the `weights` keyword argument can be a vector for weighted graphs or `NoWeight()` for unweighted graphs.
+# The tensor labels that associated with the weights can be accessed by
+GenericTensorNetworks.energy_terms(problem)
+
+# Here, the `weights` keyword argument can be a vector for weighted graphs or `UnitWeight()` for unweighted graphs.
 # Most solution space properties work for unweighted graphs also work for the weighted graphs.
 # For example, the maximum independent set can be found as follows.
 
@@ -16,9 +20,7 @@ max_config_weighted = solve(problem, SingleConfigMax())[]
 
 # Let us visualize the solution.
 rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
-
 locations = [[rot15(0.0, 2.0, i) for i=0:4]..., [rot15(0.0, 1.0, i) for i=0:4]...]
-
 show_graph(graph; locs=locations, format=:svg, vertex_colors=
           [iszero(max_config_weighted.c.data[i]) ? "white" : "red" for i=1:nv(graph)])
 

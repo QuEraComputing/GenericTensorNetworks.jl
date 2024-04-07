@@ -28,7 +28,7 @@ Keyword Arguments
 """
 function graph_polynomial end
 
-function graph_polynomial(gp::GraphProblem, ::Val{:fft}; usecuda=false, T=Float64,
+function graph_polynomial(gp::GenericTensorNetwork, ::Val{:fft}; usecuda=false, T=Float64,
         maxorder=max_size(gp; usecuda=usecuda), r=1.0)
     ω = exp(-2im*π/(maxorder+1))
     xs = r .* collect(ω .^ (0:maxorder))
@@ -36,21 +36,21 @@ function graph_polynomial(gp::GraphProblem, ::Val{:fft}; usecuda=false, T=Float6
     map(ci->Polynomial(ifft(getindex.(ys, Ref(ci))) ./ (r .^ (0:maxorder))), CartesianIndices(ys[1]))
 end
 
-function graph_polynomial(gp::GraphProblem, ::Val{:fitting}; usecuda=false, T=Float64,
+function graph_polynomial(gp::GenericTensorNetwork, ::Val{:fitting}; usecuda=false, T=Float64,
         maxorder = max_size(gp; usecuda=usecuda))
     xs = (0:maxorder)
     ys = [Array(contractx(gp, T(x); usecuda=usecuda)) for x in xs]
     map(ci->fit(xs, getindex.(ys, Ref(ci))), CartesianIndices(ys[1]))
 end
 
-function graph_polynomial(gp::GraphProblem, ::Val{:polynomial}; usecuda=false, T=Float64)
+function graph_polynomial(gp::GenericTensorNetwork, ::Val{:polynomial}; usecuda=false, T=Float64)
     @assert !usecuda "Polynomial type can not be computed on GPU!"
-    contractx(gp::GraphProblem, Polynomial(T[0, 1]))
+    contractx(gp::GenericTensorNetwork, Polynomial(T[0, 1]))
 end
 
-function graph_polynomial(gp::GraphProblem, ::Val{:laurent}; usecuda=false, T=Float64)
+function graph_polynomial(gp::GenericTensorNetwork, ::Val{:laurent}; usecuda=false, T=Float64)
     @assert !usecuda "Polynomial type can not be computed on GPU!"
-    contractx(gp::GraphProblem, LaurentPolynomial(T[1], 1))
+    contractx(gp::GenericTensorNetwork, LaurentPolynomial(T[1], 1))
 end
 
 function _polynomial_fit(f, ::Type{T}; maxorder) where T
@@ -68,7 +68,7 @@ function _polynomial_fit(f, ::Type{T}; maxorder) where T
 end
 
 # T is not used in finitefield approach
-function graph_polynomial(gp::GraphProblem, ::Val{:finitefield}; usecuda=false, T=BigInt,
+function graph_polynomial(gp::GenericTensorNetwork, ::Val{:finitefield}; usecuda=false, T=BigInt,
         maxorder=max_size(gp; usecuda), max_iter=100)
     f = T->_polynomial_fit(x->Array(contractx(gp, x; usecuda)), T; maxorder)
     return map(Polynomial, big_integer_solve(f, Int32, max_iter))

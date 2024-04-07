@@ -27,7 +27,7 @@ end
     item(x::AbstractArray) = Array(x)[]
     #optimizer = TreeSA(ntrials=1)
     optimizer = GreedyMethod()
-    gp = IndependentSet(g; optimizer=optimizer)
+    gp = GenericTensorNetwork(IndependentSet(g); optimizer=optimizer)
     @test contraction_complexity(gp).sc == 4
     @test timespacereadwrite_complexity(gp)[2] == 4
     @test timespace_complexity(gp)[2] == 4
@@ -58,9 +58,9 @@ end
 
 @testset "spinglass" begin
     g = Graphs.smallgraph("petersen")
-    gp = SpinGlass(g)
+    gp = GenericTensorNetwork(SpinGlass(g, UnitWeight()))
     usecuda=true
     @test solve(gp, CountingMax(); usecuda) isa CuArray
-    gp2 = SpinGlass(g; openvertices=(2,))
+    gp2 = GenericTensorNetwork(SpinGlass(g, UnitWeight()); openvertices=(2,))
     @test solve(gp2, CountingMax(); usecuda) isa CuArray
 end

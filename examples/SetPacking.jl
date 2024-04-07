@@ -18,8 +18,11 @@ sets = [[1,3,4,6,7], [4,7,8,12], [2,5,9,11,13],
     [1,2,6,11], [1,2,4,6,8,12]]
 
 # ## Generic tensor network representation
-# We create a [`SetPacking`] instance that contains a generic tensor network as its `code` field.
-problem = SetPacking(sets);
+# We can define the set packing problem with the [`SetPacking`](@ref) type as
+problem = SetPacking(sets)
+
+# The tensor network representation of the set packing problem can be obtained by
+problem = GenericTensorNetwork(problem)
 
 # ### Theory (can skip)
 # Let ``S`` be the target set packing problem that we want to solve.

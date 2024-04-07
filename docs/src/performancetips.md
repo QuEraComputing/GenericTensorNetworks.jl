@@ -2,17 +2,15 @@
 ## Optimize contraction orders
 
 Let us use the independent set problem on 3-regular graphs as an example.
-```julia
-julia> using GenericTensorNetworks, Graphs, Random
-
-julia> graph = random_regular_graph(120, 3)
-{120, 180} undirected simple Int64 graph
-
-julia> problem = IndependentSet(graph; optimizer=TreeSA(
-    sc_target=20, sc_weight=1.0, rw_weight=3.0, ntrials=10, βs=0.01:0.1:15.0, niters=20), simplifier=MergeGreedy());
+```@repl performancetips
+using GenericTensorNetworks, Graphs, Random
+graph = random_regular_graph(120, 3)
+iset = IndependentSet(graph)
+problem = GenericTensorNetwork(iset; optimizer=TreeSA(
+    sc_target=20, sc_weight=1.0, rw_weight=3.0, ntrials=10, βs=0.01:0.1:15.0, niters=20));
 ```
 
-The [`IndependentSet`](@ref) constructor maps an independent set problem to a tensor network with optimized contraction order.
+The [`GenericTensorNetwork`](@ref) constructor maps an independent set problem to a tensor network with optimized contraction order.
 The key word argument `optimizer` specifies the contraction order optimizer of the tensor network.
 Here, we choose the local search based [`TreeSA`](@ref) algorithm, which often finds the smallest time/space complexity and supports slicing.
 One can type `?TreeSA` in a Julia REPL for more information about how to configure the hyper-parameters of the [`TreeSA`](@ref) method, 
@@ -22,7 +20,6 @@ Alternative tensor network contraction order optimizers include
 * [`KaHyParBipartite`](@ref)
 * [`SABipartite`](@ref)
 
-The keyword argument `simplifier` specifies the preprocessor to improve the searching speed of the contraction order finding.
 For example, the `MergeGreedy()` here "contracts" tensors greedily whenever the contraction result has a smaller space complexity.
 It can remove all vertex tensors (vectors) before entering the contraction order optimization algorithm.
 
@@ -30,38 +27,25 @@ The returned object `problem` contains a field `code` that specifies the tensor 
 For an independent set problem, the optimal contraction time/space complexity is ``\sim 2^{{\rm tw}(G)}``, where ``{\rm tw(G)}`` is the [tree-width](https://en.wikipedia.org/wiki/Treewidth) of ``G``.
 One can check the time, space and read-write complexity with the [`contraction_complexity`](@ref) function.
 
-```julia
-julia> contraction_complexity(problem)
-Time complexity (number of element-wise multiplications) = 2^20.568850503058382
-Space complexity (number of elements in the largest intermediate tensor) = 2^16.0
-Read-write complexity (number of element-wise read and write) = 2^18.70474460304404
+```@repl performancetips
+contraction_complexity(problem)
 ```
 
 The return values are `log2` values of the number of multiplications, the number elements in the largest tensor during contraction and the number of read-write operations to tensor elements.
 In this example, the number `*` operations is ``\sim 2^{21.9}``, the number of read-write operations are ``\sim 2^{20}``, and the largest tensor size is ``2^{17}``.
 One can check the element size by typing
-```julia
-julia> sizeof(TropicalF64)
-8
-
-julia> sizeof(TropicalF32)
-4
-
-julia> sizeof(StaticBitVector{200,4})
-32
-
-julia> sizeof(TruncatedPoly{5,Float64,Float64})
-48
+```@repl performancetips
+sizeof(TropicalF64)
+sizeof(TropicalF32)
+sizeof(StaticBitVector{200,4})
+sizeof(TruncatedPoly{5,Float64,Float64})
 ```
 
 One can use [`estimate_memory`](@ref) to get a good estimation of peak memory in bytes.
 For example, to compute the graph polynomial, the peak memory can be estimated as follows.
-```julia
-julia> estimate_memory(problem, GraphPolynomial(; method=:finitefield))
-297616
-
-julia> estimate_memory(problem, GraphPolynomial(; method=:polynomial))
-71427840
+```@repl performancetips
+estimate_memory(problem, GraphPolynomial(; method=:finitefield))
+estimate_memory(problem, GraphPolynomial(; method=:polynomial))
 ```
 The finite field approach only requires 298 KB memory, while using the [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2) number type requires 71 MB memory.
 
@@ -75,25 +59,11 @@ For large scale applications, it is also possible to slice over certain degrees 
 loop and accumulate over certain degrees of freedom so that one can have a smaller tensor network inside the loop due to the removal of these degrees of freedom.
 In the [`TreeSA`](@ref) optimizer, one can set `nslices` to a value larger than zero to turn on this feature.
 
-```julia
-julia> using GenericTensorNetworks, Graphs, Random
-
-julia> graph = random_regular_graph(120, 3)
-{120, 180} undirected simple Int64 graph
-
-julia> problem = IndependentSet(graph; optimizer=TreeSA(βs=0.01:0.1:25.0, ntrials=10, niters=10));
-
-julia> contraction_complexity(problem)
-Time complexity (number of element-wise multiplications) = 2^20.53277253647484
-Space complexity (number of elements in the largest intermediate tensor) = 2^16.0
-Read-write complexity (number of element-wise read and write) = 2^19.34699193791874
-
-julia> problem = IndependentSet(graph; optimizer=TreeSA(βs=0.01:0.1:25.0, ntrials=10, niters=10, nslices=5));
-
-julia> contraction_complexity(problem)
-Time complexity (number of element-wise multiplications) = 2^21.117277836449578
-Space complexity (number of elements in the largest intermediate tensor) = 2^11.0
-Read-write complexity (number of element-wise read and write) = 2^19.854965754099602
+```@repl performancetips
+problem = GenericTensorNetwork(iset; optimizer=TreeSA(βs=0.01:0.1:25.0, ntrials=10, niters=10));
+contraction_complexity(problem)
+problem = GenericTensorNetwork(iset; optimizer=TreeSA(βs=0.01:0.1:25.0, ntrials=10, niters=10, nslices=5));
+contraction_complexity(problem)
 ```
 
 In the second `IndependentSet` constructor, we slice over 5 degrees of freedom, which can reduce the space complexity by at most 5.
@@ -103,7 +73,7 @@ i.e. the peak memory usage is reduced by a factor ``32``, while the (theoretical
 ## GEMM for Tropical numbers
 One can speed up the Tropical number matrix multiplication when computing the solution space property [`SizeMax`](@ref)`()` by using the Tropical GEMM routines implemented in package [`TropicalGEMM`](https://github.com/TensorBFS/TropicalGEMM.jl/).
 
-```julia
+```julia-repl
 julia> using BenchmarkTools
 
 julia> @btime solve(problem, SizeMax())
@@ -139,7 +109,7 @@ results = multiprocess_run(collect(1:10)) do seed
     n = 10
     @info "Graph size $n x $n, seed= $seed"
     g = random_diagonal_coupled_graph(n, n, 0.8)
-    gp = Independence(g; optimizer=TreeSA(), simplifier=MergeGreedy())
+    gp = GenericTensorNetwork(IndependentSet(g); optimizer=TreeSA())
     res = solve(gp, GraphPolynomial())[]
     return res
 end
@@ -165,7 +135,7 @@ You will see a vector of polynomials printed out.
 
 ## Make use of GPUs
 To upload the computation to GPU, you just add `using CUDA` before calling the `solve` function, and set the keyword argument `usecuda` to `true`.
-```julia
+```julia-repl
 julia> using CUDA
 [ Info: OMEinsum loaded the CUDA module successfully
 

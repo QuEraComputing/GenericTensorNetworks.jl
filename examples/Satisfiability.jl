@@ -21,9 +21,11 @@ assignment = Dict([:a=>true, :b=>false, :c=>false, :d=>true, :e=>false, :f=>fals
 satisfiable(cnf, assignment)
 
 # ## Generic tensor network representation
-# If we contract this tensor network, we will get a multiplicative factor ``x`` whenever there is a clause satisfied.
+# We can use [`Satisfiability`](@ref) to construct the tensor network for solving the satisfiability problem as
+sat = Satisfiability(cnf)
 
-problem = Satisfiability(cnf);
+# The tensor network representation of the satisfiability problem can be obtained by
+problem = GenericTensorNetwork(sat)
 
 # ### Theory (can skip)
 # We can construct a [`Satisfiability`](@ref) problem to solve the above problem.

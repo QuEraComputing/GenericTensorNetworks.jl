@@ -1,22 +1,12 @@
 """
-    IndependentSet{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    IndependentSet(graph; weights=NoWeight(), openvertices=(),
-            optimizer=GreedyMethod(), simplifier=nothing,
-            fixedvertices=Dict()
-        )
+$TYPEDEF
 
 The [independent set problem](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/IndependentSet/) in graph theory.
 
 Positional arguments
 -------------------------------
 * `graph` is the problem graph.
-
-Keyword arguments
--------------------------------
-* `weights` are associated with the vertices of the `graph`.
-* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
-* `fixedvertices` is a dict to specify the values of degree of freedoms on vertices, where a value can be `0` (absent in the set) or `1` (present in the set).
-* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
+* `weights` are associated with the vertices of the `graph`, default to `UnitWeight()`.
 
 Examples
 -------------------------------
@@ -25,47 +15,32 @@ julia> using GenericTensorNetworks, Graphs
 
 julia> problem = IndependentSet(smallgraph(:petersen));
 
-julia> solve(problem, ConfigsMax())
+julia> net = GenericTensorNetwork(problem);
+
+julia> solve(net, ConfigsMax())
 0-dimensional Array{CountingTropical{Float64, ConfigEnumerator{10, 1, 1}}, 0}:
-(4.0, {0101010001, 1010000011, 0100100110, 0010111000, 1001001100})ₜ
+(4.0, {1010000011, 1001001100, 0100100110, 0101010001, 0010111000})ₜ
 ```
 """
-struct IndependentSet{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    code::CT
+struct IndependentSet{WT} <: GraphProblem
     graph::SimpleGraph{Int}
     weights::WT
-    fixedvertices::Dict{Int,Int}
+    function IndependentSet(graph::SimpleGraph{Int}, weights::WT=UnitWeight()) where WT
+        @assert weights isa UnitWeight || length(weights) == nv(graph) "got unexpected weights for $(nv(graph))-vertex graph: $weights"
+        new{WT}(graph, weights)
+    end
 end
-
-function IndependentSet(g::SimpleGraph; weights=NoWeight(), openvertices=(), fixedvertices=Dict{Int,Int}(), optimizer=GreedyMethod(), simplifier=nothing)
-    @assert weights isa NoWeight || length(weights) == nv(g)
-    rawcode = EinCode([[[i] for i in Graphs.vertices(g)]..., # labels for vertex tensors
-                       [[minmax(e.src,e.dst)...] for e in Graphs.edges(g)]...], collect(Int, openvertices))  # labels for edge tensors
-    code = _optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier)
-    IndependentSet(code, g, weights, Dict{Int,Int}(fixedvertices))
-end
-
 flavors(::Type{<:IndependentSet}) = [0, 1]
-terms(gp::IndependentSet) = getixsv(gp.code)[1:nv(gp.graph)]
+energy_terms(gp::IndependentSet) = [[i] for i in 1:nv(gp.graph)]
+energy_tensors(x::T, c::IndependentSet) where T = [misv(_pow.(Ref(x), get_weights(c, i))) for i=1:nv(c.graph)]
+extra_terms(gp::IndependentSet) = [[minmax(e.src,e.dst)...] for e in Graphs.edges(gp.graph)]
+extra_tensors(::Type{T}, gp::IndependentSet) where T = [misb(T) for i=1:ne(gp.graph)]
 labels(gp::IndependentSet) = [1:nv(gp.graph)...]
-fixedvertices(gp::IndependentSet) = gp.fixedvertices
 
 # weights interface
 get_weights(c::IndependentSet) = c.weights
 get_weights(gp::IndependentSet, i::Int) = [0, gp.weights[i]]
-chweights(c::IndependentSet, weights) = IndependentSet(c.code, c.graph, weights, c.fixedvertices)
-
-# generate tensors
-function generate_tensors(x::T, gp::IndependentSet) where T
-    nv(gp.graph) == 0 && return []
-    ixs = getixsv(gp.code)
-    # we only add labels at vertex tensors
-    tensors = select_dims([
-            add_labels!(Array{T}[misv(_pow.(Ref(x), get_weights(gp, i))) for i=1:nv(gp.graph)], ixs[1:nv(gp.graph)], labels(gp))...,
-            Array{T}[misb(T, length(ix)) for ix in ixs[nv(gp.graph)+1:end]]... # if n!=2, it corresponds to set packing problem.
-    ], ixs, fixedvertices(gp))
-    return tensors
-end
+chweights(c::IndependentSet, weights) = IndependentSet(c.graph, weights)
 
 function misb(::Type{T}, n::Integer=2) where T
     res = zeros(T, fill(2, n)...)

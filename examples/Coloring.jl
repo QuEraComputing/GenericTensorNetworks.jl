@@ -19,9 +19,11 @@ locations = [[rot15(0.0, 2.0, i) for i=0:4]..., [rot15(0.0, 1.0, i) for i=0:4]..
 show_graph(graph; locs=locations, format=:svg)
 
 # ## Generic tensor network representation
-#
-# We construct the tensor network for the 3-coloring problem as
-problem = Coloring{3}(graph);
+# We can define the 3-coloring problem with the [`Coloring`](@ref) type as
+coloring = Coloring{3}(graph)
+
+# The tensor network representation of the 3-coloring problem can be obtained by
+problem = GenericTensorNetwork(coloring)
 
 # ### Theory (can skip)
 # Type [`Coloring`](@ref) can be used for constructing the tensor network with optimized contraction order for a coloring problem.
@@ -67,7 +69,7 @@ show_graph(linegraph; locs=[0.5 .* (locations[e.src] .+ locations[e.dst])
 # Let us construct the tensor network and see if there are solutions.
 lineproblem = Coloring{3}(linegraph);
 
-num_of_coloring = solve(lineproblem, CountingMax())[]
+num_of_coloring = solve(GenericTensorNetwork(lineproblem), CountingMax())[]
 
 # You will see the maximum size 28 is smaller than the number of edges in the `linegraph`,
 # meaning no solution for the 3-coloring on edges of a Petersen graph.

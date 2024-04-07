@@ -37,14 +37,13 @@ export square_lattice_graph, unit_disk_graph, random_diagonal_coupled_graph, ran
 export line_graph
 
 # Tensor Networks (Graph problems)
-export GraphProblem, optimize_code, NoWeight, ZeroWeight
-export flavors, labels, terms, nflavor, get_weights, fixedvertices, chweights
+export GraphProblem, GenericTensorNetwork, optimize_code, UnitWeight, ZeroWeight
+export flavors, labels, nflavor, get_weights, fixedvertices, chweights, energy_terms
 export IndependentSet, mis_compactify!, is_independent_set
 export MaximalIS, is_maximal_independent_set
 export cut_size, MaxCut
-export spinglass_energy, SpinGlass
-export hyperspinglass_energy, HyperSpinGlass
-export PaintShop, paintshop_from_pairs, num_paint_shop_color_switch, paint_shop_coloring_from_config
+export spinglass_energy, spin_glass_from_matrix, SpinGlass
+export PaintShop, paintshop_from_pairs, num_paint_shop_color_switch, paint_shop_coloring_from_config, paint_shop_from_pairs
 export Coloring, is_vertex_coloring
 export Satisfiability, CNF, CNFClause, BoolVar, satisfiable, @bools, ∨, ¬, ∧
 export DominatingSet, is_dominating_set
@@ -52,7 +51,6 @@ export Matching, is_matching
 export SetPacking, is_set_packing
 export SetCovering, is_set_covering
 export OpenPitMining, is_valid_mining, print_mining
-export ReducedProblem, target_problem, extract_result
 
 # Interfaces
 export solve, SizeMax, SizeMin, PartitionFunction, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin, Single

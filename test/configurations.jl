@@ -30,8 +30,10 @@ using GenericTensorNetworks: _onehotv, _x, sampler_type, set_type, best_solution
 end
 
 @testset "enumerating" begin
-    rawcode = IndependentSet(smallgraph(:petersen); optimizer=nothing)
-    optcode = IndependentSet(optimize_code(rawcode.code, uniformsize(rawcode.code, 2), GreedyMethod()), smallgraph(:petersen), NoWeight(), Dict{Int,Int}())
+    problem = IndependentSet(smallgraph(:petersen))
+    rawcode = GenericTensorNetwork(problem, optimizer=nothing)
+    @test rawcode.code isa DynamicEinCode
+    optcode = GenericTensorNetwork(problem, optimizer=GreedyMethod())
     for code in [rawcode, optcode]
         res0 = max_size(code)
         _, res1 = max_size_count(code)
@@ -69,7 +71,7 @@ end
         end
         g
     end
-    problem = IndependentSet(subgraph, openvertices=[1,4,5])
+    problem = GenericTensorNetwork(IndependentSet(subgraph), openvertices=[1,4,5])
     res1 = solve(problem, SizeMax(), T=Float64)
     @test res1 == Tropical.(reshape([1, 1, 2, -Inf, 2, 2, -Inf, -Inf], 2, 2, 2))
     res2 = solve(problem, CountingMax(); T=Float64)

@@ -34,8 +34,11 @@ show_graph(graph; locs=locations, texts=string.(sequence), format=:svg, edge_col
 # and the goal becomes a min-cut problem defined on black edges.
 
 # ## Generic tensor network representation
-# Let us construct the problem instance as bellow.
-problem = PaintShop(sequence);
+# We can define the binary paint shop problem with the [`PaintShop`](@ref) type as
+pshop = PaintShop(sequence)
+
+# The tensor network representation of the binary paint shop problem can be obtained by
+problem = GenericTensorNetwork(pshop)
 
 # ### Theory (can skip)
 # Type [`PaintShop`](@ref) can be used for constructing the tensor network with optimized contraction order for solving a binary paint shop problem.
@@ -88,7 +91,7 @@ best_configs = solve(problem, ConfigsMin())[]
 
 # One can see to identical bitstrings corresponding two different vertex configurations, they are related to bit-flip symmetry.
 
-painting1 = paint_shop_coloring_from_config(problem, best_configs.c.data[1])
+painting1 = paint_shop_coloring_from_config(pshop, best_configs.c.data[1])
 
 show_graph(graph; locs=locations, format=:svg, texts=string.(sequence),
     edge_colors=[sequence[e.src] == sequence[e.dst] ? "blue" : "black" for e in edges(graph)],

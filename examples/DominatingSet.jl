@@ -23,7 +23,11 @@ show_graph(graph; locs=locations, format=:svg)
 
 # ## Generic tensor network representation
 # We can use [`DominatingSet`](@ref) to construct the tensor network for solving the dominating set problem as
-problem = DominatingSet(graph; optimizer=TreeSA());
+dom = DominatingSet(graph)
+
+# The tensor network representation of the dominating set problem can be obtained by
+problem = GenericTensorNetwork(dom; optimizer=TreeSA())
+# where the key word argument `optimizer` specifies the tensor network contraction order optimizer as a local search based optimizer [`TreeSA`](@ref).
 
 # ### Theory (can skip)
 # Let ``G=(V,E)`` be the target graph that we want to solve.

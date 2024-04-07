@@ -2,6 +2,7 @@
 ## Graph problems
 ```@docs
 solve
+GenericTensorNetwork
 GraphProblem
 IndependentSet
 MaximalIS
@@ -9,7 +10,6 @@ Matching
 Coloring
 DominatingSet
 SpinGlass
-HyperSpinGlass
 MaxCut
 PaintShop
 Satisfiability
@@ -27,14 +27,12 @@ Interfaces [`GenericTensorNetworks.generate_tensors`](@ref), [`labels`](@ref), [
 ```@docs
 GenericTensorNetworks.generate_tensors
 labels
-terms
+energy_terms
 flavors
 get_weights
 chweights
 nflavor
 fixedvertices
-
-extract_result
 ```
 
 #### Graph Problem Utilities
@@ -49,7 +47,6 @@ is_set_packing
 
 cut_size
 spinglass_energy
-hyperspinglass_energy
 num_paint_shop_color_switch
 paint_shop_coloring_from_config
 mis_compactify!

@@ -1,53 +1,34 @@
 """
-    MaximalIS{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    MaximalIS(graph; weights=NoWeight(), openvertices=(),
-            optimizer=GreedyMethod(), simplifier=nothing,
-            fixedvertices=Dict()
-        )
+$TYPEDEF
 
 The [maximal independent set](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/MaximalIS/) problem. In the constructor, `weights` are the weights of vertices.
 
 Positional arguments
 -------------------------------
 * `graph` is the problem graph.
-
-Keyword arguments
--------------------------------
 * `weights` are associated with the vertices of the `graph`.
-* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
-* `fixedvertices` is a dict to specify the values of degree of freedoms, where a value can be `0` (absent in the set) or `1` (present in the set).
-* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
 """
-struct MaximalIS{CT<:AbstractEinsum,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    code::CT
+struct MaximalIS{WT<:Union{UnitWeight, Vector}} <: GraphProblem
     graph::SimpleGraph
     weights::WT
-    fixedvertices::Dict{Int,Int}
-end
-
-function MaximalIS(g::SimpleGraph; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{Int,Int}())
-    @assert weights isa NoWeight || length(weights) == nv(g)
-    rawcode = EinCode(([[Graphs.neighbors(g, v)..., v] for v in Graphs.vertices(g)]...,), collect(Int, openvertices))
-    MaximalIS(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), g, weights, Dict{Int,Int}(fixedvertices))
+    function MaximalIS(g::SimpleGraph, weights::Union{UnitWeight, Vector}=UnitWeight())
+        @assert weights isa UnitWeight || length(weights) == nv(g)
+        new{typeof(weights)}(g, weights)
+    end
 end
 
 flavors(::Type{<:MaximalIS}) = [0, 1]
-terms(gp::MaximalIS) = getixsv(gp.code)
-labels(gp::MaximalIS) = [1:length(getixsv(gp.code))...]
-fixedvertices(gp::MaximalIS) = gp.fixedvertices
+energy_terms(gp::MaximalIS) = [[Graphs.neighbors(gp.graph, v)..., v] for v in Graphs.vertices(gp.graph)]
+energy_tensors(x::T, c::MaximalIS) where T = [maximal_independent_set_tensor(_pow.(Ref(x), get_weights(c, i))..., degree(c.graph, i)+1) for i=1:nv(c.graph)]
+extra_terms(::MaximalIS) = Vector{Int}[]
+extra_tensors(::Type{T}, ::MaximalIS) where T = Array{T}[]
+labels(gp::MaximalIS) = [1:nv(gp.graph)...]
 
 # weights interface
 get_weights(c::MaximalIS) = c.weights
 get_weights(gp::MaximalIS, i::Int) = [0, gp.weights[i]]
-chweights(c::MaximalIS, weights) = MaximalIS(c.code, c.graph, weights, c.fixedvertices)
+chweights(c::MaximalIS, weights) = MaximalIS(c.graph, weights)
 
-function generate_tensors(x::T, mi::MaximalIS) where T
-    ixs = getixsv(mi.code)
-    isempty(ixs) && return []
-	return select_dims(add_labels!(map(enumerate(ixs)) do (i, ix)
-        maximal_independent_set_tensor(_pow.(Ref(x), get_weights(mi, i))..., length(ix))
-    end, ixs, labels(mi)), ixs, fixedvertices(mi))
-end
 function maximal_independent_set_tensor(a::T, b::T, d::Int) where T
     t = zeros(T, fill(2, d)...)
     for i = 2:1<<(d-1)

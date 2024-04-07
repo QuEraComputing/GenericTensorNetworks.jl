@@ -107,24 +107,14 @@ macro bools(syms::Symbol...)
 end
 
 """
-    Satisfiability{CT<:AbstractEinsum,T,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    Satisfiability(cnf::CNF; weights=NoWeight(), openvertices=(),
-            optimizer=GreedyMethod(), simplifier=nothing,
-            fixedvertices=Dict()
-        )
+$TYPEDEF
 
 The [satisfiability](https://queracomputing.github.io/GenericTensorNetworks.jl/dev/generated/Satisfiability/) problem.
 
 Positional arguments
 -------------------------------
 * `cnf` is a conjunctive normal form ([`CNF`](@ref)) for specifying the satisfiability problems.
-
-Keyword arguments
--------------------------------
 * `weights` are associated with clauses.
-* `optimizer` and `simplifier` are for tensor network optimization, check [`optimize_code`](@ref) for details.
-* `fixedvertices` is a dict to specify the values of boolean variables, where a value can be `0` or `1`.
-* `openvertices` is a tuple of labels to specify the output tensor. Theses degree of freedoms will not be contracted.
 
 Examples
 -------------------------------
@@ -146,34 +136,32 @@ c ∨ z ∨ ¬b
 julia> cnf = (c1 ∧ c4) ∧ (c2 ∧ c3)
 (x ∨ ¬y) ∧ (c ∨ z ∨ ¬b) ∧ (c ∨ ¬a ∨ b) ∧ (z ∨ ¬a ∨ y)
 
-julia> gp = Satisfiability(cnf);
+julia> gp = GenericTensorNetwork(Satisfiability(cnf));
 
 julia> solve(gp, SizeMax())[]
 4.0ₜ
 ```
 """
-struct Satisfiability{CT<:AbstractEinsum,T,WT<:Union{NoWeight, Vector}} <: GraphProblem
-    code::CT
+struct Satisfiability{T,WT<:Union{UnitWeight, Vector}} <: GraphProblem
     cnf::CNF{T}
     weights::WT
-    fixedvertices::Dict{T,Int}
-end
-
-function Satisfiability(cnf::CNF{T}; weights=NoWeight(), openvertices=(), optimizer=GreedyMethod(), simplifier=nothing, fixedvertices=Dict{T,Int}()) where T
-    @assert weights isa NoWeight || length(weights) == length(cnf) "weights size inconsistent! should be $(length(cnf)), got: $(length(weights))"
-    rawcode = EinCode([[getfield.(c.vars, :name)...] for c in cnf.clauses], collect(T, openvertices))
-    Satisfiability(_optimize_code(rawcode, uniformsize_fix(rawcode, 2, fixedvertices), optimizer, simplifier), cnf, weights, Dict{T,Int}(fixedvertices))
+    function Satisfiability(cnf::CNF{T}, weights::WT=UnitWeight()) where {T, WT}
+        @assert weights isa UnitWeight || length(weights) == length(cnf) "weights size inconsistent! should be $(length(cnf)), got: $(length(weights))"
+        new{T, typeof(weights)}(cnf, weights)
+    end
 end
 
 flavors(::Type{<:Satisfiability}) = [0, 1]  # false, true
-terms(gp::Satisfiability) = getixsv(gp.code)
-labels(gp::Satisfiability) = unique!(vcat(getixsv(gp.code)...))
-fixedvertices(gp::Satisfiability) = gp.fixedvertices
+energy_terms(gp::Satisfiability) = [[getfield.(c.vars, :name)...] for c in gp.cnf.clauses]
+energy_tensors(x::T, c::Satisfiability) where T = [tensor_for_clause(c.cnf.clauses[i], _pow.(Ref(x), get_weights(c, i))...) for i=1:length(c.cnf.clauses)]
+extra_terms(::Satisfiability{T}) where T = Vector{T}[]
+extra_tensors(::Type{T}, c::Satisfiability) where T = Array{T}[]
+labels(gp::Satisfiability) = unique!(vcat(energy_terms(gp)...))
 
 # weights interface
 get_weights(c::Satisfiability) = c.weights
 get_weights(s::Satisfiability, i::Int) = [0, s.weights[i]]
-chweights(c::Satisfiability, weights) = Satisfiability(c.code, c.cnf, weights, c.fixedvertices)
+chweights(c::Satisfiability, weights) = Satisfiability(c.cnf, weights)
 
 """
     satisfiable(cnf::CNF, config::AbstractDict)
@@ -188,21 +176,6 @@ function satisfiable(c::CNFClause{T}, config::AbstractDict{T}) where T
 end
 function satisfiable(v::BoolVar{T}, config::AbstractDict{T}) where T
     config[v.name] == ~v.neg
-end
-
-# the first argument is a function of variables
-function generate_tensors(x::VT, sa::Satisfiability{CT,T}) where {CT,T,VT}
-    cnf = sa.cnf
-    ixs = getixsv(sa.code)
-    isempty(cnf.clauses) && return []
-	return select_dims(
-        add_labels!(
-            map(1:length(cnf.clauses)) do i
-                tensor_for_clause(cnf.clauses[i], _pow.(Ref(x), get_weights(sa, i))...)
-            end,
-            ixs, labels(sa))
-        , ixs, fixedvertices(sa)
-    )
 end
 
 function tensor_for_clause(c::CNFClause{T}, a, b) where T

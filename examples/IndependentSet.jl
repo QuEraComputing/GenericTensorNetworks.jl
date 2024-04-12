@@ -12,10 +12,8 @@ graph = Graphs.smallgraph(:petersen)
 # We can visualize this graph using the [`show_graph`](@ref) function
 ## set the vertex locations manually instead of using the default spring layout
 rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
-
-locations = [[rot15(0.0, 2.0, i) for i=0:4]..., [rot15(0.0, 1.0, i) for i=0:4]...]
-
-show_graph(graph; locs=locations, format=:svg)
+locations = [[rot15(0.0, 60.0, i) for i=0:4]..., [rot15(0.0, 30, i) for i=0:4]...]
+show_graph(graph, locations; format=:svg)
 
 # The graphical display is available in the following editors
 # * a [VSCode](https://github.com/julia-vscode/julia-vscode) editor,
@@ -122,7 +120,7 @@ single_solution = max_config.c.data
 
 # This bit string should be read from left to right, with the i-th bit being 1 (0) to indicate the i-th vertex is present (absent) in the set.
 # We can visualize this MIS with the following function.
-show_graph(graph; locs=locations, format=:svg, vertex_colors=
+show_graph(graph, locations; format=:svg, vertex_colors=
     [iszero(single_solution[i]) ? "white" : "red" for i=1:nv(graph)])
 
 # ##### Enumerate all solutions and best several solutions

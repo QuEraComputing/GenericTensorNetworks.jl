@@ -44,10 +44,10 @@ Keyword arguments
 $(LuxorGraphPlot.CONFIGHELP)
 """
 function show_einsum(ein::AbstractEinsum;
-        label_size=0.15,
+        label_size=7,
         label_color="black",
         open_label_color="red",
-        tensor_size=0.3,
+        tensor_size=15,
         tensor_color="black",
         tensor_text_color="white",
         annotate_labels=true,
@@ -55,7 +55,7 @@ function show_einsum(ein::AbstractEinsum;
         tensor_locs=nothing,
         label_locs=nothing,  # dict
         layout::Symbol=:auto,
-        optimal_distance=1.0,
+        optimal_distance=25.0,
         kwargs...
         )
     ixs = getixsv(ein)
@@ -75,7 +75,7 @@ function show_einsum(ein::AbstractEinsum;
         end
     end
     if label_locs === nothing && tensor_locs === nothing
-        locs = LuxorGraphPlot.autolocs(graph, nothing, layout, optimal_distance, trues(nv(graph)))
+        locs = LuxorGraphPlot.render_locs(graph, Layout(layout; optimal_distance, spring_mask = trues(nv(graph))))
     elseif label_locs === nothing
         # infer label locs from tensor locs
         label_locs = [(lst = [iloc for (iloc,ix) in zip(tensor_locs, ixs) if l ∈ ix]; reduce((x,y)->x .+ y, lst) ./ length(lst)) for l in labels]
@@ -87,7 +87,7 @@ function show_einsum(ein::AbstractEinsum;
     else
         locs = [label_locs..., tensor_locs...]
     end
-    show_graph(locs, [(e.src, e.dst) for e in edges(graph)]; texts, vertex_colors=colors,
+    show_graph(GraphViz(; locs, edges=[(e.src, e.dst) for e in edges(graph)], texts, vertex_colors=colors,
         vertex_text_colors,
-        vertex_sizes=sizes, vertex_line_width=0, kwargs...)
+        vertex_sizes=sizes); config=LuxorGraphPlot.GraphDisplayConfig(vertex_line_width=0, kwargs...))
 end

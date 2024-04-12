@@ -18,16 +18,13 @@ sequence = collect("iadgbeadfcchghebif")
 
 # We can visualize this paint shop problem as a graph
 rot(a, b, θ) = cos(θ)*a + sin(θ)*b, cos(θ)*b - sin(θ)*a
-
-locations = [rot(0.0, 2.0, -0.25π - 1.5*π*(i-0.5)/length(sequence)) for i=1:length(sequence)]
-
+locations = [rot(0.0, 100.0, -0.25π - 1.5*π*(i-0.5)/length(sequence)) for i=1:length(sequence)]
 graph = path_graph(length(sequence))
 for i=1:length(sequence) 
     j = findlast(==(sequence[i]), sequence)
     i != j && add_edge!(graph, i, j)
 end
-
-show_graph(graph; locs=locations, texts=string.(sequence), format=:svg, edge_colors=
+show_graph(graph, locations; texts=string.(sequence), format=:svg, edge_colors=
     [sequence[e.src] == sequence[e.dst] ? "blue" : "black" for e in edges(graph)])
 
 # Vertices connected by blue edges must have different colors,

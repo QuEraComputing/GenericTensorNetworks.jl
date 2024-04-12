@@ -14,8 +14,8 @@ graph = Graphs.smallgraph(:petersen)
 
 # We can visualize this graph using the following function
 rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
-locations = [[rot15(0.0, 2.0, i) for i=0:4]..., [rot15(0.0, 1.0, i) for i=0:4]...]
-show_graph(graph; locs=locations, format=:svg)
+locations = [[rot15(0.0, 60.0, i) for i=0:4]..., [rot15(0.0, 30, i) for i=0:4]...]
+show_graph(graph, locations; format=:svg)
 
 # ## Generic tensor network representation
 # We can define the matching problem with the [`Matching`](@ref) type as

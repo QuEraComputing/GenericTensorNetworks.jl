@@ -75,7 +75,7 @@ function show_einsum(ein::AbstractEinsum;
         end
     end
     if label_locs === nothing && tensor_locs === nothing
-        locs = LuxorGraphPlot.render_locs(graph, Layout(layout; optimal_distance, spring_mask = trues(nv(graph))))
+        locs = LuxorGraphPlot.render_locs(graph, LuxorGraphPlot.Layout(layout; optimal_distance, spring_mask = trues(nv(graph))))
     elseif label_locs === nothing
         # infer label locs from tensor locs
         label_locs = [(lst = [iloc for (iloc,ix) in zip(tensor_locs, ixs) if l ∈ ix]; reduce((x,y)->x .+ y, lst) ./ length(lst)) for l in labels]

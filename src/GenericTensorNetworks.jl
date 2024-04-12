@@ -60,7 +60,7 @@ export solve, SizeMax, SizeMin, PartitionFunction, CountingAll, CountingMax, Cou
 export save_configs, load_configs, hamming_distribution, save_sumproduct, load_sumproduct
 
 # Visualization
-export show_graph, spring_layout!, show_configs, show_einsum
+export show_graph, spring_layout!, show_configs, show_einsum, GraphDisplayConfig
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 

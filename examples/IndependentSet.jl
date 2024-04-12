@@ -132,8 +132,8 @@ all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]
 
 all_max_configs.c.data
 
-# These solutions can be visualized with the [`show_gallery`](@ref) function.
-show_gallery(graph, (1, length(all_max_configs.c)); locs=locations, vertex_configs=all_max_configs.c, format=:svg)
+# These solutions can be visualized with the [`show_configs`](@ref) function.
+show_configs(graph, locations, reshape(collect(all_max_configs.c), 1, length(all_max_configs.c)); padding_left=20)
 
 # We can use [`ConfigsAll`](@ref) to enumerate all sets satisfying the independence constraint.
 all_independent_sets = solve(problem, ConfigsAll())[]

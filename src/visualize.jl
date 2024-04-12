@@ -3,14 +3,14 @@
         tensor_locs=nothing,
         label_locs=nothing,  # dict
         spring::Bool=true,
-        optimal_distance=1.0,
+        optimal_distance=25.0,
 
-        tensor_size=0.3,
+        tensor_size=15,
         tensor_color="black",
         tensor_text_color="white",
         annotate_tensors=false,
 
-        label_size=0.15,
+        label_size=7,
         label_color="black",
         open_label_color="red",
         annotate_labels=true,
@@ -90,4 +90,25 @@ function show_einsum(ein::AbstractEinsum;
     show_graph(GraphViz(; locs, edges=[(e.src, e.dst) for e in edges(graph)], texts, vertex_colors=colors,
         vertex_text_colors,
         vertex_sizes=sizes); config=LuxorGraphPlot.GraphDisplayConfig(vertex_line_width=0, kwargs...))
+end
+
+"""
+    show_configs(gp::GraphProblem, locs, configs::AbstractMatrix; kwargs...)
+    show_configs(graph::SimpleGraph, locs, configs::AbstractMatrix; nflavor=2, kwargs...)
+
+Show a gallery of configurations on a graph.
+"""
+function show_configs(gp::GraphProblem, locs, configs::AbstractMatrix; kwargs...)
+    show_configs(gp.graph, locs, configs; nflavor=nflavor(gp), kwargs...)
+end
+function show_configs(graph::SimpleGraph, locs, configs::AbstractMatrix;
+        nflavor::Int=2,
+        kwargs...)
+    cmap = range(colorant"white", stop=colorant"red", length=nflavor)
+    locs = render_locs(graph, locs)
+    graphs = map(configs) do cfg
+        @assert all(0 .<= cfg .<= nflavor-1)
+        GraphViz(graph; locs, vertex_colors=cmap[cfg .+ 1])
+    end
+    show_gallery(graphs; kwargs...)
 end

@@ -41,5 +41,4 @@ max5_configs = solve(problem, SingleConfigMax(5))[]
 max5_configs.orders
 
 # Let us visually check these configurations
-show_gallery(graph, (1, 5); locs=locations, format=:svg, vertex_configs=[max5_configs.orders[k].c.data for k=1:5])
-
+show_configs(graph, locations, [max5_configs.orders[j].c.data for i=1:1, j=1:5]; padding_left=20)

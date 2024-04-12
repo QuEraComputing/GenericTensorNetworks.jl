@@ -134,7 +134,7 @@ MergeGreedy
 #### Graph
 ```@docs
 show_graph
-show_gallery
+show_configs
 show_einsum
 
 diagonal_coupled_graph

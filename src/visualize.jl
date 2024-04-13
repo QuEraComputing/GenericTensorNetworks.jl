@@ -12,7 +12,7 @@
 
         label_size=7,
         label_color="black",
-        open_label_color="red",
+        open_label_color="black",
         annotate_labels=true,
         kwargs...
         )
@@ -46,7 +46,7 @@ $(LuxorGraphPlot.CONFIGHELP)
 function show_einsum(ein::AbstractEinsum;
         label_size=7,
         label_color="black",
-        open_label_color="red",
+        open_label_color="black",
         tensor_size=15,
         tensor_color="black",
         tensor_text_color="white",
@@ -56,7 +56,13 @@ function show_einsum(ein::AbstractEinsum;
         label_locs=nothing,  # dict
         layout::Symbol=:auto,
         optimal_distance=25.0,
-        kwargs...
+        filename=nothing,
+        format=:svg,
+        padding_left=10.0,
+        padding_right=10.0,
+        padding_top=10.0,
+        padding_bottom=10.0,
+        config=LuxorGraphPlot.GraphDisplayConfig(; vertex_line_width=0.0),
         )
     ixs = getixsv(ein)
     iy = getiyv(ein)
@@ -89,7 +95,10 @@ function show_einsum(ein::AbstractEinsum;
     end
     show_graph(GraphViz(; locs, edges=[(e.src, e.dst) for e in edges(graph)], texts, vertex_colors=colors,
         vertex_text_colors,
-        vertex_sizes=sizes); config=LuxorGraphPlot.GraphDisplayConfig(vertex_line_width=0, kwargs...))
+        vertex_sizes=sizes);
+        filename, format,
+        padding_left, padding_right, padding_top, padding_bottom, config
+        )
 end
 
 """

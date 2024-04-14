@@ -134,8 +134,11 @@ MergeGreedy
 #### Graph
 ```@docs
 show_graph
-show_gallery
+show_configs
 show_einsum
+GraphDisplayConfig
+Layout
+render_locs
 
 diagonal_coupled_graph
 square_lattice_graph

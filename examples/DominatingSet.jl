@@ -74,7 +74,7 @@ all(c->is_dominating_set(graph, c), min_configs)
 
 #
 
-show_gallery(graph, (2, 5); locs=locations, vertex_configs=min_configs, format=:svg)
+show_configs(graph, locations, reshape(collect(min_configs), 2, 5); padding_left=20)
 
 # Similarly, if one is only interested in computing one of the minimum dominating sets,
 # one can use the graph property [`SingleConfigMin`](@ref).

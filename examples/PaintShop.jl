@@ -90,9 +90,9 @@ best_configs = solve(problem, ConfigsMin())[]
 
 painting1 = paint_shop_coloring_from_config(pshop, best_configs.c.data[1])
 
-show_graph(graph; locs=locations, format=:svg, texts=string.(sequence),
+show_graph(graph, locations; format=:svg, texts=string.(sequence),
     edge_colors=[sequence[e.src] == sequence[e.dst] ? "blue" : "black" for e in edges(graph)],
-    vertex_colors=[isone(c) ? "red" : "black" for c in painting1], vertex_text_color="white")
+    vertex_colors=[isone(c) ? "red" : "black" for c in painting1], config=GraphDisplayConfig(;vertex_text_color="white"))
 
 # Since we have different choices of initial color, the number of best solution is 2.
 

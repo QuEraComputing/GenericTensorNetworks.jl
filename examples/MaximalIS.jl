@@ -72,7 +72,7 @@ all(c->is_maximal_independent_set(graph, c), maximal_configs)
 
 #
 
-show_gallery(graph, (3, 5); locs=locations, vertex_configs=maximal_configs, format=:svg)
+show_configs(graph, locations, reshape(collect(maximal_configs), 3, 5); padding_left=20)
 
 # This result should be consistent with that given by the [Bron Kerbosch algorithm](https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm) on the complement of Petersen graph.
 cliques = maximal_cliques(complement(graph))
@@ -83,7 +83,7 @@ cliques = maximal_cliques(complement(graph))
 # It is the [`ConfigsMin`](@ref) property in the program.
 minimum_maximal_configs = solve(problem, ConfigsMin())[].c
 
-show_gallery(graph, (2, 5); locs=locations, vertex_configs=minimum_maximal_configs, format=:svg)
+show_configs(graph, locations, reshape(collect(minimum_maximal_configs), 2, 5); padding_left=20)
 
 # Similarly, if one is only interested in computing one of the minimum sets,
 # one can use the graph property [`SingleConfigMin`](@ref).

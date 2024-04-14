@@ -7,6 +7,7 @@ using OMEinsum: contraction_complexity, timespace_complexity, timespacereadwrite
 using Graphs, Random
 using DelimitedFiles, Serialization, Printf
 using LuxorGraphPlot
+using LuxorGraphPlot.Luxor.Colors: @colorant_str
 import Polynomials
 using Polynomials: Polynomial, LaurentPolynomial, printpoly, fit
 using FFTW
@@ -59,7 +60,7 @@ export solve, SizeMax, SizeMin, PartitionFunction, CountingAll, CountingMax, Cou
 export save_configs, load_configs, hamming_distribution, save_sumproduct, load_sumproduct
 
 # Visualization
-export show_graph, spring_layout!, show_gallery, show_einsum
+export show_graph, spring_layout!, show_configs, show_einsum, GraphDisplayConfig, Layout, render_locs
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 

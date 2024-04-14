@@ -20,49 +20,46 @@ sequence = collect(&quot;iadgbeadfcchghebif&quot;)</code></pre><pre class="docum
  &#39;b&#39;: ASCII/Unicode U+0062 (category Ll: Letter, lowercase)
  &#39;i&#39;: ASCII/Unicode U+0069 (category Ll: Letter, lowercase)
  &#39;f&#39;: ASCII/Unicode U+0066 (category Ll: Letter, lowercase)</code></pre><p>We can visualize this paint shop problem as a graph</p><pre><code class="language-julia hljs">rot(a, b, θ) = cos(θ)*a + sin(θ)*b, cos(θ)*b - sin(θ)*a
-
-locations = [rot(0.0, 2.0, -0.25π - 1.5*π*(i-0.5)/length(sequence)) for i=1:length(sequence)]
-
+locations = [rot(0.0, 100.0, -0.25π - 1.5*π*(i-0.5)/length(sequence)) for i=1:length(sequence)]
 graph = path_graph(length(sequence))
 for i=1:length(sequence)
     j = findlast(==(sequence[i]), sequence)
     i != j &amp;&amp; add_edge!(graph, i, j)
 end
-
-show_graph(graph; locs=locations, texts=string.(sequence), format=:svg, edge_colors=
-    [sequence[e.src] == sequence[e.dst] ? &quot;blue&quot; : &quot;black&quot; for e in edges(graph)])</code></pre><img src="9b2a2909.svg" alt="Example block output"/><p>Vertices connected by blue edges must have different colors, and the goal becomes a min-cut problem defined on black edges.</p><h2 id="Generic-tensor-network-representation"><a class="docs-heading-anchor" href="#Generic-tensor-network-representation">Generic tensor network representation</a><a id="Generic-tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Generic-tensor-network-representation" title="Permalink"></a></h2><p>We can define the binary paint shop problem with the <a href="../../ref/#GenericTensorNetworks.PaintShop"><code>PaintShop</code></a> type as</p><pre><code class="language-julia hljs">pshop = PaintShop(sequence)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">PaintShop{Char}([&#39;i&#39;, &#39;a&#39;, &#39;d&#39;, &#39;g&#39;, &#39;b&#39;, &#39;e&#39;, &#39;a&#39;, &#39;d&#39;, &#39;f&#39;, &#39;c&#39;, &#39;c&#39;, &#39;h&#39;, &#39;g&#39;, &#39;h&#39;, &#39;e&#39;, &#39;b&#39;, &#39;i&#39;, &#39;f&#39;], Bool[1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0])</code></pre><p>The tensor network representation of the binary paint shop problem can be obtained by</p><pre><code class="language-julia hljs">problem = GenericTensorNetwork(pshop)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">GenericTensorNetwork{PaintShop{Char}, OMEinsum.DynamicNestedEinsum{Char}, Char}(PaintShop{Char}([&#39;i&#39;, &#39;a&#39;, &#39;d&#39;, &#39;g&#39;, &#39;b&#39;, &#39;e&#39;, &#39;a&#39;, &#39;d&#39;, &#39;f&#39;, &#39;c&#39;, &#39;c&#39;, &#39;h&#39;, &#39;g&#39;, &#39;h&#39;, &#39;e&#39;, &#39;b&#39;, &#39;i&#39;, &#39;f&#39;], Bool[1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0]), ib, bi -&gt; 
-├─ idbh, bidh -&gt; ib
-│  ├─ ide, bhe -&gt; idbh
-│  │  ├─ ida, ea -&gt; ide
-│  │  │  ├─ ia, ad -&gt; ida
-│  │  │  │  ├─ ia
-│  │  │  │  └─ ad, ad -&gt; ad
-│  │  │  │     ⋮
-│  │  │  │     
-│  │  │  └─ ea
-│  │  └─ be, he -&gt; bhe
-│  │     ├─ be, eb -&gt; be
-│  │     │  ├─ be
-│  │     │  └─ eb
-│  │     └─ he
-│  └─ dbh, dih -&gt; bidh
-│     ├─ dbg, hg -&gt; dbh
-│     │  ├─ dg, gb -&gt; dbg
-│     │  │  ├─ dg
-│     │  │  └─ gb
-│     │  └─ hg, gh -&gt; hg
-│     │     ├─ hg
-│     │     └─ gh
-│     └─ dif, fh -&gt; dih
-│        ├─ df, if -&gt; dif
-│        │  ├─ df
-│        │  └─ if
-│        └─ fc, ch -&gt; fh
-│           ├─ fc, cc -&gt; fc
-│           │  ⋮
-│           │  
-│           └─ ch
-└─ bi
+show_graph(graph, locations; texts=string.(sequence), format=:svg, edge_colors=
+    [sequence[e.src] == sequence[e.dst] ? &quot;blue&quot; : &quot;black&quot; for e in edges(graph)])</code></pre><img src="85d3a320.svg" alt="Example block output"/><p>Vertices connected by blue edges must have different colors, and the goal becomes a min-cut problem defined on black edges.</p><h2 id="Generic-tensor-network-representation"><a class="docs-heading-anchor" href="#Generic-tensor-network-representation">Generic tensor network representation</a><a id="Generic-tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Generic-tensor-network-representation" title="Permalink"></a></h2><p>We can define the binary paint shop problem with the <a href="../../ref/#GenericTensorNetworks.PaintShop"><code>PaintShop</code></a> type as</p><pre><code class="language-julia hljs">pshop = PaintShop(sequence)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">PaintShop{Char}([&#39;i&#39;, &#39;a&#39;, &#39;d&#39;, &#39;g&#39;, &#39;b&#39;, &#39;e&#39;, &#39;a&#39;, &#39;d&#39;, &#39;f&#39;, &#39;c&#39;, &#39;c&#39;, &#39;h&#39;, &#39;g&#39;, &#39;h&#39;, &#39;e&#39;, &#39;b&#39;, &#39;i&#39;, &#39;f&#39;], Bool[1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0])</code></pre><p>The tensor network representation of the binary paint shop problem can be obtained by</p><pre><code class="language-julia hljs">problem = GenericTensorNetwork(pshop)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">GenericTensorNetwork{PaintShop{Char}, OMEinsum.DynamicNestedEinsum{Char}, Char}(PaintShop{Char}([&#39;i&#39;, &#39;a&#39;, &#39;d&#39;, &#39;g&#39;, &#39;b&#39;, &#39;e&#39;, &#39;a&#39;, &#39;d&#39;, &#39;f&#39;, &#39;c&#39;, &#39;c&#39;, &#39;h&#39;, &#39;g&#39;, &#39;h&#39;, &#39;e&#39;, &#39;b&#39;, &#39;i&#39;, &#39;f&#39;], Bool[1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0]), ide, edi -&gt; 
+├─ ia, dea -&gt; ide
+│  ├─ ia
+│  └─ ad, ea -&gt; dea
+│     ├─ ad, ad -&gt; ad
+│     │  ├─ ad
+│     │  └─ ad
+│     └─ ea
+└─ dhie, dih -&gt; edi
+   ├─ dehg, gie -&gt; dhie
+   │  ├─ dg, geh -&gt; dehg
+   │  │  ├─ dg
+   │  │  └─ hg, he -&gt; geh
+   │  │     ├─ hg, gh -&gt; hg
+   │  │     │  ⋮
+   │  │     │  
+   │  │     └─ he
+   │  └─ gib, be -&gt; gie
+   │     ├─ gb, bi -&gt; gib
+   │     │  ├─ gb
+   │     │  └─ bi
+   │     └─ be, eb -&gt; be
+   │        ├─ be
+   │        └─ eb
+   └─ dif, fh -&gt; dih
+      ├─ df, if -&gt; dif
+      │  ├─ df
+      │  └─ if
+      └─ fc, ch -&gt; fh
+         ├─ fc, cc -&gt; fc
+         │  ├─ fc
+         │  └─ cc
+         └─ ch
 , Dict{Char, Int64}())</code></pre><h3 id="Theory-(can-skip)"><a class="docs-heading-anchor" href="#Theory-(can-skip)">Theory (can skip)</a><a id="Theory-(can-skip)-1"></a><a class="docs-heading-anchor-permalink" href="#Theory-(can-skip)" title="Permalink"></a></h3><p>Type <a href="../../ref/#GenericTensorNetworks.PaintShop"><code>PaintShop</code></a> can be used for constructing the tensor network with optimized contraction order for solving a binary paint shop problem. To obtain its tensor network representation, we associating car <span>$c_i$</span> (the <span>$i$</span>-th character in our example) with a degree of freedom <span>$s_{c_i} \in \{0, 1\}$</span>, where we use <span>$0$</span> to denote the first appearance of a car is colored red and <span>$1$</span> to denote the first appearance of a car is colored blue. For each black edges <span>$(i, i+1)$</span>, we define an edge tensor labeled by <span>$(s_{c_i}, s_{c_{i+1}})$</span> as follows: If both cars on this edge are their first or second appearance</p><p class="math-container">\[B^{\rm parallel} = \left(\begin{matrix}
 x &amp; 1 \\
 1 &amp; x \\
@@ -71,6 +68,6 @@ x &amp; 1 \\
 x &amp; 1 \\
 \end{matrix}\right).\]</p><p>It can be understood as, when both cars are their first appearance, they tend to have the same configuration so that the color is not changed. Otherwise, they tend to have different configuration to keep the color unchanged.</p><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="graph-polynomial"><a class="docs-heading-anchor" href="#graph-polynomial">graph polynomial</a><a id="graph-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#graph-polynomial" title="Permalink"></a></h5><p>The graph polynomial defined for the maximal independent set problem is</p><p class="math-container">\[I_{\rm max}(G, x) = \sum_{k=0}^{\alpha(G)} b_k x^k,\]</p><p>where <span>$b_k$</span> is the number of maximal independent sets of size <span>$k$</span> in graph <span>$G=(V, E)$</span>.</p><pre><code class="language-julia hljs">max_config = solve(problem, GraphPolynomial())[]</code></pre>2&#8729;x<sup>4</sup> &#43; 28&#8729;x<sup>5</sup> &#43; 32&#8729;x<sup>6</sup> &#43; 80&#8729;x<sup>7</sup> &#43; 60&#8729;x<sup>8</sup> &#43; 88&#8729;x<sup>9</sup> &#43; 104&#8729;x<sup>10</sup> &#43; 48&#8729;x<sup>11</sup> &#43; 50&#8729;x<sup>12</sup> &#43; 12&#8729;x<sup>13</sup> &#43; 8&#8729;x<sup>14</sup><p>Since it only counts the maximal independent sets, the first several coefficients are 0.</p><h3 id="Counting-properties-2"><a class="docs-heading-anchor" href="#Counting-properties-2">Counting properties</a><a class="docs-heading-anchor-permalink" href="#Counting-properties-2" title="Permalink"></a></h3><h5 id="graph-polynomial-2"><a class="docs-heading-anchor" href="#graph-polynomial-2">graph polynomial</a><a class="docs-heading-anchor-permalink" href="#graph-polynomial-2" title="Permalink"></a></h5><p>The graph polynomial of the binary paint shop problem in our convention is defined as</p><p class="math-container">\[P(G, x) = \sum_{k=0}^{\delta(G)} p_k x^k\]</p><p>where <span>$p_k$</span> is the number of possible coloring with number of color changes <span>$2m-1-k$</span>.</p><pre><code class="language-julia hljs">paint_polynomial = solve(problem, GraphPolynomial())[]</code></pre>2&#8729;x<sup>4</sup> &#43; 28&#8729;x<sup>5</sup> &#43; 32&#8729;x<sup>6</sup> &#43; 80&#8729;x<sup>7</sup> &#43; 60&#8729;x<sup>8</sup> &#43; 88&#8729;x<sup>9</sup> &#43; 104&#8729;x<sup>10</sup> &#43; 48&#8729;x<sup>11</sup> &#43; 50&#8729;x<sup>12</sup> &#43; 12&#8729;x<sup>13</sup> &#43; 8&#8729;x<sup>14</sup><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="finding-best-solutions"><a class="docs-heading-anchor" href="#finding-best-solutions">finding best solutions</a><a id="finding-best-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#finding-best-solutions" title="Permalink"></a></h5><pre><code class="language-julia hljs">best_configs = solve(problem, ConfigsMin())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, {000000110, 111111001})ₜ</code></pre><p>One can see to identical bitstrings corresponding two different vertex configurations, they are related to bit-flip symmetry.</p><pre><code class="language-julia hljs">painting1 = paint_shop_coloring_from_config(pshop, best_configs.c.data[1])
 
-show_graph(graph; locs=locations, format=:svg, texts=string.(sequence),
+show_graph(graph, locations; format=:svg, texts=string.(sequence),
     edge_colors=[sequence[e.src] == sequence[e.dst] ? &quot;blue&quot; : &quot;black&quot; for e in edges(graph)],
-    vertex_colors=[isone(c) ? &quot;red&quot; : &quot;black&quot; for c in painting1], vertex_text_color=&quot;white&quot;)</code></pre><img src="42fed9b3.svg" alt="Example block output"/><p>Since we have different choices of initial color, the number of best solution is 2.</p><p>The following function will check the solution and return you the number of color switches</p><pre><code class="language-julia hljs">num_paint_shop_color_switch(sequence, painting1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Matching/">« Vertex matching problem</a><a class="docs-footer-nextpage" href="../Coloring/">Coloring problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.3.0 on <span class="colophon-date" title="Sunday 7 April 2024 04:20">Sunday 7 April 2024</span>. Using Julia version 1.10.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+    vertex_colors=[isone(c) ? &quot;red&quot; : &quot;black&quot; for c in painting1], config=GraphDisplayConfig(;vertex_text_color=&quot;white&quot;))</code></pre><img src="9949cf33.svg" alt="Example block output"/><p>Since we have different choices of initial color, the number of best solution is 2.</p><p>The following function will check the solution and return you the number of color switches</p><pre><code class="language-julia hljs">num_paint_shop_color_switch(sequence, painting1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Matching/">« Vertex matching problem</a><a class="docs-footer-nextpage" href="../Coloring/">Coloring problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.3.0 on <span class="colophon-date" title="Sunday 14 April 2024 10:06">Sunday 14 April 2024</span>. Using Julia version 1.10.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

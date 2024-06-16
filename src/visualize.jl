@@ -118,3 +118,24 @@ function show_configs(graph::SimpleGraph, locs, configs::AbstractMatrix;
     end
     show_gallery(graphs; kwargs...)
 end
+
+function show_landscape(is_neighbor, x::TruncatedPoly{K}; layer_distance=200) where K
+    nv = 0
+    kv = read_size_configs(x)
+    zlocs = Float64[]
+    for (i, (k, v)) in enumerate(kv)
+        nv += length(v)
+        append!(zlocs, fill((i-1)*layer_distance, length(v)))
+    end
+    graph = SimpleGraph(nv)
+    configs = vcat(getindex.(kv, 2)...)
+    for (i, c) in enumerate(configs)
+        for (j, d) in enumerate(configs)
+            if is_neighbor(c, d)
+                add_edge!(graph, i, j)
+            end
+        end
+    end
+    layout=LayeredSpringLayout(; zlocs)
+    show_graph(graph, layout)
+end

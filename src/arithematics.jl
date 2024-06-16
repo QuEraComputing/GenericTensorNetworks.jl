@@ -931,3 +931,17 @@ post_invert_exponent(t::TruncatedPoly{K}) where K = TruncatedPoly(ntuple(i->t.co
 post_invert_exponent(t::LaurentPolynomial) = error("This method is not implemented yet, please file an issue if you find a using case!")
 post_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
 post_invert_exponent(t::ExtendedTropical{K}) where K = ExtendedTropical{K}(map(i->inv(t.orders[i]), K:-1:1))
+
+# Data reading
+read_size(x::Tropical) = x.n
+read_size(x::ExtendedTropical) = x.orders
+
+read_size_count(x::TruncatedPoly{K, T}) where {K, T<:Real} = [(x.maxorder-K+i => x.coeffs[i]) for i=1:K]
+read_size_count(x::CountingTropical{TV, T}) where {TV, T<:Real} = x.n => x.c
+
+read_size_configs(x::TruncatedPoly{K, T}) where {K, T<:ConfigEnumerator} = [(x.maxorder-K+i => x.coeffs[i].data) for i=1:K]
+read_size_configs(x::CountingTropical{TV, T}) where {TV, T<:ConfigEnumerator} = x.n => x.c.data
+
+read_size_singleconfig(x::TruncatedPoly{K, T}) where {K, T<:ConfigSampler} = [(x.maxorder-K+i => x.coeffs[i].data) for i=1:K]
+
+read_configs(x::ConfigEnumerator) = x.data

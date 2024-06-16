@@ -25,7 +25,7 @@ export GreedyMethod, TreeSA, SABipartite, KaHyParBipartite, MergeVectors, MergeG
 export estimate_memory
 
 # Algebras
-export StaticBitVector, StaticElementVector, @bv_str
+export StaticBitVector, StaticElementVector, @bv_str, hamming_distance
 export is_commutative_semiring
 export Max2Poly, TruncatedPoly, Polynomial, LaurentPolynomial, Tropical, CountingTropical, StaticElementVector, Mod
 export ConfigEnumerator, onehotv, ConfigSampler, SumProductTree
@@ -59,8 +59,11 @@ export solve, SizeMax, SizeMin, PartitionFunction, CountingAll, CountingMax, Cou
 # Utilities
 export save_configs, load_configs, hamming_distribution, save_sumproduct, load_sumproduct
 
+# Readers
+export read_size_count, read_size_configs
+
 # Visualization
-export show_graph, spring_layout!, show_configs, show_einsum, GraphDisplayConfig, Layout, render_locs
+export show_graph, show_configs, show_einsum, GraphDisplayConfig, Layout, render_locs, show_landscape
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 

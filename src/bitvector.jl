@@ -168,6 +168,13 @@ function Base.count_ones(x::StaticBitVector)
 end
 
 """
+    hamming_distance(x::StaticBitVector, y::StaticBitVector)
+
+Calculate the Hamming distance between two static bit vectors.
+"""
+hamming_distance(x::StaticBitVector, y::StaticBitVector) = count_ones(x ⊻ y)
+
+"""
 Constructing a static bit vector.
 """
 macro bv_str(str)

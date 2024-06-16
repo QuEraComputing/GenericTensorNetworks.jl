@@ -14,3 +14,10 @@ end
     @test show_einsum(pb.code; layout=SpringLayout(; optimal_distance=25), annotate_tensors=true) isa Any
     @test show_einsum(pb.code; layout=SpringLayout(; optimal_distance=25), locs=([(randn(), randn()) .* 40 for i=1:25], Dict(i=>(randn(), randn()) .* 40 for i=1:10))) isa Any
 end
+
+@testset "landscape" begin
+    graph = smallgraph(:petersen)
+    pb = GenericTensorNetwork(IndependentSet(graph))
+    res = solve(pb, ConfigsMax(2))[]
+    show_landscape((x, y)->hamming_distance(x, y) <= 2, res)
+end

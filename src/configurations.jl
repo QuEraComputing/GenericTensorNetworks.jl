@@ -113,7 +113,7 @@ end
 function hamming_distribution!(out::AbstractVector, s1::AbstractVector{StaticElementVector{N,S,C}}, s2::AbstractVector{StaticElementVector{N,S,C}}) where {N,S,C}
     @assert length(out) == N+1
     @inbounds for a in s1, b in s2
-        out[count_ones(a ⊻ b)+1] += 1
+        out[hamming_distance(a, b)+1] += 1
     end
     return out
 end

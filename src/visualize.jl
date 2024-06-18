@@ -151,7 +151,7 @@ function show_landscape(is_neighbor, configurations::TruncatedPoly{K};
         kwargs...) where K
     @assert length(colors) == K "colors should have length $K"
     nv = 0
-    kv = read_size_configs(configurations)
+    kv = read_size_config(configurations)
     zlocs = Float64[]
     vertex_colors = String[]
     for (c, (k, v)) in zip(colors, kv)

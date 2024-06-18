@@ -936,12 +936,15 @@ post_invert_exponent(t::ExtendedTropical{K}) where K = ExtendedTropical{K}(map(i
 read_size(x::Tropical) = x.n
 read_size(x::ExtendedTropical) = x.orders
 
-read_size_count(x::TruncatedPoly{K, T}) where {K, T<:Real} = [(x.maxorder-K+i => x.coeffs[i]) for i=1:K]
 read_size_count(x::CountingTropical{TV, T}) where {TV, T<:Real} = x.n => x.c
+read_size_count(x::TruncatedPoly{K, T}) where {K, T<:Real} = [(x.maxorder-K+i => x.coeffs[i]) for i=1:K]
+read_size_count(x::Polynomial) = [(i-1 => x.coeffs[i]) for i=1:length(x.coeffs)]
 
-read_size_configs(x::TruncatedPoly{K, T}) where {K, T<:ConfigEnumerator} = [(x.maxorder-K+i => x.coeffs[i].data) for i=1:K]
-read_size_configs(x::CountingTropical{TV, T}) where {TV, T<:ConfigEnumerator} = x.n => x.c.data
+read_size_config(x::TruncatedPoly{K, T}) where {K, T<:Union{ConfigEnumerator, ConfigSampler}} = [(x.maxorder-K+i => read_config(x.coeffs[i])) for i=1:K]
+read_size_config(x::CountingTropical{TV, T}) where {TV, T<:Union{ConfigEnumerator, ConfigSampler}} = x.n => read_config(x.c)
 
 read_size_singleconfig(x::TruncatedPoly{K, T}) where {K, T<:ConfigSampler} = [(x.maxorder-K+i => x.coeffs[i].data) for i=1:K]
 
-read_configs(x::ConfigEnumerator) = x.data
+read_config(x::ConfigEnumerator) = x.data
+read_config(x::SumProductTree) = collect(x)
+read_config(x::ConfigSampler) = x.data

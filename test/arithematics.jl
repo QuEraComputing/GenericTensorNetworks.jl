@@ -211,5 +211,5 @@ end
     s4 = [StaticBitVector(trues(10)) for j=1:3]
     s5 = [StaticBitVector(trues(10)) for j=1:4]
     x = TruncatedPoly((ConfigEnumerator(s4), ConfigEnumerator(s5)), 5)
-    @test read_size_configs(x) == [4=>s4, 5=>s5]
+    @test read_size_config(x) == [4=>s4, 5=>s5]
 end

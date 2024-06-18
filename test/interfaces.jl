@@ -27,13 +27,22 @@ using Graphs, Test, Random
         res16 = solve(gp, ConfigsMax(2; bounded=true))[]
         res17 = solve(gp, ConfigsMax(3; bounded=true))[]
         res18 = solve(gp, PartitionFunction(0.0))[]
-        @test res1.n == 4
+        @test res1.n == 4 == read_size(res1)
         @test res2 == 76
-        @test res3.n == 4 && res3.c == 5
-        @test res4.maxorder == 4 && res4.coeffs[1] == 30 && res4.coeffs[2]==5
+        res3n, res3c = read_size_count(res3)
+        @test res3.n == 4 == res3n && res3.c == 5 == res3c
+        res4nc = read_size_count(res4)
+        @test res4.maxorder == 4 == res4nc[end].first && res4.coeffs[1] == 30 == res4nc[1].second && res4.coeffs[2]==5 == res4nc[2].second
+        @test read_size_count(res5) == [0=>1.0, 1=>10.0, 2=>30.0, 3=>30.0, 4=>5.0]
         @test res5 == Polynomial([1.0, 10.0, 30, 30, 5])
+        res6n, res6c = read_size_config(res6)
+        res7n, res7c = read_size_config(res7)
         @test res6.c.data ∈ res7.c.data
+        @test res6n == res6n
+        @test res6c ∈ res7c
         @test all(x->sum(x) == 4, res7.c.data)
+        res8nc = read_size_config(res8)
+        @test res8nc[1].second == res8.coeffs[1].data
         @test all(x->sum(x) == 3, res8.coeffs[1].data) && all(x->sum(x) == 4, res8.coeffs[2].data) && length(res8.coeffs[1].data) == 30 && length(res8.coeffs[2].data) == 5
         @test length(unique(res9.data)) == 76 && all(c->is_independent_set(g, c), res9.data)
         @test res10 ≈ res5

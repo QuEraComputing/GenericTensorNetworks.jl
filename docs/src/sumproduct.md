@@ -4,6 +4,7 @@ It is a sum-product expression tree to store [`ConfigEnumerator`](@ref) in a laz
 Although it is space efficient, it is in general not easy to extract information from it due to the exponential large configuration space.
 Directed sampling is one of its most important operations, with which one can get some statistic properties from it with an intermediate effort. For example, if we want to check some property of an intermediate scale graph, one can type
 ```@repl sumproduct
+using GenericTensorNetworks
 graph = random_regular_graph(70, 3)
 problem = GenericTensorNetwork(IndependentSet(graph); optimizer=TreeSA());
 tree = solve(problem, ConfigsAll(; tree_storage=true))[]
@@ -15,11 +16,14 @@ However, this sum-product binary tree structure supports efficient and unbiased 
 samples = generate_samples(tree, 1000)
 ```
 
-With these samples, one can already compute useful properties like Hamming distance (see [`hamming_distribution`](@ref)) distribution.
+With these samples, one can already compute useful properties like Hamming distance (see [`hamming_distribution`](@ref)) distribution. The following code visualizes this distribution with `CairoMakie`.
 
-```@repl sumproduct
-using UnicodePlots
-lineplot(hamming_distribution(samples, samples))
+```@example sumproduct
+using CairoMakie
+dist = hamming_distribution(samples, samples)
+# bar plot
+fig = Figure()
+ax = Axis(fig[1, 1]; xlabel="Hamming distance", ylabel="Frequency")
+barplot!(ax, 0:length(dist)-1, dist)
+fig
 ```
-
-Here, the ``x``-axis is the Hamming distance and the ``y``-axis is the counting of pair-wise Hamming distances.

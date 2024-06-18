@@ -119,13 +119,45 @@ function show_configs(graph::SimpleGraph, locs, configs::AbstractMatrix;
     show_gallery(graphs; kwargs...)
 end
 
-function show_landscape(is_neighbor, x::TruncatedPoly{K}; layer_distance=200) where K
+"""
+    show_landscape(is_neighbor, configurations::TruncatedPoly;
+        layer_distance=200,
+        config=GraphDisplayConfig(; edge_color="gray", vertex_stroke_color="transparent", vertex_size=5),
+        layout_method=:spring,
+        optimal_distance=30.0,
+        colors=fill("green", K),
+        kwargs...)
+
+Show the energy landscape of configurations.
+
+### Arguments
+- `is_neighbor`: a function to determine if two configurations are neighbors.
+- `configurations`: a TruncatedPoly object, which is the default output of the [`solve`](@ref) function with [`ConfigsMax`](@ref) property as the argument.
+
+### Keyword arguments
+- `layer_distance`: the distance between layers.
+- `config`: a `LuxorGraphPlot.GraphDisplayConfig` object.
+- `layout_method`: the layout method, either `:spring`, `:stress` or `:spectral`
+- `optimal_distance`: the optimal distance for the layout.
+- `colors`: a vector of colors for each layer.
+- `kwargs...`: other keyword arguments passed to `show_graph`.
+"""
+function show_landscape(is_neighbor, configurations::TruncatedPoly{K};
+            layer_distance=200,
+            config=GraphDisplayConfig(; edge_color="gray", vertex_stroke_color="transparent", vertex_size=5),
+            layout_method = :spring,
+            optimal_distance = 30.0,
+            colors=fill("green", K),
+        kwargs...) where K
+    @assert length(colors) == K "colors should have length $K"
     nv = 0
-    kv = read_size_configs(x)
+    kv = read_size_configs(configurations)
     zlocs = Float64[]
-    for (i, (k, v)) in enumerate(kv)
+    vertex_colors = String[]
+    for (c, (k, v)) in zip(colors, kv)
         nv += length(v)
-        append!(zlocs, fill((i-1)*layer_distance, length(v)))
+        append!(zlocs, fill(k*layer_distance, length(v)))
+        append!(vertex_colors, fill(c, length(v)))
     end
     graph = SimpleGraph(nv)
     configs = vcat(getindex.(kv, 2)...)
@@ -136,6 +168,14 @@ function show_landscape(is_neighbor, x::TruncatedPoly{K}; layer_distance=200) wh
             end
         end
     end
-    layout=LayeredSpringLayout(; zlocs)
-    show_graph(graph, layout)
+    if layout_method == :spring
+        layout=LayeredSpringLayout(; zlocs, optimal_distance)
+    elseif layout_method == :stress
+        layout=LayeredStressLayout(; zlocs, optimal_distance)
+    elseif layout_method == :spectral
+        layout=LuxorGraphPlot.Layered(SpectralLayout(), zlocs, 0.2)
+    else
+        error("layout_method should be :spring, :stress or :spectral")
+    end
+    show_graph(graph, layout; config, vertex_colors, kwargs...)
 end

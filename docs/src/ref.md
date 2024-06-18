@@ -136,8 +136,15 @@ MergeGreedy
 show_graph
 show_configs
 show_einsum
+show_landscape
 GraphDisplayConfig
-Layout
+AbstractLayout
+SpringLayout
+StressLayout
+SpectralLayout
+Layered
+LayeredSpringLayout
+LayeredStressLayout
 render_locs
 
 diagonal_coupled_graph

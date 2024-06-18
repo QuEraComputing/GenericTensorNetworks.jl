@@ -8,6 +8,7 @@ using Graphs, Random
 using DelimitedFiles, Serialization, Printf
 using LuxorGraphPlot
 using LuxorGraphPlot.Luxor.Colors: @colorant_str
+using LuxorGraphPlot: Layered
 import Polynomials
 using Polynomials: Polynomial, LaurentPolynomial, printpoly, fit
 using FFTW
@@ -63,7 +64,8 @@ export save_configs, load_configs, hamming_distribution, save_sumproduct, load_s
 export read_size_count, read_size_configs
 
 # Visualization
-export show_graph, show_configs, show_einsum, GraphDisplayConfig, Layout, render_locs, show_landscape
+export show_graph, show_configs, show_einsum, GraphDisplayConfig, render_locs, show_landscape
+export AbstractLayout, SpringLayout, StressLayout, SpectralLayout, Layered, LayeredSpringLayout, LayeredStressLayout
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 

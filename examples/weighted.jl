@@ -35,10 +35,8 @@ spectrum.orders
 
 # We can see the `order` is a vector of [`Tropical`](@ref) numbers.
 # Similarly, we can get weighted independent sets with maximum 5 sizes as follows.
-max5_configs = solve(problem, SingleConfigMax(5))[]
+max5_configs = read_config(solve(problem, SingleConfigMax(5))[])
 
-# The return value also has type [`ExtendedTropical`](@ref), but this time the element type of `orders` has been changed to [`CountingTropical`](@ref)`{Float64,`[`ConfigSampler`](@ref)`}`.
-max5_configs.orders
-
+# The return value of `solve` has type [`ExtendedTropical`](@ref), but this time the element type of `orders` has been changed to [`CountingTropical`](@ref)`{Float64,`[`ConfigSampler`](@ref)`}`.
 # Let us visually check these configurations
-show_configs(graph, locations, [max5_configs.orders[j].c.data for i=1:1, j=1:5]; padding_left=20)
+show_configs(graph, locations, [max5_configs[j] for i=1:1, j=1:5]; padding_left=20)

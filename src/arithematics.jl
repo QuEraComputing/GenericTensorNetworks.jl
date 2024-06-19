@@ -164,9 +164,11 @@ function Base.show(io::IO, ::MIME"text/plain", x::TruncatedPoly{K}) where K
     if isinf(x.maxorder)
         print(io, 0)
     else
-        printpoly(io, Polynomial([x.coeffs...], :x), offset=Int(x.maxorder-K+1))
+        print(io, Polynomial(x))
     end
 end
+Polynomials.Polynomial(x::TruncatedPoly{K, T}) where {K, T} = Polynomial(vcat(zeros(T, Int(x.maxorder)-K+1), [x.coeffs...]))
+Polynomials.LaurentPolynomial(x::TruncatedPoly{K, T}) where {K, T} = LaurentPolynomial([x.coeffs...], Int(x.maxorder-K+1))
 
 Base.literal_pow(::typeof(^), a::TruncatedPoly, ::Val{b}) where b = a ^ b
 function Base.:^(x::TruncatedPoly{K,T,TO}, b::Integer) where {K,T,TO}
@@ -931,3 +933,61 @@ post_invert_exponent(t::TruncatedPoly{K}) where K = TruncatedPoly(ntuple(i->t.co
 post_invert_exponent(t::LaurentPolynomial) = error("This method is not implemented yet, please file an issue if you find a using case!")
 post_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
 post_invert_exponent(t::ExtendedTropical{K}) where K = ExtendedTropical{K}(map(i->inv(t.orders[i]), K:-1:1))
+
+# Data reading
+"""
+    read_size(x)
+
+Read the size information from the generic element.
+"""
+read_size(x::Tropical) = x.n
+read_size(x::ExtendedTropical) = x.orders
+
+"""
+    read_count(x)
+
+Read the counting information from the generic element.
+"""
+function read_count end
+
+"""
+    read_size_count(x)
+
+Read the size and counting information from the generic element.
+"""
+read_size_count(x::CountingTropical{TV, T}) where {TV, T<:Real} = x.n => x.c
+read_size_count(x::TruncatedPoly{K, T}) where {K, T<:Real} = [(x.maxorder-K+i => x.coeffs[i]) for i=1:K]
+read_size_count(x::Polynomial{<:Real}) = [(i-1 => x.coeffs[i]) for i=1:length(x.coeffs)]
+read_size_count(x::LaurentPolynomial{<:Real}) = [(i-1+x.order[] => x.coeffs[i]) for i=1:length(x.coeffs)]
+for T in [:(CountingTropical{TV, <:Real} where TV), :(TruncatedPoly{K, <:Real} where K), :(Polynomial{<:Real}), :(LaurentPolynomial{<:Real})]
+    @eval read_size(x::$T) = extract_first(read_size_count(x))
+    @eval read_count(x::$T) = extract_second(read_size_count(x))
+end
+extract_first(x::Pair) = x.first
+extract_second(x::Pair) = x.second
+extract_first(x::AbstractVector{<:Pair}) = getfield.(x, :first)
+extract_second(x::AbstractVector{<:Pair}) = getfield.(x, :second)
+
+"""
+    read_config(x; keeptree=false)
+
+Read the configuration information from the generic element, if `keeptree=true`, the tree structure will not be flattened.
+"""
+read_config(x::ConfigEnumerator; keeptree=false) = x.data
+read_config(x::SumProductTree; keeptree=false) = keeptree ? x : collect(x)
+read_config(x::ConfigSampler; keeptree=false) = x.data
+
+"""
+    read_size_config(x; keeptree=false)
+
+Read the size and configuration information from the generic element. If `keeptree=true`, the tree structure will not be flattened.
+"""
+read_size_config(x::TruncatedPoly{K, T}; keeptree=false) where {K, T<:AbstractSetNumber} = [(x.maxorder-K+i => read_config(x.coeffs[i]; keeptree)) for i=1:K]
+read_size_config(x::CountingTropical{TV, T}; keeptree=false) where {TV, T<:AbstractSetNumber} = x.n => read_config(x.c; keeptree)
+read_size_config(x::ExtendedTropical{N, CountingTropical{TV, T}}; keeptree=false) where {N, TV, T<:AbstractSetNumber} = read_size_config.(x.orders; keeptree)
+read_size_config(x::Polynomial{T}; keeptree=false) where T<:AbstractSetNumber = [(i-1 => read_config(x.coeffs[i]; keeptree)) for i=1:length(x.coeffs)]
+read_size_config(x::LaurentPolynomial{T}; keeptree=false) where T<:AbstractSetNumber = [(i-1+x.order[] => read_config(x.coeffs[i]; keeptree)) for i=1:length(x.coeffs)]
+for T in [:(CountingTropical{TV, <:AbstractSetNumber} where TV), :(TruncatedPoly{K, <:AbstractSetNumber} where K), :(Polynomial{<:AbstractSetNumber}), :(LaurentPolynomial{<:AbstractSetNumber}), :(ExtendedTropical{N, CountingTropical{TV, S}} where {N, TV, S<:AbstractSetNumber})]
+    @eval read_size(x::$T) = extract_first(read_size_config(x; keeptree=true))
+    @eval read_config(x::$T; keeptree=false) = extract_second(read_size_config(x; keeptree))
+end

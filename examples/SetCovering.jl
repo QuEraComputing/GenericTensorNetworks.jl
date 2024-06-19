@@ -68,7 +68,7 @@ counting_minimum_setcovering = solve(problem, CountingMin())[]
 # ### Configuration properties
 # ##### Finding minimum set covering
 # One can enumerate all minimum set covering with the [`ConfigsMin`](@ref) property in the program.
-min_configs = solve(problem, ConfigsMin())[].c
+min_configs = read_config(solve(problem, ConfigsMin())[])
 
 # Hence the two optimal solutions are ``\{z_1, z_3, z_5, z_6\}`` and ``\{z_2, z_3, z_4, z_5\}``.
 # The correctness of this result can be checked with the [`is_set_covering`](@ref) function.

@@ -79,7 +79,7 @@ partition_function = solve(problem, GraphPolynomial())[]
 
 # ### Configuration properties
 #  The ground state of the spin glass problem can be found by the [`SingleConfigMin`](@ref) solver.
-ground_state = solve(problem, SingleConfigMin())[].c.data
+ground_state = read_config(solve(problem, SingleConfigMin())[])
 
 # The energy of the ground state can be verified by the [`spinglass_energy`](@ref) function.
 Emin_verify = spinglass_energy(spinglass, ground_state)
@@ -153,7 +153,7 @@ poly = solve(hyperproblem, GraphPolynomial())[]
 
 # ### Configuration properties
 # The ground state of the spin glass problem can be found by the [`SingleConfigMin`](@ref) solver.
-ground_state = solve(hyperproblem, SingleConfigMin())[].c.data
+ground_state = read_config(solve(hyperproblem, SingleConfigMin())[])
 
 # The energy of the ground state can be verified by the [`spinglass_energy`](@ref) function.
 

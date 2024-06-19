@@ -70,7 +70,7 @@ max_config = solve(problem, GraphPolynomial())[]
 
 # ### Configuration properties
 # ##### finding one max cut solution
-max_vertex_config = solve(problem, SingleConfigMax())[].c.data
+max_vertex_config = read_config(solve(problem, SingleConfigMax())[])
 
 max_cut_size_verify = cut_size(graph, max_vertex_config)
 

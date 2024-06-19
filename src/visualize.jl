@@ -23,8 +23,7 @@ Positional arguments
 
 Keyword arguments
 -----------------------------
-* `tensor_locs` is a vector of tuples for specifying the vertex locations.
-* `label_locs` is a vector of tuples for specifying the vertex locations.
+* `locs` is a tuple of `tensor_locs` (vector) and `label_locs` (dict).
 * `spring` is switch to use spring method to optimize the location.
 * `optimal_distance` is a optimal distance parameter for `spring` optimizer.
 
@@ -52,18 +51,18 @@ function show_einsum(ein::AbstractEinsum;
         tensor_text_color="white",
         annotate_labels=true,
         annotate_tensors=false,
-        tensor_locs=nothing,
-        label_locs=nothing,  # dict
-        layout::Symbol=:auto,
-        optimal_distance=25.0,
-        filename=nothing,
+        layout = SpringLayout(),
+        locs = nothing,  # dict
+        filename = nothing,
         format=:svg,
         padding_left=10.0,
         padding_right=10.0,
         padding_top=10.0,
         padding_bottom=10.0,
         config=LuxorGraphPlot.GraphDisplayConfig(; vertex_line_width=0.0),
+        tensor_texts = nothing,
         )
+    layout = deepcopy(layout)
     ixs = getixsv(ein)
     iy = getiyv(ein)
     labels = uniquelabels(ein)
@@ -72,7 +71,10 @@ function show_einsum(ein::AbstractEinsum;
     labelmap = Dict(zip(labels, 1:m))
     colors = [["transparent" for l in labels]..., fill(tensor_color, n)...]
     sizes = [fill(label_size, m)..., fill(tensor_size, n)...]
-    texts = [[annotate_labels ? "$(labels[i])" : "" for i=1:m]..., [annotate_tensors ? "$i" : "" for i=1:n]...]
+    if tensor_texts === nothing
+        tensor_texts = [annotate_tensors ? "$i" : "" for i=1:n]
+    end
+    texts = [[annotate_labels ? "$(labels[i])" : "" for i=1:m]..., tensor_texts...]
     vertex_text_colors = [[l ∈ iy ? open_label_color : label_color for l in labels]..., [tensor_text_color for ix in ixs]...]
     graph = SimpleGraph(m+n)
     for (j, ix) in enumerate(ixs)
@@ -80,18 +82,14 @@ function show_einsum(ein::AbstractEinsum;
             add_edge!(graph, j+m, labelmap[l])
         end
     end
-    if label_locs === nothing && tensor_locs === nothing
-        locs = LuxorGraphPlot.render_locs(graph, LuxorGraphPlot.Layout(layout; optimal_distance, spring_mask = trues(nv(graph))))
-    elseif label_locs === nothing
-        # infer label locs from tensor locs
-        label_locs = [(lst = [iloc for (iloc,ix) in zip(tensor_locs, ixs) if l ∈ ix]; reduce((x,y)->x .+ y, lst) ./ length(lst)) for l in labels]
-        locs = [label_locs..., tensor_locs...]
-    elseif tensor_locs === nothing
-        # infer tensor locs from label locs
-        tensor_locs = [length(ix) == 0 ? (optimal_distance*randn(), optimal_distance*randn()) : reduce((x,y)-> x .+ y, [label_locs[l] for l in ix]) ./ length(ix) for ix in ixs]
-        locs = [label_locs..., tensor_locs...]
+    if locs === nothing
+        locs = getfield.(LuxorGraphPlot.render_locs(graph, layout), :data)
     else
-        locs = [label_locs..., tensor_locs...]
+        tensor_locs, label_locs = locs
+        @assert tensor_locs isa AbstractVector && label_locs isa AbstractDict "locs should be a tuple of `tensor_locs` (vector) and `label_locs` (dict)"
+        @assert length(tensor_locs) == n "the length of tensor_locs should be $n"
+        @assert length(label_locs) == m "the length of label_locs should be $m"
+        locs = [[label_locs[l] for l in labels]..., tensor_locs...]
     end
     show_graph(GraphViz(; locs, edges=[(e.src, e.dst) for e in edges(graph)], texts, vertex_colors=colors,
         vertex_text_colors,
@@ -114,10 +112,70 @@ function show_configs(graph::SimpleGraph, locs, configs::AbstractMatrix;
         nflavor::Int=2,
         kwargs...)
     cmap = range(colorant"white", stop=colorant"red", length=nflavor)
-    locs = render_locs(graph, locs)
     graphs = map(configs) do cfg
         @assert all(0 .<= cfg .<= nflavor-1)
-        GraphViz(graph; locs, vertex_colors=cmap[cfg .+ 1])
+        GraphViz(graph, locs; vertex_colors=cmap[cfg .+ 1])
     end
     show_gallery(graphs; kwargs...)
+end
+
+"""
+    show_landscape(is_neighbor, configurations::TruncatedPoly;
+        layer_distance=200,
+        config=GraphDisplayConfig(; edge_color="gray", vertex_stroke_color="transparent", vertex_size=5),
+        layout_method=:spring,
+        optimal_distance=30.0,
+        colors=fill("green", K),
+        kwargs...)
+
+Show the energy landscape of configurations.
+
+### Arguments
+- `is_neighbor`: a function to determine if two configurations are neighbors.
+- `configurations`: a TruncatedPoly object, which is the default output of the [`solve`](@ref) function with [`ConfigsMax`](@ref) property as the argument.
+
+### Keyword arguments
+- `layer_distance`: the distance between layers.
+- `config`: a `LuxorGraphPlot.GraphDisplayConfig` object.
+- `layout_method`: the layout method, either `:spring`, `:stress` or `:spectral`
+- `optimal_distance`: the optimal distance for the layout.
+- `colors`: a vector of colors for each layer.
+- `kwargs...`: other keyword arguments passed to `show_graph`.
+"""
+function show_landscape(is_neighbor, configurations::TruncatedPoly{K};
+            layer_distance=200,
+            config=GraphDisplayConfig(; edge_color="gray", vertex_stroke_color="transparent", vertex_size=5),
+            layout_method = :spring,
+            optimal_distance = 30.0,
+            colors=fill("green", K),
+        kwargs...) where K
+    @assert length(colors) == K "colors should have length $K"
+    nv = 0
+    kv = read_size_config(configurations)
+    zlocs = Float64[]
+    vertex_colors = String[]
+    for (c, (k, v)) in zip(colors, kv)
+        nv += length(v)
+        append!(zlocs, fill(k*layer_distance, length(v)))
+        append!(vertex_colors, fill(c, length(v)))
+    end
+    graph = SimpleGraph(nv)
+    configs = vcat(getindex.(kv, 2)...)
+    for (i, c) in enumerate(configs)
+        for (j, d) in enumerate(configs)
+            if is_neighbor(c, d)
+                add_edge!(graph, i, j)
+            end
+        end
+    end
+    if layout_method == :spring
+        layout=LayeredSpringLayout(; zlocs, optimal_distance)
+    elseif layout_method == :stress
+        layout=LayeredStressLayout(; zlocs, optimal_distance)
+    elseif layout_method == :spectral
+        layout=LuxorGraphPlot.Layered(SpectralLayout(), zlocs, 0.2)
+    else
+        error("layout_method should be :spring, :stress or :spectral")
+    end
+    show_graph(graph, layout; config, vertex_colors, kwargs...)
 end

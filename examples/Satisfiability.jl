@@ -52,10 +52,10 @@ problem = GenericTensorNetwork(sat)
 num_satisfiable = solve(problem, SizeMax())[]
 
 # The [`GraphPolynomial`](@ref) of a satisfiability problem counts the number of solutions that `k` clauses satisfied.
-num_satisfiable_count = solve(problem, GraphPolynomial())[]
+num_satisfiable_count = read_size_count(solve(problem, GraphPolynomial())[])
 
 # #### Find one of the solutions
-single_config = solve(problem, SingleConfigMax())[].c.data
+single_config = read_config(solve(problem, SingleConfigMax())[])
 
 # One will see a bit vector printed.
 # One can create an assignment and check the validity with the following statement:

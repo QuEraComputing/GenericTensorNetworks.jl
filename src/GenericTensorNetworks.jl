@@ -8,6 +8,7 @@ using Graphs, Random
 using DelimitedFiles, Serialization, Printf
 using LuxorGraphPlot
 using LuxorGraphPlot.Luxor.Colors: @colorant_str
+using LuxorGraphPlot: Layered
 import Polynomials
 using Polynomials: Polynomial, LaurentPolynomial, printpoly, fit
 using FFTW
@@ -25,7 +26,7 @@ export GreedyMethod, TreeSA, SABipartite, KaHyParBipartite, MergeVectors, MergeG
 export estimate_memory
 
 # Algebras
-export StaticBitVector, StaticElementVector, @bv_str
+export StaticBitVector, StaticElementVector, @bv_str, hamming_distance
 export is_commutative_semiring
 export Max2Poly, TruncatedPoly, Polynomial, LaurentPolynomial, Tropical, CountingTropical, StaticElementVector, Mod
 export ConfigEnumerator, onehotv, ConfigSampler, SumProductTree
@@ -59,8 +60,12 @@ export solve, SizeMax, SizeMin, PartitionFunction, CountingAll, CountingMax, Cou
 # Utilities
 export save_configs, load_configs, hamming_distribution, save_sumproduct, load_sumproduct
 
+# Readers
+export read_size, read_count, read_config, read_size_count, read_size_config
+
 # Visualization
-export show_graph, spring_layout!, show_configs, show_einsum, GraphDisplayConfig, Layout, render_locs
+export show_graph, show_configs, show_einsum, GraphDisplayConfig, render_locs, show_landscape
+export AbstractLayout, SpringLayout, StressLayout, SpectralLayout, Layered, LayeredSpringLayout, LayeredStressLayout
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 

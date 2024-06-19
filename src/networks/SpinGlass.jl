@@ -77,6 +77,7 @@ where ``C`` is the set of cliques, and ``w_c`` is the weight of the clique ``c``
 """
 function spinglass_energy(cliques::AbstractVector{Vector{Int}}, config; weights=UnitWeight())::Real
     size = zero(eltype(weights))
+    @assert all(x->x == 0 || x == 1, config)
     s = 1 .- 2 .* Int.(config)  # 0 -> spin 1, 1 -> spin -1
     for (i, spins) in enumerate(cliques)
         size += prod(s[spins]) * weights[i]

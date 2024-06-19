@@ -49,6 +49,7 @@ problem = GenericTensorNetwork(matching)
 # ## Solving properties
 # The maximum matching size can be obtained by
 max_matching = solve(problem, SizeMax())[]
+read_size(max_matching)
 # The largest number of matching is 5, which means we have a perfect matching (vertices are all paired).
 
 # The graph polynomial defined for the matching problem is known as the matching polynomial.
@@ -59,14 +60,16 @@ max_matching = solve(problem, SizeMax())[]
 # where ``k`` is the number of matches, and coefficients ``c_k`` are the corresponding counting.
 
 matching_poly = solve(problem, GraphPolynomial())[]
+read_size_count(matching_poly)
 
 # ### Configuration properties
 
 # ##### one of the perfect matches
 match_config = solve(problem, SingleConfigMax())[]
+read_size_config(match_config)
 
 # Let us show the result by coloring the matched edges to red
 show_graph(graph, locations; format=:svg, edge_colors=
-    [isone(match_config.c.data[i]) ? "red" : "black" for i=1:ne(graph)])
+    [isone(read_config(match_config)[i]) ? "red" : "black" for i=1:ne(graph)])
 
 # where we use edges with red color to related pairs of matched vertices.

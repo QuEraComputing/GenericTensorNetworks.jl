@@ -69,7 +69,7 @@ counting_maximum_set_packing = solve(problem, CountingMax())[]
 # ### Configuration properties
 # ##### Finding maximum set packing
 # One can enumerate all maximum set packing with the [`ConfigsMax`](@ref) property in the program.
-max_configs = solve(problem, ConfigsMax())[].c
+max_configs = read_config(solve(problem, ConfigsMax())[])
 
 # Hence the only optimal solution is ``\{z_1, z_3, z_6\}`` that has size 3.
 # The correctness of this result can be checked with the [`is_set_packing`](@ref) function.

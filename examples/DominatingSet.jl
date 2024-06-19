@@ -68,7 +68,7 @@ counting_min_dominating_set = solve(problem, CountingMin())[]
 # ### Configuration properties
 # ##### finding minimum dominating set
 # One can enumerate all minimum dominating sets with the [`ConfigsMin`](@ref) property in the program.
-min_configs = solve(problem, ConfigsMin())[].c
+min_configs = read_config(solve(problem, ConfigsMin())[])
 
 all(c->is_dominating_set(graph, c), min_configs)
 

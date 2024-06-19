@@ -8,6 +8,8 @@ using LinearAlgebra
     p1 = TruncatedPoly((2,2,1), 2.0)
     p2 = TruncatedPoly((2,3,9), 4.0)
     x = Polynomial([2, 2, 1])
+    @test Polynomial(p1) == x
+    @test LaurentPolynomial(p1) == x
     y = Polynomial([0, 0, 2, 3, 9])
     r1 = p1 + p2
     r2 = p2 + p1
@@ -203,4 +205,13 @@ end
 
 @testset "LaurentPolynomial" begin
     @test GenericTensorNetworks._x(LaurentPolynomial{Float64, :x}; invert=false) == GenericTensorNetworks._x(Polynomial{Float64, :x}; invert=false)
+end
+
+@testset "readers" begin
+    x = TruncatedPoly((2,3), 5)
+    @test read_size_count(x) == [4=>2, 5=>3]
+    s4 = [StaticBitVector(trues(10)) for j=1:3]
+    s5 = [StaticBitVector(trues(10)) for j=1:4]
+    x = TruncatedPoly((ConfigEnumerator(s4), ConfigEnumerator(s5)), 5)
+    @test read_size_config(x) == [4=>s4, 5=>s5]
 end

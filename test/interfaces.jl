@@ -14,6 +14,7 @@ using Graphs, Test, Random
         res3 = solve(gp, CountingMax(Single))[]
         res4 = solve(gp, CountingMax(2))[]
         res5 = solve(gp, GraphPolynomial(; method = :polynomial))[]
+        res5b = solve(gp, GraphPolynomial(; method = :laurent))[]
         res6 = solve(gp, SingleConfigMax())[]
         res7 = solve(gp, ConfigsMax(;bounded=false))[]
         res8 = solve(gp, ConfigsMax(2; bounded=false))[]
@@ -27,18 +28,50 @@ using Graphs, Test, Random
         res16 = solve(gp, ConfigsMax(2; bounded=true))[]
         res17 = solve(gp, ConfigsMax(3; bounded=true))[]
         res18 = solve(gp, PartitionFunction(0.0))[]
-        @test res1.n == 4
+        @test res1.n == 4 == read_size(res1)
         @test res2 == 76
-        @test res3.n == 4 && res3.c == 5
-        @test res4.maxorder == 4 && res4.coeffs[1] == 30 && res4.coeffs[2]==5
+        res3n, res3c = read_size_count(res3)
+        @test read_count(res3) == res3c
+        @test read_size(res3) == res3n
+        @test res3.n == 4 == res3n && res3.c == 5 == res3c
+        res4nc = read_size_count(res4)
+        @test read_size(res4) == getfield.(res4nc, :first)
+        @test read_count(res4) == getfield.(res4nc, :second)
+        @test res4.maxorder == 4 == res4nc[end].first && res4.coeffs[1] == 30 == res4nc[1].second && res4.coeffs[2]==5 == res4nc[2].second
+        @test read_size_count(res5) == [0=>1.0, 1=>10.0, 2=>30.0, 3=>30.0, 4=>5.0]
         @test res5 == Polynomial([1.0, 10.0, 30, 30, 5])
+        @test read_size_count(res5b) == [0=>1.0, 1=>10.0, 2=>30.0, 3=>30.0, 4=>5.0]
+        @test read_size(res5b) == getfield.(read_size_count(res5), :first)
+        @test read_count(res5b) == getfield.(read_size_count(res5), :second)
+        @test res5b == LaurentPolynomial([1.0, 10.0, 30, 30, 5])
+        res6n, res6c = read_size_config(res6)
+        @test read_size(res6) == res6n
+        @test read_config(res6) == res6c
+        res7n, res7c = read_size_config(res7)
+        @test read_size(res7) == res7n
+        @test read_config(res7) == res7c
         @test res6.c.data ∈ res7.c.data
+        @test res6n == res6n
+        @test res6c ∈ res7c
         @test all(x->sum(x) == 4, res7.c.data)
+        res8nc = read_size_config(res8)
+        @test read_size(res8) == getfield.(res8nc, :first)
+        @test read_config(res8) == getfield.(res8nc, :second)
+        res8p = Polynomial(res8)
+        order = length(res8p.coeffs)
+        @test read_size(res8p)[order-1:order] == getfield.(res8nc, :first)
+        @test read_config(res8p)[order-1:order] == getfield.(res8nc, :second)
+        @test res8nc[1].second == res8.coeffs[1].data
         @test all(x->sum(x) == 3, res8.coeffs[1].data) && all(x->sum(x) == 4, res8.coeffs[2].data) && length(res8.coeffs[1].data) == 30 && length(res8.coeffs[2].data) == 5
+        res9c = read_config(res9)
+        @test res9c == res9.data
         @test length(unique(res9.data)) == 76 && all(c->is_independent_set(g, c), res9.data)
         @test res10 ≈ res5
         @test res11 == res5
-        @test res12.c.data ∈ res13.c.data
+        res12n, res12c = read_size_config(res12)
+        @test res12n == res12.n
+        @test res12c == res12.c.data
+        @test res12.c.data ∈ res13.c.data 
         @test res13.c == res7.c
         @test res14.maxorder == 4 && res14.coeffs[1]==30 && res14.coeffs[2] == 30 && res14.coeffs[3]==5
         @test all(x->sum(x) == 2, res15.coeffs[1].data) && all(x->sum(x) == 3, res15.coeffs[2].data) && all(x->sum(x) == 4, res15.coeffs[3].data) &&
@@ -115,6 +148,8 @@ end
     res5 = solve(gp, SizeMax(6))[]
     @test res5.orders == Tropical.([3.0,4,4,4,4,4] ./ 2)
     res6 = solve(gp, SingleConfigMax(6))[]
+    res6c = read_config(res6)
+    @test res6c == getfield.(getfield.(res6.orders, :c), :data)
     @test all(enumerate(res6.orders)) do r
         i, o = r
         is_independent_set(g, o.c.data) && count_ones(o.c.data) == (i==1 ? 3 : 4)
@@ -130,25 +165,32 @@ end
     @test length(res1) == length(res2)
     @test Set(res2 |> collect) == Set(res1 |> collect)
 
-    res1 = solve(gp, ConfigsMax(; tree_storage=true))[].c
+    res1 = solve(gp, ConfigsMax(; tree_storage=true))[]
     res2 = solve(gp, ConfigsMax(; tree_storage=false))[].c
-    @test res1 isa SumProductTree && res2 isa ConfigEnumerator
-    @test length(res1) == length(res2)
-    @test Set(res2 |> collect) == Set(res1 |> collect)
+    res1n, res1c = read_size_config(res1)
+    @test read_size(res1) == res1n
+    @test read_config(res1) == res1c
+    @test res1c == collect(res1.c)
+    @test res1.c isa SumProductTree && res2 isa ConfigEnumerator
+    @test length(res1.c) == length(res2)
+    @test Set(res2 |> collect) == Set(res1.c |> collect)
 
-    res1s = solve(gp, ConfigsMax(2; tree_storage=true))[].coeffs
+    res1s = solve(gp, ConfigsMax(2; tree_storage=true))[]
     res2s = solve(gp, ConfigsMax(2; tree_storage=false))[].coeffs
-    for (res1, res2) in zip(res1s, res2s)
+    res1ncs = read_size_config(res1s)
+    @test length(res1ncs) == 2
+    @test res1ncs[1].second == collect(res1s.coeffs[1])
+    for (res1, res2) in zip(res1s.coeffs, res2s)
         @test res1 isa SumProductTree && res2 isa ConfigEnumerator
         @test length(res1) == length(res2)
         @test Set(res2 |> collect) == Set(res1 |> collect)
     end
 
-    res1 = solve(gp, ConfigsMin(; tree_storage=true))[].c
+    res1 = solve(gp, ConfigsMin(; tree_storage=true))[]
     res2 = solve(gp, ConfigsMin(; tree_storage=false))[].c
-    @test res1 isa SumProductTree && res2 isa ConfigEnumerator
-    @test length(res1) == length(res2)
-    @test Set(res2 |> collect) == Set(res1 |> collect)
+    @test res1.c isa SumProductTree && res2 isa ConfigEnumerator
+    @test length(res1.c) == length(res2)
+    @test Set(res2 |> collect) == Set(res1.c |> collect)
 
     res1s = solve(gp, ConfigsMin(2; tree_storage=true))[].coeffs
     res2s = solve(gp, ConfigsMin(2; tree_storage=false))[].coeffs

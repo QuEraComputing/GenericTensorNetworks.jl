@@ -99,6 +99,18 @@ ConfigSampler
 
 `GenericTensorNetworks` also exports the [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2) and [`LaurentPolynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomials.LaurentPolynomial) types defined in package `Polynomials`.
 
+
+For reading the properties from the above element types, one can use the following functions.
+
+```@docs
+read_size
+read_config
+read_size_count
+read_size_config
+```
+
+The following functions are for saving and loading configurations.
+
 ```@docs
 StaticBitVector
 StaticElementVector

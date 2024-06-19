@@ -933,18 +933,66 @@ post_invert_exponent(t::TropicalNumbers.TropicalTypes) = inv(t)
 post_invert_exponent(t::ExtendedTropical{K}) where K = ExtendedTropical{K}(map(i->inv(t.orders[i]), K:-1:1))
 
 # Data reading
+"""
+    read_size(x)
+
+Read the size information from the generic element. The input argument `x` can be
+- [`Tropical`](@ref)
+- [`ExtendedTropical`](@ref)
+
+The relevant properties are
+- [`SizeMax`](@ref)
+- [`SizeMin`](@ref)
+"""
 read_size(x::Tropical) = x.n
 read_size(x::ExtendedTropical) = x.orders
 
+"""
+    read_size_count(x)
+
+Read the size and counting information from the generic element. The input argument `x` can be
+- [`CountingTropical`](@ref)
+- [`TruncatedPoly`](@ref)
+- `Polynomial` defined in Polynomials.jl
+- `LaurentPolynomial` defined in Polynomials.jl
+
+The relevant properties are
+- [`CountingMax`](@ref)
+- [`CountingMin`](@ref)
+- [`GraphPolynomial`](@ref)
+"""
 read_size_count(x::CountingTropical{TV, T}) where {TV, T<:Real} = x.n => x.c
 read_size_count(x::TruncatedPoly{K, T}) where {K, T<:Real} = [(x.maxorder-K+i => x.coeffs[i]) for i=1:K]
 read_size_count(x::Polynomial) = [(i-1 => x.coeffs[i]) for i=1:length(x.coeffs)]
+read_size_count(x::LaurentPolynomial) = [(i-1+x.order[] => x.coeffs[i]) for i=1:length(x.coeffs)]
 
-read_size_config(x::TruncatedPoly{K, T}) where {K, T<:Union{ConfigEnumerator, ConfigSampler}} = [(x.maxorder-K+i => read_config(x.coeffs[i])) for i=1:K]
-read_size_config(x::CountingTropical{TV, T}) where {TV, T<:Union{ConfigEnumerator, ConfigSampler}} = x.n => read_config(x.c)
+"""
+    read_size_config(x)
 
-read_size_singleconfig(x::TruncatedPoly{K, T}) where {K, T<:ConfigSampler} = [(x.maxorder-K+i => x.coeffs[i].data) for i=1:K]
+Read the size and configuration information from the generic element. The input argument `x` can be
+- [`TruncatedPoly`](@ref), with coefficients being [`ConfigEnumerator`](@ref), [`SumProductTree`](@ref) or [`ConfigSampler`](@ref)
+- [`CountingTropical`](@ref), with coefficients being [`ConfigEnumerator`](@ref), [`SumProductTree`](@ref) or [`ConfigSampler`](@ref)
 
+The relevant properties are
+- [`ConfigsMax`](@ref)
+- [`ConfigsMin`](@ref)
+- [`SingleConfigMax`](@ref)
+- [`SingleConfigMin`](@ref)
+"""
+read_size_config(x::TruncatedPoly{K, T}) where {K, T<:Union{ConfigEnumerator, SumProductTree, ConfigSampler}} = [(x.maxorder-K+i => read_config(x.coeffs[i])) for i=1:K]
+read_size_config(x::CountingTropical{TV, T}) where {TV, T<:Union{ConfigEnumerator, SumProductTree, ConfigSampler}} = x.n => read_config(x.c)
+
+"""
+    read_config(x)
+
+Read the configuration information from the generic element. The input argument `x` can be
+- [`ConfigEnumerator`](@ref)
+- [`SumProductTree`](@ref)
+- [`ConfigSampler`](@ref)
+
+The relevant properties are
+- [`ConfigsAll`](@ref)
+"""
 read_config(x::ConfigEnumerator) = x.data
 read_config(x::SumProductTree) = collect(x)
 read_config(x::ConfigSampler) = x.data

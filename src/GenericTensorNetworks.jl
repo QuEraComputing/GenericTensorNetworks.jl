@@ -61,7 +61,7 @@ export solve, SizeMax, SizeMin, PartitionFunction, CountingAll, CountingMax, Cou
 export save_configs, load_configs, hamming_distribution, save_sumproduct, load_sumproduct
 
 # Readers
-export read_size, read_config, read_size_count, read_size_config
+export read_size, read_count, read_config, read_size_count, read_size_config
 
 # Visualization
 export show_graph, show_configs, show_einsum, GraphDisplayConfig, render_locs, show_landscape

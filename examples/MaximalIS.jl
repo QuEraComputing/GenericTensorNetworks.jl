@@ -66,7 +66,7 @@ counting_min_maximal_independent_set = solve(problem, CountingMin())[]
 
 # ### Configuration properties
 # ##### finding all maximal independent set
-maximal_configs = solve(problem, ConfigsAll())[]
+maximal_configs = read_config(solve(problem, ConfigsAll())[])
 
 all(c->is_maximal_independent_set(graph, c), maximal_configs)
 
@@ -81,7 +81,7 @@ cliques = maximal_cliques(complement(graph))
 
 # ##### finding minimum maximal independent set
 # It is the [`ConfigsMin`](@ref) property in the program.
-minimum_maximal_configs = solve(problem, ConfigsMin())[].c
+minimum_maximal_configs = read_config(solve(problem, ConfigsMin())[])
 
 show_configs(graph, locations, reshape(collect(minimum_maximal_configs), 2, 5); padding_left=20)
 

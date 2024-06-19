@@ -104,6 +104,7 @@ For reading the properties from the above element types, one can use the followi
 
 ```@docs
 read_size
+read_count
 read_config
 read_size_count
 read_size_config

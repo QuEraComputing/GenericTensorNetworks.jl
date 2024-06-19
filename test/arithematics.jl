@@ -8,6 +8,8 @@ using LinearAlgebra
     p1 = TruncatedPoly((2,2,1), 2.0)
     p2 = TruncatedPoly((2,3,9), 4.0)
     x = Polynomial([2, 2, 1])
+    @test Polynomial(p1) == x
+    @test LaurentPolynomial(p1) == x
     y = Polynomial([0, 0, 2, 3, 9])
     r1 = p1 + p2
     r2 = p2 + p1

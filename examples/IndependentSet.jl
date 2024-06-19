@@ -65,7 +65,7 @@ maximum_independent_set_size = solve(problem, SizeMax())[]
 
 # Here [`SizeMax`](@ref) means finding the solution with maximum set size.
 # The return value has [`Tropical`](@ref) type. We can get its content by typing
-maximum_independent_set_size.n
+read_size(maximum_independent_set_size)
 
 # ### Counting properties
 # ##### Count all solutions and best several solutions
@@ -81,7 +81,7 @@ count_maximum_independent_sets = solve(problem, CountingMax())[]
 # The return value has type [`CountingTropical`](@ref), which contains two fields.
 # They are `n` being the maximum independent set size and `c` being the number of the maximum independent sets.
 
-count_maximum_independent_sets.c
+read_size_count(count_maximum_independent_sets)
 
 # Similarly, we can count independent sets of sizes ``\alpha(G)`` and ``\alpha(G)-1`` by feeding an integer positional argument to [`CountingMax`](@ref).
 count_max2_independent_sets = solve(problem, CountingMax(2))[]
@@ -89,7 +89,7 @@ count_max2_independent_sets = solve(problem, CountingMax(2))[]
 # The return value has type [`TruncatedPoly`](@ref), which contains two fields.
 # They are `maxorder` being the maximum independent set size and `coeffs` being the number of independent sets having sizes ``\alpha(G)-1`` and ``\alpha(G)``.
 
-count_max2_independent_sets.coeffs
+read_size_count(count_max2_independent_sets)
 
 # ##### Find the graph polynomial
 # We can count the number of independent sets at any size, which is equivalent to finding the coefficients of an independence polynomial that defined as
@@ -104,7 +104,7 @@ count_max2_independent_sets.coeffs
 independence_polynomial = solve(problem, GraphPolynomial(; method=:finitefield))[]
 
 # The return type is [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2).
-independence_polynomial.coeffs
+read_size_count(independence_polynomial)
 
 # ### Configuration properties
 # ##### Find one best solution
@@ -116,7 +116,7 @@ independence_polynomial.coeffs
 max_config = solve(problem, SingleConfigMax(; bounded=false))[]
 
 # The return value has type [`CountingTropical`](@ref) with its counting field having [`ConfigSampler`](@ref) type. The `data` field of [`ConfigSampler`](@ref) is a bit string that corresponds to the solution
-single_solution = max_config.c.data
+single_solution = read_config(max_config)
 
 # This bit string should be read from left to right, with the i-th bit being 1 (0) to indicate the i-th vertex is present (absent) in the set.
 # We can visualize this MIS with the following function.
@@ -130,10 +130,10 @@ all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]
 
 # The return value has type [`CountingTropical`](@ref), while its counting field having type [`ConfigEnumerator`](@ref). The `data` field of a [`ConfigEnumerator`](@ref) instance contains a vector of bit strings.
 
-all_max_configs.c.data
+_, configs_vector = read_size_config(all_max_configs)
 
 # These solutions can be visualized with the [`show_configs`](@ref) function.
-show_configs(graph, locations, reshape(collect(all_max_configs.c), 1, length(all_max_configs.c)); padding_left=20)
+show_configs(graph, locations, reshape(configs_vector, 1, :); padding_left=20)
 
 # We can use [`ConfigsAll`](@ref) to enumerate all sets satisfying the independence constraint.
 all_independent_sets = solve(problem, ConfigsAll())[]

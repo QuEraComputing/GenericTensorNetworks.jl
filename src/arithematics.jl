@@ -164,7 +164,7 @@ function Base.show(io::IO, ::MIME"text/plain", x::TruncatedPoly{K}) where K
     if isinf(x.maxorder)
         print(io, 0)
     else
-        printpoly(io, LaurentPolynomial(x))
+        print(io, Polynomial(x))
     end
 end
 Polynomials.Polynomial(x::TruncatedPoly{K, T}) where {K, T} = Polynomial(vcat(zeros(T, Int(x.maxorder)-K+1), [x.coeffs...]))

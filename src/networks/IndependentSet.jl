@@ -53,24 +53,38 @@ end
 misv(vals) = vals
 
 """
-    mis_compactify!(tropicaltensor)
+    mis_compactify!(tropicaltensor; potential=nothing)
 
 Compactify tropical tensor for maximum independent set problem. It will eliminate
 some entries by setting them to zero, by the criteria that removing these entry
 does not change the MIS size of its parent graph (reference to be added).
+
+### Arguments
+- `tropicaltensor::AbstractArray{T}`: the tropical tensor
+
+### Keyword arguments
+- `potential=nothing`: the maximum possible MIS contribution from each open vertex
 """
-function mis_compactify!(a::AbstractArray{T}) where T <: TropicalTypes
+function mis_compactify!(a::AbstractArray{T, N}; potential=nothing) where {T <: TropicalTypes, N}
+    @assert potential === nothing || length(potential) == N "got unexpected potential length: $(length(potential)), expected $N"
 	for (ind_a, val_a) in enumerate(a)
 		for (ind_b, val_b) in enumerate(a)
 			bs_a = ind_a - 1
 			bs_b = ind_b - 1
-			@inbounds if bs_a != bs_b && val_a <= val_b && (bs_b & bs_a) == bs_b
-				a[ind_a] = zero(T)
-			end
+            if worse_than(bs_a, bs_b, val_a.n, val_b.n, potential)
+                @inbounds a[ind_a] = zero(T)
+            end
 		end
 	end
 	return a
 end
+function worse_than(bs_a::Integer, bs_b::Integer, val_a::T, val_b::T, potential::AbstractVector) where T
+    bs_a != bs_b && val_a + sum(k->readbit(bs_a, k) < readbit(bs_b, k) ? potential[k] : zero(T), 1:length(potential)) <= val_b
+end
+function worse_than(bs_a::Integer, bs_b::Integer, val_a::T, val_b::T, ::Nothing) where T
+    bs_a != bs_b && val_a <= val_b && (bs_b & bs_a) == bs_b
+end
+readbit(bs::Integer, k::Integer) = (bs >> (k-1)) & 1
 
 """
     is_independent_set(g::SimpleGraph, config)

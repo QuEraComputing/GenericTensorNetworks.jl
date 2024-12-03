@@ -8,16 +8,6 @@ Positional arguments
 * `graph` is the problem graph.
 * `weights` are associated with the vertices of the `graph`.
 """
-struct MaximalIS{WT<:Union{UnitWeight, Vector}} <: GraphProblem
-    graph::SimpleGraph
-    weights::WT
-    function MaximalIS(g::SimpleGraph, weights::Union{UnitWeight, Vector}=UnitWeight())
-        @assert weights isa UnitWeight || length(weights) == nv(g)
-        new{typeof(weights)}(g, weights)
-    end
-end
-
-flavors(::Type{<:MaximalIS}) = [0, 1]
 energy_terms(gp::MaximalIS) = [[Graphs.neighbors(gp.graph, v)..., v] for v in Graphs.vertices(gp.graph)]
 energy_tensors(x::T, c::MaximalIS) where T = [maximal_independent_set_tensor(_pow.(Ref(x), get_weights(c, i))..., degree(c.graph, i)+1) for i=1:nv(c.graph)]
 extra_terms(::MaximalIS) = Vector{Int}[]
@@ -27,7 +17,6 @@ labels(gp::MaximalIS) = [1:nv(gp.graph)...]
 # weights interface
 get_weights(c::MaximalIS) = c.weights
 get_weights(gp::MaximalIS, i::Int) = [0, gp.weights[i]]
-chweights(c::MaximalIS, weights) = MaximalIS(c.graph, weights)
 
 function maximal_independent_set_tensor(a::T, b::T, d::Int) where T
     t = zeros(T, fill(2, d)...)

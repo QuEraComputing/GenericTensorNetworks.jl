@@ -22,15 +22,6 @@ julia> solve(net, ConfigsMax())
 (4.0, {1010000011, 1001001100, 0100100110, 0101010001, 0010111000})ₜ
 ```
 """
-struct IndependentSet{WT} <: GraphProblem
-    graph::SimpleGraph{Int}
-    weights::WT
-    function IndependentSet(graph::SimpleGraph{Int}, weights::WT=UnitWeight()) where WT
-        @assert weights isa UnitWeight || length(weights) == nv(graph) "got unexpected weights for $(nv(graph))-vertex graph: $weights"
-        new{WT}(graph, weights)
-    end
-end
-flavors(::Type{<:IndependentSet}) = [0, 1]
 energy_terms(gp::IndependentSet) = [[i] for i in 1:nv(gp.graph)]
 energy_tensors(x::T, c::IndependentSet) where T = [misv(_pow.(Ref(x), get_weights(c, i))) for i=1:nv(c.graph)]
 extra_terms(gp::IndependentSet) = [[minmax(e.src,e.dst)...] for e in Graphs.edges(gp.graph)]
@@ -40,7 +31,6 @@ labels(gp::IndependentSet) = [1:nv(gp.graph)...]
 # weights interface
 get_weights(c::IndependentSet) = c.weights
 get_weights(gp::IndependentSet, i::Int) = [0, gp.weights[i]]
-chweights(c::IndependentSet, weights) = IndependentSet(c.graph, weights)
 
 function misb(::Type{T}, n::Integer=2) where T
     res = zeros(T, fill(2, n)...)

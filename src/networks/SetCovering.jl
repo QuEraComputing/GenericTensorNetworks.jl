@@ -19,16 +19,6 @@ julia> res = solve(gp, ConfigsMin())[]
 (3.0, {10110, 10101})ₜ
 ```
 """
-struct SetCovering{ET, WT<:Union{UnitWeight, Vector}} <: GraphProblem
-    sets::Vector{Vector{ET}}
-    weights::WT
-    function SetCovering(sets::Vector{Vector{ET}}, weights::Union{UnitWeight, Vector}=UnitWeight()) where {ET}
-        @assert weights isa UnitWeight || length(weights) == length(sets)
-        new{ET, typeof(weights)}(sets, weights)
-    end
-end
-
-flavors(::Type{<:SetCovering}) = [0, 1]
 energy_terms(gp::SetCovering) = [[i] for i=1:length(gp.sets)]
 energy_tensors(x::T, c::SetCovering) where T = [misv(_pow.(Ref(x), get_weights(c, i))) for i=1:length(c.sets)]
 function extra_terms(sc::SetCovering)
@@ -41,7 +31,6 @@ labels(gp::SetCovering) = [1:length(gp.sets)...]
 # weights interface
 get_weights(c::SetCovering) = c.weights
 get_weights(gp::SetCovering, i::Int) = [0, gp.weights[i]]
-chweights(c::SetCovering, weights) = SetCovering(c.sets, weights)
 
 function cover_tensor(::Type{T}, set_indices::AbstractVector{Int}) where T
     n = length(set_indices)
@@ -63,14 +52,4 @@ function cover_count(sets)
         end
     end
     return elements, count
-end
-
-"""
-    is_set_covering(sets::AbstractVector, config)
-
-Return true if `config` (a vector of boolean numbers as the mask of sets) is a set covering of `sets`.
-"""
-function is_set_covering(sets::AbstractVector, config)
-    insets = sets[(!iszero).(config)]
-    return length(unique!(vcat(insets...))) == length(unique!(vcat(sets...)))
 end

@@ -100,12 +100,12 @@ function show_einsum(ein::AbstractEinsum;
 end
 
 """
-    show_configs(gp::GraphProblem, locs, configs::AbstractMatrix; kwargs...)
+    show_configs(gp::ConstraintSatisfactionProblem, locs, configs::AbstractMatrix; kwargs...)
     show_configs(graph::SimpleGraph, locs, configs::AbstractMatrix; nflavor=2, kwargs...)
 
 Show a gallery of configurations on a graph.
 """
-function show_configs(gp::GraphProblem, locs, configs::AbstractMatrix; kwargs...)
+function show_configs(gp::ConstraintSatisfactionProblem, locs, configs::AbstractMatrix; kwargs...)
     show_configs(gp.graph, locs, configs; nflavor=nflavor(gp), kwargs...)
 end
 function show_configs(graph::SimpleGraph, locs, configs::AbstractMatrix;

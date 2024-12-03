@@ -15,6 +15,11 @@ using FFTW
 using Primes
 using DocStringExtensions
 using Base.Cartesian
+using ProblemReductions
+import ProblemReductions: ConstraintSatisfactionProblem,AbstractSatisfiabilityProblem, UnitWeight, ZeroWeight
+import ProblemReductions: @bv_str, StaticElementVector, StaticBitVector,onehotv, _nints
+import ProblemReductions: is_set_covering, is_vertex_coloring, is_set_packing,is_matching, is_valid_mining, print_mining,num_paint_shop_color_switch, paint_shop_coloring_from_config, paint_shop_from_pairs,spin_glass_from_matrix, CNF, CNFClause, BoolVar, satisfiable, @bools, ∨, ¬, ∧
+import ProblemReductions: flavors,set_weights
 import AbstractTrees: children, printnode, print_tree
 import StatsBase
 
@@ -39,8 +44,8 @@ export square_lattice_graph, unit_disk_graph, random_diagonal_coupled_graph, ran
 export line_graph
 
 # Tensor Networks (Graph problems)
-export GraphProblem, GenericTensorNetwork, optimize_code, UnitWeight, ZeroWeight
-export flavors, labels, nflavor, get_weights, fixedvertices, chweights, energy_terms
+export GenericTensorNetwork, optimize_code, UnitWeight, ZeroWeight
+export flavors, labels, nflavor, get_weights, fixedvertices, set_weights, energy_terms
 export IndependentSet, mis_compactify!, is_independent_set
 export MaximalIS, is_maximal_independent_set
 export cut_size, MaxCut
@@ -55,7 +60,7 @@ export SetCovering, is_set_covering
 export OpenPitMining, is_valid_mining, print_mining
 
 # Interfaces
-export solve, SizeMax, SizeMin, PartitionFunction, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin, Single
+export solve, SizeMax, SizeMin, PartitionFunction, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin, Single, AllConfigs
 
 # Utilities
 export save_configs, load_configs, hamming_distribution, save_sumproduct, load_sumproduct
@@ -74,7 +79,6 @@ include("Mods.jl/src/Mods.jl")
 using .Mods
 
 include("utils.jl")
-include("bitvector.jl")
 include("arithematics.jl")
 include("networks/networks.jl")
 include("graph_polynomials.jl")

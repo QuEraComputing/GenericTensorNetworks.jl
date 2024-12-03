@@ -9,7 +9,7 @@ Positional arguments
 * `edge_weights` are associated with the edges of the `graph`.
 * `vertex_weights` are associated with the vertices of the `graph`.
 """
-struct MaxCut{WT1<:Union{UnitWeight, Vector},WT2<:Union{ZeroWeight, Vector}} <: GraphProblem
+struct MaxCut{WT1<:Union{UnitWeight, Vector},WT2<:Union{ZeroWeight, Vector}} 
     graph::SimpleGraph{Int}
     edge_weights::WT1
     vertex_weights::WT2
@@ -22,7 +22,6 @@ struct MaxCut{WT1<:Union{UnitWeight, Vector},WT2<:Union{ZeroWeight, Vector}} <: 
     end
 end
 
-flavors(::Type{<:MaxCut}) = [0, 1]
 # first `ne` indices are for edge weights, last `nv` indices are for vertex weights.
 energy_terms(gp::MaxCut) = [[[minmax(e.src,e.dst)...] for e in Graphs.edges(gp.graph)]...,
                             [[v] for v in Graphs.vertices(gp.graph)]...]
@@ -35,7 +34,6 @@ labels(gp::MaxCut) = [1:nv(gp.graph)...]
 # weights interface
 get_weights(c::MaxCut) = [[c.edge_weights[i] for i=1:ne(c.graph)]..., [c.vertex_weights[i] for i=1:nv(c.graph)]...]
 get_weights(gp::MaxCut, i::Int) = i <= ne(gp.graph) ? [0, gp.edge_weights[i]] : [0, gp.vertex_weights[i-ne(gp.graph)]]
-chweights(c::MaxCut, weights) = MaxCut(c.graph, weights[1:ne(c.graph)], weights[ne(c.graph)+1:end])
 
 function maxcutb(a, b)
     return [a b; b a]

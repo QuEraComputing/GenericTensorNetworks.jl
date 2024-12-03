@@ -9,16 +9,6 @@ Positional arguments
 * `graph` is the problem graph.
 * `weights` are associated with the vertices of the `graph`, default to `UnitWeight()`.
 """
-struct DominatingSet{WT<:Union{UnitWeight, Vector}} <: GraphProblem
-    graph::SimpleGraph{Int}
-    weights::WT
-    function DominatingSet(g::SimpleGraph, weights::Union{UnitWeight, Vector}=UnitWeight())
-        @assert weights isa UnitWeight || length(weights) == nv(g)
-        new{typeof(weights)}(g, weights)
-    end
-end
-
-flavors(::Type{<:DominatingSet}) = [0, 1]
 energy_terms(gp::DominatingSet) = [[Graphs.neighbors(gp.graph, v)..., v] for v in Graphs.vertices(gp.graph)]
 energy_tensors(x::T, c::DominatingSet) where T = [dominating_set_tensor(_pow.(Ref(x), get_weights(c, i))..., degree(c.graph, i)+1) for i=1:nv(c.graph)]
 extra_terms(::DominatingSet) = Vector{Int}[]
@@ -28,7 +18,6 @@ labels(gp::DominatingSet) = [1:nv(gp.graph)...]
 # weights interface
 get_weights(c::DominatingSet) = c.weights
 get_weights(gp::DominatingSet, i::Int) = [0, gp.weights[i]]
-chweights(c::DominatingSet, weights) = DominatingSet(c.graph, weights)
 
 function dominating_set_tensor(a::T, b::T, d::Int) where T
     t = zeros(T, fill(2, d)...)

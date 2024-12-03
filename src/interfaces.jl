@@ -10,7 +10,7 @@ _asint(x::Type{Single}) = 1
 The maximum-K set sizes. e.g. the largest size of the [`IndependentSet`](@ref)  problem is also know as the independence number.
 
 * The corresponding tensor element type are max-plus tropical number [`Tropical`](@ref) if `K` is `Single` and [`ExtendedTropical`](@ref) if `K` is an integer.
-* It is compatible with weighted graph problems.
+* It is compatible with weighted Constraint Satisfaction Problems.
 * BLAS (on CPU) and GPU are supported only if `K` is `Single`,
 """
 struct SizeMax{K} <: AbstractProperty end
@@ -25,7 +25,7 @@ The minimum-K set sizes. e.g. the smallest size ofthe [`MaximalIS`](@ref) proble
 
 * The corresponding tensor element type are inverted max-plus tropical number [`Tropical`](@ref) if `K` is `Single` and inverted [`ExtendedTropical`](@ref) `K` is an integer.
 The inverted Tropical number emulates the min-plus tropical number.
-* It is compatible with weighted graph problems.
+* It is compatible with weighted constraint satisfaction problems.
 * BLAS (on CPU) and GPU are supported only if `K` is `Single`,
 """
 struct SizeMin{K} <: AbstractProperty end
@@ -64,7 +64,7 @@ Counting the number of sets with largest-K size. e.g. for [`IndependentSet`](@re
 it counts independent sets of size ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
 
 * The corresponding tensor element type is [`CountingTropical`](@ref) if `K` is `Single`, and [`TruncatedPoly`](@ref)`{K}` if `K` is an integer.
-* Weighted graph problems is only supported if `K` is `Single`.
+* Weighted constraint satisfaction problems is only supported if `K` is `Single`.
 * GPU is supported,
 """
 struct CountingMax{K} <: AbstractProperty end
@@ -78,7 +78,7 @@ max_k(::CountingMax{K}) where K = K
 Counting the number of sets with smallest-K size.
 
 * The corresponding tensor element type is inverted [`CountingTropical`](@ref) if `K` is `Single`, and [`TruncatedPoly`](@ref)`{K}` if `K` is an integer.
-* Weighted graph problems is only supported if `K` is `Single`.
+* Weighted constraint satisfaction problems is only supported if `K` is `Single`.
 * GPU is supported,
 """
 struct CountingMin{K} <: AbstractProperty end
@@ -115,7 +115,7 @@ Method Argument
     * It has round-off error.
     * BLAS and GPU are supported, it is the fastest among all methods.
 
-Graph polynomials are not defined for weighted graph problems.
+Graph polynomials are not defined for weighted constraint satisfaction problems.
 """
 struct GraphPolynomial{METHOD} <: AbstractProperty
     kwargs
@@ -130,7 +130,7 @@ graph_polynomial_method(::GraphPolynomial{METHOD}) where METHOD = METHOD
 Finding single solution for largest-K sizes, e.g. for [`IndependentSet`](@ref) problem, it is one of the maximum independent sets.
 
 * The corresponding data type is [`CountingTropical{Float64,<:ConfigSampler}`](@ref) if `BOUNDED` is `false`, [`Tropical`](@ref) otherwise.
-* Weighted graph problems is supported.
+* Weighted constraint satisfaction problems is supported.
 * GPU is supported,
 
 Keyword Arguments
@@ -148,7 +148,7 @@ max_k(::SingleConfigMax{K}) where K = K
 Finding single solution with smallest-K size.
 
 * The corresponding data type is inverted [`CountingTropical{Float64,<:ConfigSampler}`](@ref) if `BOUNDED` is `false`, inverted [`Tropical`](@ref) otherwise.
-* Weighted graph problems is supported.
+* Weighted constraint satisfaction problems is supported.
 * GPU is supported,
 
 Keyword Arguments
@@ -184,7 +184,7 @@ Find configurations with largest-K sizes, e.g. for [`IndependentSet`](@ref) prob
 it is finding all independent sets of sizes ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
 
 * The corresponding data type is [`CountingTropical`](@ref)`{Float64,<:ConfigEnumerator}` if `K` is `Single` and [`TruncatedPoly`](@ref)`{K,<:ConfigEnumerator}` if `K` is an integer.
-* Weighted graph problems is only supported if `K` is `Single`.
+* Weighted constraint satisfaction problem is only supported if `K` is `Single`.
 
 Keyword Arguments
 ----------------------------
@@ -203,7 +203,7 @@ tree_storage(::ConfigsMax{K,BOUNDED,TREESTORAGE}) where {K,BOUNDED,TREESTORAGE} 
 Find configurations with smallest-K sizes.
 
 * The corresponding data type is inverted [`CountingTropical`](@ref)`{Float64,<:ConfigEnumerator}` if `K` is `Single` and inverted [`TruncatedPoly`](@ref)`{K,<:ConfigEnumerator}` if `K` is an integer.
-* Weighted graph problems is only supported if `K` is `Single`.
+* Weighted constraint satisfaction problem is only supported if `K` is `Single`.
 
 Keyword Arguments
 ----------------------------
@@ -278,18 +278,18 @@ function solve(gp::GenericTensorNetwork, property::AbstractProperty; T=Float64, 
         ws = get_weights(gp)
         if !(eltype(ws) <: Integer)
             @warn "Input weights are not Integer types, try casting to weights of `Int64` type..."
-            gp = chweights(gp, Int.(ws))
+            gp = set_weights(gp, Int.(ws))
             ws = get_weights(gp)
         end
         n = length(energy_terms(gp))
         if ws isa UnitWeight || ws isa ZeroWeight || all(i->all(>=(0), get_weights(gp, i)), 1:n)
             return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
         elseif all(i->all(<=(0), get_weights(gp, i)), 1:n)
-            res = graph_polynomial(chweights(gp, -ws), Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
+            res = graph_polynomial(set_weights(gp, -ws), Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
             return asarray(invert_polynomial.(res), res)
         else
             if graph_polynomial_method(property) != :laurent
-                @warn "Weights are not all positive or all negative, switch to using laurent polynomial."
+                @warn "get_weights are not all positive or all negative, switch to using laurent polynomial."
             end
             return graph_polynomial(gp, Val(:laurent); usecuda=usecuda, T=T, property.kwargs...)
         end

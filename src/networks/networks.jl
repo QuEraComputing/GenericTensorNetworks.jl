@@ -1,33 +1,19 @@
-"""
-    GraphProblem
-
-The abstract base type of graph problems.
-"""
-abstract type GraphProblem end
-function generate_tensors(x::T, m::GraphProblem) where T
+function generate_tensors(x::T, m::ConstraintSatisfactionProblem) where T
     tensors = [energy_tensors(x, m)..., extra_tensors(T, m)...]
     ixs = [energy_terms(m)..., extra_terms(m)...]
     return add_labels!(tensors, ixs, labels(m))
 end
-function rawcode(problem::GraphProblem; openvertices=())
+function rawcode(problem::ConstraintSatisfactionProblem; openvertices=())
     ixs = [energy_terms(problem)..., extra_terms(problem)...]
     LT = eltype(eltype(ixs))
     return DynamicEinCode(ixs, collect(LT, openvertices))  # labels for edge tensors
 end
 
-struct UnitWeight end
-Base.getindex(::UnitWeight, i) = 1
-Base.eltype(::UnitWeight) = Int
-
-struct ZeroWeight end
-Base.getindex(::ZeroWeight, i) = 0
-Base.eltype(::ZeroWeight) = Int
-
 """
 $TYPEDEF
-    GenericTensorNetwork(problem::GraphProblem; openvertices=(), fixedvertices=Dict(), optimizer=GreedyMethod())
+    GenericTensorNetwork(problem::ConstraintSatisfactionProblem; openvertices=(), fixedvertices=Dict(), optimizer=GreedyMethod())
 
-The generic tensor network that generated from a [`GraphProblem`](@ref).
+The generic tensor network that generated from a [`ConstraintSatisfactionProblem`](@ref).
 
 Positional arguments
 -------------------------------
@@ -40,7 +26,12 @@ struct GenericTensorNetwork{CFG, CT, LT}
     code::CT
     fixedvertices::Dict{LT,Int}
 end
-function GenericTensorNetwork(problem::GraphProblem; openvertices=(), fixedvertices=Dict(), optimizer=GreedyMethod())
+function GenericTensorNetwork(problem::ConstraintSatisfactionProblem; openvertices=(), fixedvertices=Dict(), optimizer=GreedyMethod())
+    rcode = rawcode(problem; openvertices)
+    code = _optimize_code(rcode, uniformsize_fix(rcode, nflavor(problem), fixedvertices), optimizer, MergeVectors())
+    return GenericTensorNetwork(problem, code, Dict{labeltype(code),Int}(fixedvertices))
+end
+function GenericTensorNetwork(problem::OpenPitMining; openvertices=(), fixedvertices=Dict(), optimizer=GreedyMethod())
     rcode = rawcode(problem; openvertices)
     code = _optimize_code(rcode, uniformsize_fix(rcode, nflavor(problem), fixedvertices), optimizer, MergeVectors())
     return GenericTensorNetwork(problem, code, Dict{labeltype(code),Int}(fixedvertices))
@@ -52,9 +43,9 @@ function generate_tensors(x::T, tn::GenericTensorNetwork) where {T}
     return select_dims(tensors, ixs, fixedvertices(tn))
 end
 
-######## Interfaces for graph problems ##########
+######## Interfaces for constraint satisfaction problems ##########
 """
-    get_weights(problem::GraphProblem[, i::Int]) -> Vector
+    get_weights(problem::ConstraintSatisfactionProblem[, i::Int]) -> Vector
     get_weights(problem::GenericTensorNetwork[, i::Int]) -> Vector
 
 The weights for the `problem` or the weights for the degree of freedom specified by the `i`-th term if a second argument is provided.
@@ -66,18 +57,16 @@ get_weights(gp::GenericTensorNetwork) = get_weights(gp.problem)
 get_weights(gp::GenericTensorNetwork, i::Int) = get_weights(gp.problem, i)
 
 """
-    chweights(problem::GraphProblem, weights) -> GraphProblem
-    chweights(problem::GenericTensorNetwork, weights) -> GenericTensorNetwork
+    set_weights(problem::GenericTensorNetwork, get_weights) -> GenericTensorNetwork
 
 Change the weights for the `problem` and return a new problem instance.
 Weights are associated with [`energy_terms`](@ref) in the graph problem.
 In graph polynomial, integer weights can be the exponents.
 """
-function chweights end
-chweights(gp::GenericTensorNetwork, weights) = GenericTensorNetwork(chweights(gp.problem, weights), gp.code, gp.fixedvertices)
+set_weights(gp::GenericTensorNetwork, get_weights) = GenericTensorNetwork(ProblemReductions.set_weights(gp.problem, get_weights), gp.code, gp.fixedvertices)
 
 """
-    labels(problem::GraphProblem) -> Vector
+    labels(problem::ConstraintSatisfactionProblem) -> Vector
     labels(problem::GenericTensorNetwork) -> Vector
 
 The labels of a graph problem is defined as the degrees of freedoms in the graph problem.
@@ -87,19 +76,19 @@ while for the max cut problem, they are the edges.
 labels(gp::GenericTensorNetwork) = labels(gp.problem)
 
 """
-    energy_terms(problem::GraphProblem) -> Vector
+    energy_terms(problem::ConstraintSatisfactionProblem) -> Vector
     energy_terms(problem::GenericTensorNetwork) -> Vector
 
-The energy terms of a graph problem is defined as the tensor labels that carrying local energies (or weights) in the graph problem.
+The energy terms of a graph problem is defined as the tensor labels that carrying local energies (or get_weights) in the graph problem.
 """
 function energy_terms end
 energy_terms(gp::GenericTensorNetwork) = energy_terms(gp.problem)
 
 """
-    extra_terms(problem::GraphProblem) -> Vector
+    extra_terms(problem::ConstraintSatisfactionProblem) -> Vector
     extra_terms(problem::GenericTensorNetwork) -> Vector
 
-The extra terms of a graph problem is defined as the tensor labels that not carrying local energies (or weights) in the graph problem.
+The extra terms of a graph problem is defined as the tensor labels that not carrying local energies (or get_weights) in the graph problem.
 """
 function extra_terms end
 extra_terms(gp::GenericTensorNetwork) = extra_terms(gp.problem)
@@ -112,27 +101,25 @@ Returns the fixed vertices in the graph problem, which is a dictionary specifyin
 fixedvertices(gtn::GenericTensorNetwork) = gtn.fixedvertices
 
 """
-    flavors(::Type{<:GraphProblem}) -> Vector
     flavors(::Type{<:GenericTensorNetwork}) -> Vector
 
 It returns a vector of integers as the flavors of a degree of freedom.
 Its size is the same as the degree of freedom on a single vertex/edge.
 """
-flavors(::GT) where GT<:GraphProblem = flavors(GT)
-flavors(::GenericTensorNetwork{GT}) where GT<:GraphProblem = flavors(GT)
+flavors(::GenericTensorNetwork{GT}) where GT<:ConstraintSatisfactionProblem = flavors(GT)
 
 """
-    nflavor(::Type{<:GraphProblem}) -> Int
+    nflavor(::Type{<:ConstraintSatisfactionProblem}) -> Int
     nflavor(::Type{<:GenericTensorNetwork}) -> Int
-    nflavor(::GT) where GT<:GraphProblem -> Int
-    nflavor(::GenericTensorNetwork{GT}) where GT<:GraphProblem -> Int
+    nflavor(::GT) where GT<:ConstraintSatisfactionProblem -> Int
+    nflavor(::GenericTensorNetwork{GT}) where GT<:ConstraintSatisfactionProblem -> Int
 
 Bond size is equal to the number of flavors.
 """
 nflavor(::Type{GT}) where GT = length(flavors(GT))
 nflavor(::Type{GenericTensorNetwork{GT}}) where GT = nflavor(GT)
-nflavor(::GT) where GT<:GraphProblem = nflavor(GT)
-nflavor(::GenericTensorNetwork{GT}) where GT<:GraphProblem = nflavor(GT)
+nflavor(::GT) where GT<:ConstraintSatisfactionProblem = nflavor(GT)
+nflavor(::GenericTensorNetwork{GT}) where GT<:ConstraintSatisfactionProblem = nflavor(GT)
 
 """
     generate_tensors(func, problem::GenericTensorNetwork)

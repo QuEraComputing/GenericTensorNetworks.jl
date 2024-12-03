@@ -1,5 +1,4 @@
 @enum TreeTag LEAF SUM PROD ZERO ONE
-
 # pirate
 Base.abs(x::Mod) = x
 Base.isless(x::Mod{N}, y::Mod{N}) where N = mod(x.val, N) < mod(y.val, N)

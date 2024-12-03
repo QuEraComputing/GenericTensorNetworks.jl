@@ -1,9 +1,9 @@
 # References
-## Graph problems
+## Constraint Satisfaction Problems
 ```@docs
 solve
 GenericTensorNetwork
-GraphProblem
+ConstraintSatisfactionProblem
 IndependentSet
 MaximalIS
 Matching
@@ -18,9 +18,9 @@ SetPacking
 OpenPitMining
 ```
 
-#### Graph Problem Interfaces
+#### Constraint Satisfaction Problem Interfaces
 
-To subtype [`GraphProblem`](@ref), a new type must contain a `code` field to represent the (optimized) tensor network.
+To subtype [`ConstraintSatisfactionProblem`](@ref), a new type must contain a `code` field to represent the (optimized) tensor network.
 Interfaces [`GenericTensorNetworks.generate_tensors`](@ref), [`labels`](@ref), [`flavors`](@ref) and [`get_weights`](@ref) are required.
 [`nflavor`](@ref) is optional.
 
@@ -30,12 +30,12 @@ labels
 energy_terms
 flavors
 get_weights
-chweights
+set_weights
 nflavor
 fixedvertices
 ```
 
-#### Graph Problem Utilities
+#### Constraint Satisfaction Problem Utilities
 ```@docs
 is_independent_set
 is_maximal_independent_set

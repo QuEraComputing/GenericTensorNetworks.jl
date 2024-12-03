@@ -26,8 +26,8 @@ show_graph(graph, locations; format=:svg, vertex_colors=
 
 # The only solution space property that can not be defined for general real-weighted (not including integer-weighted) graphs is the [`GraphPolynomial`](@ref).
 
-# For the weighted MIS problem, a useful solution space property is the "energy spectrum", i.e. the largest several configurations and their weights.
-# We can use the solution space property is [`SizeMax`](@ref)`(10)` to compute the largest 10 weights.
+# For the weighted MIS problem, a useful solution space property is the "energy spectrum", i.e. the largest several configurations and their get_weights.
+# We can use the solution space property is [`SizeMax`](@ref)`(10)` to compute the largest 10 get_weights.
 spectrum = solve(problem, SizeMax(10))[]
 
 # The return value has type [`ExtendedTropical`](@ref), which contains one field `orders`.

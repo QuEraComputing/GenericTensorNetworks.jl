@@ -4,8 +4,8 @@ using GenericTensorNetworks: graph_polynomial
 @testset "counting maximal IS" begin
     g = random_regular_graph(20, 3)
     gp = GenericTensorNetwork(MaximalIS(g), optimizer=KaHyParBipartite(sc_target=20))
-    @test get_weights(gp) == UnitWeight()
-    @test get_weights(chweights(gp, fill(3, 20))) == fill(3, 20)
+    @test get_weights(gp) == UnitWeight(nv(g))
+    @test get_weights(set_weights(gp, fill(3, 20))) == fill(3, 20)
     cs = graph_polynomial(gp, Val(:fft); r=1.0)[]
     gp = GenericTensorNetwork(MaximalIS(g), optimizer=SABipartite(sc_target=20))
     cs2 = graph_polynomial(gp, Val(:polynomial))[]

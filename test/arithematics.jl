@@ -1,7 +1,7 @@
 using GenericTensorNetworks, Test, OMEinsum
 using GenericTensorNetworks.Mods, Polynomials, TropicalNumbers
 using Graphs, Random
-using GenericTensorNetworks: StaticBitVector
+using GenericTensorNetworks: StaticBitVector, @bv_str, _nints
 using LinearAlgebra
 
 @testset "truncated poly" begin

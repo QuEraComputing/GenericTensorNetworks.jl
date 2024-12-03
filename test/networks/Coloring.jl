@@ -23,7 +23,7 @@ end
     g = smallgraph(:petersen)
     problem = GenericTensorNetwork(Coloring{3}(g, fill(2, 15)))
     @test get_weights(problem) == fill(2, 15)
-    @test get_weights(chweights(problem, fill(3, 15))) == fill(3, 15)
+    @test get_weights(set_weights(problem, fill(3, 15))) == fill(3, 15)
     @test solve(problem, SizeMax())[].n == 30
     res = solve(problem, SingleConfigMax())[].c.data
     @test is_vertex_coloring(g, res)

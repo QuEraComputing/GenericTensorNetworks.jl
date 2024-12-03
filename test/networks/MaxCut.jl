@@ -15,7 +15,7 @@ using GenericTensorNetworks: max_size, graph_polynomial
     ws = collect(1:ne(g))
     gp = GenericTensorNetwork(MaxCut(g, ws))
     @test get_weights(gp) == [ws..., zeros(10)...]
-    @test get_weights(chweights(gp, fill(3, 25))) == fill(3, 25)
+    @test get_weights(set_weights(gp, fill(3, 25))) == fill(3, 25)
     mc = max_size(gp)
     config = solve(gp, SingleConfigMax())[].c.data
     @test solve(gp, CountingMax())[].c == 2
@@ -54,14 +54,14 @@ end
     @test optimal_config[1] == StaticBitVector(Array{Bool, 1}([1, 0, 1, 0, 0]))
 end
 
-@testset "vertex weights" begin
+@testset "vertex get_weights" begin
     g = smallgraph(:petersen)
-    edge_weights = collect(1:ne(g))
-    vertex_weights = collect(1:nv(g))
-    gp = GenericTensorNetwork(MaxCut(g, edge_weights, vertex_weights))
+    edge_get_weights = collect(1:ne(g))
+    vertex_get_weights = collect(1:nv(g))
+    gp = GenericTensorNetwork(MaxCut(g, edge_get_weights, vertex_get_weights))
 
     mc = max_size(gp)
     config = solve(gp, SingleConfigMax())[].c.data
     @test solve(gp, CountingMax())[].c == 1
-    @test cut_size(g, config; edge_weights, vertex_weights) == mc
+    @test cut_size(g, config; edge_get_weights, vertex_get_weights) == mc
 end

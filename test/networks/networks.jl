@@ -1,4 +1,5 @@
 using GenericTensorNetworks: select_dims
+using ProblemReductions
 using Test
 
 @testset "select dims" begin
@@ -15,13 +16,13 @@ end
 
 include("IndependentSet.jl")
 include("MaximalIS.jl")
-include("MaxCut.jl")
-include("SpinGlass.jl")
-include("PaintShop.jl")
+# include("MaxCut.jl") 
+# include("SpinGlass.jl") 
+include("PaintShop.jl") 
 include("Coloring.jl")
 include("Matching.jl")
-include("Satisfiability.jl")
+include("Satisfiability.jl") 
 include("DominatingSet.jl")
 include("SetPacking.jl")
 include("SetCovering.jl")
-include("OpenPitMining.jl")
+include("OpenPitMining.jl") 

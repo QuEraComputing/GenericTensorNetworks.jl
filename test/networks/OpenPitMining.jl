@@ -1,4 +1,5 @@
 using GenericTensorNetworks, Test, Graphs
+using ProblemReductions: open_pit_mining_branching 
 
 @testset "open pit mining" begin
     rewards = zeros(Int,6,6)
@@ -7,12 +8,12 @@ using GenericTensorNetworks, Test, Graphs
     rewards[3,3:end-2] .= [1, 8]
     problem = GenericTensorNetwork(OpenPitMining(rewards))
     @test get_weights(problem) == [-4,-7,-7,-17,-7,-26, 39, -7, -7, -4, 1, 8]
-    @test get_weights(chweights(problem, fill(3, 20))) == fill(3, 12)
+    @test get_weights(set_weights(problem, fill(3, 20))) == fill(3, 12)
     res = solve(problem, SingleConfigMax())[]
     @test is_valid_mining(rewards, res.c.data)
     @test res.n == 21
     print_mining(rewards, res.c.data)
-    val, mask = GenericTensorNetworks.open_pit_mining_branching(rewards)
+    val, mask = open_pit_mining_branching(rewards)
     @test val == res.n
     res_b = map(block->mask[block...], problem.problem.blocks)
     @test res_b == [res.c.data...]

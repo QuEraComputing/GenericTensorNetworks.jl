@@ -21,8 +21,8 @@ using GenericTensorNetworks
     gp = GenericTensorNetwork(Satisfiability(cnf))
     @test satisfiable(cnf, Dict(:x=>true, :y=>true, :z=>true, :a=>false, :b=>false, :c=>true))
     @test !satisfiable(cnf, Dict(:x=>false, :y=>true, :z=>true, :a=>false, :b=>false, :c=>true))
-    @test get_weights(gp) == UnitWeight()
-    @test get_weights(chweights(gp, fill(3, 4))) == fill(3,4)
+    @test get_weights(gp) == UnitWeight(length(gp.problem.cnf))
+    @test get_weights(set_weights(gp, fill(3, 4))) == fill(3,4)
     @test_throws AssertionError Satisfiability(cnf, fill(3, 9))
 end
 

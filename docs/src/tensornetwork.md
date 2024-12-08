@@ -51,7 +51,6 @@ The maximum/minimum solution sizes can be represented as a tensor network as wel
 which can be represented as a tropical tensor network[^Liu2021] $(V, \{h_{\sigma_e} \mid e\in E\}, \emptyset)$, where $h_{\sigma_e}$ is a tensor labeled by $\sigma_e \subseteq V$, and its elements are defined by $h_{\sigma_e}= h_e(\sigma_e)$.
 
 ## Problems
-### Independent set problem
 The independent set problem on graph $G=(V, E)$ is characterized by the Hamiltonian
 ```math
 H(\sigma) = U \sum_{(i, j) \in E}  n_i n_j - \sum_{i \in V} n_i

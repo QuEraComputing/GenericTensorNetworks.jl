@@ -46,10 +46,11 @@ problem = GenericTensorNetwork(coloring)
 
 # ## Solving properties
 # ##### counting all possible coloring
-num_of_coloring = solve(problem, CountingMax())[]
+# The size of a coloring problem is the number of violations of the coloring constraint.
+num_of_coloring = solve(problem, CountingMin())[]
 
 # ##### finding one best coloring
-single_solution = solve(problem, SingleConfigMax())[]
+single_solution = solve(problem, SingleConfigMin())[]
 read_config(single_solution)
 
 is_vertex_coloring(graph, read_config(single_solution))
@@ -68,7 +69,7 @@ show_graph(linegraph, [(locations[e.src] .+ locations[e.dst])
 # Let us construct the tensor network and see if there are solutions.
 lineproblem = Coloring{3}(linegraph);
 
-num_of_coloring = solve(GenericTensorNetwork(lineproblem), CountingMax())[]
+num_of_coloring = solve(GenericTensorNetwork(lineproblem), CountingMin())[]
 read_size_count(num_of_coloring)
 
 # You will see the maximum size 28 is smaller than the number of edges in the `linegraph`,

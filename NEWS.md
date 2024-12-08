@@ -5,3 +5,4 @@
 3. Remove the weights from `PaintShop`.
 4. Remove the weights on vertices from `MaxCut`.
 5. `SpinGlass` is no longer specified by cliques. It is now specified by graphs or hypergraphs. Weights can be defined on both edges and vertices.
+6. Remove `unit_disk_graph`, replace it with `UnitDiskGraph` from `ProblemReductions`.

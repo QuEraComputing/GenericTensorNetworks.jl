@@ -74,7 +74,7 @@ max_configs = read_config(solve(problem, ConfigsMax())[])
 # Hence the only optimal solution is ``\{z_1, z_3, z_6\}`` that has size 3.
 # The correctness of this result can be checked with the [`is_set_packing`](@ref) function.
 
-all(c->is_set_packing(sets, c), max_configs)
+all(c->is_set_packing(problem.problem, c), max_configs)
 
 # Similarly, if one is only interested in computing one of the maximum set packing,
 # one can use the graph property [`SingleConfigMax`](@ref).

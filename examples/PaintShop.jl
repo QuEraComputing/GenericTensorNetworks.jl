@@ -12,7 +12,7 @@
 # In the following, we use a character to represent a car,
 # and defined a binary paint shop problem as a string that each character appear exactly twice.
 
-using GenericTensorNetworks, Graphs
+using GenericTensorNetworks, Graphs, GenericTensorNetworks.ProblemReductions
 
 sequence = collect("iadgbeadfcchghebif")
 
@@ -88,7 +88,7 @@ best_configs = solve(problem, ConfigsMin())[]
 
 # One can see to identical bitstrings corresponding two different vertex configurations, they are related to bit-flip symmetry.
 
-painting1 = paint_shop_coloring_from_config(pshop, read_config(best_configs)[1])
+painting1 = ProblemReductions.paint_shop_coloring_from_config(pshop, read_config(best_configs)[1])
 
 show_graph(graph, locations; format=:svg, texts=string.(sequence),
     edge_colors=[sequence[e.src] == sequence[e.dst] ? "blue" : "black" for e in edges(graph)],

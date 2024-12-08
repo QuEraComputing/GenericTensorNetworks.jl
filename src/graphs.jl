@@ -15,7 +15,7 @@ Create a masked square lattice graph.
 """
 function square_lattice_graph(mask::AbstractMatrix{Bool})
     locs = [(i, j) for i=1:size(mask, 1), j=1:size(mask, 2) if mask[i,j]]
-    unit_disk_graph(locs, 1.1)
+    UnitDiskGraph(locs, 1.1)
 end
 
 """
@@ -41,23 +41,7 @@ Create a masked diagonal coupled square lattice graph from a specified `mask`.
 """
 function diagonal_coupled_graph(mask::AbstractMatrix{Bool})
     locs = [(i, j) for i=1:size(mask, 1), j=1:size(mask, 2) if mask[i,j]]
-    unit_disk_graph(locs, 1.5)
-end
-
-"""
-    unit_disk_graph(locs::AbstractVector, unit::Real)
-
-Create a unit disk graph with locations specified by `locs` and unit distance `unit`.
-"""
-function unit_disk_graph(locs::AbstractVector, unit::Real)
-    n = length(locs)
-    g = SimpleGraph(n)
-    for i=1:n, j=i+1:n
-        if sum(abs2, locs[i] .- locs[j]) < unit ^ 2
-            add_edge!(g, i, j)
-        end
-    end
-    return g
+    UnitDiskGraph(locs, 1.5)
 end
 
 """

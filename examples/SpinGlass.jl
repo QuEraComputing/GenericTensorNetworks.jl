@@ -26,7 +26,7 @@ show_graph(graph, locations; format=:svg)
 
 # ## Generic tensor network representation
 # An anti-ferromagnetic spin glass problem can be defined with the [`SpinGlass`](@ref) type as
-spinglass = SpinGlass(graph, fill(1, ne(graph)))
+spinglass = SpinGlass(graph, fill(1, ne(graph)), zeros(Int, nv(graph)))
 
 # The tensor network representation of the set packing problem can be obtained by
 problem = GenericTensorNetwork(spinglass)
@@ -81,8 +81,10 @@ partition_function = solve(problem, GraphPolynomial())[]
 #  The ground state of the spin glass problem can be found by the [`SingleConfigMin`](@ref) solver.
 ground_state = read_config(solve(problem, SingleConfigMin())[])
 
-# The energy of the ground state can be verified by the [`spinglass_energy`](@ref) function.
-Emin_verify = spinglass_energy(spinglass, ground_state)
+# The energy of the ground state can be verified by the [`energy`](@ref) function.
+# Note the output of the ground state can not be directly used as the input of the `energy` function.
+# It needs to be converted to the spin configurations.
+Emin_verify = energy(problem.problem, 1 .- 2 .* Int.(ground_state))
 
 # You should see a consistent result as above `Emin`.
 
@@ -117,7 +119,7 @@ weights = [-1, 1, -1, 1, -1, 1, -1, 1];
 # \end{align*}
 # ```
 # A spin glass problem can be defined with the [`SpinGlass`](@ref) type as
-hyperspinglass = SpinGlass(num_vertices, hyperedges, weights)
+hyperspinglass = SpinGlass(HyperGraph(num_vertices, hyperedges), weights, zeros(Int, num_vertices))
 
 # The tensor network representation of the set packing problem can be obtained by
 hyperproblem = GenericTensorNetwork(hyperspinglass)
@@ -155,8 +157,8 @@ poly = solve(hyperproblem, GraphPolynomial())[]
 # The ground state of the spin glass problem can be found by the [`SingleConfigMin`](@ref) solver.
 ground_state = read_config(solve(hyperproblem, SingleConfigMin())[])
 
-# The energy of the ground state can be verified by the [`spinglass_energy`](@ref) function.
+# The energy of the ground state can be verified by the [`energy`](@ref) function.
 
-Emin_verify = spinglass_energy(hyperspinglass, ground_state)
+Emin_verify = energy(hyperproblem.problem, 1 .- 2 .* Int.(ground_state))
 
 # You should see a consistent result as above `Emin`.

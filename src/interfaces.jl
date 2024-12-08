@@ -275,16 +275,15 @@ function solve(gp::GenericTensorNetwork, property::AbstractProperty; T=Float64, 
         res = contractx(gp, pre_invert_exponent(TruncatedPoly(ntuple(i->i == min_k(property) ? one(T) : zero(T), min_k(property)), one(T))); usecuda=usecuda)
         return asarray(post_invert_exponent.(res), res)
     elseif property isa GraphPolynomial
-        ws = weights(gp)
-        if !(eltype(ws) <: Integer)
+        # fix the fake non-integer weights
+        if is_weighted(gp) && !(eltype(weights(gp)) <: Integer)
             @warn "Input weights are not Integer types, try casting to weights of `Int64` type..."
-            gp = set_weights(gp, Int.(ws))
-            ws = weights(gp)
+            gp = set_weights(gp, Int.(weights(gp)))
         end
-        if size_all_positive(gp.problem)
+        if !is_weighted(gp) || size_all_positive(gp.problem)
             return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
-        elseif size_all_negative(gp.problem)
-            res = graph_polynomial(set_weights(gp, -ws), Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
+        elseif is_weighted(gp) && size_all_negative(gp.problem)
+            res = graph_polynomial(set_weights(gp, -weights(gp)), Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
             return asarray(invert_polynomial.(res), res)
         else
             if graph_polynomial_method(property) != :laurent

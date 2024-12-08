@@ -15,28 +15,33 @@ PaintShop
 Satisfiability
 SetCovering
 SetPacking
-OpenPitMining
 ```
 
 #### Constraint Satisfaction Problem Interfaces
 
 To subtype [`ConstraintSatisfactionProblem`](@ref), a new type must contain a `code` field to represent the (optimized) tensor network.
-Interfaces [`GenericTensorNetworks.generate_tensors`](@ref), [`labels`](@ref), [`flavors`](@ref) and [`weights`](@ref) are required.
+Interfaces [`GenericTensorNetworks.generate_tensors`](@ref), [`flavors`](@ref) and [`weights`](@ref) are required.
 [`num_flavors`](@ref) is optional.
 
 ```@docs
 GenericTensorNetworks.generate_tensors
-labels
-energy_terms
 flavors
 weights
 set_weights
+is_weighted
 num_flavors
 fixedvertices
 ```
 
 #### Constraint Satisfaction Problem Utilities
 ```@docs
+hard_constraints
+is_satisfied
+local_solution_spec
+solution_size
+energy_mode
+energy
+
 is_independent_set
 is_maximal_independent_set
 is_dominating_set
@@ -46,10 +51,7 @@ is_set_covering
 is_set_packing
 
 cut_size
-spinglass_energy
 num_paint_shop_color_switch
-paint_shop_coloring_from_config
-mis_compactify!
 
 CNF
 CNFClause
@@ -60,8 +62,7 @@ satisfiable
 ¬
 ∧
 
-is_valid_mining
-print_mining
+mis_compactify!
 ```
 
 ## Properties
@@ -145,7 +146,12 @@ MergeGreedy
 
 ## Others
 #### Graph
+Except the `SimpleGraph` defined in [Graphs](https://github.com/JuliaGraphs/Graphs.jl), `GenericTensorNetworks` also defines the following types and functions.
+
 ```@docs
+HyperGraph
+UnitDiskGraph
+
 show_graph
 show_configs
 show_einsum
@@ -162,7 +168,6 @@ render_locs
 
 diagonal_coupled_graph
 square_lattice_graph
-unit_disk_graph
 line_graph
 
 random_diagonal_coupled_graph

@@ -50,6 +50,7 @@ end
 variables(gp::GenericTensorNetwork) = variables(gp.problem)
 set_weights(gp::GenericTensorNetwork, weights) = GenericTensorNetwork(set_weights(gp.problem, weights), gp.code, gp.fixedvertices)
 weights(gp::GenericTensorNetwork) = weights(gp.problem)
+is_weighted(gp::GenericTensorNetwork) = is_weighted(gp.problem)
 
 """
     fixedvertices(tnet::GenericTensorNetwork) -> Dict

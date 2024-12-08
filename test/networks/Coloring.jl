@@ -6,14 +6,14 @@ using Test, GenericTensorNetworks, Graphs
         add_edge!(g, i, j)
     end
     code = GenericTensorNetwork(Coloring{3}(g); optimizer=GreedyMethod())
-    res = GenericTensorNetworks.best_solutions(code; all=true)[]
+    res = GenericTensorNetworks.largest_solutions(code; all=true, invert=true)[]
     @test length(res.c.data) == 12
     g = smallgraph(:petersen)
     code = GenericTensorNetwork(Coloring{3}(g); optimizer=GreedyMethod())
-    res = GenericTensorNetworks.best_solutions(code; all=true)[]
+    res = GenericTensorNetworks.largest_solutions(code; all=true, invert=true)[]
     @test length(res.c.data) == 120
 
-    c = solve(code, SingleConfigMax())[]
+    c = solve(code, SingleConfigMin())[]
     @test c.c.data ∈ res.c.data
     @test is_vertex_coloring(g, c.c.data)
 end
@@ -22,17 +22,17 @@ end
 @testset "weighted coloring" begin
     g = smallgraph(:petersen)
     problem = GenericTensorNetwork(Coloring{3}(g, fill(2, 15)))
-    @test get_weights(problem) == fill(2, 15)
-    @test get_weights(set_weights(problem, fill(3, 15))) == fill(3, 15)
-    @test solve(problem, SizeMax())[].n == 30
-    res = solve(problem, SingleConfigMax())[].c.data
+    @test GenericTensorNetworks.weights(problem) == fill(2, 15)
+    @test GenericTensorNetworks.weights(set_weights(problem, fill(3, 15))) == fill(3, 15)
+    @test solve(problem, SizeMin())[].n == 0
+    res = solve(problem, SingleConfigMin())[].c.data
     @test is_vertex_coloring(g, res)
 end
 
 @testset "empty graph" begin
     g = SimpleGraph(4)
     pb = GenericTensorNetwork(Coloring{3}(g))
-    @test solve(pb, SizeMax()) !== 4
+    @test solve(pb, SizeMin()) !== 4
 end
 
 @testset "planar gadget checking" begin
@@ -53,7 +53,7 @@ end
 
     g = graph_crossing_gadget()
     problem = GenericTensorNetwork(Coloring{3}(g); openvertices=[3, 5])
-    res = solve(problem, ConfigsMax())
+    res = solve(problem, ConfigsMin())
     for i=1:3
         for ci in res[i,i].c
             @test ci[1] === ci[3] === ci[5] === ci[7] == i-1

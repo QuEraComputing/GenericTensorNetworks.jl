@@ -1,10 +1,11 @@
 function generate_tensors(x::T, m::ConstraintSatisfactionProblem) where T
-    tensors = [energy_tensors(x, m)..., extra_tensors(T, m)...]
-    ixs = [energy_terms(m)..., extra_terms(m)...]
-    return add_labels!(tensors, ixs, labels(m))
+    terms = ProblemReductions.size_terms(m)
+    tensors = [reshape(map(s -> !s.is_valid ? zero(x) : _pow(x, s.size), t.solution_sizes), ntuple(i->num_flavors(m), length(t.variables))) for t in terms]
+    ixs = [t.variables for t in terms]
+    return add_labels!(tensors, ixs, variables(m))
 end
 function rawcode(problem::ConstraintSatisfactionProblem; openvertices=())
-    ixs = [energy_terms(problem)..., extra_terms(problem)...]
+    ixs = [t.variables for t in ProblemReductions.size_terms(problem)]
     LT = eltype(eltype(ixs))
     return DynamicEinCode(ixs, collect(LT, openvertices))  # labels for edge tensors
 end
@@ -28,14 +29,17 @@ struct GenericTensorNetwork{CFG, CT, LT}
 end
 function GenericTensorNetwork(problem::ConstraintSatisfactionProblem; openvertices=(), fixedvertices=Dict(), optimizer=GreedyMethod())
     rcode = rawcode(problem; openvertices)
-    code = _optimize_code(rcode, uniformsize_fix(rcode, nflavor(problem), fixedvertices), optimizer, MergeVectors())
+    code = _optimize_code(rcode, uniformsize_fix(rcode, num_flavors(problem), fixedvertices), optimizer, MergeVectors())
     return GenericTensorNetwork(problem, code, Dict{labeltype(code),Int}(fixedvertices))
 end
-function GenericTensorNetwork(problem::OpenPitMining; openvertices=(), fixedvertices=Dict(), optimizer=GreedyMethod())
-    rcode = rawcode(problem; openvertices)
-    code = _optimize_code(rcode, uniformsize_fix(rcode, nflavor(problem), fixedvertices), optimizer, MergeVectors())
-    return GenericTensorNetwork(problem, code, Dict{labeltype(code),Int}(fixedvertices))
+function Base.show(io::IO, tn::GenericTensorNetwork)
+    println(io, "$(typeof(tn))")
+    println(io, "- open vertices: $(getiyv(tn.code))")
+    println(io, "- fixed vertices: $(tn.fixedvertices)")
+    tc, sc, rw = contraction_complexity(tn)
+    print(io, "- contraction time = 2^$(round(tc; digits=3)), space = 2^$(round(sc; digits=3)), read-write = 2^$(round(rw; digits=3))")
 end
+Base.show(io::IO, ::MIME"text/plain", tn::GenericTensorNetwork) = Base.show(io, tn)
 function generate_tensors(x::T, tn::GenericTensorNetwork) where {T}
     ixs = getixsv(tn.code)
     isempty(ixs) && return Array{T}[]
@@ -43,55 +47,9 @@ function generate_tensors(x::T, tn::GenericTensorNetwork) where {T}
     return select_dims(tensors, ixs, fixedvertices(tn))
 end
 
-######## Interfaces for constraint satisfaction problems ##########
-"""
-    get_weights(problem::ConstraintSatisfactionProblem[, i::Int]) -> Vector
-    get_weights(problem::GenericTensorNetwork[, i::Int]) -> Vector
-
-The weights for the `problem` or the weights for the degree of freedom specified by the `i`-th term if a second argument is provided.
-Weights are associated with [`energy_terms`](@ref) in the graph problem.
-In graph polynomial, integer weights can be the exponents.
-"""
-function get_weights end
-get_weights(gp::GenericTensorNetwork) = get_weights(gp.problem)
-get_weights(gp::GenericTensorNetwork, i::Int) = get_weights(gp.problem, i)
-
-"""
-    set_weights(problem::GenericTensorNetwork, get_weights) -> GenericTensorNetwork
-
-Change the weights for the `problem` and return a new problem instance.
-Weights are associated with [`energy_terms`](@ref) in the graph problem.
-In graph polynomial, integer weights can be the exponents.
-"""
-set_weights(gp::GenericTensorNetwork, get_weights) = GenericTensorNetwork(ProblemReductions.set_weights(gp.problem, get_weights), gp.code, gp.fixedvertices)
-
-"""
-    labels(problem::ConstraintSatisfactionProblem) -> Vector
-    labels(problem::GenericTensorNetwork) -> Vector
-
-The labels of a graph problem is defined as the degrees of freedoms in the graph problem.
-e.g. for the maximum independent set problems, they are the indices of vertices: 1, 2, 3...,
-while for the max cut problem, they are the edges.
-"""
-labels(gp::GenericTensorNetwork) = labels(gp.problem)
-
-"""
-    energy_terms(problem::ConstraintSatisfactionProblem) -> Vector
-    energy_terms(problem::GenericTensorNetwork) -> Vector
-
-The energy terms of a graph problem is defined as the tensor labels that carrying local energies (or get_weights) in the graph problem.
-"""
-function energy_terms end
-energy_terms(gp::GenericTensorNetwork) = energy_terms(gp.problem)
-
-"""
-    extra_terms(problem::ConstraintSatisfactionProblem) -> Vector
-    extra_terms(problem::GenericTensorNetwork) -> Vector
-
-The extra terms of a graph problem is defined as the tensor labels that not carrying local energies (or get_weights) in the graph problem.
-"""
-function extra_terms end
-extra_terms(gp::GenericTensorNetwork) = extra_terms(gp.problem)
+variables(gp::GenericTensorNetwork) = variables(gp.problem)
+set_weights(gp::GenericTensorNetwork, weights) = GenericTensorNetwork(set_weights(gp.problem, weights), gp.code, gp.fixedvertices)
+weights(gp::GenericTensorNetwork) = weights(gp.problem)
 
 """
     fixedvertices(tnet::GenericTensorNetwork) -> Dict
@@ -109,17 +67,11 @@ Its size is the same as the degree of freedom on a single vertex/edge.
 flavors(::GenericTensorNetwork{GT}) where GT<:ConstraintSatisfactionProblem = flavors(GT)
 
 """
-    nflavor(::Type{<:ConstraintSatisfactionProblem}) -> Int
-    nflavor(::Type{<:GenericTensorNetwork}) -> Int
-    nflavor(::GT) where GT<:ConstraintSatisfactionProblem -> Int
-    nflavor(::GenericTensorNetwork{GT}) where GT<:ConstraintSatisfactionProblem -> Int
+    num_flavors(::GenericTensorNetwork{GT}) where GT<:ConstraintSatisfactionProblem -> Int
 
 Bond size is equal to the number of flavors.
 """
-nflavor(::Type{GT}) where GT = length(flavors(GT))
-nflavor(::Type{GenericTensorNetwork{GT}}) where GT = nflavor(GT)
-nflavor(::GT) where GT<:ConstraintSatisfactionProblem = nflavor(GT)
-nflavor(::GenericTensorNetwork{GT}) where GT<:ConstraintSatisfactionProblem = nflavor(GT)
+num_flavors(::GenericTensorNetwork{GT}) where GT<:ConstraintSatisfactionProblem = num_flavors(GT)
 
 """
     generate_tensors(func, problem::GenericTensorNetwork)
@@ -138,7 +90,17 @@ julia> gp = GenericTensorNetwork(IndependentSet(smallgraph(:petersen)));
 
 julia> getixsv(gp.code)
 25-element Vector{Vector{Int64}}:
- [1]
+ [1, 2]
+ [1, 5]
+ [1, 6]
+ [2, 3]
+ [2, 7]
+ [3, 4]
+ [3, 8]
+ [4, 5]
+ [4, 9]
+ [5, 10]
+ ⋮
  [2]
  [3]
  [4]
@@ -148,16 +110,6 @@ julia> getixsv(gp.code)
  [8]
  [9]
  [10]
- ⋮
- [3, 8]
- [4, 5]
- [4, 9]
- [5, 10]
- [6, 8]
- [6, 9]
- [7, 9]
- [7, 10]
- [8, 10]
 
 julia> gp.code(GenericTensorNetworks.generate_tensors(Tropical(1.0), gp)...)
 0-dimensional Array{Tropical{Float64}, 0}:
@@ -166,31 +118,17 @@ julia> gp.code(GenericTensorNetworks.generate_tensors(Tropical(1.0), gp)...)
 """
 function generate_tensors end
 
-# requires field `code`
-
-include("IndependentSet.jl")
-include("MaximalIS.jl")
-include("MaxCut.jl")
-include("Matching.jl")
-include("Coloring.jl")
-include("PaintShop.jl")
-include("Satisfiability.jl")
-include("DominatingSet.jl")
-include("SetPacking.jl")
-include("SetCovering.jl")
-include("OpenPitMining.jl")
-include("SpinGlass.jl")
-
 # forward the time, space and readwrite complexity
-OMEinsum.contraction_complexity(gp::GenericTensorNetwork) = contraction_complexity(gp.code, uniformsize(gp.code, nflavor(gp)))
+OMEinsum.contraction_complexity(gp::GenericTensorNetwork) = contraction_complexity(gp.code, uniformsize(gp.code, num_flavors(gp)))
 # the following two interfaces will be deprecated
-OMEinsum.timespace_complexity(gp::GenericTensorNetwork) = timespace_complexity(gp.code, uniformsize(gp.code, nflavor(gp)))
-OMEinsum.timespacereadwrite_complexity(gp::GenericTensorNetwork) = timespacereadwrite_complexity(gp.code, uniformsize(gp.code, nflavor(gp)))
+OMEinsum.timespace_complexity(gp::GenericTensorNetwork) = timespace_complexity(gp.code, uniformsize(gp.code, num_flavors(gp)))
+OMEinsum.timespacereadwrite_complexity(gp::GenericTensorNetwork) = timespacereadwrite_complexity(gp.code, uniformsize(gp.code, num_flavors(gp)))
 
 # contract the graph tensor network
 function contractx(gp::GenericTensorNetwork, x; usecuda=false)
     @debug "generating tensors for x = `$x` ..."
     xs = generate_tensors(x, gp)
+    length(xs) == 0 && return asarray(one(x))  # empty tensor network
     @debug "contracting tensors ..."
     if usecuda
         gp.code([togpu(x) for x in xs]...)
@@ -243,3 +181,39 @@ function _pow(x::LaurentPolynomial{BS,X}, i) where {BS,X}
         return LaurentPolynomial(x.coeffs .^ i, x.order[]*i)
     end
 end
+
+####### Extra utilities #######
+"""
+    mis_compactify!(tropicaltensor; potential=nothing)
+
+Compactify tropical tensor for maximum independent set problem. It will eliminate
+some entries by setting them to zero, by the criteria that removing these entry
+does not change the MIS size of its parent graph (reference to be added).
+
+### Arguments
+- `tropicaltensor::AbstractArray{T}`: the tropical tensor
+
+### Keyword arguments
+- `potential=nothing`: the maximum possible MIS contribution from each open vertex
+"""
+function mis_compactify!(a::AbstractArray{T, N}; potential=nothing) where {T <: TropicalTypes, N}
+    @assert potential === nothing || length(potential) == N "got unexpected potential length: $(length(potential)), expected $N"
+	for (ind_a, val_a) in enumerate(a)
+		for (ind_b, val_b) in enumerate(a)
+			bs_a = ind_a - 1
+			bs_b = ind_b - 1
+            if worse_than(bs_a, bs_b, val_a.n, val_b.n, potential)
+                @inbounds a[ind_a] = zero(T)
+            end
+		end
+	end
+	return a
+end
+function worse_than(bs_a::Integer, bs_b::Integer, val_a::T, val_b::T, potential::AbstractVector) where T
+    bs_a != bs_b && val_a + sum(k->readbit(bs_a, k) < readbit(bs_b, k) ? potential[k] : zero(T), 1:length(potential)) <= val_b
+end
+function worse_than(bs_a::Integer, bs_b::Integer, val_a::T, val_b::T, ::Nothing) where T
+    bs_a != bs_b && val_a <= val_b && (bs_b & bs_a) == bs_b
+end
+readbit(bs::Integer, k::Integer) = (bs >> (k-1)) & 1
+

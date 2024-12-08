@@ -1,17 +1,17 @@
-function config_type(::Type{T}, n, nflavor; all::Bool, tree_storage::Bool) where T
+function config_type(::Type{T}, n, num_flavors; all::Bool, tree_storage::Bool) where T
     if all
         if tree_storage
-            return treeset_type(T, n, nflavor)
+            return treeset_type(T, n, num_flavors)
         else
-            return set_type(T, n, nflavor)
+            return set_type(T, n, num_flavors)
         end
     else
-        return sampler_type(T, n, nflavor)
+        return sampler_type(T, n, num_flavors)
     end
 end
 
 """
-    best_solutions(problem; all=false, usecuda=false, invert=false, tree_storage::Bool=false)
+    largest_solutions(problem; all=false, usecuda=false, invert=false, tree_storage::Bool=false)
     
 Find optimal solutions with bounding.
 
@@ -20,19 +20,19 @@ Find optimal solutions with bounding.
 * If `invert` is true, find the minimum.
 * If `tree_storage` is true, use [`SumProductTree`](@ref) as the storage of solutions.
 """
-function best_solutions(gp::GenericTensorNetwork; all=false, usecuda=false, invert=false, tree_storage::Bool=false, T=Float64)
+function largest_solutions(gp::GenericTensorNetwork; all=false, usecuda=false, invert=false, tree_storage::Bool=false, T=Float64)
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
     xst = generate_tensors(_x(Tropical{T}; invert), gp)
-    ymask = trues(fill(nflavor(gp), length(getiyv(gp.code)))...)
+    ymask = trues(fill(num_flavors(gp), length(getiyv(gp.code)))...)
     if usecuda
         xst = togpu.(xst)
         ymask = togpu(ymask)
     end
     if all
         # we use `Float64` as default because we want to support weighted graphs.
-        T = config_type(CountingTropical{T,T}, length(labels(gp)), nflavor(gp); all, tree_storage)
+        T = config_type(CountingTropical{T,T}, length(labels(gp)), num_flavors(gp); all, tree_storage)
         xs = generate_tensors(_x(T; invert), gp)
         ret = bounding_contract(AllConfigs{1}(), gp.code, xst, ymask, xs)
         return invert ? asarray(post_invert_exponent.(ret), ret) : ret
@@ -61,22 +61,22 @@ function solutions(gp::GenericTensorNetwork, ::Type{BT}; all::Bool, usecuda::Boo
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
-    T = config_type(BT, length(labels(gp)), nflavor(gp); all, tree_storage)
+    T = config_type(BT, length(labels(gp)), num_flavors(gp); all, tree_storage)
     ret = contractx(gp, _x(T; invert); usecuda=usecuda)
     return invert ? asarray(post_invert_exponent.(ret), ret) : ret
 end
 
 """
-    best2_solutions(problem; all=true, usecuda=false, invert=false, tree_storage::Bool=false)
+    largest2_solutions(problem; all=true, usecuda=false, invert=false, tree_storage::Bool=false)
 
 Finding optimal and suboptimal solutions.
 """
-best2_solutions(gp::GenericTensorNetwork; all=true, usecuda=false, invert::Bool=false, T=Float64) = solutions(gp, Max2Poly{T,T}; all, usecuda, invert)
+largest2_solutions(gp::GenericTensorNetwork; all=true, usecuda=false, invert::Bool=false, T=Float64) = solutions(gp, Max2Poly{T,T}; all, usecuda, invert)
 
-function bestk_solutions(gp::GenericTensorNetwork, k::Int; invert::Bool=false, tree_storage::Bool=false, T=Float64)
+function largestk_solutions(gp::GenericTensorNetwork, k::Int; invert::Bool=false, tree_storage::Bool=false, T=Float64)
     xst = generate_tensors(_x(Tropical{T}; invert), gp)
     ymask = trues(fill(2, length(getiyv(gp.code)))...)
-    T = config_type(TruncatedPoly{k,T,T}, length(labels(gp)), nflavor(gp); all=true, tree_storage)
+    T = config_type(TruncatedPoly{k,T,T}, length(labels(gp)), num_flavors(gp); all=true, tree_storage)
     xs = generate_tensors(_x(T; invert), gp)
     ret = bounding_contract(AllConfigs{k}(), gp.code, xst, ymask, xs)
     return invert ? asarray(post_invert_exponent.(ret), ret) : ret

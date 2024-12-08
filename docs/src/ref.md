@@ -21,17 +21,17 @@ OpenPitMining
 #### Constraint Satisfaction Problem Interfaces
 
 To subtype [`ConstraintSatisfactionProblem`](@ref), a new type must contain a `code` field to represent the (optimized) tensor network.
-Interfaces [`GenericTensorNetworks.generate_tensors`](@ref), [`labels`](@ref), [`flavors`](@ref) and [`get_weights`](@ref) are required.
-[`nflavor`](@ref) is optional.
+Interfaces [`GenericTensorNetworks.generate_tensors`](@ref), [`labels`](@ref), [`flavors`](@ref) and [`weights`](@ref) are required.
+[`num_flavors`](@ref) is optional.
 
 ```@docs
 GenericTensorNetworks.generate_tensors
 labels
 energy_terms
 flavors
-get_weights
+weights
 set_weights
-nflavor
+num_flavors
 fixedvertices
 ```
 

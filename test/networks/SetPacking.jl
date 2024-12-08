@@ -5,7 +5,7 @@ using GenericTensorNetworks, Test, Graphs
     gp = GenericTensorNetwork(SetPacking(sets); optimizer=GreedyMethod())
     @test get_weights(gp) == UnitWeight(length(sets))
     @test get_weights(set_weights(gp, fill(3, 5))) == fill(3,5)
-    res = GenericTensorNetworks.best_solutions(gp; all=true)[]
+    res = GenericTensorNetworks.largest_solutions(gp; all=true)[]
     @test res.n == 2
     @test BitVector(Bool[0,0,1,1,0]) ∈ res.c.data
     @test BitVector(Bool[1,0,0,1,0]) ∈ res.c.data

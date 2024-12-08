@@ -7,7 +7,7 @@
 # In graph theory, a [cut](https://en.wikipedia.org/wiki/Cut_(graph_theory)) is a partition of the vertices of a graph into two disjoint subsets.
 # It is closely related to the [Spin-glass problem](@ref) in physics.
 # Finding the maximum cut is NP-Hard, where a maximum cut is a cut whose size is at least the size of any other cut,
-# where the size of a cut is the number of edges (or the sum of get_weights on edges) crossing the cut.
+# where the size of a cut is the number of edges (or the sum of weights on edges) crossing the cut.
 
 using GenericTensorNetworks, Graphs
 
@@ -40,7 +40,7 @@ problem = GenericTensorNetwork(maxcut)
 # where ``w_{ij}`` is a real number associated with edge ``(i, j)`` as the edge weight.
 # If and only if the bipartition cuts on edge ``(i, j)``,
 # this tensor contributes a factor ``x_{i}^{w_{ij}}`` or ``x_{j}^{w_{ij}}``.
-# Similarly, one can assign get_weights to vertices, which corresponds to the onsite energy terms in the spin glass.
+# Similarly, one can assign weights to vertices, which corresponds to the onsite energy terms in the spin glass.
 # The vertex tensor is
 # ```math
 # W(x_i, w_i) = \left(\begin{matrix}

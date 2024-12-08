@@ -101,19 +101,19 @@ end
 
 """
     show_configs(gp::ConstraintSatisfactionProblem, locs, configs::AbstractMatrix; kwargs...)
-    show_configs(graph::SimpleGraph, locs, configs::AbstractMatrix; nflavor=2, kwargs...)
+    show_configs(graph::SimpleGraph, locs, configs::AbstractMatrix; num_flavors=2, kwargs...)
 
 Show a gallery of configurations on a graph.
 """
 function show_configs(gp::ConstraintSatisfactionProblem, locs, configs::AbstractMatrix; kwargs...)
-    show_configs(gp.graph, locs, configs; nflavor=nflavor(gp), kwargs...)
+    show_configs(gp.graph, locs, configs; num_flavors=num_flavors(gp), kwargs...)
 end
 function show_configs(graph::SimpleGraph, locs, configs::AbstractMatrix;
-        nflavor::Int=2,
+        num_flavors::Int=2,
         kwargs...)
-    cmap = range(colorant"white", stop=colorant"red", length=nflavor)
+    cmap = range(colorant"white", stop=colorant"red", length=num_flavors)
     graphs = map(configs) do cfg
-        @assert all(0 .<= cfg .<= nflavor-1)
+        @assert all(0 .<= cfg .<= num_flavors-1)
         GraphViz(graph, locs; vertex_colors=cmap[cfg .+ 1])
     end
     show_gallery(graphs; kwargs...)

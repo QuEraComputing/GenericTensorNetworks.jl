@@ -788,31 +788,31 @@ end
 # convert from counting type to bitstring type
 for F in [:set_type, :sampler_type, :treeset_type]
     @eval begin
-        function $F(::Type{T}, n::Int, nflavor::Int) where {OT, K, T<:TruncatedPoly{K,C,OT} where C}
-            TruncatedPoly{K, $F(n,nflavor),OT}
+        function $F(::Type{T}, n::Int, num_flavors::Int) where {OT, K, T<:TruncatedPoly{K,C,OT} where C}
+            TruncatedPoly{K, $F(n,num_flavors),OT}
         end
-        function $F(::Type{T}, n::Int, nflavor::Int) where {TX, T<:Polynomial{C,TX} where C}
-            Polynomial{$F(n,nflavor),:x}
+        function $F(::Type{T}, n::Int, num_flavors::Int) where {TX, T<:Polynomial{C,TX} where C}
+            Polynomial{$F(n,num_flavors),:x}
         end
-        function $F(::Type{T}, n::Int, nflavor::Int) where {TV, T<:CountingTropical{TV}}
-            CountingTropical{TV, $F(n,nflavor)}
+        function $F(::Type{T}, n::Int, num_flavors::Int) where {TV, T<:CountingTropical{TV}}
+            CountingTropical{TV, $F(n,num_flavors)}
         end
-        function $F(::Type{Real}, n::Int, nflavor::Int)
-            $F(n, nflavor)
+        function $F(::Type{Real}, n::Int, num_flavors::Int)
+            $F(n, num_flavors)
         end
     end
 end
 for (F,TP) in [(:set_type, :ConfigEnumerator), (:sampler_type, :ConfigSampler)]
-    @eval function $F(n::Integer, nflavor::Integer)
-        s = ceil(Int, log2(nflavor))
+    @eval function $F(n::Integer, num_flavors::Integer)
+        s = ceil(Int, log2(num_flavors))
         c = _nints(n,s)
         return $TP{n,s,c}
     end
 end
-function treeset_type(n::Integer, nflavor::Integer)
-    return SumProductTree{OnehotVec{n, nflavor}}
+function treeset_type(n::Integer, num_flavors::Integer)
+    return SumProductTree{OnehotVec{n, num_flavors}}
 end
-sampler_type(::Type{ExtendedTropical{K,T}}, n::Int, nflavor::Int) where {K,T} = ExtendedTropical{K, sampler_type(T, n, nflavor)}
+sampler_type(::Type{ExtendedTropical{K,T}}, n::Int, num_flavors::Int) where {K,T} = ExtendedTropical{K, sampler_type(T, n, num_flavors)}
 
 # utilities for creating onehot vectors
 onehotv(::Type{ConfigEnumerator{N,S,C}}, i::Integer, v) where {N,S,C} = ConfigEnumerator([onehotv(StaticElementVector{N,S,C}, i, v)])

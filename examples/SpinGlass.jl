@@ -106,7 +106,7 @@ hyperedges = [[1,3,4,6,7], [4,7,8,12], [2,5,9,11,13],
     [1,2,14,15], [3,6,10,12,14], [8,14,15], 
     [1,2,6,11], [1,2,4,6,8,12]]
 
-get_weights = [-1, 1, -1, 1, -1, 1, -1, 1];
+weights = [-1, 1, -1, 1, -1, 1, -1, 1];
 
 # The energy function of the spin glass problem is
 # ```math
@@ -117,7 +117,7 @@ get_weights = [-1, 1, -1, 1, -1, 1, -1, 1];
 # \end{align*}
 # ```
 # A spin glass problem can be defined with the [`SpinGlass`](@ref) type as
-hyperspinglass = SpinGlass(num_vertices, hyperedges, get_weights)
+hyperspinglass = SpinGlass(num_vertices, hyperedges, weights)
 
 # The tensor network representation of the set packing problem can be obtained by
 hyperproblem = GenericTensorNetwork(hyperspinglass)

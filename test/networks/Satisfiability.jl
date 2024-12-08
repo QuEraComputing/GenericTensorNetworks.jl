@@ -35,14 +35,14 @@ end
     cnf = (c1 ∧ c4) ∧ (c2 ∧ c3)
     gp = GenericTensorNetwork(Satisfiability(cnf))
 
-    @test solve(gp, SizeMax())[].n == 4.0
-    res = GenericTensorNetworks.best_solutions(gp; all=true)[].c.data
+    @test solve(gp, SizeMax())[].n == 2.0
+    res = GenericTensorNetworks.largest_solutions(gp; invert=true, all=true)[].c.data
     for i=0:1<<6-1
         v = StaticBitVector(Bool[i>>(k-1) & 1 for k=1:6])
         if v ∈ res
-            @test satisfiable(gp.problem.cnf, Dict(zip(labels(gp), v)))
+            @test satisfiable(gp.problem.cnf, Dict(zip(ProblemReductions.symbols(gp.problem), v)))
         else
-            @test !satisfiable(gp.problem.cnf, Dict(zip(labels(gp), v)))
+            @test !satisfiable(gp.problem.cnf, Dict(zip(ProblemReductions.symbols(gp.problem), v)))
         end
     end
 end
@@ -56,14 +56,14 @@ end
     cnf = (c1 ∧ c4) ∧ (c2 ∧ c3)
     gp = GenericTensorNetwork(Satisfiability(cnf, fill(2, length(cnf))))
 
-    @test solve(gp, SizeMax())[].n == 8.0
-    res = GenericTensorNetworks.best_solutions(gp; all=true)[].c.data
+    @test solve(gp, SizeMax())[].n == 4.0
+    res = GenericTensorNetworks.largest_solutions(gp; invert=true, all=true)[].c.data
     for i=0:1<<6-1
         v = StaticBitVector(Bool[i>>(k-1) & 1 for k=1:6])
         if v ∈ res
-            @test satisfiable(gp.problem.cnf, Dict(zip(labels(gp), v)))
+            @test satisfiable(gp.problem.cnf, Dict(zip(ProblemReductions.symbols(gp.problem), v)))
         else
-            @test !satisfiable(gp.problem.cnf, Dict(zip(labels(gp), v)))
+            @test !satisfiable(gp.problem.cnf, Dict(zip(ProblemReductions.symbols(gp.problem), v)))
         end
     end
 end

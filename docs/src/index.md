@@ -41,7 +41,7 @@ solve(
 Here the main function [`solve`](@ref) takes three input arguments, the problem instance of type [`IndependentSet`](@ref), the property instance of type [`GraphPolynomial`](@ref) and an optional key word argument `usecuda` to decide use GPU or not.
 If one wants to use GPU to accelerate the computation, the `, CUDA` should be uncommented.
 
-An [`IndependentSet`](@ref) instance takes two positional arguments to initialize, the graph instance that one wants to solve and the get_weights for each vertex. Here, we use a random regular graph with 20 vertices and degree 3, and the default uniform weight 1.
+An [`IndependentSet`](@ref) instance takes two positional arguments to initialize, the graph instance that one wants to solve and the weights for each vertex. Here, we use a random regular graph with 20 vertices and degree 3, and the default uniform weight 1.
 
 The [`GenericTensorNetwork`](@ref) function is a constructor for the problem instance, which takes the problem instance as the first argument and optional key word arguments. The key word argument `optimizer` is for specifying the tensor network optimization algorithm.
 The keyword argument `openvertices` is a tuple of labels for specifying the degrees of freedom not summed over, and `fixedvertices` is a label-value dictionary for specifying the fixed values of the degree of freedoms.

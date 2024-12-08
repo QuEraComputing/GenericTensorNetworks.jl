@@ -10,5 +10,5 @@ using GenericTensorNetworks, Test, Graphs
     @test BitVector(Bool[0,0,1,1,0]) ∈ res.c.data
     @test BitVector(Bool[1,0,0,1,0]) ∈ res.c.data
     @test BitVector(Bool[0,1,1,0,0]) ∈ res.c.data
-    @test all(x->is_set_packing(sets, x),res.c) # need GenericTensorNetworks: is_set_packing
+    @test all(x->is_set_packing(gp.problem, x),res.c) # need GenericTensorNetworks: is_set_packing
 end

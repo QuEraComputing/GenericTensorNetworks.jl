@@ -1,6 +1,6 @@
 using Pkg
 using GenericTensorNetworks
-using GenericTensorNetworks: TropicalNumbers, Polynomials, OMEinsum, OMEinsum.OMEinsumContractionOrders, LuxorGraphPlot
+using GenericTensorNetworks: TropicalNumbers, Polynomials, OMEinsum, OMEinsum.OMEinsumContractionOrders, LuxorGraphPlot, ProblemReductions
 using Documenter
 using DocThemeIndigo
 using Literate
@@ -17,7 +17,7 @@ indigo = DocThemeIndigo.install(GenericTensorNetworks)
 DocMeta.setdocmeta!(GenericTensorNetworks, :DocTestSetup, :(using GenericTensorNetworks); recursive=true)
 
 makedocs(;
-    modules=[GenericTensorNetworks, TropicalNumbers, OMEinsum, OMEinsumContractionOrders, LuxorGraphPlot],
+    modules=[GenericTensorNetworks, ProblemReductions, TropicalNumbers, OMEinsum, OMEinsumContractionOrders, LuxorGraphPlot],
     authors="Jinguo Liu",
     repo="https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/{commit}{path}#{line}",
     sitename="GenericTensorNetworks.jl",
@@ -40,7 +40,6 @@ makedocs(;
             "Satisfiability problem" => "generated/Satisfiability.md",
             "Set covering problem" => "generated/SetCovering.md",
             "Set packing problem" => "generated/SetPacking.md",
-            #"Other problems" => "generated/Others.md",
         ],
         "Topics" => [
             "Gist" => "gist.md",

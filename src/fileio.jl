@@ -14,20 +14,20 @@ function save_configs(filename, data::ConfigEnumerator{N,S,C}; format::Symbol=:b
 end
 
 """
-    load_configs(filename; format=:binary, bitlength=nothing, nflavors=2)
+    load_configs(filename; format=:binary, bitlength=nothing, num_flavors=2)
 
 Load configurations from file `filename`. The format is `:binary` or `:text`.
 If the format is `:binary`, the bitstring length `bitlength` must be specified,
-`nflavors` specifies the degree of freedom.
+`num_flavors` specifies the degree of freedom.
 """
-function load_configs(filename; bitlength=nothing, format::Symbol=:binary, nflavors=2)
+function load_configs(filename; bitlength=nothing, format::Symbol=:binary, num_flavors=2)
     if format == :binary
         bitlength === nothing && error("you need to specify `bitlength` for reading configurations from binary files.")
-        S = ceil(Int, log2(nflavors))
+        S = ceil(Int, log2(num_flavors))
         C = _nints(bitlength, S)
         return _from_raw_matrix(StaticElementVector{bitlength,S,C}, reshape(reinterpret(UInt64, read(filename)),C,:))
     elseif format == :text
-        return from_plain_matrix(readdlm(filename); nflavors=nflavors)
+        return from_plain_matrix(readdlm(filename); num_flavors=num_flavors)
     else
         error("format must be `:binary` or `:text`, got `:$format`")
     end
@@ -48,8 +48,8 @@ function plain_matrix(x::ConfigEnumerator{N,S,C}) where {N,S,C}
     return m
 end
 
-function from_raw_matrix(m; bitlength, nflavors=2)
-    S = ceil(Int,log2(nflavors))
+function from_raw_matrix(m; bitlength, num_flavors=2)
+    S = ceil(Int,log2(num_flavors))
     C = size(m, 1)
     T = StaticElementVector{bitlength,S,C}
     @assert bitlength*S <= C*64
@@ -62,8 +62,8 @@ function _from_raw_matrix(::Type{StaticElementVector{N,S,C}}, m::AbstractMatrix)
     end
     return ConfigEnumerator(data)
 end
-function from_plain_matrix(m::Matrix; nflavors=2)
-    S = ceil(Int,log2(nflavors))
+function from_plain_matrix(m::Matrix; num_flavors=2)
+    S = ceil(Int,log2(num_flavors))
     N = size(m, 1)
     C = _nints(N, S)
     T = StaticElementVector{N,S,C}

@@ -5,8 +5,8 @@ using GenericTensorNetworks, Test, Graphs
     for (i,j) in [(1,2), (2,3), (4,5), (5,6), (1,6)]
         add_edge!(g, i, j)
     end
-    g = GenericTensorNetwork(IndependentSet(g); openvertices=[1,4,6,3])
-    m = solve(g, SizeMax())
+    net = GenericTensorNetwork(IndependentSet(g); openvertices=[1,4,6,3])
+    m = solve(net, SizeMax())
     @test m isa Array{Tropical{Float64}, 4}
     @test count(!iszero, m) == 12
     m1 = mis_compactify!(copy(m))
@@ -14,12 +14,13 @@ using GenericTensorNetworks, Test, Graphs
     potential = zeros(Float64, 4)
     m2 = mis_compactify!(copy(m); potential)
     @test count(!iszero, m2) == 1
-    @test get_weights(g) == UnitWeight()
-    @test get_weights(chweights(g, fill(3, 6))) == fill(3, 6)
+    @test get_weights(net.problem) == UnitWeight(nv(net.problem.graph))
+    @test get_weights(set_weights(net.problem, fill(3, 6))) == fill(3, 6)
 end
 
 @testset "empty graph" begin
     g = SimpleGraph(4)
     pb = GenericTensorNetwork(IndependentSet(g))
+    println(pb)
     @test solve(pb, SizeMax()) !== 4
 end

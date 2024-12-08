@@ -1,16 +1,16 @@
 # # Weighted problems
 # Let us use the maximum independent set problem on Petersen graph as an example.
 
-using GenericTensorNetworks, Graphs
+using GenericTensorNetworks, GenericTensorNetworks.ProblemReductions, Graphs
 
 graph = Graphs.smallgraph(:petersen)
 
 # The following code constructs a weighted MIS problem instance.
 problem = GenericTensorNetwork(IndependentSet(graph, collect(1:10)));
-GenericTensorNetworks.get_weights(problem)
+GenericTensorNetworks.weights(problem)
 
 # The tensor labels that associated with the weights can be accessed by
-GenericTensorNetworks.energy_terms(problem)
+ProblemReductions.local_solution_spec(problem.problem)
 
 # Here, the `weights` keyword argument can be a vector for weighted graphs or `UnitWeight()` for unweighted graphs.
 # Most solution space properties work for unweighted graphs also work for the weighted graphs.

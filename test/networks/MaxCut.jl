@@ -14,12 +14,12 @@ using GenericTensorNetworks: max_size, graph_polynomial
     # weighted
     ws = collect(1:ne(g))
     gp = GenericTensorNetwork(MaxCut(g, ws))
-    @test get_weights(gp) == [ws..., zeros(10)...]
-    @test get_weights(chweights(gp, fill(3, 25))) == fill(3, 25)
+    @test get_weights(gp) == ws
+    @test get_weights(set_weights(gp, fill(3, 15))) == fill(3, 15)
     mc = max_size(gp)
     config = solve(gp, SingleConfigMax())[].c.data
     @test solve(gp, CountingMax())[].c == 2
-    @test cut_size(g, config; edge_weights=ws) == mc
+    @test cut_size(g, config; weights=ws) == mc
 end
 
 @testset "MaxCut" begin
@@ -37,7 +37,7 @@ end
         add_edge!(g, i, j)
     end
     code = GenericTensorNetwork(MaxCut(g); optimizer=GreedyMethod())
-    res = GenericTensorNetworks.best_solutions(code; all=true)[]
+    res = GenericTensorNetworks.largest_solutions(code; all=true)[]
     @test length(res.c.data) == 2
     @test cut_size(g, res.c.data[1]) == 5
 end
@@ -54,14 +54,13 @@ end
     @test optimal_config[1] == StaticBitVector(Array{Bool, 1}([1, 0, 1, 0, 0]))
 end
 
-@testset "vertex weights" begin
+@testset "vertex get_weights" begin
     g = smallgraph(:petersen)
-    edge_weights = collect(1:ne(g))
-    vertex_weights = collect(1:nv(g))
-    gp = GenericTensorNetwork(MaxCut(g, edge_weights, vertex_weights))
+    weights = collect(1:ne(g))
+    gp = GenericTensorNetwork(MaxCut(g, weights))
 
     mc = max_size(gp)
     config = solve(gp, SingleConfigMax())[].c.data
-    @test solve(gp, CountingMax())[].c == 1
-    @test cut_size(g, config; edge_weights, vertex_weights) == mc
+    @test solve(gp, CountingMax())[].c == 2
+    @test cut_size(g, config; weights) == mc
 end

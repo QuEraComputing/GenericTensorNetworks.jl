@@ -1,7 +1,8 @@
 using GenericTensorNetworks, Test, Graphs
 using OMEinsum
 using TropicalNumbers: CountingTropicalF64
-using GenericTensorNetworks: _onehotv, _x, sampler_type, set_type, best_solutions, best2_solutions, solutions, all_solutions, bestk_solutions, AllConfigs, SingleConfig, max_size, max_size_count
+using GenericTensorNetworks: _onehotv, _x, sampler_type, set_type, largest_solutions, largest2_solutions, solutions, all_solutions, largestk_solutions, AllConfigs, SingleConfig, max_size, max_size_count
+using GenericTensorNetworks: graph_polynomial
 
 @testset "Config types" begin
     T = sampler_type(CountingTropical{Float32}, 5, 2)
@@ -37,18 +38,18 @@ end
     for code in [rawcode, optcode]
         res0 = max_size(code)
         _, res1 = max_size_count(code)
-        res2 = best_solutions(code; all=true)[]
+        res2 = largest_solutions(code; all=true)[]
         res3 = solutions(code, CountingTropical{Float64}; all=false)[]
         res4 = solutions(code, CountingTropical{Float64}; all=true)[]
         @test res0 == res2.n == res3.n == res4.n
         @test res1 == length(res2.c) == length(res4.c)
         @test res3.c.data ∈ res2.c.data
         @test res3.c.data ∈ res4.c.data
-        res5 = best_solutions(code; all=false)[]
+        res5 = largest_solutions(code; all=false)[]
         @test res5.n == res0
         @test res5.c.data ∈ res2.c.data
-        res6 = best2_solutions(code; all=true)[]
-        res6_ = bestk_solutions(code, 2)[]
+        res6 = largest2_solutions(code; all=true)[]
+        res6_ = largestk_solutions(code, 2)[]
         res7 = all_solutions(code)[]
         idp = graph_polynomial(code, Val(:finitefield))[]
         @test all(x->x ∈ res7.coeffs[end-1].data, res6.coeffs[1].data)

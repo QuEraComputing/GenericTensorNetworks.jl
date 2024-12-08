@@ -1,5 +1,5 @@
 using Test, GenericTensorNetworks
-using GenericTensorNetworks: statictrues, staticfalses, StaticBitVector, onehotv
+using GenericTensorNetworks: statictrues, staticfalses, StaticBitVector, onehotv, @bv_str, StaticElementVector
 
 @testset "static bit vector" begin
     @test statictrues(StaticBitVector{3,1}) == trues(3)

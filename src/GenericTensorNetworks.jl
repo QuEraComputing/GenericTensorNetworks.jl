@@ -5,7 +5,7 @@ using TropicalNumbers
 using OMEinsum
 using OMEinsum: contraction_complexity, timespace_complexity, timespacereadwrite_complexity, getixsv, NestedEinsum, getixs, getiy, DynamicEinCode
 using Graphs, Random
-using DelimitedFiles, Serialization, Printf
+using DelimitedFiles, Serialization
 using LuxorGraphPlot
 using LuxorGraphPlot.Luxor.Colors: @colorant_str
 using LuxorGraphPlot: Layered

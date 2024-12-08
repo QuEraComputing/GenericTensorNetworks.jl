@@ -40,6 +40,8 @@ is_satisfied
 local_solution_spec
 solution_size
 energy_mode
+LargerSizeIsBetter
+SmallerSizeIsBetter
 energy
 
 is_independent_set

@@ -105,7 +105,7 @@ end
 
 Show a gallery of configurations on a graph.
 """
-function show_configs(gp::ConstraintSatisfactionProblem, locs, configs::AbstractMatrix; kwargs...)
+function show_configs(gp::Union{Coloring,DominatingSet,IndependentSet,Matching,MaxCut,MaximalIndependentSet,SpinGlass}, locs, configs::AbstractMatrix; kwargs...)
     show_configs(gp.graph, locs, configs; num_flavors=num_flavors(gp), kwargs...)
 end
 function show_configs(graph::SimpleGraph, locs, configs::AbstractMatrix;

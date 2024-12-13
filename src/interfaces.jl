@@ -390,7 +390,7 @@ Memory estimation in number of bytes to compute certain `property` of a `problem
 `T` is the base type.
 """
 function estimate_memory(problem::GenericTensorNetwork, property::AbstractProperty; T=Float64)::Real
-    _estimate_memory(tensor_element_type(T, length(labels(problem)), num_flavors(problem), property), problem)
+    _estimate_memory(tensor_element_type(T, length(variables(problem)), num_flavors(problem), property), problem)
 end
 function estimate_memory(problem::GenericTensorNetwork, property::Union{SingleConfigMax{K,BOUNDED},SingleConfigMin{K,BOUNDED}}; T=Float64) where {K, BOUNDED}
     tc, sc, rw = contraction_complexity(problem.code, _size_dict(problem))
@@ -398,29 +398,29 @@ function estimate_memory(problem::GenericTensorNetwork, property::Union{SingleCo
     if K === Single && BOUNDED
         return ceil(Int, exp2(rw - 1)) * sizeof(Tropical{T})
     elseif K === Single && !BOUNDED
-        n, nf = length(labels(problem)), num_flavors(problem)
+        n, nf = length(variables(problem)), num_flavors(problem)
         return peak_memory(problem.code, _size_dict(problem)) * (sizeof(tensor_element_type(T, n, nf, property)))
     else
         # NOTE: the integer `K` case does not respect bounding
-        n, nf = length(labels(problem)), num_flavors(problem)
+        n, nf = length(variables(problem)), num_flavors(problem)
         TT = tensor_element_type(T, n, nf, property)
         return peak_memory(problem.code, _size_dict(problem)) * (sizeof(tensor_element_type(T, n, nf, SingleConfigMax{Single,BOUNDED}())) * K + sizeof(TT))
     end
 end
 function estimate_memory(problem::GenericTensorNetwork, ::GraphPolynomial{:polynomial}; T=Float64)
     # this is the upper bound
-    return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * length(labels(problem)))
+    return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * length(variables(problem)))
 end
 function estimate_memory(problem::GenericTensorNetwork, ::GraphPolynomial{:laurent}; T=Float64)
     # this is the upper bound
-    return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * length(labels(problem)))
+    return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * length(variables(problem)))
 end
 function estimate_memory(problem::GenericTensorNetwork, ::Union{SizeMax{K},SizeMin{K}}; T=Float64) where K
     return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * _asint(K))
 end
 
 function _size_dict(problem)
-    lbs = labels(problem)
+    lbs = variables(problem)
     nf = num_flavors(problem)
     return Dict([lb=>nf for lb in lbs])
 end

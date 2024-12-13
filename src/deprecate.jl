@@ -9,4 +9,13 @@
 @deprecate get_weights(args...; kwargs...) weights(args...; kwargs...)
 @deprecate chweights(args...; kwargs...) set_weights(args...; kwargs...)
 
-@deprecate GraphProblem() ConstraintSatisfactionProblem()
+@deprecate spinglass_energy(args...; kwargs...) energy(args...; kwargs...)
+@deprecate unit_disk_graph(args...; kwargs...) UnitDiskGraph(args...; kwargs...)
+@deprecate solve(problem::ConstraintSatisfactionProblem, args...; kwargs...) solve(GenericTensorNetwork(problem), args...; kwargs...)
+
+"""
+const GraphProblem = ConstraintSatisfactionProblem
+
+Deprecated. Use `ConstraintSatisfactionProblem` instead.
+"""
+const GraphProblem = ConstraintSatisfactionProblem

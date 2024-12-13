@@ -32,6 +32,10 @@ function GenericTensorNetwork(problem::ConstraintSatisfactionProblem; openvertic
     code = _optimize_code(rcode, uniformsize_fix(rcode, num_flavors(problem), fixedvertices), optimizer, MergeVectors())
     return GenericTensorNetwork(problem, code, Dict{labeltype(code),Int}(fixedvertices))
 end
+# a unified interface to optimize the contraction code
+_optimize_code(code, size_dict, optimizer::Nothing, simplifier) = code
+_optimize_code(code, size_dict, optimizer, simplifier) = optimize_code(code, size_dict, optimizer, simplifier)
+
 function Base.show(io::IO, tn::GenericTensorNetwork)
     println(io, "$(typeof(tn))")
     println(io, "- open vertices: $(getiyv(tn.code))")
@@ -184,6 +188,9 @@ function _pow(x::LaurentPolynomial{BS,X}, i) where {BS,X}
 end
 
 ####### Extra utilities #######
+"""Upload a tensor network to GPU, need `using CUDA` to activate this extension."""
+function togpu end
+
 """
     mis_compactify!(tropicaltensor; potential=nothing)
 

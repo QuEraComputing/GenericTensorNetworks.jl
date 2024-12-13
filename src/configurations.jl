@@ -11,84 +11,69 @@ function config_type(::Type{T}, n, num_flavors; all::Bool, tree_storage::Bool) w
 end
 
 """
-    largest_solutions(problem; all=false, usecuda=false, invert=false, tree_storage::Bool=false)
+    largest_solutions(net::GenericTensorNetwork; all=false, usecuda=false, invert=false, tree_storage::Bool=false, T=Float64)
     
-Find optimal solutions with bounding.
-
-* When `all` is true, the program will use set for enumerate all possible solutions, otherwise, it will return one solution for each size.
-* `usecuda` can not be true if you want to use set to enumerate all possible solutions.
-* If `invert` is true, find the minimum.
-* If `tree_storage` is true, use [`SumProductTree`](@ref) as the storage of solutions.
+Find optimal solutions, with bounding. Please check [`solutions`](@ref) for argument descriptions.
 """
-function largest_solutions(gp::GenericTensorNetwork; all=false, usecuda=false, invert=false, tree_storage::Bool=false, T=Float64)
+function largest_solutions(net::GenericTensorNetwork; all=false, usecuda=false, invert=false, tree_storage::Bool=false, T=Float64)
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
-    xst = generate_tensors(_x(Tropical{T}; invert), gp)
-    ymask = trues(fill(num_flavors(gp), length(getiyv(gp.code)))...)
+    xst = generate_tensors(_x(Tropical{T}; invert), net)
+    ymask = trues(fill(num_flavors(net), length(getiyv(net.code)))...)
     if usecuda
         xst = togpu.(xst)
         ymask = togpu(ymask)
     end
     if all
         # we use `Float64` as default because we want to support weighted graphs.
-        T = config_type(CountingTropical{T,T}, length(labels(gp)), num_flavors(gp); all, tree_storage)
-        xs = generate_tensors(_x(T; invert), gp)
-        ret = bounding_contract(AllConfigs{1}(), gp.code, xst, ymask, xs)
+        T = config_type(CountingTropical{T,T}, length(variables(net)), num_flavors(net); all, tree_storage)
+        xs = generate_tensors(_x(T; invert), net)
+        ret = bounding_contract(AllConfigs{1}(), net.code, xst, ymask, xs)
         return invert ? asarray(post_invert_exponent.(ret), ret) : ret
     else
         @assert ndims(ymask) == 0
-        t, res = solution_ad(gp.code, xst, ymask)
+        t, res = solution_ad(net.code, xst, ymask)
         ret = fill(CountingTropical(asscalar(t).n, ConfigSampler(StaticBitVector(map(l->res[l], 1:length(res))))))
         return invert ? asarray(post_invert_exponent.(ret), ret) : ret
     end
 end
 
 """
-    solutions(problem, basetype; all, usecuda=false, invert=false, tree_storage::Bool=false)
+    solutions(net::GenericTensorNetwork, ::Type{BT}; all::Bool, usecuda::Bool=false, invert::Bool=false, tree_storage::Bool=false) where BT
     
-General routine to find solutions without bounding,
+Find all solutions, solutions with largest sizes or solutions with smallest sizes. Bounding is not supported.
 
-* `basetype` can be a type with counting field,
+### Arguments
+- `net` is a [`GenericTensorNetwork`](@ref) instance.
+- `BT` is the data types used for computing, which can be
     * `CountingTropical{Float64,Float64}` for finding optimal solutions,
     * `Polynomial{Float64, :x}` for enumerating all solutions,
     * `Max2Poly{Float64,Float64}` for optimal and suboptimal solutions.
-* When `all` is true, the program will use set for enumerate all possible solutions, otherwise, it will return one solution for each size.
-* `usecuda` can not be true if you want to use set to enumerate all possible solutions.
-* If `tree_storage` is true, use [`SumProductTree`](@ref) as the storage of solutions.
+
+### Keyword arguments
+- `all` is an indicator whether to find all solutions or just one of them.
+- `usecuda` is an indicator of using CUDA or not, which must be false if `all` is true.
+- `invert` is an indicator of whether flip the size or not. If true, instead of finding the maximum, it find the minimum.
+- `tree_storage` is an indicator of whether using more compact [`SumProductTree`](@ref) as the storage or not.
 """
-function solutions(gp::GenericTensorNetwork, ::Type{BT}; all::Bool, usecuda::Bool=false, invert::Bool=false, tree_storage::Bool=false) where BT
+function solutions(net::GenericTensorNetwork, ::Type{BT}; all::Bool, usecuda::Bool=false, invert::Bool=false, tree_storage::Bool=false) where BT
     if all && usecuda
         throw(ArgumentError("ConfigEnumerator can not be computed on GPU!"))
     end
-    T = config_type(BT, length(labels(gp)), num_flavors(gp); all, tree_storage)
-    ret = contractx(gp, _x(T; invert); usecuda=usecuda)
+    T = config_type(BT, length(variables(net)), num_flavors(net); all, tree_storage)
+    ret = contractx(net, _x(T; invert); usecuda=usecuda)
     return invert ? asarray(post_invert_exponent.(ret), ret) : ret
 end
 
-"""
-    largest2_solutions(problem; all=true, usecuda=false, invert=false, tree_storage::Bool=false)
-
-Finding optimal and suboptimal solutions.
-"""
-largest2_solutions(gp::GenericTensorNetwork; all=true, usecuda=false, invert::Bool=false, T=Float64) = solutions(gp, Max2Poly{T,T}; all, usecuda, invert)
-
-function largestk_solutions(gp::GenericTensorNetwork, k::Int; invert::Bool=false, tree_storage::Bool=false, T=Float64)
-    xst = generate_tensors(_x(Tropical{T}; invert), gp)
-    ymask = trues(fill(2, length(getiyv(gp.code)))...)
-    T = config_type(TruncatedPoly{k,T,T}, length(labels(gp)), num_flavors(gp); all=true, tree_storage)
-    xs = generate_tensors(_x(T; invert), gp)
-    ret = bounding_contract(AllConfigs{k}(), gp.code, xst, ymask, xs)
+function largestk_solutions(net::GenericTensorNetwork, k::Int; invert::Bool=false, tree_storage::Bool=false, T=Float64)
+    xst = generate_tensors(_x(Tropical{T}; invert), net)
+    ymask = trues(fill(2, length(getiyv(net.code)))...)
+    T = config_type(TruncatedPoly{k,T,T}, length(variables(net)), num_flavors(net); all=true, tree_storage)
+    xs = generate_tensors(_x(T; invert), net)
+    ret = bounding_contract(AllConfigs{k}(), net.code, xst, ymask, xs)
     return invert ? asarray(post_invert_exponent.(ret), ret) : ret
 end
-
-"""
-    all_solutions(problem)
-
-Finding all solutions grouped by size.
-e.g. when the problem is [`MaximalIS`](@ref), it computes all maximal independent sets, or the maximal cliques of it complement.
-"""
-all_solutions(gp::GenericTensorNetwork; T=Float64) = solutions(gp, Polynomial{T,:x}, all=true, usecuda=false, tree_storage=false)
 
 # NOTE: do we have more efficient way to compute it?
 # NOTE: doing pair-wise Hamming distance might be biased?

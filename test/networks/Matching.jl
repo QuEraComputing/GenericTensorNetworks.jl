@@ -8,8 +8,8 @@ using GenericTensorNetworks: solutions
     @test length(res.c.data) == 6
     k = findfirst(x->x==Graphs.SimpleEdge(1,2), collect(edges(g)))
     code = GenericTensorNetwork(Matching(g); optimizer=GreedyMethod(), fixedvertices=Dict(k=>1))
-    @test get_weights(code) == UnitWeight(ne(code.problem.graph))
-    @test get_weights(set_weights(code, fill(3, 15))) == fill(3, 15)
+    @test GenericTensorNetworks.weights(code) == UnitWeight(ne(code.problem.graph))
+    @test GenericTensorNetworks.weights(set_weights(code, fill(3, 15))) == fill(3, 15)
     res = solutions(code, CountingTropicalF64; all=true)[]
     @test res.n == 5
     @test length(res.c.data) == 2 && res.c.data[1][k] == 1 && res.c.data[2][k] == 1

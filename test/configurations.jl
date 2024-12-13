@@ -1,7 +1,7 @@
 using GenericTensorNetworks, Test, Graphs
 using OMEinsum
 using TropicalNumbers: CountingTropicalF64
-using GenericTensorNetworks: _onehotv, _x, sampler_type, set_type, largest_solutions, largest2_solutions, solutions, all_solutions, largestk_solutions, AllConfigs, SingleConfig, max_size, max_size_count
+using GenericTensorNetworks: _onehotv, _x, sampler_type, set_type, largest_solutions, solutions, largestk_solutions, AllConfigs, SingleConfig, max_size, max_size_count
 using GenericTensorNetworks: graph_polynomial
 
 @testset "Config types" begin
@@ -48,14 +48,11 @@ end
         res5 = largest_solutions(code; all=false)[]
         @test res5.n == res0
         @test res5.c.data ∈ res2.c.data
-        res6 = largest2_solutions(code; all=true)[]
-        res6_ = largestk_solutions(code, 2)[]
-        res7 = all_solutions(code)[]
+        res6 = largestk_solutions(code, 2)[]
+        res7 = GenericTensorNetworks.solutions(code, Polynomial{Float64,:x}, all=true, usecuda=false, tree_storage=false)[]
         idp = graph_polynomial(code, Val(:finitefield))[]
         @test all(x->x ∈ res7.coeffs[end-1].data, res6.coeffs[1].data)
         @test all(x->x ∈ res7.coeffs[end].data, res6.coeffs[2].data)
-        @test all(x->x ∈ res7.coeffs[end-1].data, res6_.coeffs[1].data)
-        @test all(x->x ∈ res7.coeffs[end].data, res6_.coeffs[2].data)
         for (i, (s, c)) in enumerate(zip(res7.coeffs, idp.coeffs))
             @test length(s) == c
             @test all(x->count_ones(x)==(i-1), s.data)

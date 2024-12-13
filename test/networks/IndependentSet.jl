@@ -14,8 +14,8 @@ using GenericTensorNetworks, Test, Graphs
     potential = zeros(Float64, 4)
     m2 = mis_compactify!(copy(m); potential)
     @test count(!iszero, m2) == 1
-    @test get_weights(net.problem) == UnitWeight(nv(net.problem.graph))
-    @test get_weights(set_weights(net.problem, fill(3, 6))) == fill(3, 6)
+    @test GenericTensorNetworks.weights(net.problem) == UnitWeight(nv(net.problem.graph))
+    @test GenericTensorNetworks.weights(set_weights(net.problem, fill(3, 6))) == fill(3, 6)
 end
 
 @testset "empty graph" begin

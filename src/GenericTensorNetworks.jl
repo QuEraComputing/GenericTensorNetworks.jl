@@ -83,7 +83,6 @@ project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODUL
 include("Mods.jl/src/Mods.jl")
 using .Mods
 
-include("utils.jl")
 include("arithematics.jl")
 include("networks.jl")
 include("graph_polynomials.jl")

@@ -8,7 +8,7 @@ using GenericTensorNetworks: StaticBitVector, graph_polynomial
     @test ne(g) == 20
     g = diagonal_coupled_graph((x = trues(3, 3); x[2,2]=0; x))
     @test ne(g) == 12
-    @test length(GenericTensorNetworks.labels(GenericTensorNetwork(IndependentSet(g)).code)) == 8
+    @test length(uniquelabels(GenericTensorNetwork(IndependentSet(g)).code)) == 8
 end
 
 @testset "independence_polynomial" begin

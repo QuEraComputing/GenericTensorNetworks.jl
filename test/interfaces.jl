@@ -1,4 +1,4 @@
-using GenericTensorNetworks
+using GenericTensorNetworks, GenericTensorNetworks.ProblemReductions
 using Graphs, Test, Random
 
 @testset "independent set problem" begin
@@ -245,4 +245,12 @@ end
     @test_throws ArgumentError solve(gp, ConfigsMin(2))
     @test solve(gp, ConfigsMin(Single)) isa Array
     @test_throws AssertionError ConfigsMin(0)
+end
+
+@testset "GTNSolver" begin
+    sg = SpinGlass(smallgraph(:petersen), rand(15), rand(10))
+    solver1 = GTNSolver(; optimizer=TreeSA(ntrials=1))
+    solver2 = BruteForce()
+    @test Set(findmin(sg, solver1)) == Set(findmin(sg, solver2))
+    @test Set(findmax(sg, solver1)) == Set(findmax(sg, solver2))
 end

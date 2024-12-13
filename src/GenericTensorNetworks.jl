@@ -67,6 +67,9 @@ export SetCovering, is_set_covering
 # Interfaces
 export solve, SizeMax, SizeMin, PartitionFunction, CountingAll, CountingMax, CountingMin, GraphPolynomial, SingleConfigMax, SingleConfigMin, ConfigsAll, ConfigsMax, ConfigsMin, Single, AllConfigs
 
+# ProblemReductions API
+export GTNSolver
+
 # Utilities
 export save_configs, load_configs, hamming_distribution, save_sumproduct, load_sumproduct
 

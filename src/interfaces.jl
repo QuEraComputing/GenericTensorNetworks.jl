@@ -483,3 +483,18 @@ for GP in [:IndependentSet, :MaxCut, :DominatingSet, :Satisfiability, :Coloring,
 end
 size_all_negative(::SpinGlass) = false
 size_all_positive(::SpinGlass) = false
+
+# NOTE: `findmin` and `findmax` are required by `ProblemReductions.jl`
+Base.@kwdef struct GTNSolver
+    optimizer::OMEinsum.CodeOptimizer = TreeSA()
+    usecuda::Bool = false
+    T::Type = Float64
+end
+function Base.findmin(problem::AbstractProblem, solver::GTNSolver)
+    res = collect(solve(GenericTensorNetwork(problem; optimizer=solver.optimizer), ConfigsMin(; tree_storage=true); usecuda=solver.usecuda, T=solver.T)[].c)
+    return map(x -> ProblemReductions.id_to_config(problem, Int.(x) .+ 1), res)
+end
+function Base.findmax(problem::AbstractProblem, solver::GTNSolver)
+    res = collect(solve(GenericTensorNetwork(problem; optimizer=solver.optimizer), ConfigsMax(; tree_storage=true); usecuda=solver.usecuda, T=solver.T)[].c)
+    return map(x -> ProblemReductions.id_to_config(problem, Int.(x) .+ 1), res)
+end

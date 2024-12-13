@@ -73,7 +73,7 @@ min_configs = read_config(solve(problem, ConfigsMin())[])
 # Hence the two optimal solutions are ``\{z_1, z_3, z_5, z_6\}`` and ``\{z_2, z_3, z_4, z_5\}``.
 # The correctness of this result can be checked with the [`is_set_covering`](@ref) function.
 
-all(c->is_set_covering(sets, c), min_configs)
+all(c->is_set_covering(problem.problem, c), min_configs)
 
 # Similarly, if one is only interested in computing one of the minimum set coverings,
 # one can use the graph property [`SingleConfigMin`](@ref).

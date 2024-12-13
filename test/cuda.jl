@@ -58,9 +58,9 @@ end
 
 @testset "spinglass" begin
     g = Graphs.smallgraph("petersen")
-    gp = GenericTensorNetwork(SpinGlass(g, UnitWeight()))
+    gp = GenericTensorNetwork(SpinGlass(g, UnitWeight(ne(g)), zeros(Int, nv(g))))
     usecuda=true
     @test solve(gp, CountingMax(); usecuda) isa CuArray
-    gp2 = GenericTensorNetwork(SpinGlass(g, UnitWeight()); openvertices=(2,))
+    gp2 = GenericTensorNetwork(SpinGlass(g, UnitWeight(ne(g)), zeros(Int, nv(g))); openvertices=(2,))
     @test solve(gp2, CountingMax(); usecuda) isa CuArray
 end

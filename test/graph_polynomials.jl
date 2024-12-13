@@ -3,17 +3,12 @@ using GenericTensorNetworks.Mods, Polynomials, TropicalNumbers
 using Graphs, Random
 using GenericTensorNetworks: StaticBitVector, graph_polynomial
 
-@testset "bond and vertex tensor" begin
-    @test GenericTensorNetworks.misb(TropicalF64) == [TropicalF64(0) TropicalF64(0); TropicalF64(0) TropicalF64(-Inf)]
-    @test GenericTensorNetworks.misv([one(TropicalF64), TropicalF64(2.0)]) == [TropicalF64(0), TropicalF64(2.0)]
-end
-
 @testset "graph generator" begin
     g = diagonal_coupled_graph(trues(3, 3))
     @test ne(g) == 20
     g = diagonal_coupled_graph((x = trues(3, 3); x[2,2]=0; x))
     @test ne(g) == 12
-    @test length(GenericTensorNetworks.labels(GenericTensorNetwork(IndependentSet(g)).code)) == 8
+    @test length(uniquelabels(GenericTensorNetwork(IndependentSet(g)).code)) == 8
 end
 
 @testset "independence_polynomial" begin

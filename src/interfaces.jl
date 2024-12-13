@@ -10,7 +10,7 @@ _asint(x::Type{Single}) = 1
 The maximum-K set sizes. e.g. the largest size of the [`IndependentSet`](@ref)  problem is also know as the independence number.
 
 * The corresponding tensor element type are max-plus tropical number [`Tropical`](@ref) if `K` is `Single` and [`ExtendedTropical`](@ref) if `K` is an integer.
-* It is compatible with weighted graph problems.
+* It is compatible with weighted Constraint Satisfaction Problems.
 * BLAS (on CPU) and GPU are supported only if `K` is `Single`,
 """
 struct SizeMax{K} <: AbstractProperty end
@@ -25,7 +25,7 @@ The minimum-K set sizes. e.g. the smallest size ofthe [`MaximalIS`](@ref) proble
 
 * The corresponding tensor element type are inverted max-plus tropical number [`Tropical`](@ref) if `K` is `Single` and inverted [`ExtendedTropical`](@ref) `K` is an integer.
 The inverted Tropical number emulates the min-plus tropical number.
-* It is compatible with weighted graph problems.
+* It is compatible with weighted constraint satisfaction problems.
 * BLAS (on CPU) and GPU are supported only if `K` is `Single`,
 """
 struct SizeMin{K} <: AbstractProperty end
@@ -64,7 +64,7 @@ Counting the number of sets with largest-K size. e.g. for [`IndependentSet`](@re
 it counts independent sets of size ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
 
 * The corresponding tensor element type is [`CountingTropical`](@ref) if `K` is `Single`, and [`TruncatedPoly`](@ref)`{K}` if `K` is an integer.
-* Weighted graph problems is only supported if `K` is `Single`.
+* Weighted constraint satisfaction problems is only supported if `K` is `Single`.
 * GPU is supported,
 """
 struct CountingMax{K} <: AbstractProperty end
@@ -78,7 +78,7 @@ max_k(::CountingMax{K}) where K = K
 Counting the number of sets with smallest-K size.
 
 * The corresponding tensor element type is inverted [`CountingTropical`](@ref) if `K` is `Single`, and [`TruncatedPoly`](@ref)`{K}` if `K` is an integer.
-* Weighted graph problems is only supported if `K` is `Single`.
+* Weighted constraint satisfaction problems is only supported if `K` is `Single`.
 * GPU is supported,
 """
 struct CountingMin{K} <: AbstractProperty end
@@ -115,7 +115,7 @@ Method Argument
     * It has round-off error.
     * BLAS and GPU are supported, it is the fastest among all methods.
 
-Graph polynomials are not defined for weighted graph problems.
+Graph polynomials are not defined for weighted constraint satisfaction problems.
 """
 struct GraphPolynomial{METHOD} <: AbstractProperty
     kwargs
@@ -130,7 +130,7 @@ graph_polynomial_method(::GraphPolynomial{METHOD}) where METHOD = METHOD
 Finding single solution for largest-K sizes, e.g. for [`IndependentSet`](@ref) problem, it is one of the maximum independent sets.
 
 * The corresponding data type is [`CountingTropical{Float64,<:ConfigSampler}`](@ref) if `BOUNDED` is `false`, [`Tropical`](@ref) otherwise.
-* Weighted graph problems is supported.
+* Weighted constraint satisfaction problems is supported.
 * GPU is supported,
 
 Keyword Arguments
@@ -148,7 +148,7 @@ max_k(::SingleConfigMax{K}) where K = K
 Finding single solution with smallest-K size.
 
 * The corresponding data type is inverted [`CountingTropical{Float64,<:ConfigSampler}`](@ref) if `BOUNDED` is `false`, inverted [`Tropical`](@ref) otherwise.
-* Weighted graph problems is supported.
+* Weighted constraint satisfaction problems is supported.
 * GPU is supported,
 
 Keyword Arguments
@@ -184,7 +184,7 @@ Find configurations with largest-K sizes, e.g. for [`IndependentSet`](@ref) prob
 it is finding all independent sets of sizes ``\\alpha(G), \\alpha(G)-1, \\ldots, \\alpha(G)-K+1``.
 
 * The corresponding data type is [`CountingTropical`](@ref)`{Float64,<:ConfigEnumerator}` if `K` is `Single` and [`TruncatedPoly`](@ref)`{K,<:ConfigEnumerator}` if `K` is an integer.
-* Weighted graph problems is only supported if `K` is `Single`.
+* Weighted constraint satisfaction problem is only supported if `K` is `Single`.
 
 Keyword Arguments
 ----------------------------
@@ -203,7 +203,7 @@ tree_storage(::ConfigsMax{K,BOUNDED,TREESTORAGE}) where {K,BOUNDED,TREESTORAGE} 
 Find configurations with smallest-K sizes.
 
 * The corresponding data type is inverted [`CountingTropical`](@ref)`{Float64,<:ConfigEnumerator}` if `K` is `Single` and inverted [`TruncatedPoly`](@ref)`{K,<:ConfigEnumerator}` if `K` is an integer.
-* Weighted graph problems is only supported if `K` is `Single`.
+* Weighted constraint satisfaction problem is only supported if `K` is `Single`.
 
 Keyword Arguments
 ----------------------------
@@ -275,21 +275,19 @@ function solve(gp::GenericTensorNetwork, property::AbstractProperty; T=Float64, 
         res = contractx(gp, pre_invert_exponent(TruncatedPoly(ntuple(i->i == min_k(property) ? one(T) : zero(T), min_k(property)), one(T))); usecuda=usecuda)
         return asarray(post_invert_exponent.(res), res)
     elseif property isa GraphPolynomial
-        ws = get_weights(gp)
-        if !(eltype(ws) <: Integer)
+        # fix the fake non-integer weights
+        if is_weighted(gp) && !(eltype(weights(gp)) <: Integer)
             @warn "Input weights are not Integer types, try casting to weights of `Int64` type..."
-            gp = chweights(gp, Int.(ws))
-            ws = get_weights(gp)
+            gp = set_weights(gp, Int.(weights(gp)))
         end
-        n = length(energy_terms(gp))
-        if ws isa UnitWeight || ws isa ZeroWeight || all(i->all(>=(0), get_weights(gp, i)), 1:n)
+        if !is_weighted(gp) || size_all_positive(gp.problem)
             return graph_polynomial(gp, Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
-        elseif all(i->all(<=(0), get_weights(gp, i)), 1:n)
-            res = graph_polynomial(chweights(gp, -ws), Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
+        elseif is_weighted(gp) && size_all_negative(gp.problem)
+            res = graph_polynomial(set_weights(gp, -weights(gp)), Val(graph_polynomial_method(property)); usecuda=usecuda, T=T, property.kwargs...)
             return asarray(invert_polynomial.(res), res)
         else
             if graph_polynomial_method(property) != :laurent
-                @warn "Weights are not all positive or all negative, switch to using laurent polynomial."
+                @warn "weights are not all positive or all negative, switch to using laurent polynomial."
             end
             return graph_polynomial(gp, Val(:laurent); usecuda=usecuda, T=T, property.kwargs...)
         end
@@ -312,23 +310,23 @@ function solve(gp::GenericTensorNetwork, property::AbstractProperty; T=Float64, 
     elseif property isa ConfigsAll
         return solutions(gp, Real; all=true, usecuda=usecuda, tree_storage=tree_storage(property))
     elseif property isa SingleConfigMax{Single,true}
-        return best_solutions(gp; all=false, usecuda=usecuda, T=T)
+        return largest_solutions(gp; all=false, usecuda=usecuda, T=T)
     elseif property isa (SingleConfigMax{K,true} where K)
         @warn "bounded `SingleConfigMax` property for `K != Single` is not implemented. Switching to the unbounded version."
         return solve(gp, SingleConfigMax{max_k(property),false}(); T, usecuda)
     elseif property isa SingleConfigMin{Single,true}
-        return best_solutions(gp; all=false, usecuda=usecuda, invert=true, T=T)
+        return largest_solutions(gp; all=false, usecuda=usecuda, invert=true, T=T)
     elseif property isa (SingleConfigMin{K,true} where K)
         @warn "bounded `SingleConfigMin` property for `K != Single` is not implemented. Switching to the unbounded version."
         return solve(gp, SingleConfigMin{min_k(property),false}(); T, usecuda)
     elseif property isa ConfigsMax{Single,true}
-        return best_solutions(gp; all=true, usecuda=usecuda, tree_storage=tree_storage(property), T=T)
+        return largest_solutions(gp; all=true, usecuda=usecuda, tree_storage=tree_storage(property), T=T)
     elseif property isa ConfigsMin{Single,true}
-        return best_solutions(gp; all=true, usecuda=usecuda, invert=true, tree_storage=tree_storage(property), T=T)
+        return largest_solutions(gp; all=true, usecuda=usecuda, invert=true, tree_storage=tree_storage(property), T=T)
     elseif property isa (ConfigsMax{K,true} where K)
-        return bestk_solutions(gp, max_k(property), tree_storage=tree_storage(property), T=T)
+        return largestk_solutions(gp, max_k(property), tree_storage=tree_storage(property), T=T)
     elseif property isa (ConfigsMin{K,true} where K)
-        return bestk_solutions(gp, min_k(property), invert=true, tree_storage=tree_storage(property), T=T)
+        return largestk_solutions(gp, min_k(property), invert=true, tree_storage=tree_storage(property), T=T)
     else
         error("unknown property: `$property`.")
     end
@@ -362,10 +360,8 @@ function assert_solvable(problem, property::CountingMin)
     end
 end
 function has_noninteger_weights(problem::GenericTensorNetwork)
-    for i in 1:length(energy_terms(problem))
-        if any(!isinteger, get_weights(problem, i))
-            return true
-        end
+    if ProblemReductions.is_weighted(problem.problem) && any(!isinteger, weights(problem))
+        return true
     end
     return false
 end
@@ -394,7 +390,7 @@ Memory estimation in number of bytes to compute certain `property` of a `problem
 `T` is the base type.
 """
 function estimate_memory(problem::GenericTensorNetwork, property::AbstractProperty; T=Float64)::Real
-    _estimate_memory(tensor_element_type(T, length(labels(problem)), nflavor(problem), property), problem)
+    _estimate_memory(tensor_element_type(T, length(variables(problem)), num_flavors(problem), property), problem)
 end
 function estimate_memory(problem::GenericTensorNetwork, property::Union{SingleConfigMax{K,BOUNDED},SingleConfigMin{K,BOUNDED}}; T=Float64) where {K, BOUNDED}
     tc, sc, rw = contraction_complexity(problem.code, _size_dict(problem))
@@ -402,30 +398,30 @@ function estimate_memory(problem::GenericTensorNetwork, property::Union{SingleCo
     if K === Single && BOUNDED
         return ceil(Int, exp2(rw - 1)) * sizeof(Tropical{T})
     elseif K === Single && !BOUNDED
-        n, nf = length(labels(problem)), nflavor(problem)
+        n, nf = length(variables(problem)), num_flavors(problem)
         return peak_memory(problem.code, _size_dict(problem)) * (sizeof(tensor_element_type(T, n, nf, property)))
     else
         # NOTE: the integer `K` case does not respect bounding
-        n, nf = length(labels(problem)), nflavor(problem)
+        n, nf = length(variables(problem)), num_flavors(problem)
         TT = tensor_element_type(T, n, nf, property)
         return peak_memory(problem.code, _size_dict(problem)) * (sizeof(tensor_element_type(T, n, nf, SingleConfigMax{Single,BOUNDED}())) * K + sizeof(TT))
     end
 end
 function estimate_memory(problem::GenericTensorNetwork, ::GraphPolynomial{:polynomial}; T=Float64)
     # this is the upper bound
-    return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * length(labels(problem)))
+    return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * length(variables(problem)))
 end
 function estimate_memory(problem::GenericTensorNetwork, ::GraphPolynomial{:laurent}; T=Float64)
     # this is the upper bound
-    return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * length(labels(problem)))
+    return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * length(variables(problem)))
 end
 function estimate_memory(problem::GenericTensorNetwork, ::Union{SizeMax{K},SizeMin{K}}; T=Float64) where K
     return peak_memory(problem.code, _size_dict(problem)) * (sizeof(T) * _asint(K))
 end
 
 function _size_dict(problem)
-    lbs = labels(problem)
-    nf = nflavor(problem)
+    lbs = variables(problem)
+    nf = num_flavors(problem)
     return Dict([lb=>nf for lb in lbs])
 end
 
@@ -444,23 +440,23 @@ for (PROP, ET) in [
         (:(GraphPolynomial{:laurent}), :(LaurentPolynomial{T, :x})), (:(GraphPolynomial{:fft}), :(Complex{T})), 
         (:(GraphPolynomial{:finitefield}), :(Mod{N,Int32} where N))
     ]
-    @eval tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T} = $ET
+    @eval tensor_element_type(::Type{T}, n::Int, num_flavors::Int, ::$PROP) where {T} = $ET
 end
 for (PROP, ET) in [
         (:(SizeMax{K}), :(ExtendedTropical{K,Tropical{T}})), (:(SizeMin{K}), :(ExtendedTropical{K,Tropical{T}})),
         (:(CountingMax{K}), :(TruncatedPoly{K,T,T})), (:(CountingMin{K}), :(TruncatedPoly{K,T,T})),
     ]
-    @eval tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T, K} = $ET
+    @eval tensor_element_type(::Type{T}, n::Int, num_flavors::Int, ::$PROP) where {T, K} = $ET
 end
 
-function tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::PROP) where {T, K, BOUNDED, PROP<:Union{SingleConfigMax{K,BOUNDED},SingleConfigMin{K,BOUNDED}}}
+function tensor_element_type(::Type{T}, n::Int, num_flavors::Int, ::PROP) where {T, K, BOUNDED, PROP<:Union{SingleConfigMax{K,BOUNDED},SingleConfigMin{K,BOUNDED}}}
     if K === Single && BOUNDED
         return Tropical{T}
     elseif K === Single && !BOUNDED
-        return sampler_type(CountingTropical{T,T}, n, nflavor)
+        return sampler_type(CountingTropical{T,T}, n, num_flavors)
     else
         # NOTE: the integer `K` case does not respect bounding
-        return sampler_type(ExtendedTropical{K,CountingTropical{T,T}}, n, nflavor)
+        return sampler_type(ExtendedTropical{K,CountingTropical{T,T}}, n, num_flavors)
     end
 end
 
@@ -468,15 +464,22 @@ for (PROP, ET) in [
         (:(ConfigsMax{Single}), :(CountingTropical{T,T})), (:(ConfigsMin{Single}), :(CountingTropical{T,T})),
         (:(ConfigsAll), :(Real))
     ]
-    @eval function tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T}
-        set_type($ET, n, nflavor)
+    @eval function tensor_element_type(::Type{T}, n::Int, num_flavors::Int, ::$PROP) where {T}
+        set_type($ET, n, num_flavors)
     end
 end
 
 for (PROP, ET) in [
         (:(ConfigsMax{K}), :(TruncatedPoly{K,T,T})), (:(ConfigsMin{K}), :(TruncatedPoly{K,T,T})),
     ]
-    @eval function tensor_element_type(::Type{T}, n::Int, nflavor::Int, ::$PROP) where {T, K}
-        set_type($ET, n, nflavor)
+    @eval function tensor_element_type(::Type{T}, n::Int, num_flavors::Int, ::$PROP) where {T, K}
+        set_type($ET, n, num_flavors)
     end
 end
+
+for GP in [:IndependentSet, :MaxCut, :DominatingSet, :Satisfiability, :Coloring, :PaintShop, :SetCovering, :SetPacking, :MaximalIS, :Matching]
+    @eval size_all_negative(problem::$(GP)) = all(<=(0), weights(problem))
+    @eval size_all_positive(problem::$(GP)) = all(>=(0), weights(problem))
+end
+size_all_negative(::SpinGlass) = false
+size_all_positive(::SpinGlass) = false

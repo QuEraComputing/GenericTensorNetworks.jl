@@ -1,18 +1,17 @@
 using Test, GenericTensorNetworks, Graphs
 using GenericTensorNetworks: solutions
-
 @testset "enumerating - matching" begin
     g = smallgraph(:petersen)
     code = GenericTensorNetwork(Matching(g); optimizer=GreedyMethod(), fixedvertices=Dict())
     res = solutions(code, CountingTropicalF64; all=true)[]
     @test res.n == 5
     @test length(res.c.data) == 6
-    code = GenericTensorNetwork(Matching(g); optimizer=GreedyMethod(), fixedvertices=Dict((1,2)=>1))
-    @test get_weights(code) == UnitWeight()
-    @test get_weights(chweights(code, fill(3, 15))) == fill(3, 15)
+    k = findfirst(x->x==Graphs.SimpleEdge(1,2), collect(edges(g)))
+    code = GenericTensorNetwork(Matching(g); optimizer=GreedyMethod(), fixedvertices=Dict(k=>1))
+    @test GenericTensorNetworks.weights(code) == UnitWeight(ne(code.problem.graph))
+    @test GenericTensorNetworks.weights(set_weights(code, fill(3, 15))) == fill(3, 15)
     res = solutions(code, CountingTropicalF64; all=true)[]
     @test res.n == 5
-    k = findfirst(x->x==(1,2), labels(code))
     @test length(res.c.data) == 2 && res.c.data[1][k] == 1 && res.c.data[2][k] == 1
 end
 

@@ -25,7 +25,7 @@ end
     rawcode = GenericTensorNetwork(IndependentSet(random_regular_graph(10, 3)); optimizer=nothing).code
     optcode = GenericTensorNetwork(IndependentSet(random_regular_graph(10, 3)); optimizer=GreedyMethod()).code
     xs = map(OMEinsum.getixs(rawcode)) do ix
-        length(ix)==1 ? GenericTensorNetworks.misv([one(TropicalF64), TropicalF64(1.0)]) : GenericTensorNetworks.misb(TropicalF64)
+        length(ix)==1 ? [one(TropicalF64), TropicalF64(1.0)] : TropicalF64.([0 0; 0 -Inf])
     end
     y1 = rawcode(xs...)
     y2 = bounding_contract(AllConfigs{1}(), rawcode, xs, BitArray(fill(true)), xs)

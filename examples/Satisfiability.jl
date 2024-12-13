@@ -8,7 +8,7 @@
 # One can specify a satisfiable problem in the [conjunctive normal form](https://en.wikipedia.org/wiki/Conjunctive_normal_form).
 # In boolean logic, a formula is in conjunctive normal form (CNF) if it is a conjunction (∧) of one or more clauses,
 # where a clause is a disjunction (∨) of literals.
-using GenericTensorNetworks
+using GenericTensorNetworks, GenericTensorNetworks.ProblemReductions
 
 @bools a b c d e f g
 
@@ -48,15 +48,15 @@ problem = GenericTensorNetwork(sat)
 
 # ## Solving properties
 # #### Satisfiability and its counting
-# The size of a satisfiability problem is defined by the number of satisfiable clauses.
-num_satisfiable = solve(problem, SizeMax())[]
+# The size of a satisfiability problem is defined by the number of unsatisfied clauses.
+num_satisfiable = solve(problem, SizeMin())[]
 
 # The [`GraphPolynomial`](@ref) of a satisfiability problem counts the number of solutions that `k` clauses satisfied.
 num_satisfiable_count = read_size_count(solve(problem, GraphPolynomial())[])
 
 # #### Find one of the solutions
-single_config = read_config(solve(problem, SingleConfigMax())[])
+single_config = read_config(solve(problem, SingleConfigMin())[])
 
 # One will see a bit vector printed.
 # One can create an assignment and check the validity with the following statement:
-satisfiable(cnf, Dict(zip(labels(problem), single_config)))
+satisfiable(cnf, Dict(zip(ProblemReductions.symbols(problem.problem), single_config)))

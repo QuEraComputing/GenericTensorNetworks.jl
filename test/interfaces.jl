@@ -208,10 +208,11 @@ end
             ConfigsMax(;bounded=true), ConfigsMin(;bounded=true), ConfigsMax(2;bounded=true), ConfigsMin(2;bounded=true), 
             ConfigsMax(;bounded=false), ConfigsMin(;bounded=false), ConfigsMax(2;bounded=false), ConfigsMin(2;bounded=false), SingleConfigMax(;bounded=false), SingleConfigMin(;bounded=false),
             CountingAll(), ConfigsAll(), SingleConfigMax(2), SingleConfigMin(2), SingleConfigMax(2; bounded=true), SingleConfigMin(2,bounded=true),
+            PartitionFunction(0.0)
         ]
         @show property
         ET = GenericTensorNetworks.tensor_element_type(Float32, 10, 2, property)
-        @test eltype(solve(gp, property, T=Float32)) <: ET
+        @test eltype(solve(gp, property, T=Float32)) <: (property isa CountingAll ? BigInt : ET)
         @test estimate_memory(gp, property) isa Integer
     end
     @test GenericTensorNetworks.tensor_element_type(Float32, 10, 2, GraphPolynomial(method=:polynomial)) == Polynomial{Float32, :x}

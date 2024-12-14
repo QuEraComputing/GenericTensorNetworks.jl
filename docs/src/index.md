@@ -28,7 +28,7 @@ using GenericTensorNetworks, Graphs#, CUDA
 solve(
            GenericTensorNetwork(IndependentSet(
                    Graphs.random_regular_graph(20, 3),
-                   UnitWeight());    # default: uniform weight 1
+                   UnitWeight(20));    # default: uniform weight 1
                optimizer = TreeSA(),
                openvertices = (),       # default: no open vertices
                fixedvertices = Dict()   # default: no fixed vertices

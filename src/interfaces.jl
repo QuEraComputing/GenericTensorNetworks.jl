@@ -263,7 +263,8 @@ function solve(gp::GenericTensorNetwork, property::AbstractProperty; T=Float64, 
         return asarray(post_invert_exponent.(res), res)
     elseif property isa CountingAll
         return big_integer_solve(Int32, 100) do T
-            contractx(gp, one(T); usecuda=usecuda)
+            # NOTE: download to CPU after computation for post-processing (CRT)
+            Array(contractx(gp, one(T); usecuda=usecuda))
         end
     elseif property isa PartitionFunction
         return contractx(gp, exp(property.beta); usecuda=usecuda)

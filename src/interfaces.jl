@@ -36,9 +36,10 @@ max_k(::SizeMin{K}) where K = K
     CountingAll <: AbstractProperty
     CountingAll()
 
-Counting the total number of sets. e.g. for the [`IndependentSet`](@ref) problem, it counts the independent sets.
+Counting the total number of sets exactly without overflow. e.g. for the [`IndependentSet`](@ref) problem, it counts the independent sets.
+Note that `PartitionFunction(0.0)` also does the counting. It is more efficient, but uses floating point numbers, which does not have arbitrary precision.
 
-* The corresponding tensor element type is `Base.Real`.
+* The corresponding tensor element type is `BigInt`.
 * The weights on graph does not have effect.
 * BLAS (GPU and CPU) and GPU are supported,
 """
@@ -261,7 +262,10 @@ function solve(gp::GenericTensorNetwork, property::AbstractProperty; T=Float64, 
         res = contractx(gp, _x(ExtendedTropical{max_k(property), Tropical{T}}; invert=true); usecuda=usecuda)
         return asarray(post_invert_exponent.(res), res)
     elseif property isa CountingAll
-        return contractx(gp, one(T); usecuda=usecuda)
+        return big_integer_solve(Int32, 100) do T
+            # NOTE: download to CPU after computation for post-processing (CRT)
+            Array(contractx(gp, one(T); usecuda=usecuda))
+        end
     elseif property isa PartitionFunction
         return contractx(gp, exp(property.beta); usecuda=usecuda)
     elseif property isa CountingMax{Single}
@@ -433,15 +437,15 @@ function _estimate_memory(::Type{ET}, problem::GenericTensorNetwork) where ET
 end
 
 for (PROP, ET) in [
-        (:(PartitionFunction{T}), :(T)),
         (:(SizeMax{Single}), :(Tropical{T})), (:(SizeMin{Single}), :(Tropical{T})),
-        (:(CountingAll), :T), (:(CountingMax{Single}), :(CountingTropical{T,T})), (:(CountingMin{Single}), :(CountingTropical{T,T})),
+        (:(CountingAll), :Int32), (:(CountingMax{Single}), :(CountingTropical{T,T})), (:(CountingMin{Single}), :(CountingTropical{T,T})),
         (:(GraphPolynomial{:polynomial}), :(Polynomial{T, :x})), (:(GraphPolynomial{:fitting}), :T),
         (:(GraphPolynomial{:laurent}), :(LaurentPolynomial{T, :x})), (:(GraphPolynomial{:fft}), :(Complex{T})), 
         (:(GraphPolynomial{:finitefield}), :(Mod{N,Int32} where N))
     ]
     @eval tensor_element_type(::Type{T}, n::Int, num_flavors::Int, ::$PROP) where {T} = $ET
 end
+tensor_element_type(::Type{T}, n::Int, num_flavors::Int, ::PartitionFunction{T2}) where {T, T2} = T2
 for (PROP, ET) in [
         (:(SizeMax{K}), :(ExtendedTropical{K,Tropical{T}})), (:(SizeMin{K}), :(ExtendedTropical{K,Tropical{T}})),
         (:(CountingMax{K}), :(TruncatedPoly{K,T,T})), (:(CountingMin{K}), :(TruncatedPoly{K,T,T})),

@@ -1,94 +1,96 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Sum product tree representation · GenericTensorNetworks.jl</title><meta name="title" content="Sum product tree representation · GenericTensorNetworks.jl"/><meta property="og:title" content="Sum product tree representation · GenericTensorNetworks.jl"/><meta property="twitter:title" content="Sum product tree representation · GenericTensorNetworks.jl"/><meta name="description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="twitter:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/sumproduct/"/><meta property="twitter:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/sumproduct/"/><link rel="canonical" href="https://QuEraComputing.github.io/GenericTensorNetworks.jl/sumproduct/"/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">GenericTensorNetworks.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><span class="tocitem">Problems</span><ul><li><a class="tocitem" href="../generated/IndependentSet/">Independent set problem</a></li><li><a class="tocitem" href="../generated/MaximalIS/">Maximal independent set problem</a></li><li><a class="tocitem" href="../generated/SpinGlass/">Spin glass problem</a></li><li><a class="tocitem" href="../generated/MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../generated/Matching/">Vertex matching problem</a></li><li><a class="tocitem" href="../generated/PaintShop/">Binary paint shop problem</a></li><li><a class="tocitem" href="../generated/Coloring/">Coloring problem</a></li><li><a class="tocitem" href="../generated/DominatingSet/">Dominating set problem</a></li><li><a class="tocitem" href="../generated/Satisfiability/">Satisfiability problem</a></li><li><a class="tocitem" href="../generated/SetCovering/">Set covering problem</a></li><li><a class="tocitem" href="../generated/SetPacking/">Set packing problem</a></li></ul></li><li><span class="tocitem">Topics</span><ul><li><a class="tocitem" href="../gist/">Gist</a></li><li><a class="tocitem" href="../generated/saveload/">Save and load solutions</a></li><li class="is-active"><a class="tocitem" href>Sum product tree representation</a></li><li><a class="tocitem" href="../generated/weighted/">Weighted problems</a></li><li><a class="tocitem" href="../generated/open/">Open and fixed degrees of freedom</a></li></ul></li><li><a class="tocitem" href="../performancetips/">Performance Tips</a></li><li><a class="tocitem" href="../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Topics</a></li><li class="is-active"><a href>Sum product tree representation</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Sum product tree representation</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/docs/src/sumproduct.md#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Sum-product-representation-for-configurations"><a class="docs-heading-anchor" href="#Sum-product-representation-for-configurations">Sum product representation for configurations</a><a id="Sum-product-representation-for-configurations-1"></a><a class="docs-heading-anchor-permalink" href="#Sum-product-representation-for-configurations" title="Permalink"></a></h1><p><a href="../ref/#GenericTensorNetworks.SumProductTree"><code>SumProductTree</code></a> can use polynomial memory to store exponential number of configurations. It is a sum-product expression tree to store <a href="../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a> in a lazy style, where configurations can be extracted by depth first searching the tree with the <code>Base.collect</code> method. Although it is space efficient, it is in general not easy to extract information from it due to the exponential large configuration space. Directed sampling is one of its most important operations, with which one can get some statistic properties from it with an intermediate effort. For example, if we want to check some property of an intermediate scale graph, one can type</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using GenericTensorNetworks</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; graph = random_regular_graph(70, 3)</code><code class="nohighlight hljs ansi" style="display:block;">{70, 105} undirected simple Int64 graph</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; problem = GenericTensorNetwork(IndependentSet(graph); optimizer=TreeSA());</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code><code class="nohighlight hljs ansi" style="display:block;">+ (count = 1.55951641647e13)
-├─ + (count = 1.1851712477918e13)
-│  ├─ + (count = 8.087315420816e12)
-│  │  ├─ * (count = 8.25781484447e11)
-│  │  │  ├─ * (count = 8.25781484447e11)
-│  │  │  │  ├─ + (count = 8.25781484447e11)
-│  │  │  │  │  ⋮
-│  │  │  │  │
-│  │  │  │  └─ * (count = 1.0)
-│  │  │  │     ⋮
-│  │  │  │
-│  │  │  └─ * (count = 1.0)
-│  │  │     ├─ OnehotVec{70, 2}(65, 1)
-│  │  │     └─ * (count = 1.0)
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Sum product tree representation · GenericTensorNetworks.jl</title><meta name="title" content="Sum product tree representation · GenericTensorNetworks.jl"/><meta property="og:title" content="Sum product tree representation · GenericTensorNetworks.jl"/><meta property="twitter:title" content="Sum product tree representation · GenericTensorNetworks.jl"/><meta name="description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="twitter:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/sumproduct/"/><meta property="twitter:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/sumproduct/"/><link rel="canonical" href="https://QuEraComputing.github.io/GenericTensorNetworks.jl/sumproduct/"/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script><link href="../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">GenericTensorNetworks.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><span class="tocitem">Problems</span><ul><li><a class="tocitem" href="../generated/IndependentSet/">Independent set problem</a></li><li><a class="tocitem" href="../generated/MaximalIS/">Maximal independent set problem</a></li><li><a class="tocitem" href="../generated/SpinGlass/">Spin glass problem</a></li><li><a class="tocitem" href="../generated/MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../generated/Matching/">Vertex matching problem</a></li><li><a class="tocitem" href="../generated/PaintShop/">Binary paint shop problem</a></li><li><a class="tocitem" href="../generated/Coloring/">Coloring problem</a></li><li><a class="tocitem" href="../generated/DominatingSet/">Dominating set problem</a></li><li><a class="tocitem" href="../generated/Satisfiability/">Satisfiability problem</a></li><li><a class="tocitem" href="../generated/SetCovering/">Set covering problem</a></li><li><a class="tocitem" href="../generated/SetPacking/">Set packing problem</a></li></ul></li><li><span class="tocitem">Topics</span><ul><li><a class="tocitem" href="../gist/">Gist</a></li><li><a class="tocitem" href="../generated/saveload/">Save and load solutions</a></li><li class="is-active"><a class="tocitem" href>Sum product tree representation</a></li><li><a class="tocitem" href="../generated/weighted/">Weighted problems</a></li><li><a class="tocitem" href="../generated/open/">Open and fixed degrees of freedom</a></li></ul></li><li><a class="tocitem" href="../performancetips/">Performance Tips</a></li><li><a class="tocitem" href="../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Topics</a></li><li class="is-active"><a href>Sum product tree representation</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Sum product tree representation</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/docs/src/sumproduct.md#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Sum-product-representation-for-configurations"><a class="docs-heading-anchor" href="#Sum-product-representation-for-configurations">Sum product representation for configurations</a><a id="Sum-product-representation-for-configurations-1"></a><a class="docs-heading-anchor-permalink" href="#Sum-product-representation-for-configurations" title="Permalink"></a></h1><p><a href="../ref/#GenericTensorNetworks.SumProductTree"><code>SumProductTree</code></a> can use polynomial memory to store exponential number of configurations. It is a sum-product expression tree to store <a href="../ref/#GenericTensorNetworks.ConfigEnumerator"><code>ConfigEnumerator</code></a> in a lazy style, where configurations can be extracted by depth first searching the tree with the <code>Base.collect</code> method. Although it is space efficient, it is in general not easy to extract information from it due to the exponential large configuration space. Directed sampling is one of its most important operations, with which one can get some statistic properties from it with an intermediate effort. For example, if we want to check some property of an intermediate scale graph, one can type</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using GenericTensorNetworks</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; graph = random_regular_graph(70, 3)</code><code class="nohighlight hljs ansi" style="display:block;">{70, 105} undirected simple Int64 graph</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; problem = GenericTensorNetwork(IndependentSet(graph); optimizer=TreeSA());</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code><code class="nohighlight hljs ansi" style="display:block;">+ (count = 1.7042933526212e13)
+├─ + (count = 1.2943469325281e13)
+│  ├─ + (count = 8.849769392095e12)
+│  │  ├─ * (count = 9.47476020478e11)
+│  │  │  ├─ * (count = 1.0)
+│  │  │  │  ├─ OnehotVec{70, 2}(56, 1)
+│  │  │  │  └─ OnehotVec{70, 2}(2, 1)
+│  │  │  └─ + (count = 9.47476020478e11)
+│  │  │     ├─ * (count = 1.30951955306e11)
+│  │  │     │  ⋮
+│  │  │     │
+│  │  │     └─ + (count = 8.16524065172e11)
 │  │  │        ⋮
 │  │  │
-│  │  └─ + (count = 7.261533936369e12)
-│  │     ├─ * (count = 1.770261320811e12)
-│  │     │  ├─ * (count = 1.770261320811e12)
-│  │     │  │  ⋮
-│  │     │  │
-│  │     │  └─ OnehotVec{70, 2}(65, 1)
-│  │     └─ + (count = 5.491272615558e12)
-│  │        ├─ * (count = 1.747820928776e12)
+│  │  └─ + (count = 7.902293371617e12)
+│  │     ├─ * (count = 1.879319842489e12)
+│  │     │  ├─ OnehotVec{70, 2}(2, 1)
+│  │     │  └─ + (count = 1.879319842489e12)
+│  │     │     ⋮
+│  │     │
+│  │     └─ + (count = 6.022973529128e12)
+│  │        ├─ * (count = 1.929273595942e12)
 │  │        │  ⋮
 │  │        │
-│  │        └─ + (count = 3.743451686782e12)
+│  │        └─ + (count = 4.093699933186e12)
 │  │           ⋮
 │  │
-│  └─ * (count = 3.764397057102e12)
-│     ├─ OnehotVec{70, 2}(39, 1)
-│     └─ + (count = 3.764397057102e12)
-│        ├─ * (count = 3.74734118834e11)
-│        │  ├─ * (count = 3.74734118834e11)
-│        │  │  ⋮
-│        │  │
-│        │  └─ * (count = 1.0)
-│        │     ⋮
-│        │
-│        └─ + (count = 3.389662938268e12)
-│           ├─ * (count = 8.0397937569e11)
-│           │  ⋮
-│           │
-│           └─ + (count = 2.585683562578e12)
-│              ⋮
-│
-└─ * (count = 3.743451686782e12)
-   ├─ OnehotVec{70, 2}(51, 1)
-   └─ * (count = 3.743451686782e12)
-      ├─ + (count = 3.743451686782e12)
-      │  ├─ * (count = 1.169455305325e12)
-      │  │  ├─ + (count = 1.169455305325e12)
-      │  │  │  ⋮
-      │  │  │
-      │  │  └─ OnehotVec{70, 2}(44, 1)
-      │  └─ + (count = 2.573996381457e12)
-      │     ├─ * (count = 1.87731284801e11)
-      │     │  ⋮
-      │     │
-      │     └─ + (count = 2.386265096656e12)
-      │        ⋮
-      │
-      └─ * (count = 1.0)
-         ├─ OnehotVec{70, 2}(51, 1)
-         └─ * (count = 1.0)
-            ├─ OnehotVec{70, 2}(51, 1)
-            └─ OnehotVec{70, 2}(51, 1)</code></pre><p>If one wants to store these configurations, he will need a hard disk of size 256 TB! However, this sum-product binary tree structure supports efficient and unbiased direct sampling.</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; samples = generate_samples(tree, 1000)</code><code class="nohighlight hljs ansi" style="display:block;">1000-element Vector{StaticBitVector{70, 2}}:
- 0000000100010010001000100001110011110001000000000000000110100010110000
- 1000000100001010010011100101100100100000000000000000100000011110101000
- 0000000000001010101000001010110100100001000000001000000100011010110000
- 0100000000011010010000110001110111100000010000000100000111100001110000
- 1100000000001011110010000000100010100000000010011000000010000000101010
- 0100001110001011100100001000100100100001000000110100000001001000101000
- 0000000000100011001001101000101100100000000001000101000010100000100000
- 0000001000000011101000001011100000100001000010100000000001001000101000
- 0000000100000110000000001100101101000000100000010100100001100110110000
- 0000000100000010010011000000100001001100100010000100100011001110101000
+│  └─ * (count = 4.093699933186e12)
+│     ├─ * (count = 4.093699933186e12)
+│     │  ├─ * (count = 1.0)
+│     │  │  ├─ OnehotVec{70, 2}(47, 1)
+│     │  │  └─ * (count = 1.0)
+│     │  │     ⋮
+│     │  │
+│     │  └─ + (count = 4.093699933186e12)
+│     │     ├─ * (count = 8.0585461904e10)
+│     │     │  ⋮
+│     │     │
+│     │     └─ + (count = 4.013114471282e12)
+│     │        ⋮
+│     │
+│     └─ OnehotVec{70, 2}(47, 1)
+└─ * (count = 4.099464200931e12)
+   ├─ + (count = 4.099464200931e12)
+   │  ├─ * (count = 4.32196039729e11)
+   │  │  ├─ * (count = 1.0)
+   │  │  │  ├─ OnehotVec{70, 2}(56, 1)
+   │  │  │  └─ OnehotVec{70, 2}(2, 1)
+   │  │  └─ + (count = 4.32196039729e11)
+   │  │     ├─ * (count = 5.84493145e10)
+   │  │     │  ⋮
+   │  │     │
+   │  │     └─ + (count = 3.73746725229e11)
+   │  │        ⋮
+   │  │
+   │  └─ + (count = 3.667268161202e12)
+   │     ├─ * (count = 8.59078393352e11)
+   │     │  ├─ OnehotVec{70, 2}(2, 1)
+   │     │  └─ + (count = 8.59078393352e11)
+   │     │     ⋮
+   │     │
+   │     └─ + (count = 2.80818976785e12)
+   │        ├─ * (count = 8.98174172841e11)
+   │        │  ⋮
+   │        │
+   │        └─ + (count = 1.910015595009e12)
+   │           ⋮
+   │
+   └─ OnehotVec{70, 2}(66, 1)</code></pre><p>If one wants to store these configurations, he will need a hard disk of size 256 TB! However, this sum-product binary tree structure supports efficient and unbiased direct sampling.</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; samples = generate_samples(tree, 1000)</code><code class="nohighlight hljs ansi" style="display:block;">1000-element Vector{StaticBitVector{70, 2}}:
+ 1100001010100010000001101000011100000000010000000000100100001010100110
+ 1100000010010010001001111000010011011001010100000010110100000100100100
+ 0100100100101010000001111001000010100001011000001100001100000000100100
+ 0100001010110010000001001001000000000100010010000010010100001100101100
+ 0100000010001000011000101000010010010000010100000000001100110000100010
+ 0100000010110100000000011000010000000101010100000000110100011001100010
+ 0110001000010000000000101100010100001100010110000000000100100000101100
+ 0100000001010100010001001110001000010000010000000100001100000000100000
+ 0100100000001110100000000000000101000010010000000001000101001000000010
+ 1100001100101010010000100000010010010010010100001000100100010100100000
  ⋮
- 0001000101000000000100010010010000010101000000001010000000011000000001
- 1010110000010000000000010001010000000100010000000010000011000000001011
- 0100010000000100100000000010010000010001000000000010010011101000000100
- 0000000010000000010000110000000000001000100001000010000001001100001110
- 0010000000000000010001000010000000011100100000000011000001000100000001
- 0000001011010000000100000001000010000000110011000011011001000000000011
- 1010100000000000000000000001000000001000001000000111101011100000000111
- 0001100000001000001001100011000000000000000011001010000110001000000100
- 1000000000000000100000010001001000000001100001001110000010000000001110</code></pre><p>With these samples, one can already compute useful properties like Hamming distance (see <a href="../ref/#GenericTensorNetworks.hamming_distribution"><code>hamming_distribution</code></a>) distribution. The following code visualizes this distribution with <code>CairoMakie</code>.</p><pre><code class="language-julia hljs">using CairoMakie
+ 0001001110000100100011000000100000100000001000000001001001100010110000
+ 0001000110101000000011000000100000000001000011000000000000001100010101
+ 0000000100101000000010000010100000010001001001001001001001010000010000
+ 0000000000110000100010010001100010100001000001000000000001001001010100
+ 0000001010110001110010000101100000001000001000000000010001000110011100
+ 0011000010000000000000000011001010010010000011000101000001000000110000
+ 0000000000010001100010010001000001011000001000010110001000000000011000
+ 0001000100001000010001010000001010000010000000000001000000100010010001
+ 0001010000010100100001000000000001010001001001000011001001000000010001</code></pre><p>With these samples, one can already compute useful properties like Hamming distance (see <a href="../ref/#GenericTensorNetworks.hamming_distribution"><code>hamming_distribution</code></a>) distribution. The following code visualizes this distribution with <code>CairoMakie</code>.</p><pre><code class="language-julia hljs">using CairoMakie
 dist = hamming_distribution(samples, samples)
 # bar plot
 fig = Figure()
 ax = Axis(fig[1, 1]; xlabel=&quot;Hamming distance&quot;, ylabel=&quot;Frequency&quot;)
 barplot!(ax, 0:length(dist)-1, dist)
-fig</code></pre><img src="ee6f4e25.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../generated/saveload/">« Save and load solutions</a><a class="docs-footer-nextpage" href="../generated/weighted/">Weighted problems »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Saturday 14 December 2024 03:02">Saturday 14 December 2024</span>. Using Julia version 1.11.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+fig</code></pre><img src="5f94069e.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../generated/saveload/">« Save and load solutions</a><a class="docs-footer-nextpage" href="../generated/weighted/">Weighted problems »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Sunday 15 December 2024 09:27">Sunday 15 December 2024</span>. Using Julia version 1.11.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

@@ -254,4 +254,8 @@ end
     solver2 = BruteForce()
     @test Set(findmin(sg, solver1)) == Set(findmin(sg, solver2))
     @test Set(findmax(sg, solver1)) == Set(findmax(sg, solver2))
+
+    solver3 = GTNSolver(; optimizer=TreeSA(ntrials=1), single=true)
+    @test findmin(sg, solver3)[] ∈ findmin(sg, solver2)
+    @test findmax(sg, solver3)[] ∈ findmax(sg, solver2)
 end

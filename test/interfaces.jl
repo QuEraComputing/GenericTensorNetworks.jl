@@ -259,3 +259,23 @@ end
     @test findmin(sg, solver3)[] ∈ findmin(sg, solver2)
     @test findmax(sg, solver3)[] ∈ findmax(sg, solver2)
 end
+
+@testset "partition function" begin
+    function fullerene()
+        φ = (1+√5)/2
+        res = NTuple{3,Float64}[]
+        for (x, y, z) in ((0.0, 1.0, 3φ), (1.0, 2 + φ, 2φ), (φ, 2.0, 2φ + 1.0))
+            for (α, β, γ) in ((x,y,z), (y,z,x), (z,x,y))
+                for loc in ((α,β,γ), (α,β,-γ), (α,-β,γ), (α,-β,-γ), (-α,β,γ), (-α,β,-γ), (-α,-β,γ), (-α,-β,-γ))
+                    if loc ∉ res
+                        push!(res, loc)
+                    end
+                end
+            end
+        end
+        return res
+    end
+    graph = UnitDiskGraph(fullerene(), sqrt(5))
+    spin_glass = SpinGlass(graph, UnitWeight(ne(graph)), zeros(Int, nv(graph)))
+    @test log(solve(spin_glass, PartitionFunction(1.0))[])/nv(graph) ≈ 1.3073684577607942
+end

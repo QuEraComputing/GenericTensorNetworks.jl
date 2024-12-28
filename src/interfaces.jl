@@ -267,7 +267,8 @@ function solve(gp::GenericTensorNetwork, property::AbstractProperty; T=Float64, 
             Array(contractx(gp, one(T); usecuda=usecuda))
         end
     elseif property isa PartitionFunction
-        return contractx(gp, exp(property.beta); usecuda=usecuda)
+        # for larger size is better, we use the negative size as the energy
+        return contractx(gp, exp(energy_mode(gp.problem) isa LargerSizeIsBetter ? property.beta : -property.beta); usecuda=usecuda)
     elseif property isa CountingMax{Single}
         return contractx(gp, _x(CountingTropical{T,T}; invert=false); usecuda=usecuda)
     elseif property isa CountingMin{Single}

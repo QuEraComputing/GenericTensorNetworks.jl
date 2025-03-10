@@ -15,7 +15,7 @@ using Test, GenericTensorNetworks, Graphs
 
     @test GenericTensorNetworks.GraphProblem === ConstraintSatisfactionProblem
     sg = SpinGlass(smallgraph(:petersen), ones(Int, ne(smallgraph(:petersen))), ones(Int, nv(smallgraph(:petersen))))
-    cfg = rand([-1, 1], nv(sg.graph))
+    cfg = rand([0, 1], nv(sg.graph))
     @test spinglass_energy(sg, cfg) == energy(sg, cfg)
     @test unit_disk_graph([(1, 2), (2, 2)], 1.6) isa UnitDiskGraph
     @test solve(sg, SizeMax()) == solve(GenericTensorNetwork(sg), SizeMax())

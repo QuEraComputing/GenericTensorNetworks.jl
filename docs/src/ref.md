@@ -19,9 +19,7 @@ SetPacking
 
 #### Constraint Satisfaction Problem Interfaces
 
-To subtype [`ConstraintSatisfactionProblem`](@ref), a new type must contain a `code` field to represent the (optimized) tensor network.
-Interfaces [`GenericTensorNetworks.generate_tensors`](@ref), [`flavors`](@ref) and [`weights`](@ref) are required.
-[`num_flavors`](@ref) is optional.
+Constraint satisfaction problems are defined by a set of constraints and objectives defined on a set of local variables.
 
 ```@docs
 GenericTensorNetworks.generate_tensors
@@ -30,14 +28,16 @@ weights
 set_weights
 is_weighted
 num_flavors
+num_variables
 fixedvertices
 ```
 
 #### Constraint Satisfaction Problem Utilities
 ```@docs
-hard_constraints
+constraints
+objectives
+flavor_names
 is_satisfied
-local_solution_spec
 solution_size
 energy_mode
 LargerSizeIsBetter
@@ -100,7 +100,7 @@ SumProductTree
 ConfigSampler
 ```
 
-`GenericTensorNetworks` also exports the [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2) and [`LaurentPolynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomials.LaurentPolynomial) types defined in package `Polynomials`.
+Extra types include the [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2) and [`LaurentPolynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomials.LaurentPolynomial) types defined in package `Polynomials`.
 
 
 For reading the properties from the above element types, one can use the following functions.
@@ -148,7 +148,7 @@ MergeGreedy
 
 ## Others
 #### Graph
-Except the `SimpleGraph` defined in [Graphs](https://github.com/JuliaGraphs/Graphs.jl), `GenericTensorNetworks` also defines the following types and functions.
+Except the `SimpleGraph` defined in [Graphs](https://github.com/JuliaGraphs/Graphs.jl), `GenericTensorNetworks` also defines the following graph types and functions.
 
 ```@docs
 HyperGraph
@@ -175,8 +175,6 @@ line_graph
 random_diagonal_coupled_graph
 random_square_lattice_graph
 ```
-
-One can also use `random_regular_graph` and `smallgraph` in [Graphs](https://github.com/JuliaGraphs/Graphs.jl) to build special graphs.
 
 #### Multiprocessing
 ```@docs

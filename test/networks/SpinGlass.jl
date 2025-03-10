@@ -6,7 +6,7 @@ using GenericTensorNetworks, Test, Graphs
     h = randn(10) .* 0.5
     problem = SpinGlass(g, J, h)
     gp = GenericTensorNetwork(problem)
-    cfg(x) = [(x>>i & 1) == 1 ? -1 : 1 for i=0:9]
+    cfg(x) = [x>>i & 1 for i=0:9]
     energies = [energy(problem, cfg(b)) for b=0:1<<nv(g)-1]
     sorted_energies = sort(energies)
     @test solve(gp, SizeMax())[].n ≈ sorted_energies[end]
@@ -14,7 +14,7 @@ using GenericTensorNetworks, Test, Graphs
     @test getfield.(solve(gp, SizeMax(2))[].orders |> collect, :n) ≈ sorted_energies[end-1:end]
     res = solve(gp, SingleConfigMax(2))[].orders |> collect
     @test getfield.(res, :n) ≈ sorted_energies[end-1:end]
-    cfg2(x) = 1 .- 2 .* Int.(x)
+    cfg2(x) = Int.(x)
     @test energy(problem, cfg2(res[1].c.data)) ≈ res[end-1].n
     @test energy(problem, cfg2(res[2].c.data)) ≈ res[end].n
     val, ind = findmax(energies)
@@ -64,7 +64,7 @@ end
     end; M += M'
     gp2 = GenericTensorNetwork(spin_glass_from_matrix(M, h))
     @test gp2.problem.J ≈ gp.problem.J
-    cfg(x) = [(x>>i & 1) == 1 ? -1 : 1 for i=0:9]
+    cfg(x) = [(x>>i & 1) for i=0:9]
     energies = [energy(gp.problem, cfg(b)) for b=0:1<<nv(g)-1]
     sorted_energies = sort(energies)
     @test solve(gp, SizeMax())[].n ≈ sorted_energies[end]
@@ -72,7 +72,7 @@ end
     @test getfield.(solve(gp, SizeMax(2))[].orders |> collect, :n) ≈ sorted_energies[end-1:end]
     res = solve(gp, SingleConfigMax(2))[].orders |> collect
     @test getfield.(res, :n) ≈ sorted_energies[end-1:end]
-    cfg2(x) = 1 .- 2 .* Int.(x)
+    cfg2(x) = Int.(x)
     @test energy(gp.problem, cfg2(res[1].c.data)) ≈ res[end-1].n
     @test energy(gp.problem, cfg2(res[2].c.data)) ≈ res[end].n
     val, ind = findmax(energies)

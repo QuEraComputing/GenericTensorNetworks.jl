@@ -1,80 +1,89 @@
-# # Set packing problem
-
-# !!! note
-#     It is highly recommended to read the [Independent set problem](@ref) chapter before reading this one.
-
-# ## Problem definition
-
-# The [set packing problem](https://en.wikipedia.org/wiki/Set_packing) is generalization of the [`IndependentSet`](@ref) problem from the simple graph to the multigraph.
-# Suppose one has a finite set ``S`` and a list of subsets of ``S``. Then, the set packing problem asks if some ``k`` subsets in the list are pairwise disjoint.
-# In the following, we will find the solution space properties for the set in the [Set covering problem](@ref).
+# # Set Packing Problem
+#
+# ## Overview
+# The Set Packing Problem is a generalization of the Independent Set problem from simple graphs
+# to hypergraphs. Given a collection of sets, the goal is to find the maximum number of mutually
+# disjoint sets (sets that share no common elements).
+#
+# This example demonstrates:
+# * Formulating a set packing problem
+# * Converting it to a tensor network
+# * Finding maximum set packings
+# * Analyzing the solution space
+#
+# We'll use the same sets from the [Set Covering Problem](@ref) example for comparison.
 
 using GenericTensorNetworks, Graphs
 
-# The packing stadium areas of cameras are represented as the following sets.
-
+# Define our sets (each representing a camera's coverage area)
 sets = [[1,3,4,6,7], [4,7,8,12], [2,5,9,11,13],
     [1,2,14,15], [3,6,10,12,14], [8,14,15], 
     [1,2,6,11], [1,2,4,6,8,12]]
 
-# ## Generic tensor network representation
-# We can define the set packing problem with the [`SetPacking`](@ref) type as
-problem = SetPacking(sets)
+# ## Tensor Network Formulation
+# Define the set packing problem:
+setpacking = SetPacking(sets)
 
-# The tensor network representation of the set packing problem can be obtained by
-problem = GenericTensorNetwork(problem)
+# The problem consists of:
+# 1. Packing constraints: No element can be covered by more than one set
+# 2. Optimization objective: Maximize the number of sets used
+constraints(setpacking)
+#
+objectives(setpacking)
 
-# ### Theory (can skip)
-# Let ``S`` be the target set packing problem that we want to solve.
-# For each set ``s \in S``, we associate it with a weight ``w_s`` to it.
-# The tensor network representation map a set ``s\in S`` to a boolean degree of freedom ``v_s\in\{0, 1\}``.
-# For each set ``s``, we defined a parameterized rank-one tensor indexed by ``v_s`` as
-# ```math
-# W(x_s^{w_s}) = \left(\begin{matrix}
-#     1 \\
-#     x_s^{w_s}
-#     \end{matrix}\right)
-# ```
-# where ``x_s`` is a variable associated with ``s``.
-# For each unique element ``a``, we defined the constraint over all sets containing it ``N(a) = \{s | s \in S \land a\in s\}``:
-# ```math
-# B_{s_1,s_2,\ldots,s_{|N(a)|}} = \begin{cases}
-#     0 & s_1+s_2+\ldots+s_{|N(a)|} > 1,\\
-#     1 & \text{otherwise}.
-# \end{cases}
-# ```
-# This tensor means if in a configuration, two sets contain the element ``a``, then this configuration is forbidden,
-# One can check the contraction time space complexity of a [`SetPacking`](@ref) instance by typing:
+# Convert to tensor network representation:
+problem = GenericTensorNetwork(setpacking)
 
+# ## Mathematical Background
+# For each set $s$ with weight $w_s$, we assign a boolean variable $v_s ∈ \{0,1\}$,
+# indicating whether the set is included in the solution.
+#
+# The network uses two types of tensors:
+#
+# 1. Set Tensors: For each set $s$:
+#    ```math
+#    W(x_s, w_s) = \begin{pmatrix}
+#        1 \\
+#        x_s^{w_s}
+#    \end{pmatrix}
+#    ```
+#
+# 2. Element Constraint Tensors: For each element a and its containing sets N(a):
+#    ```math
+#    B_{s_1,...,s_{|N(a)|}} = 
+#    \begin{cases}
+#        0 & \text{if } \sum_i s_i > 1 \text{ (element covered multiple times - invalid)} \\
+#        1 & \text{otherwise (element covered at most once - valid)}
+#    \end{cases}
+#    ```
+#
+# Check the contraction complexity:
 contraction_complexity(problem)
 
-# ## Solving properties
-
-# ### Counting properties
-# ##### The "graph" polynomial
-# The graph polynomial for the set packing problem is defined as
-# ```math
-# P(S, x) = \sum_{k=0}^{\alpha(S)} c_k x^k,
-# ```
-# where ``c_k`` is the number of configurations having ``k`` sets, and ``\alpha(S)`` is the maximum size of the packing.
-
+# ## Solution Analysis
+# ### 1. Set Packing Polynomial
+# The polynomial $P(S,x) = \sum_i c_i x^i$ counts set packings by size,
+# where $c_i$ is the number of valid packings using $i$ sets
 packing_polynomial = solve(problem, GraphPolynomial())[]
 
-# The maximum number of sets that packing the set of elements can be computed with the [`SizeMax`](@ref) property:
+# ### 2. Maximum Set Packing Size
+# Find the maximum number of mutually disjoint sets:
 max_packing_size = solve(problem, SizeMax())[]
 
-# Similarly, we have its counting [`CountingMax`](@ref):
+# Count maximum set packings:
 counting_maximum_set_packing = solve(problem, CountingMax())[]
 
-# ### Configuration properties
-# ##### Finding maximum set packing
-# One can enumerate all maximum set packing with the [`ConfigsMax`](@ref) property in the program.
+# ### 3. Maximum Set Packing Configurations
+# Enumerate all maximum set packings:
 max_configs = read_config(solve(problem, ConfigsMax())[])
 
-# Hence the only optimal solution is ``\{z_1, z_3, z_6\}`` that has size 3.
-# The correctness of this result can be checked with the [`is_set_packing`](@ref) function.
+# The optimal solution is $\{z_1, z_3, z_6\}$ with size 3,
+# where $z_i$ represents the $i$-th set in our original list.
 
+# Verify solutions are valid:
 all(c->is_set_packing(problem.problem, c), max_configs)
 
-# Similarly, if one is only interested in computing one of the maximum set packing,
-# one can use the graph property [`SingleConfigMax`](@ref).
+# Note: For finding just one maximum set packing, use the SingleConfigMax property
+
+# ## More APIs
+# The [Independent Set Problem](@ref) chapter has more examples on how to use the APIs.

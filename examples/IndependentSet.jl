@@ -1,5 +1,10 @@
-# # Independent set problem
-
+# # Independent Set Problem
+#
+# ## Overview
+# This example demonstrates how to solve the Independent Set problem using tensor networks.
+# An independent set is a set of vertices in a graph where no two vertices are adjacent.
+# We'll explore this problem using the Petersen graph as our example.
+#
 # ## Problem definition
 # In graph theory, an [independent set](https://en.wikipedia.org/wiki/Independent_set_(graph_theory)) is a set of vertices in a graph, no two of which are adjacent.
 #
@@ -20,9 +25,21 @@ show_graph(graph, locations; format=:svg)
 # * a [Jupyter](https://github.com/JunoLab/Juno.jl) notebook,
 # * or a [Pluto](https://github.com/fonsp/Pluto.jl) notebook,
 
-# ## Generic tensor network representation
-# The independent set problem can be constructed with [`IndependentSet`](@ref) type as
+# ## Tensor Network Formulation
+# We represent the independent set problem using a tensor network approach.
+# This allows us to efficiently compute various properties of the solution space.
+
 iset = IndependentSet(graph)
+
+# The problem has two main components:
+# 1. Independence constraints: Ensure no adjacent vertices are selected
+# 2. Optimization objective: Maximize the size of the independent set
+
+constraints(iset)
+
+#
+
+objectives(iset)
 
 # The tensor network representation of the independent set problem can be obtained by
 problem = GenericTensorNetwork(iset; optimizer=TreeSA())
@@ -31,7 +48,7 @@ problem = GenericTensorNetwork(iset; optimizer=TreeSA())
 # Here, the key word argument `optimizer` specifies the tensor network contraction order optimizer as a local search based optimizer [`TreeSA`](@ref).
 # The resulting contraction order optimized tensor network is contained in the `code` field of `problem`.
 #
-# ### Theory (can skip)
+# ### Mathematical Background
 # Let ``G=(V, E)`` be a graph with each vertex $v\in V$ associated with a weight ``w_v``.
 # To reduce the independent set problem on it to a tensor network contraction, we first map a vertex ``v\in V`` to a label ``s_v \in \{0, 1\}`` of dimension ``2``, where we use ``0`` (``1``) to denote a vertex absent (present) in the set.
 # For each vertex ``v``, we defined a parameterized rank-one tensor indexed by ``s_v`` as
@@ -57,99 +74,45 @@ contraction_complexity(problem)
 
 # For more information about how to improve the contraction order, please check the [Performance Tips](@ref).
 
-# ## Solution space properties
-
-# ### Maximum independent set size ``\alpha(G)``
-# We can compute solution space properties with the [`solve`](@ref) function, which takes two positional arguments, the problem instance and the wanted property.
+# ## Solution Space Analysis
+#
+# ### 1. Maximum Independent Set Size ($α(G)$)
+# First, we compute the size of the largest independent set:
 maximum_independent_set_size = solve(problem, SizeMax())[]
-
-# Here [`SizeMax`](@ref) means finding the solution with maximum set size.
-# The return value has [`Tropical`](@ref) type. We can get its content by typing
 read_size(maximum_independent_set_size)
 
-# ### Counting properties
-# ##### Count all solutions and best several solutions
-# We can count all independent sets with the [`CountingAll`](@ref) property.
+# ### 2. Counting Solutions
+# We can analyze the solution space in several ways:
+#
+# #### a. Total Count
+# Count all possible independent sets:
 count_all_independent_sets = solve(problem, CountingAll())[]
 
-# The return value has type `Float64`. The counting of all independent sets is equivalent to the infinite temperature partition function
-solve(problem, PartitionFunction(0.0))[]
-
-# We can count the maximum independent sets with [`CountingMax`](@ref).
+# #### b. Maximum Solutions
+# Count independent sets of maximum size:
 count_maximum_independent_sets = solve(problem, CountingMax())[]
-
-# The return value has type [`CountingTropical`](@ref), which contains two fields.
-# They are `n` being the maximum independent set size and `c` being the number of the maximum independent sets.
-
 read_size_count(count_maximum_independent_sets)
 
-# Similarly, we can count independent sets of sizes ``\alpha(G)`` and ``\alpha(G)-1`` by feeding an integer positional argument to [`CountingMax`](@ref).
-count_max2_independent_sets = solve(problem, CountingMax(2))[]
-
-# The return value has type [`TruncatedPoly`](@ref), which contains two fields.
-# They are `maxorder` being the maximum independent set size and `coeffs` being the number of independent sets having sizes ``\alpha(G)-1`` and ``\alpha(G)``.
-
-read_size_count(count_max2_independent_sets)
-
-# ##### Find the graph polynomial
-# We can count the number of independent sets at any size, which is equivalent to finding the coefficients of an independence polynomial that defined as
-# ```math
-# I(G, x) = \sum_{k=0}^{\alpha(G)} a_k x^k,
-# ```
-# where ``\alpha(G)`` is the maximum independent set size, 
-# ``a_k`` is the number of independent sets of size ``k``.
-# The total number of independent sets is thus equal to ``I(G, 1)``.
-# There are 3 methods to compute a graph polynomial, `:finitefield`, `:fft` and `:polynomial`.
-# These methods are introduced in the docstring of [`GraphPolynomial`](@ref).
-independence_polynomial = solve(problem, GraphPolynomial(; method=:finitefield))[]
-
-# The return type is [`Polynomial`](https://juliamath.github.io/Polynomials.jl/stable/polynomials/polynomial/#Polynomial-2).
-read_size_count(independence_polynomial)
-
-# ### Configuration properties
-# ##### Find one best solution
-# We can use the bounded or unbounded [`SingleConfigMax`](@ref) to find one of the solutions with largest size.
-# The unbounded (default) version uses a joint type of [`CountingTropical`](@ref) and [`ConfigSampler`](@ref) in computation,
-# where `CountingTropical` finds the maximum size and `ConfigSampler` samples one of the best solutions.
-# The bounded version uses the binary gradient back-propagation (see our paper) to compute the gradients.
-# It requires caching intermediate states, but is often faster (on CPU) because it can use [`TropicalGEMM`](https://github.com/TensorBFS/TropicalGEMM.jl) (see [Performance Tips](@ref)).
+# ## Configuration Analysis
+#
+# ### 1. Finding Optimal Solutions
+# We can find a single optimal solution using SingleConfigMax:
 max_config = solve(problem, SingleConfigMax(; bounded=false))[]
-
-# The return value has type [`CountingTropical`](@ref) with its counting field having [`ConfigSampler`](@ref) type. The `data` field of [`ConfigSampler`](@ref) is a bit string that corresponds to the solution
 single_solution = read_config(max_config)
 
-# This bit string should be read from left to right, with the i-th bit being 1 (0) to indicate the i-th vertex is present (absent) in the set.
-# We can visualize this MIS with the following function.
+# Visualize the maximum independent set:
 show_graph(graph, locations; format=:svg, vertex_colors=
     [iszero(single_solution[i]) ? "white" : "red" for i=1:nv(graph)])
 
-# ##### Enumerate all solutions and best several solutions
-# We can use bounded or unbounded [`ConfigsMax`](@ref) to find all solutions with largest-K set sizes.
-# In most cases, the bounded (default) version is preferred because it can reduce the memory usage significantly.
+# ### 2. Solution Enumeration
+# We can enumerate all optimal solutions or generate samples:
+
+# a. Find all maximum independent sets:
 all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]
-
-# The return value has type [`CountingTropical`](@ref), while its counting field having type [`ConfigEnumerator`](@ref). The `data` field of a [`ConfigEnumerator`](@ref) instance contains a vector of bit strings.
-
 _, configs_vector = read_size_config(all_max_configs)
 
-# These solutions can be visualized with the [`show_configs`](@ref) function.
-show_configs(graph, locations, reshape(configs_vector, 1, :); padding_left=20)
-
-# We can use [`ConfigsAll`](@ref) to enumerate all sets satisfying the independence constraint.
-all_independent_sets = solve(problem, ConfigsAll())[]
-
-# The return value has type [`ConfigEnumerator`](@ref).
-
-# ##### Sample solutions
-# It is often difficult to store all configurations in a vector.
-# A more clever way to store the data is using the sum product tree format.
+# b. Store all independent sets efficiently using a tree structure:
 all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]
 
-# The return value has the [`SumProductTree`](@ref) type. Its length corresponds to the number of configurations.
-length(all_independent_sets_tree)
-
-# We can use `Base.collect` function to create a [`ConfigEnumerator`](@ref) or use [`generate_samples`](@ref) to generate samples from it.
-
-collect(all_independent_sets_tree)
-
+# Generate a sample of 10 random solutions:
 generate_samples(all_independent_sets_tree, 10)

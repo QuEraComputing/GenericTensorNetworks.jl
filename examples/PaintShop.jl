@@ -1,22 +1,29 @@
-# # Binary paint shop problem
-
-# !!! note
-#     It is highly recommended to read the [Independent set problem](@ref) chapter before reading this one.
-
-# ## Problem Definition
-# The [binary paint shop problem](http://m-hikari.com/ams/ams-2012/ams-93-96-2012/popovAMS93-96-2012-2.pdf) is defined as follows:
-# we are given a ``2m`` length sequence containing ``m`` cars, where each car appears twice.
-# Each car need to be colored red in one occurrence, and blue in the other.
-# We need to choose which occurrence for each car to color with which color — the goal is to minimize the number of times we need to change the current color.
-
-# In the following, we use a character to represent a car,
-# and defined a binary paint shop problem as a string that each character appear exactly twice.
+# # Binary Paint Shop Problem
+#
+# ## Overview
+# The Binary Paint Shop Problem involves a sequence of cars, each appearing exactly twice.
+# Each car must be painted red in one occurrence and blue in the other. The goal is to
+# minimize the number of color changes when processing the sequence in order.
+#
+# This example demonstrates:
+# * Formulating the paint shop problem
+# * Converting it to a tensor network
+# * Finding optimal coloring sequences
+# * Visualizing solutions
+#
+# We'll use a character sequence where each character represents a car.
 
 using GenericTensorNetworks, Graphs, GenericTensorNetworks.ProblemReductions
 
+# Define our sequence (each character appears exactly twice)
 sequence = collect("iadgbeadfcchghebif")
 
-# We can visualize this paint shop problem as a graph
+# ## Problem Visualization
+# We can represent this problem as a graph:
+# * Vertices are positions in the sequence
+# * Blue edges connect the same car's two occurrences
+# * Black edges connect adjacent positions in the sequence
+
 rot(a, b, θ) = cos(θ)*a + sin(θ)*b, cos(θ)*b - sin(θ)*a
 locations = [rot(0.0, 100.0, -0.25π - 1.5*π*(i-0.5)/length(sequence)) for i=1:length(sequence)]
 graph = path_graph(length(sequence))
@@ -27,74 +34,71 @@ end
 show_graph(graph, locations; texts=string.(sequence), format=:svg, edge_colors=
     [sequence[e.src] == sequence[e.dst] ? "blue" : "black" for e in edges(graph)])
 
-# Vertices connected by blue edges must have different colors,
-# and the goal becomes a min-cut problem defined on black edges.
+# Note: Vertices connected by blue edges must have different colors,
+# and our goal becomes a min-cut problem on the black edges.
 
-# ## Generic tensor network representation
-# We can define the binary paint shop problem with the [`PaintShop`](@ref) type as
+# ## Tensor Network Formulation
+# Define the binary paint shop problem:
 pshop = PaintShop(sequence)
 
-# The tensor network representation of the binary paint shop problem can be obtained by
+# The objective is to minimize color changes:
+objectives(pshop)
+
+# Convert to tensor network representation:
 problem = GenericTensorNetwork(pshop)
 
-# ### Theory (can skip)
-# Type [`PaintShop`](@ref) can be used for constructing the tensor network with optimized contraction order for solving a binary paint shop problem.
-# To obtain its tensor network representation, we associating car ``c_i`` (the ``i``-th character in our example) with a degree of freedom ``s_{c_i} \in \{0, 1\}``,
-# where we use ``0`` to denote the first appearance of a car is colored red and ``1`` to denote the first appearance of a car is colored blue.
-# For each black edges ``(i, i+1)``, we define an edge tensor labeled by ``(s_{c_i}, s_{c_{i+1}})`` as follows:
-# If both cars on this edge are their first or second appearance
-# ```math
-# B^{\rm parallel} = \left(\begin{matrix}
-# x & 1 \\
-# 1 & x \\
-# \end{matrix}\right),
-# ```
+# ## Mathematical Background
+# For each car $c_i$, we assign a boolean variable $s_{c_i} \in \{0,1\}$, where:
+# -  $0$ means the first appearance is colored red
+# -  $1$ means the first appearance is colored blue
 #
-# otherwise,
-# ```math
-# B^{\rm anti-parallel} = \left(\begin{matrix}
-# 1 & x \\
-# x & 1 \\
-# \end{matrix}\right).
-# ```
-# It can be understood as, when both cars are their first appearance,
-# they tend to have the same configuration so that the color is not changed.
-# Otherwise, they tend to have different configuration to keep the color unchanged.
-
-# ### Counting properties
-# ##### graph polynomial
-# The graph polynomial defined for the maximal independent set problem is
-# ```math
-# I_{\rm max}(G, x) = \sum_{k=0}^{\alpha(G)} b_k x^k,
-# ```
-# where ``b_k`` is the number of maximal independent sets of size ``k`` in graph ``G=(V, E)``.
-
-max_config = solve(problem, GraphPolynomial())[]
-
-# Since it only counts the maximal independent sets, the first several coefficients are 0.
-
-# ### Counting properties
-# ##### graph polynomial
-# The graph polynomial of the binary paint shop problem in our convention is defined as
-# ```math
-# P(G, x) = \sum_{k=0}^{\delta(G)} p_k x^k 
-# ```
-# where ``p_k`` is the number of possible coloring with number of color changes ``2m-1-k``.
+# For adjacent positions $(i,i+1)$, we define edge tensors:
+#
+# 1. If both cars are at their first or both at their second appearance:
+#    ```math
+#    B^{\text{parallel}} = \begin{pmatrix}
+#        x & 1 \\
+#        1 & x
+#    \end{pmatrix}
+#    ```
+#
+#    (Cars tend to have the same configuration to avoid color changes)
+#
+# 2. Otherwise (one first, one second appearance):
+#    ```math
+#    B^{\text{anti-parallel}} = \begin{pmatrix}
+#        1 & x \\
+#        x & 1
+#    \end{pmatrix}
+#    ```
+#
+#    (Cars tend to have different configurations to avoid color changes)
+# ## Solution Analysis
+# ### 1. Paint Shop Polynomial
+# The paint shop polynomial $P(G,x) = \sum_i p_i x^i$ counts colorings by number of color changes,
+# where $p_i$ is the number of colorings with $(2m-1-i)$ color changes
 paint_polynomial = solve(problem, GraphPolynomial())[]
 
-# ### Configuration properties
-# ##### finding best solutions
+# ### 2. Optimal Coloring Configurations
+# Find all optimal coloring configurations:
 best_configs = solve(problem, ConfigsMin())[]
 
-# One can see to identical bitstrings corresponding two different vertex configurations, they are related to bit-flip symmetry.
+# Note: We get two identical bitstrings corresponding to different vertex configurations
+# due to bit-flip symmetry (we can start with either red or blue)
 
+# ### 3. Solution Visualization
+# Convert the optimal configuration to a coloring sequence:
 painting1 = ProblemReductions.paint_shop_coloring_from_config(pshop, read_config(best_configs)[1])
 
+# Visualize the optimal coloring:
 show_graph(graph, locations; format=:svg, texts=string.(sequence),
     edge_colors=[sequence[e.src] == sequence[e.dst] ? "blue" : "black" for e in edges(graph)],
-    vertex_colors=[isone(c) ? "red" : "black" for c in painting1], config=GraphDisplayConfig(;vertex_text_color="white"))
+    vertex_colors=[isone(c) ? "red" : "black" for c in painting1], 
+    config=GraphDisplayConfig(;vertex_text_color="white"))
 
-# Since we have different choices of initial color, the number of best solution is 2.
-
-# The following function will check the solution and return you the number of color switches
+# ### 4. Verification
+# Verify the solution by counting the number of color switches:
 num_paint_shop_color_switch(sequence, painting1)
+
+# ## More APIs
+# The [Independent Set Problem](@ref) chapter has more examples on how to use the APIs.

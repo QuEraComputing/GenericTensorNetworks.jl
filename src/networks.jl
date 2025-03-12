@@ -2,8 +2,8 @@ function generate_tensors(x::T, m::ConstraintSatisfactionProblem) where T
     cons = ProblemReductions.constraints(m)
     objs = ProblemReductions.objectives(m)
     tensors = vcat(
-        [reshape(map(s -> s ? one(x) : zero(x), t.specification), ntuple(i->num_flavors(m), length(t.variables))) for t in cons],
-        [reshape(map(s -> _pow(x, s.size), t.specification), ntuple(i->num_flavors(m), length(t.variables))) for t in objs]
+        Array{T}[reshape(map(s -> s ? one(x) : zero(x), t.specification), ntuple(i->num_flavors(m), length(t.variables))) for t in cons],
+        Array{T}[reshape(map(s -> _pow(x, s), t.specification), ntuple(i->num_flavors(m), length(t.variables))) for t in objs]
     )
     ixs = vcat([t.variables for t in cons], [t.variables for t in objs])
     return add_labels!(tensors, ixs, variables(m))

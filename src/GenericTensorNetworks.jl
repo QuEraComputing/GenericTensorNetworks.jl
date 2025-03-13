@@ -16,9 +16,9 @@ using Primes
 using DocStringExtensions
 using Base.Cartesian
 using ProblemReductions
-import ProblemReductions: ConstraintSatisfactionProblem, AbstractSatisfiabilityProblem, UnitWeight, hard_constraints, is_satisfied, local_solution_spec, solution_size, energy_mode, LargerSizeIsBetter, SmallerSizeIsBetter
+import ProblemReductions: ConstraintSatisfactionProblem, AbstractSatisfiabilityProblem, UnitWeight, constraints, objectives, solution_size, energy_mode, LargerSizeIsBetter, SmallerSizeIsBetter, flavor_names, is_satisfied
 import ProblemReductions: @bv_str, StaticElementVector, StaticBitVector, onehotv, _nints, hamming_distance
-import ProblemReductions: is_set_covering, is_vertex_coloring, is_set_packing, is_dominating_set, is_matching, is_maximal_independent_set, cut_size, is_independent_set
+import ProblemReductions: is_set_covering, is_vertex_coloring, is_set_packing, is_dominating_set, is_matching, is_maximal_independent_set, cut_size, is_independent_set, num_variables
 import ProblemReductions: num_paint_shop_color_switch, spin_glass_from_matrix, CNF, CNFClause, BoolVar, satisfiable, @bools, ∨, ¬, ∧
 import ProblemReductions: flavors, set_weights, weights, is_weighted, num_flavors, variables, energy
 import AbstractTrees: children, printnode, print_tree
@@ -48,7 +48,7 @@ export line_graph
 
 # Problems
 export AbstractProblem, ConstraintSatisfactionProblem
-export hard_constraints, is_satisfied, local_solution_spec, solution_size, energy_mode, LargerSizeIsBetter, SmallerSizeIsBetter
+export constraints, objectives, solution_size, energy_mode, LargerSizeIsBetter, SmallerSizeIsBetter, flavor_names, is_satisfied, num_variables
 # Tensor Networks (Graph problems)
 export GenericTensorNetwork, optimize_code, UnitWeight
 export flavors, variables, num_flavors, weights, fixedvertices, set_weights, is_weighted

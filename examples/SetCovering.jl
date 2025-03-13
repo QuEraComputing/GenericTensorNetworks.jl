@@ -1,79 +1,90 @@
-# # Set covering problem
-
-# !!! note
-#     It is highly recommended to read the [Independent set problem](@ref) chapter before reading this one.
-
-# ## Problem definition
-
-# The [set covering problem](https://en.wikipedia.org/wiki/Set_cover_problem) is a significant NP-hard problem in combinatorial optimization. Given a collection of elements, the set covering problem aims to find the minimum number of sets that incorporate (cover) all of these elements.
-# In the following, we will find the solution space properties for the camera location and stadium area example in the [Cornell University Computational Optimization Open Textbook](https://optimization.cbe.cornell.edu/index.php?title=Set_covering_problem).
+# # Set Covering Problem
+#
+# ## Overview
+# The Set Covering Problem is a fundamental optimization challenge: given a collection of sets,
+# find the minimum number of sets needed to cover all elements. This NP-hard problem appears
+# in many real-world applications including facility location, scheduling, and resource allocation.
+#
+# This example demonstrates:
+# * Formulating a set covering problem
+# * Converting it to a tensor network
+# * Finding minimum set covers
+# * Analyzing the solution space
+#
+# We'll use the camera location and stadium area example from the Cornell University
+# Computational Optimization Open Textbook.
 
 using GenericTensorNetworks, Graphs
 
-# The covering stadium areas of cameras are represented as the following sets.
-
+# Define our sets (each representing a camera's coverage area)
 sets = [[1,3,4,6,7], [4,7,8,12], [2,5,9,11,13],
     [1,2,14,15], [3,6,10,12,14], [8,14,15], 
     [1,2,6,11], [1,2,4,6,8,12]]
 
-# ## Generic tensor network representation
-# We can define the set covering problem with the [`SetCovering`](@ref) type as
+# ## Tensor Network Formulation
+# Define the set covering problem:
 setcover = SetCovering(sets)
 
-# The tensor network representation of the set covering problem can be obtained by
+# The problem consists of:
+# 1. Coverage constraints: Every element must be covered by at least one set
+# 2. Optimization objective: Minimize the number of sets used
+constraints(setcover)
+#
+objectives(setcover)
+
+# Convert to tensor network representation:
 problem = GenericTensorNetwork(setcover)
 
-# ### Theory (can skip)
-# Let ``S`` be the target set covering problem that we want to solve.
-# For each set ``s \in S``, we associate it with a weight ``w_s`` to it.
-# The tensor network representation map a set ``s\in S`` to a boolean degree of freedom ``v_s\in\{0, 1\}``.
-# For each set ``s``, we defined a parameterized rank-one tensor indexed by ``v_s`` as
-# ```math
-# W(x_s^{w_s}) = \left(\begin{matrix}
-#     1 \\
-#     x_s^{w_s}
-#     \end{matrix}\right)
-# ```
-# where ``x_s`` is a variable associated with ``s``.
-# For each unique element ``a``, we defined the constraint over all sets containing it ``N(a) = \{s | s \in S \land a\in s\}``:
-# ```math
-# B_{s_1,s_2,\ldots,s_{|N(a)|}} = \begin{cases}
-#     0 & s_1=s_2=\ldots=s_{|N(a)|}=0,\\
-#     1 & \text{otherwise}.
-# \end{cases}
-# ```
-# This tensor means if none of the sets containing element ``a`` are included, then this configuration is forbidden,
-# One can check the contraction time space complexity of a [`SetCovering`](@ref) instance by typing:
-
+# ## Mathematical Background
+# For each set $s$ with weight $w_s$, we assign a boolean variable $v_s ∈ \{0,1\}$,
+# indicating whether the set is included in the solution.
+#
+# The network uses two types of tensors:
+#
+# 1. Set Tensors: For each set $s$:
+#    ```math
+#    W(x_s, w_s) = \begin{pmatrix}
+#        1 \\
+#        x_s^{w_s}
+#    \end{pmatrix}
+#    ```
+#
+# 2. Element Constraint Tensors: For each element a and its containing sets N(a):
+#    ```math
+#    B_{s_1,...,s_{|N(a)|}} = 
+#    \begin{cases}
+#        0 & \text{if all } s_i = 0 \text{ (element not covered - invalid)} \\
+#        1 & \text{otherwise (element is covered - valid)}
+#    \end{cases}
+#    ```
+#
+# Check the contraction complexity:
 contraction_complexity(problem)
 
-# ## Solving properties
-
-# ### Counting properties
-# ##### The "graph" polynomial
-# The graph polynomial for the set covering problem is defined as
-# ```math
-# P(S, x) = \sum_{k=0}^{|S|} c_k x^k,
-# ```
-# where ``c_k`` is the number of configurations having ``k`` sets.
-
+# ## Solution Analysis
+# ### 1. Set Covering Polynomial
+# The polynomial $P(S,x) = \sum_i c_i x^i$ counts set covers by size,
+# where $c_i$ is the number of valid covers using $i$ sets
 covering_polynomial = solve(problem, GraphPolynomial())[]
 
-# The minimum number of sets that covering the set of elements can be computed with the [`SizeMin`](@ref) property:
+# ### 2. Minimum Set Cover Size
+# Find the minimum number of sets needed:
 min_cover_size = solve(problem, SizeMin())[]
 
-# Similarly, we have its counting [`CountingMin`](@ref):
+# Count minimum set covers:
 counting_minimum_setcovering = solve(problem, CountingMin())[]
 
-# ### Configuration properties
-# ##### Finding minimum set covering
-# One can enumerate all minimum set covering with the [`ConfigsMin`](@ref) property in the program.
+# ### 3. Minimum Set Cover Configurations
+# Enumerate all minimum set covers:
 min_configs = read_config(solve(problem, ConfigsMin())[])
 
-# Hence the two optimal solutions are ``\{z_1, z_3, z_5, z_6\}`` and ``\{z_2, z_3, z_4, z_5\}``.
-# The correctness of this result can be checked with the [`is_set_covering`](@ref) function.
+# The two optimal solutions are $\{z_1, z_3, z_5, z_6\}$ and $\{z_2, z_3, z_4, z_5\}$,
+# where $z_i$ represents the $i$-th set in our original list.
 
+# Verify solutions are valid:
 all(c->is_set_covering(problem.problem, c), min_configs)
 
-# Similarly, if one is only interested in computing one of the minimum set coverings,
-# one can use the graph property [`SingleConfigMin`](@ref).
+# Note: For finding just one minimum set cover, use the SingleConfigMin property
+
+# ## More APIs
+# The [Independent Set Problem](@ref) chapter has more examples on how to use the APIs.

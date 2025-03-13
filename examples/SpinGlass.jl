@@ -1,164 +1,151 @@
-# # Spin-glass problem
+# # Spin Glass Problem
+#
+# ## Overview
+# Spin glasses are magnetic systems characterized by disordered interactions between spins.
+# They represent a fundamental model in statistical physics with applications in optimization,
+# neural networks, and complex systems. This example demonstrates:
+#
+# * Formulating spin glass problems on simple graphs and hypergraphs
+# * Converting them to tensor networks
+# * Finding ground states and excited states
+# * Computing partition functions and energy distributions
+#
+# We'll explore both standard graphs and hypergraphs to showcase the versatility of the approach.
 
-# !!! note
-#     It is highly recommended to read the [Independent set problem](@ref) chapter before reading this one.
+using GenericTensorNetworks, Graphs
 
-using GenericTensorNetworks
+# ## Part 1: Spin Glass on a Simple Graph
+# ### Problem Definition
+# A spin glass on a graph G=(V,E) is defined by the Hamiltonian:
+# H = ∑_{ij∈E} J_{ij} s_i s_j + ∑_{i∈V} h_i s_i
+#
+# Where:
+# * s_i ∈ {-1,1} are spin variables
+# * J_{ij} are coupling strengths between spins
+# * h_i are local field terms
+#
+# We use boolean variables n_i = (1-s_i)/2 in our implementation.
 
-# ## Spin-glass problem on a simple graph
-# Let ``G=(V, E)`` be a graph, the [spin-glass](https://en.wikipedia.org/wiki/Spin_glass) problem in physics is characterized by the following energy function
-# ```math
-# H = \sum_{ij \in E} J_{ij} s_i s_j + \sum_{i \in V} h_i s_i,
-# ```
-# where ``h_i`` is an onsite energy term associated with spin ``s_i \in \{-1, 1\}``, and ``J_{ij}`` is the coupling strength between spins ``s_i`` and ``s_j``.
-# In the program, we use boolean variable ``n_i = \frac{1-s_i}{2}`` to represent a spin configuration.
-
-using Graphs
-
-# In the following, we are going to defined an spin glass problem for the Petersen graph.
-
+# Create a Petersen graph instance
 graph = Graphs.smallgraph(:petersen)
 
-# We can visualize this graph using the following function
+# Define vertex layout for visualization
 rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
 locations = [[rot15(0.0, 60.0, i) for i=0:4]..., [rot15(0.0, 30, i) for i=0:4]...]
 show_graph(graph, locations; format=:svg)
 
-# ## Generic tensor network representation
-# An anti-ferromagnetic spin glass problem can be defined with the [`SpinGlass`](@ref) type as
+# ### Tensor Network Formulation
+# Define an anti-ferromagnetic spin glass with uniform couplings:
 spinglass = SpinGlass(graph, fill(1, ne(graph)), zeros(Int, nv(graph)))
 
-# The tensor network representation of the set packing problem can be obtained by
+# The objective is to minimize the energy:
+objectives(spinglass)
+
+# Convert to tensor network representation:
 problem = GenericTensorNetwork(spinglass)
 
-# The contraction order is already optimized.
-
-# ### The tensor network reduction
-# We defined the reduction of the spin-glass problem to a tensor network on a hypergraph.
-# Let ``H = (V, E)`` be a hypergraph, the tensor network for the spin glass problem on ``H`` can be defined as the following triple of (alphabet of labels $\Lambda$, input tensors $\mathcal{T}$, output labels $\sigma_o$).
-# ```math
-# \begin{cases}
-# \Lambda &= \{s_v \mid v \in V\}\\
-# \mathcal{T} &= \{B^{(c)}_{s_{N(c, 1),N(c, 2),\ldots,N(c, d(c))}} \mid c \in E\} \cup \{W^{(v)}_{s_v} \mid v \in V\}\\
-# \sigma_o &= \varepsilon
-# \end{cases}
-# ```
-# where ``s_v \in \{0, 1\}`` is the boolean degreen associated to vertex ``v``,
-# ``N(c, k)`` is the ``k``th vertex of hyperedge ``c``, and ``d(c)`` is the degree of ``c``.
-# The edge tensor ``B^{(c)}`` is defined as
-# ```math
-# B^{(c)} = \begin{cases}
-# x^{w_c} &  (\sum_{v\in c} s_v) \;is\; even, \\
-# x^{-w_c}  &  otherwise.
-# \end{cases}
-# ```
-# and the vertex tensor ``W^{(v)}`` (used to carry labels) is defined as
-# ```math
-# W^{(v)} = \left(\begin{matrix}1_v\\ 1_v\end{matrix}\right)
-# ```
-
-# ## Graph properties
-
-# ### Minimum and maximum energies
-# To find the minimum and maximum energies of the spin glass problem, we can use the [`SizeMin`](@ref) and [`SizeMax`](@ref) solvers.
+# ### Mathematical Background
+# The tensor network for a spin glass uses:
+#
+# 1. Edge Tensors: For edge $(i,j)$ with coupling $J_{ij}$:
+#    ```math
+#    B_{s_i,s_j}(x) = \begin{pmatrix}
+#        x^{J_{ij}} & x^{-J_{ij}} \\
+#        x^{-J_{ij}} & x^{J_{ij}}
+#    \end{pmatrix}
+#    ```
+#    * Contributes $x^{J_{ij}}$ when spins are aligned ($s_i = s_j$)
+#    * Contributes $x^{-J_{ij}}$ when spins are anti-aligned ($s_i ≠ s_j$)
+#
+# 2. Vertex Tensors: For vertex $i$ with local field $h_i$:
+#    ```math
+#    W_i(x) = \begin{pmatrix}
+#        x^{h_i} \\
+#        x^{-h_i}
+#    \end{pmatrix}
+#    ```
+#
+# This formulation allows efficient computation of various properties.
+# ### Solution Analysis
+# #### 1. Energy Extrema
+# Find the minimum energy (ground state):
 Emin = solve(problem, SizeMin())[]
-# The state with the highest energy is the one with all spins having the same value.
-Emax = solve(problem, SizeMax())[]
 
-# ### Counting properties
-# In the following, we are going to find the partition function and the graph polynomial of the spin glass problem.
-# Consider a spin glass problem on a graph ``G = (V, E)`` with integer coupling strength ``J`` and onsite energy ``h``.
-# Its graph polynomial is a Laurent polynomial
-# ```math
-# Z(G, J, h, x) = \sum_{k=E_{\rm min}}^{E_{\rm max}} c_k x^k,
-# ```
-# where ``E_{\rm min}`` and ``E_{\rm max}`` are minimum and maximum energies,
-# ``c_k`` is the number of spin configurations with energy ``k``.
-# The partition function at temperature ``\beta^{-1}`` can be computed by the graph polynomial at ``x = e^-\beta``.
+# Find the maximum energy (highest excited state):
+Emax = solve(problem, SizeMax())[]
+# Note: The state with highest energy has all spins with the same value
+
+# #### 2. Partition Function
+# The graph polynomial $Z(G,J,h,x) = \sum_i c_i x^i$ counts configurations by energy,
+# where $c_i$ is the number of configurations with energy $i$
 partition_function = solve(problem, GraphPolynomial())[]
 
-# ### Configuration properties
-#  The ground state of the spin glass problem can be found by the [`SingleConfigMin`](@ref) solver.
+# #### 3. Ground State Configuration
+# Find one ground state configuration:
 ground_state = read_config(solve(problem, SingleConfigMin())[])
 
-# The energy of the ground state can be verified by the [`energy`](@ref) function.
-# Note the output of the ground state can not be directly used as the input of the `energy` function.
-# It needs to be converted to the spin configurations.
-Emin_verify = energy(problem.problem, 1 .- 2 .* Int.(ground_state))
+# Verify the energy matches our earlier computation:
+Emin_verify = energy(problem.problem, ground_state)
 
-# You should see a consistent result as above `Emin`.
-
+# Visualize the ground state:
 show_graph(graph, locations; vertex_colors=[
-        iszero(ground_state[i]) ? "white" : "red" for i=1:nv(graph)], format=:svg)
+    iszero(ground_state[i]) ? "white" : "red" for i=1:nv(graph)], format=:svg)
+# Note: Red vertices represent spins with value -1 (or 1 in boolean representation)
 
-# In the plot, the red vertices are the ones with spin value `-1` (or `1` in the boolean representation).
+# ## Part 2: Spin Glass on a Hypergraph
+# ### Problem Definition
+# A spin glass on a hypergraph H=(V,E) is defined by the Hamiltonian:
+# E = ∑_{c∈E} w_c ∏_{v∈c} S_v
+#
+# Where:
+# * S_v ∈ {-1,1} are spin variables
+# * w_c are coupling strengths for hyperedges
+#
+# We use boolean variables s_v = (1-S_v)/2 in our implementation.
 
-# ## Spin-glass problem on a hypergraph
-# A spin-glass problem on hypergraph ``H = (V, E)`` can be characterized by the following energy function
-# ```math
-# E = \sum_{c \in E} w_{c} \prod_{v\in c} S_v
-# ```
-# where ``S_v \in \{-1, 1\}``, ``w_c`` is coupling strength associated with hyperedge ``c``.
-# In the program, we use boolean variable ``s_v = \frac{1-S_v}{2}`` to represent a spin configuration.
-
-# In the following, we are going to defined an spin glass problem for the following hypergraph.
+# Define a hypergraph with 15 vertices
 num_vertices = 15
 
 hyperedges = [[1,3,4,6,7], [4,7,8,12], [2,5,9,11,13],
     [1,2,14,15], [3,6,10,12,14], [8,14,15], 
     [1,2,6,11], [1,2,4,6,8,12]]
 
-weights = [-1, 1, -1, 1, -1, 1, -1, 1];
+weights = [-1, 1, -1, 1, -1, 1, -1, 1]
 
-# The energy function of the spin glass problem is
-# ```math
-# \begin{align*}
-# E = &-S_1S_3S_4S_6S_7 + S_4S_7S_8S_{12} - S_2S_5S_9S_{11}S_{13} +\\
-#    &S_1S_2S_{14}S_{15} - S_3S_6S_{10}S_{12}S_{14} + S_8S_{14}S_{15} +\\
-#    &S_1S_2S_6S_{11} - S_1s_2S_4S_6S_8S_{12}
-# \end{align*}
-# ```
-# A spin glass problem can be defined with the [`SpinGlass`](@ref) type as
+# Define the hypergraph spin glass problem:
 hyperspinglass = SpinGlass(HyperGraph(num_vertices, hyperedges), weights, zeros(Int, num_vertices))
 
-# The tensor network representation of the set packing problem can be obtained by
+# Convert to tensor network representation:
 hyperproblem = GenericTensorNetwork(hyperspinglass)
 
-# ## Graph properties
-# ### Minimum and maximum energies
-# To find the minimum and maximum energies of the spin glass problem, we can use the [`SizeMin`](@ref) and [`SizeMax`](@ref) solvers.
+# ### Solution Analysis
+# #### 1. Energy Extrema
+# Find the minimum energy (ground state):
 Emin = solve(hyperproblem, SizeMin())[]
 
-#
-
+# Find the maximum energy (highest excited state):
 Emax = solve(hyperproblem, SizeMax())[]
+# Note: Spin configurations can be chosen to make all hyperedges
+# have either even or odd spin parity
 
-# In this example, the spin configurations can be chosen to make all hyperedges having even or odd spin parity.
-
-# ### Counting properties
-# ##### partition function and graph polynomial
-# The graph polynomial defined for the spin-glass problem is a Laurent polynomial
-# ```math
-# Z(G, w, x) = \sum_{k=E_{\rm min}}^{E_{\rm max}} c_k x^k,
-# ```
-# where ``E_{\rm min}`` and ``E_{\rm max}`` are minimum and maximum energies,
-# ``c_k`` is the number of spin configurations with energy ``k``.
-# Let the inverse temperature ``\beta = 2``, the partition function is
+# #### 2. Partition Function and Polynomial
+# Compute the partition function at inverse temperature β = 2.0:
 β = 2.0
 Z = solve(hyperproblem, PartitionFunction(β))[]
 
-# The infinite temperature partition function is the counting of all feasible configurations
+# Compute the infinite temperature partition function (counts all configurations):
 solve(hyperproblem, PartitionFunction(0.0))[]
 
-# The graph polynomial is
+# Compute the full graph polynomial:
 poly = solve(hyperproblem, GraphPolynomial())[]
 
-# ### Configuration properties
-# The ground state of the spin glass problem can be found by the [`SingleConfigMin`](@ref) solver.
+# #### 3. Ground State Configuration
+# Find one ground state configuration:
 ground_state = read_config(solve(hyperproblem, SingleConfigMin())[])
 
-# The energy of the ground state can be verified by the [`energy`](@ref) function.
+# Verify the energy matches our earlier computation:
+Emin_verify = energy(hyperproblem.problem, ground_state)
+# The result should match the Emin value computed earlier
 
-Emin_verify = energy(hyperproblem.problem, 1 .- 2 .* Int.(ground_state))
-
-# You should see a consistent result as above `Emin`.
+# ## More APIs
+# The [Independent Set Problem](@ref) chapter has more examples on how to use the APIs.

@@ -35,8 +35,8 @@ end
     cnf = (c1 ∧ c4) ∧ (c2 ∧ c3)
     gp = GenericTensorNetwork(Satisfiability(cnf))
 
-    @test solve(gp, SizeMax())[].n == 2.0
-    res = GenericTensorNetworks.largest_solutions(gp; invert=true, all=true)[].c.data
+    @test solve(gp, SizeMin())[].n == sum(gp.problem.weights) - 2
+    res = GenericTensorNetworks.largest_solutions(gp; invert=false, all=true)[].c.data
     for i=0:1<<6-1
         v = StaticBitVector(Bool[i>>(k-1) & 1 for k=1:6])
         if v ∈ res
@@ -56,8 +56,8 @@ end
     cnf = (c1 ∧ c4) ∧ (c2 ∧ c3)
     gp = GenericTensorNetwork(Satisfiability(cnf, fill(2, length(cnf))))
 
-    @test solve(gp, SizeMax())[].n == 4.0
-    res = GenericTensorNetworks.largest_solutions(gp; invert=true, all=true)[].c.data
+    @test solve(gp, SizeMin())[].n == sum(gp.problem.weights) - 4
+    res = GenericTensorNetworks.largest_solutions(gp; invert=false, all=true)[].c.data
     for i=0:1<<6-1
         v = StaticBitVector(Bool[i>>(k-1) & 1 for k=1:6])
         if v ∈ res

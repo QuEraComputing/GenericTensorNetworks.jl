@@ -19,7 +19,7 @@ coverage:
 	$(JL) -e 'using Pkg; Pkg.test("GenericTensorNetworks"; coverage=true)'
 
 serve:
-	$(JL) -e 'using Pkg; Pkg.activate("docs"); using LiveServer; servedocs(;skip_dirs=["docs/src/assets", "docs/src/generated"], literate_dir="examples")'
+	$(JL) -e 'using Pkg; Pkg.activate("docs"); using LiveServer; servedocs(;skip_dirs=["docs/build", "docs/src/assets", "docs/src/generated"], literate_dir="examples")'
 
 clean:
 	rm -rf docs/build

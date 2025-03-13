@@ -1,11 +1,15 @@
 function generate_tensors(x::T, m::ConstraintSatisfactionProblem) where T
-    terms = ProblemReductions.size_terms(m)
-    tensors = [reshape(map(s -> !s.is_valid ? zero(x) : _pow(x, s.size), t.solution_sizes), ntuple(i->num_flavors(m), length(t.variables))) for t in terms]
-    ixs = [t.variables for t in terms]
+    cons = ProblemReductions.constraints(m)
+    objs = ProblemReductions.objectives(m)
+    tensors = vcat(
+        Array{T}[reshape(map(s -> s ? one(x) : zero(x), t.specification), ntuple(i->num_flavors(m), length(t.variables))) for t in cons],
+        Array{T}[reshape(map(s -> _pow(x, s), t.specification), ntuple(i->num_flavors(m), length(t.variables))) for t in objs]
+    )
+    ixs = vcat([t.variables for t in cons], [t.variables for t in objs])
     return add_labels!(tensors, ixs, variables(m))
 end
 function rawcode(problem::ConstraintSatisfactionProblem; openvertices=())
-    ixs = [t.variables for t in ProblemReductions.size_terms(problem)]
+    ixs = vcat([t.variables for t in ProblemReductions.constraints(problem)], [t.variables for t in ProblemReductions.objectives(problem)])
     LT = eltype(eltype(ixs))
     return DynamicEinCode(ixs, collect(LT, openvertices))  # labels for edge tensors
 end

@@ -1,75 +1,87 @@
-# # Vertex matching problem
-
-# !!! note
-#     It is highly recommended to read the [Independent set problem](@ref) chapter before reading this one.
-
-# ## Problem definition
-# A ``k``-matching in a graph ``G`` is a set of k edges, no two of which have a vertex in common.
+# # Vertex Matching Problem
+#
+# ## Overview
+# A k-matching in a graph is a set of k edges where no two edges share a common vertex.
+# A perfect matching occurs when every vertex in the graph is matched. This example demonstrates:
+# * Finding maximum matchings
+# * Computing the matching polynomial
+# * Visualizing matching configurations
+#
+# We'll explore these concepts using the Petersen graph.
 
 using GenericTensorNetworks, Graphs
 
-# In the following, we are going to defined a matching problem for the Petersen graph.
-
+# Create a Petersen graph instance
 graph = Graphs.smallgraph(:petersen)
 
-# We can visualize this graph using the following function
+# Define vertex layout for visualization
 rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
 locations = [[rot15(0.0, 60.0, i) for i=0:4]..., [rot15(0.0, 30, i) for i=0:4]...]
 show_graph(graph, locations; format=:svg)
 
-# ## Generic tensor network representation
-# We can define the matching problem with the [`Matching`](@ref) type as
+# ## Tensor Network Formulation
+# Define the matching problem using tensor networks:
 matching = Matching(graph)
 
-# The tensor network representation of the matching problem can be obtained by
+# The problem consists of:
+# 1. Matching constraints: No vertex can be matched more than once
+# 2. Optimization objective: Maximize the number of matches
+constraints(matching)
+
+#
+
+objectives(matching)
+
+# Convert to tensor network representation:
 problem = GenericTensorNetwork(matching)
 
-# ### Theory (can skip)
+# ## Mathematical Background
+# For a graph $G=(V,E)$, we assign a boolean variable $s_{e} \in \{0,1\}$ to each edge $e$,
+# where $1$ indicates the vertices are matched.
 #
-# Type [`Matching`](@ref) can be used for constructing the tensor network with optimized contraction order for a matching problem.
-# We map an edge ``(u, v) \in E`` to a label ``\langle u, v\rangle \in \{0, 1\}`` in a tensor network,
-# where 1 means two vertices of an edge are matched, 0 means otherwise.
-# Then we define a tensor of rank ``d(v) = |N(v)|`` on vertex ``v`` such that,
-# ```math
-# W_{\langle v, n_1\rangle, \langle v, n_2 \rangle, \ldots, \langle v, n_{d(v)}\rangle} = \begin{cases}
-#     1, & \sum_{i=1}^{d(v)} \langle v, n_i \rangle \leq 1,\\
-#     0, & \text{otherwise},
-# \end{cases}
-# ```
-# and a tensor of rank 1 on the bond
-# ```math
-# B_{\langle v, w\rangle} = \begin{cases}
-# 1, & \langle v, w \rangle = 0 \\
-# x, & \langle v, w \rangle = 1,
-# \end{cases}
-# ```
-# where label ``\langle v, w \rangle`` is equivalent to ``\langle w,v\rangle``.
+# The network uses two types of tensors:
 #
+# 1. Vertex Tensors: For vertex $v$ with incident edges $e_1,...,e_k$:
+#    ```math
+#    W_{s_{e₁},...,s_{eₖ}} = \begin{cases}
+#        1 & \text{if } \sum_{i=1}^k s_{e_i} \leq 1\\
+#        0 & \text{otherwise}
+#    \end{cases}
+#    ```
+#    This ensures at most one incident edge is selected (at most one match per vertex)
+#
+# 2. Edge Tensors: For edge $e$:
+#    ```math
+#    B_{s_e} = \begin{cases}
+#        1 & \text{if } s_e = 0\\
+#        x & \text{if } s_e = 1
+#    \end{cases}
+#    ```
+#    This assigns weight $x$ to matched edges and $1$ to unmatched edges
 
-# ## Solving properties
-# The maximum matching size can be obtained by
+# ## Solution Analysis
+# ### 1. Maximum Matching
+# Find the size of the maximum matching:
 max_matching = solve(problem, SizeMax())[]
 read_size(max_matching)
-# The largest number of matching is 5, which means we have a perfect matching (vertices are all paired).
+# Note: A maximum matching size of 5 indicates a perfect matching exists
+# (all vertices are paired)
 
-# The graph polynomial defined for the matching problem is known as the matching polynomial.
-# Here, we adopt the first definition in the [wiki page](https://en.wikipedia.org/wiki/Matching_polynomial).
-# ```math
-# M(G, x) = \sum\limits_{k=1}^{|V|/2} c_k x^k,
-# ```
-# where ``k`` is the number of matches, and coefficients ``c_k`` are the corresponding counting.
-
+# ### 2. Matching Polynomial
+# The matching polynomial $M(G,x) = \sum_i c_i x^i$ counts matchings by size,
+# where $c_i$ is the number of $i$-matchings in $G$
 matching_poly = solve(problem, GraphPolynomial())[]
 read_size_count(matching_poly)
 
-# ### Configuration properties
-
-# ##### one of the perfect matches
+# ### 3. Perfect Matching Visualization
+# Find one perfect matching configuration:
 match_config = solve(problem, SingleConfigMax())[]
-read_size_config(match_config)
+size, config = read_size_config(match_config)
 
-# Let us show the result by coloring the matched edges to red
+# Visualize the matching by highlighting matched edges in red:
 show_graph(graph, locations; format=:svg, edge_colors=
     [isone(read_config(match_config)[i]) ? "red" : "black" for i=1:ne(graph)])
+# Red edges indicate pairs of matched vertices
 
-# where we use edges with red color to related pairs of matched vertices.
+# ## More APIs
+# The [Independent Set Problem](@ref) chapter has more examples on how to use the APIs.

@@ -4,57 +4,93 @@ CurrentModule = GenericTensorNetworks
 
 # GenericTensorNetworks
 
-This package implements generic tensor networks to compute *solution space properties* of a class of hard combinatorial problems.
-The *solution space properties* include
-* The maximum/minimum solution sizes,
-* The number of solutions at certain sizes,
-* The enumeration of solutions at certain sizes.
-* The direct sampling of solutions at certain sizes.
+## Overview
+GenericTensorNetworks is a high-performance package that uses tensor network algorithms to solve challenging combinatorial optimization problems. This approach allows us to efficiently compute various solution space properties that would be intractable with traditional methods.
 
-The solvable problems include [Independent set problem](@ref), [Maximal independent set problem](@ref), [Spin-glass problem](@ref), [Cutting problem](@ref), [Vertex matching problem](@ref), [Binary paint shop problem](@ref), [Coloring problem](@ref), [Dominating set problem](@ref), [Satisfiability problem](@ref), [Set packing problem](@ref) and [Set covering problem](@ref).
+## Key Capabilities
+Our package can compute a wide range of solution space properties:
 
-## Background knowledge
+* Maximum and minimum solution sizes
+* Solution counts at specific sizes
+* Complete enumeration of solutions
+* Statistical sampling from the solution space
 
-Please check our paper ["Computing properties of independent sets by generic programming tensor networks"](https://arxiv.org/abs/2205.03718).
-If you find our paper or software useful in your work, we would be grateful if you could cite our work. The [CITATION.bib](https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/CITATION.bib) file in the root of this repository lists the relevant papers.
+## Supported Problem Classes
+GenericTensorNetworks can solve many important combinatorial problems:
 
-## Quick start
+* [Independent Set Problem](@ref)
+* [Maximal Independent Set Problem](@ref)
+* [Spin-Glass Problem](@ref)
+* [Maximum Cut Problem](@ref)
+* [Vertex Matching Problem](@ref)
+* [Binary Paint Shop Problem](@ref)
+* [Graph Coloring Problem](@ref)
+* [Dominating Set Problem](@ref)
+* [Boolean Satisfiability Problem](@ref)
+* [Set Packing Problem](@ref)
+* [Set Covering Problem](@ref)
 
-You can find a set up guide in our [README](https://github.com/QuEraComputing/GenericTensorNetworks.jl).
-To get started, open a Julia REPL and type the following code.
+## Scientific Background
+For the theoretical foundation and algorithmic details, please refer to our paper:
+["Computing properties of independent sets by generic programming tensor networks"](https://arxiv.org/abs/2205.03718)
 
-```@repl
-using GenericTensorNetworks, Graphs#, CUDA
-solve(
-           GenericTensorNetwork(IndependentSet(
-                   Graphs.random_regular_graph(20, 3),
-                   UnitWeight(20));    # default: uniform weight 1
-               optimizer = TreeSA(),
-               openvertices = (),       # default: no open vertices
-               fixedvertices = Dict()   # default: no fixed vertices
-           ),
-           GraphPolynomial();
-           usecuda=false              # the default value
-       )
+If you find our package useful in your research, please cite our work using the references in [CITATION.bib](https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/CITATION.bib).
+
+## Getting Started
+
+### Installation
+Installation instructions are available in our [README](https://github.com/QuEraComputing/GenericTensorNetworks.jl).
+
+### Basic Example
+Here's a simple example that computes the independence polynomial of a random regular graph:
+
+```julia
+using GenericTensorNetworks, Graphs  # Add CUDA for GPU acceleration
+
+# Create and solve a problem instance
+result = solve(
+    GenericTensorNetwork(
+        IndependentSet(
+            Graphs.random_regular_graph(20, 3),  # Graph to analyze
+            UnitWeight(20)                       # Uniform vertex weights
+        );
+        optimizer = TreeSA(),                    # Contraction order optimizer
+        openvertices = (),                       # No open vertices
+        fixedvertices = Dict()                   # No fixed vertices
+    ),
+    GraphPolynomial();                           # Property to compute
+    usecuda = false                              # Use CPU (set true for GPU)
+)
 ```
 
-Here the main function [`solve`](@ref) takes three input arguments, the problem instance of type [`IndependentSet`](@ref), the property instance of type [`GraphPolynomial`](@ref) and an optional key word argument `usecuda` to decide use GPU or not.
-If one wants to use GPU to accelerate the computation, the `, CUDA` should be uncommented.
+### Understanding the API
 
-An [`IndependentSet`](@ref) instance takes two positional arguments to initialize, the graph instance that one wants to solve and the weights for each vertex. Here, we use a random regular graph with 20 vertices and degree 3, and the default uniform weight 1.
+The main function `solve` takes three components:
 
-The [`GenericTensorNetwork`](@ref) function is a constructor for the problem instance, which takes the problem instance as the first argument and optional key word arguments. The key word argument `optimizer` is for specifying the tensor network optimization algorithm.
-The keyword argument `openvertices` is a tuple of labels for specifying the degrees of freedom not summed over, and `fixedvertices` is a label-value dictionary for specifying the fixed values of the degree of freedoms.
-Here, we use [`TreeSA`](@ref) method as the tensor network optimizer, and leave `openvertices` the default values.
-The [`TreeSA`](@ref) method finds the best contraction order in most of our applications, while the default [`GreedyMethod`](@ref) runs the fastest.
+1. **Problem Instance**: Created with `GenericTensorNetwork`, which wraps problem types like `IndependentSet`
+   - The first argument defines the problem (graph and weights)
+   - Optional arguments control the tensor network construction:
+     - `optimizer`: Algorithm for finding efficient contraction orders
+     - `openvertices`: Degrees of freedom to leave uncontracted
+     - `fixedvertices`: Variables with fixed assignments
 
-The first execution of this function will be a bit slow due to Julia's just in time compiling.
-The subsequent runs will be fast.
-The following diagram lists possible combinations of input arguments, where functions in the `Graph` are mainly defined in the package [Graphs](https://github.com/JuliaGraphs/Graphs.jl), and the rest can be found in this package.
+2. **Property to Compute**: Such as `GraphPolynomial`, `SizeMax`, or `ConfigsAll`
+
+3. **Computation Options**: Like `usecuda` to enable GPU acceleration
+
+Note: The first execution will be slower due to Julia's just-in-time compilation. Subsequent runs will be much faster.
+
+### API Structure
+The following diagram illustrates the possible combinations of inputs:
+
 ```@raw html
 <div align=center>
 <img src="assets/fig7.svg" width="75%"/>
 </div>
 ```⠀
-You can find many examples in this documentation, a good one to start with is [Independent set problem](@ref).
 
+Functions in the `Graph` box are primarily from the [Graphs](https://github.com/JuliaGraphs/Graphs.jl) package, while the rest are defined in GenericTensorNetworks.
+
+## Next Steps
+For a deeper understanding, we recommend starting with the [Independent Set Problem](@ref) example, which demonstrates the core functionality of the package.
+```

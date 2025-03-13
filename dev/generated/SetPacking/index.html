@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Set packing problem · GenericTensorNetworks.jl</title><meta name="title" content="Set packing problem · GenericTensorNetworks.jl"/><meta property="og:title" content="Set packing problem · GenericTensorNetworks.jl"/><meta property="twitter:title" content="Set packing problem · GenericTensorNetworks.jl"/><meta name="description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="twitter:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/SetPacking/"/><meta property="twitter:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/SetPacking/"/><link rel="canonical" href="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/SetPacking/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GenericTensorNetworks.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Problems</span><ul><li><a class="tocitem" href="../IndependentSet/">Independent set problem</a></li><li><a class="tocitem" href="../MaximalIS/">Maximal independent set problem</a></li><li><a class="tocitem" href="../SpinGlass/">Spin glass problem</a></li><li><a class="tocitem" href="../MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../Matching/">Vertex matching problem</a></li><li><a class="tocitem" href="../PaintShop/">Binary paint shop problem</a></li><li><a class="tocitem" href="../Coloring/">Coloring problem</a></li><li><a class="tocitem" href="../DominatingSet/">Dominating set problem</a></li><li><a class="tocitem" href="../Satisfiability/">Satisfiability problem</a></li><li><a class="tocitem" href="../SetCovering/">Set covering problem</a></li><li class="is-active"><a class="tocitem" href>Set packing problem</a><ul class="internal"><li><a class="tocitem" href="#Problem-definition"><span>Problem definition</span></a></li><li><a class="tocitem" href="#Generic-tensor-network-representation"><span>Generic tensor network representation</span></a></li><li><a class="tocitem" href="#Solving-properties"><span>Solving properties</span></a></li></ul></li></ul></li><li><span class="tocitem">Topics</span><ul><li><a class="tocitem" href="../../gist/">Gist</a></li><li><a class="tocitem" href="../saveload/">Save and load solutions</a></li><li><a class="tocitem" href="../../sumproduct/">Sum product tree representation</a></li><li><a class="tocitem" href="../weighted/">Weighted problems</a></li><li><a class="tocitem" href="../open/">Open and fixed degrees of freedom</a></li></ul></li><li><a class="tocitem" href="../../performancetips/">Performance Tips</a></li><li><a class="tocitem" href="../../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Problems</a></li><li class="is-active"><a href>Set packing problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Set packing problem</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/examples/SetPacking.jl#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Set-packing-problem"><a class="docs-heading-anchor" href="#Set-packing-problem">Set packing problem</a><a id="Set-packing-problem-1"></a><a class="docs-heading-anchor-permalink" href="#Set-packing-problem" title="Permalink"></a></h1><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>It is highly recommended to read the <a href="../IndependentSet/#Independent-set-problem">Independent set problem</a> chapter before reading this one.</p></div></div><h2 id="Problem-definition"><a class="docs-heading-anchor" href="#Problem-definition">Problem definition</a><a id="Problem-definition-1"></a><a class="docs-heading-anchor-permalink" href="#Problem-definition" title="Permalink"></a></h2><p>The <a href="https://en.wikipedia.org/wiki/Set_packing">set packing problem</a> is generalization of the <a href="../../ref/#ProblemReductions.IndependentSet"><code>IndependentSet</code></a> problem from the simple graph to the multigraph. Suppose one has a finite set <span>$S$</span> and a list of subsets of <span>$S$</span>. Then, the set packing problem asks if some <span>$k$</span> subsets in the list are pairwise disjoint. In the following, we will find the solution space properties for the set in the <a href="../SetCovering/#Set-covering-problem">Set covering problem</a>.</p><pre><code class="language-julia hljs">using GenericTensorNetworks, Graphs</code></pre><p>The packing stadium areas of cameras are represented as the following sets.</p><pre><code class="language-julia hljs">sets = [[1,3,4,6,7], [4,7,8,12], [2,5,9,11,13],
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Set packing problem · GenericTensorNetworks.jl</title><meta name="title" content="Set packing problem · GenericTensorNetworks.jl"/><meta property="og:title" content="Set packing problem · GenericTensorNetworks.jl"/><meta property="twitter:title" content="Set packing problem · GenericTensorNetworks.jl"/><meta name="description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="twitter:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/SetPacking/"/><meta property="twitter:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/SetPacking/"/><link rel="canonical" href="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/SetPacking/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GenericTensorNetworks.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Problems</span><ul><li><a class="tocitem" href="../IndependentSet/">Independent set problem</a></li><li><a class="tocitem" href="../MaximalIS/">Maximal independent set problem</a></li><li><a class="tocitem" href="../SpinGlass/">Spin glass problem</a></li><li><a class="tocitem" href="../MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../Matching/">Vertex matching problem</a></li><li><a class="tocitem" href="../PaintShop/">Binary paint shop problem</a></li><li><a class="tocitem" href="../Coloring/">Coloring problem</a></li><li><a class="tocitem" href="../DominatingSet/">Dominating set problem</a></li><li><a class="tocitem" href="../Satisfiability/">Satisfiability problem</a></li><li><a class="tocitem" href="../SetCovering/">Set covering problem</a></li><li class="is-active"><a class="tocitem" href>Set packing problem</a><ul class="internal"><li><a class="tocitem" href="#Overview"><span>Overview</span></a></li><li><a class="tocitem" href="#Tensor-Network-Formulation"><span>Tensor Network Formulation</span></a></li><li><a class="tocitem" href="#Mathematical-Background"><span>Mathematical Background</span></a></li><li><a class="tocitem" href="#Solution-Analysis"><span>Solution Analysis</span></a></li><li><a class="tocitem" href="#More-APIs"><span>More APIs</span></a></li></ul></li></ul></li><li><span class="tocitem">Topics</span><ul><li><a class="tocitem" href="../../gist/">Gist</a></li><li><a class="tocitem" href="../saveload/">Save and load solutions</a></li><li><a class="tocitem" href="../../sumproduct/">Sum product tree representation</a></li><li><a class="tocitem" href="../weighted/">Weighted problems</a></li><li><a class="tocitem" href="../open/">Open and fixed degrees of freedom</a></li></ul></li><li><a class="tocitem" href="../../performancetips/">Performance Tips</a></li><li><a class="tocitem" href="../../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Problems</a></li><li class="is-active"><a href>Set packing problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Set packing problem</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/examples/SetPacking.jl#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Set-Packing-Problem"><a class="docs-heading-anchor" href="#Set-Packing-Problem">Set Packing Problem</a><a id="Set-Packing-Problem-1"></a><a class="docs-heading-anchor-permalink" href="#Set-Packing-Problem" title="Permalink"></a></h1><h2 id="Overview"><a class="docs-heading-anchor" href="#Overview">Overview</a><a id="Overview-1"></a><a class="docs-heading-anchor-permalink" href="#Overview" title="Permalink"></a></h2><p>The Set Packing Problem is a generalization of the Independent Set problem from simple graphs to hypergraphs. Given a collection of sets, the goal is to find the maximum number of mutually disjoint sets (sets that share no common elements).</p><p>This example demonstrates:</p><ul><li>Formulating a set packing problem</li><li>Converting it to a tensor network</li><li>Finding maximum set packings</li><li>Analyzing the solution space</li></ul><p>We&#39;ll use the same sets from the <a href="../SetCovering/#Set-Covering-Problem">Set Covering Problem</a> example for comparison.</p><pre><code class="language-julia hljs">using GenericTensorNetworks, Graphs</code></pre><p>Define our sets (each representing a camera&#39;s coverage area)</p><pre><code class="language-julia hljs">sets = [[1,3,4,6,7], [4,7,8,12], [2,5,9,11,13],
     [1,2,14,15], [3,6,10,12,14], [8,14,15],
     [1,2,6,11], [1,2,4,6,8,12]]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">8-element Vector{Vector{Int64}}:
  [1, 3, 4, 6, 7]
@@ -9,16 +9,275 @@
  [3, 6, 10, 12, 14]
  [8, 14, 15]
  [1, 2, 6, 11]
- [1, 2, 4, 6, 8, 12]</code></pre><h2 id="Generic-tensor-network-representation"><a class="docs-heading-anchor" href="#Generic-tensor-network-representation">Generic tensor network representation</a><a id="Generic-tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Generic-tensor-network-representation" title="Permalink"></a></h2><p>We can define the set packing problem with the <a href="../../ref/#ProblemReductions.SetPacking"><code>SetPacking</code></a> type as</p><pre><code class="language-julia hljs">problem = SetPacking(sets)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">SetPacking{Int64, Int64, UnitWeight}([1, 3, 4, 6, 7, 8, 12, 2, 5, 9, 11, 13, 14, 15, 10], [[1, 3, 4, 6, 7], [4, 7, 8, 12], [2, 5, 9, 11, 13], [1, 2, 14, 15], [3, 6, 10, 12, 14], [8, 14, 15], [1, 2, 6, 11], [1, 2, 4, 6, 8, 12]], [1, 1, 1, 1, 1, 1, 1, 1])</code></pre><p>The tensor network representation of the set packing problem can be obtained by</p><pre><code class="language-julia hljs">problem = GenericTensorNetwork(problem)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">GenericTensorNetwork{SetPacking{Int64, Int64, UnitWeight}, OMEinsum.DynamicNestedEinsum{Int64}, Int64}
+ [1, 2, 4, 6, 8, 12]</code></pre><h2 id="Tensor-Network-Formulation"><a class="docs-heading-anchor" href="#Tensor-Network-Formulation">Tensor Network Formulation</a><a id="Tensor-Network-Formulation-1"></a><a class="docs-heading-anchor-permalink" href="#Tensor-Network-Formulation" title="Permalink"></a></h2><p>Define the set packing problem:</p><pre><code class="language-julia hljs">setpacking = SetPacking(sets)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">SetPacking{Int64, Int64, UnitWeight}([1, 3, 4, 6, 7, 8, 12, 2, 5, 9, 11, 13, 14, 15, 10], [[1, 3, 4, 6, 7], [4, 7, 8, 12], [2, 5, 9, 11, 13], [1, 2, 14, 15], [3, 6, 10, 12, 14], [8, 14, 15], [1, 2, 6, 11], [1, 2, 4, 6, 8, 12]], [1, 1, 1, 1, 1, 1, 1, 1])</code></pre><p>The problem consists of:</p><ol><li>Packing constraints: No element can be covered by more than one set</li><li>Optimization objective: Maximize the number of sets used</li></ol><pre><code class="language-julia hljs">constraints(setpacking)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">15-element Vector{ProblemReductions.LocalConstraint}:
+ LocalConstraint on [3]
+┌───────────────┬───────┐
+│<span class="sgr1"> Configuration │ Valid │
+├───────────────┼───────┤
+│      [0]      │ true  │
+│      [1]      │ true  │
+└───────────────┴───────┘
+
+ LocalConstraint on [2, 5, 8]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│   [0, 0, 0]   │ true  │
+│   [1, 0, 0]   │ true  │
+│   [0, 1, 0]   │ true  │
+│   [1, 1, 0]   │ false │
+│   [0, 0, 1]   │ true  │
+│   [1, 0, 1]   │ false │
+│   [0, 1, 1]   │ false │
+│   [1, 1, 1]   │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [2, 6, 8]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│   [0, 0, 0]   │ true  │
+│   [1, 0, 0]   │ true  │
+│   [0, 1, 0]   │ true  │
+│   [1, 1, 0]   │ false │
+│   [0, 0, 1]   │ true  │
+│   [1, 0, 1]   │ false │
+│   [0, 1, 1]   │ false │
+│   [1, 1, 1]   │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [1, 4, 7, 8]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ true  │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ false │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ false │
+│ [0, 1, 1, 0]  │ false │
+│ [1, 1, 1, 0]  │ false │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ false │
+│ [0, 1, 0, 1]  │ false │
+│ [1, 1, 0, 1]  │ false │
+│ [0, 0, 1, 1]  │ false │
+│ [1, 0, 1, 1]  │ false │
+│ [0, 1, 1, 1]  │ false │
+│ [1, 1, 1, 1]  │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [1, 5, 7, 8]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ true  │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ false │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ false │
+│ [0, 1, 1, 0]  │ false │
+│ [1, 1, 1, 0]  │ false │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ false │
+│ [0, 1, 0, 1]  │ false │
+│ [1, 1, 0, 1]  │ false │
+│ [0, 0, 1, 1]  │ false │
+│ [1, 0, 1, 1]  │ false │
+│ [0, 1, 1, 1]  │ false │
+│ [1, 1, 1, 1]  │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [3, 7]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│    [0, 0]     │ true  │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [3]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│      [0]      │ true  │
+│      [1]      │ true  │
+└───────────────┴───────┘
+
+ LocalConstraint on [4, 5, 6]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│   [0, 0, 0]   │ true  │
+│   [1, 0, 0]   │ true  │
+│   [0, 1, 0]   │ true  │
+│   [1, 1, 0]   │ false │
+│   [0, 0, 1]   │ true  │
+│   [1, 0, 1]   │ false │
+│   [0, 1, 1]   │ false │
+│   [1, 1, 1]   │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [1, 5]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│    [0, 0]     │ true  │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [1, 2]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│    [0, 0]     │ true  │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [1, 2, 8]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│   [0, 0, 0]   │ true  │
+│   [1, 0, 0]   │ true  │
+│   [0, 1, 0]   │ true  │
+│   [1, 1, 0]   │ false │
+│   [0, 0, 1]   │ true  │
+│   [1, 0, 1]   │ false │
+│   [0, 1, 1]   │ false │
+│   [1, 1, 1]   │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [3]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│      [0]      │ true  │
+│      [1]      │ true  │
+└───────────────┴───────┘
+
+ LocalConstraint on [4, 6]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│    [0, 0]     │ true  │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [3, 4, 7, 8]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ true  │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ false │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ false │
+│ [0, 1, 1, 0]  │ false │
+│ [1, 1, 1, 0]  │ false │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ false │
+│ [0, 1, 0, 1]  │ false │
+│ [1, 1, 0, 1]  │ false │
+│ [0, 0, 1, 1]  │ false │
+│ [1, 0, 1, 1]  │ false │
+│ [0, 1, 1, 1]  │ false │
+│ [1, 1, 1, 1]  │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [5]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│      [0]      │ true  │
+│      [1]      │ true  │
+└───────────────┴───────┘
+</span></code></pre><pre><code class="language-julia hljs">objectives(setpacking)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">8-element Vector{ProblemReductions.LocalSolutionSize{Int64}}:
+ LocalSolutionSize{Int64} on [1]
+┌───────────────┬──────┐
+│<span class="sgr1"> Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [2]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [3]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [4]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [5]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [6]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [7]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [8]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+</span></code></pre><p>Convert to tensor network representation:</p><pre><code class="language-julia hljs">problem = GenericTensorNetwork(setpacking)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">GenericTensorNetwork{SetPacking{Int64, Int64, UnitWeight}, OMEinsum.DynamicNestedEinsum{Int64}, Int64}
 - open vertices: Int64[]
 - fixed vertices: Dict{Int64, Int64}()
-- contraction time = 2^8.209, space = 2^4.0, read-write = 2^9.152</code></pre><h3 id="Theory-(can-skip)"><a class="docs-heading-anchor" href="#Theory-(can-skip)">Theory (can skip)</a><a id="Theory-(can-skip)-1"></a><a class="docs-heading-anchor-permalink" href="#Theory-(can-skip)" title="Permalink"></a></h3><p>Let <span>$S$</span> be the target set packing problem that we want to solve. For each set <span>$s \in S$</span>, we associate it with a weight <span>$w_s$</span> to it. The tensor network representation map a set <span>$s\in S$</span> to a boolean degree of freedom <span>$v_s\in\{0, 1\}$</span>. For each set <span>$s$</span>, we defined a parameterized rank-one tensor indexed by <span>$v_s$</span> as</p><p class="math-container">\[W(x_s^{w_s}) = \left(\begin{matrix}
+- contraction time = 2^8.209, space = 2^4.0, read-write = 2^9.152</code></pre><h2 id="Mathematical-Background"><a class="docs-heading-anchor" href="#Mathematical-Background">Mathematical Background</a><a id="Mathematical-Background-1"></a><a class="docs-heading-anchor-permalink" href="#Mathematical-Background" title="Permalink"></a></h2><p>For each set <span>$s$</span> with weight <span>$w_s$</span>, we assign a boolean variable <span>$v_s ∈ \{0,1\}$</span>, indicating whether the set is included in the solution.</p><p>The network uses two types of tensors:</p><ol><li><p>Set Tensors: For each set <span>$s$</span>:</p><p class="math-container">\[W(x_s, w_s) = \begin{pmatrix}
     1 \\
     x_s^{w_s}
-    \end{matrix}\right)\]</p><p>where <span>$x_s$</span> is a variable associated with <span>$s$</span>. For each unique element <span>$a$</span>, we defined the constraint over all sets containing it <span>$N(a) = \{s | s \in S \land a\in s\}$</span>:</p><p class="math-container">\[B_{s_1,s_2,\ldots,s_{|N(a)|}} = \begin{cases}
-    0 &amp; s_1+s_2+\ldots+s_{|N(a)|} &gt; 1,\\
-    1 &amp; \text{otherwise}.
-\end{cases}\]</p><p>This tensor means if in a configuration, two sets contain the element <span>$a$</span>, then this configuration is forbidden, One can check the contraction time space complexity of a <a href="../../ref/#ProblemReductions.SetPacking"><code>SetPacking</code></a> instance by typing:</p><pre><code class="language-julia hljs">contraction_complexity(problem)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Time complexity: 2^8.20945336562895
+\end{pmatrix}\]</p></li><li><p>Element Constraint Tensors: For each element a and its containing sets N(a):</p><p class="math-container">\[B_{s_1,...,s_{|N(a)|}} =
+\begin{cases}
+    0 &amp; \text{if } \sum_i s_i &gt; 1 \text{ (element covered multiple times - invalid)} \\
+    1 &amp; \text{otherwise (element covered at most once - valid)}
+\end{cases}\]</p></li></ol><p>Check the contraction complexity:</p><pre><code class="language-julia hljs">contraction_complexity(problem)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Time complexity: 2^8.20945336562895
 Space complexity: 2^4.0
-Read-write complexity: 2^9.152284842306582</code></pre><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="The-&quot;graph&quot;-polynomial"><a class="docs-heading-anchor" href="#The-&quot;graph&quot;-polynomial">The &quot;graph&quot; polynomial</a><a id="The-&quot;graph&quot;-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#The-&quot;graph&quot;-polynomial" title="Permalink"></a></h5><p>The graph polynomial for the set packing problem is defined as</p><p class="math-container">\[P(S, x) = \sum_{k=0}^{\alpha(S)} c_k x^k,\]</p><p>where <span>$c_k$</span> is the number of configurations having <span>$k$</span> sets, and <span>$\alpha(S)$</span> is the maximum size of the packing.</p><pre><code class="language-julia hljs">packing_polynomial = solve(problem, GraphPolynomial())[]</code></pre>1 &#43; 8&#8729;x &#43; 8&#8729;x<sup>2</sup> &#43; x<sup>3</sup><p>The maximum number of sets that packing the set of elements can be computed with the <a href="../../ref/#GenericTensorNetworks.SizeMax"><code>SizeMax</code></a> property:</p><pre><code class="language-julia hljs">max_packing_size = solve(problem, SizeMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3.0ₜ</code></pre><p>Similarly, we have its counting <a href="../../ref/#GenericTensorNetworks.CountingMax"><code>CountingMax</code></a>:</p><pre><code class="language-julia hljs">counting_maximum_set_packing = solve(problem, CountingMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(3.0, 1.0)ₜ</code></pre><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="Finding-maximum-set-packing"><a class="docs-heading-anchor" href="#Finding-maximum-set-packing">Finding maximum set packing</a><a id="Finding-maximum-set-packing-1"></a><a class="docs-heading-anchor-permalink" href="#Finding-maximum-set-packing" title="Permalink"></a></h5><p>One can enumerate all maximum set packing with the <a href="../../ref/#GenericTensorNetworks.ConfigsMax"><code>ConfigsMax</code></a> property in the program.</p><pre><code class="language-julia hljs">max_configs = read_config(solve(problem, ConfigsMax())[])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1-element Vector{StaticBitVector{8, 1}}:
- 10100100</code></pre><p>Hence the only optimal solution is <span>$\{z_1, z_3, z_6\}$</span> that has size 3. The correctness of this result can be checked with the <a href="../../ref/#ProblemReductions.is_set_packing"><code>is_set_packing</code></a> function.</p><pre><code class="language-julia hljs">all(c-&gt;is_set_packing(problem.problem, c), max_configs)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">true</code></pre><p>Similarly, if one is only interested in computing one of the maximum set packing, one can use the graph property <a href="../../ref/#GenericTensorNetworks.SingleConfigMax"><code>SingleConfigMax</code></a>.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../SetCovering/">« Set covering problem</a><a class="docs-footer-nextpage" href="../../gist/">Gist »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Saturday 28 December 2024 03:26">Saturday 28 December 2024</span>. Using Julia version 1.11.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+Read-write complexity: 2^9.152284842306582</code></pre><h2 id="Solution-Analysis"><a class="docs-heading-anchor" href="#Solution-Analysis">Solution Analysis</a><a id="Solution-Analysis-1"></a><a class="docs-heading-anchor-permalink" href="#Solution-Analysis" title="Permalink"></a></h2><h3 id="1.-Set-Packing-Polynomial"><a class="docs-heading-anchor" href="#1.-Set-Packing-Polynomial">1. Set Packing Polynomial</a><a id="1.-Set-Packing-Polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#1.-Set-Packing-Polynomial" title="Permalink"></a></h3><p>The polynomial <span>$P(S,x) = \sum_i c_i x^i$</span> counts set packings by size, where <span>$c_i$</span> is the number of valid packings using <span>$i$</span> sets</p><pre><code class="language-julia hljs">packing_polynomial = solve(problem, GraphPolynomial())[]</code></pre>1 &#43; 8&#8729;x &#43; 8&#8729;x<sup>2</sup> &#43; x<sup>3</sup><h3 id="2.-Maximum-Set-Packing-Size"><a class="docs-heading-anchor" href="#2.-Maximum-Set-Packing-Size">2. Maximum Set Packing Size</a><a id="2.-Maximum-Set-Packing-Size-1"></a><a class="docs-heading-anchor-permalink" href="#2.-Maximum-Set-Packing-Size" title="Permalink"></a></h3><p>Find the maximum number of mutually disjoint sets:</p><pre><code class="language-julia hljs">max_packing_size = solve(problem, SizeMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3.0ₜ</code></pre><p>Count maximum set packings:</p><pre><code class="language-julia hljs">counting_maximum_set_packing = solve(problem, CountingMax())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(3.0, 1.0)ₜ</code></pre><h3 id="3.-Maximum-Set-Packing-Configurations"><a class="docs-heading-anchor" href="#3.-Maximum-Set-Packing-Configurations">3. Maximum Set Packing Configurations</a><a id="3.-Maximum-Set-Packing-Configurations-1"></a><a class="docs-heading-anchor-permalink" href="#3.-Maximum-Set-Packing-Configurations" title="Permalink"></a></h3><p>Enumerate all maximum set packings:</p><pre><code class="language-julia hljs">max_configs = read_config(solve(problem, ConfigsMax())[])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1-element Vector{StaticBitVector{8, 1}}:
+ 10100100</code></pre><p>The optimal solution is <span>$\{z_1, z_3, z_6\}$</span> with size 3, where <span>$z_i$</span> represents the <span>$i$</span>-th set in our original list.</p><p>Verify solutions are valid:</p><pre><code class="language-julia hljs">all(c-&gt;is_set_packing(problem.problem, c), max_configs)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">true</code></pre><p>Note: For finding just one maximum set packing, use the SingleConfigMax property</p><h2 id="More-APIs"><a class="docs-heading-anchor" href="#More-APIs">More APIs</a><a id="More-APIs-1"></a><a class="docs-heading-anchor-permalink" href="#More-APIs" title="Permalink"></a></h2><p>The <a href="../IndependentSet/#Independent-Set-Problem">Independent Set Problem</a> chapter has more examples on how to use the APIs.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../SetCovering/">« Set covering problem</a><a class="docs-footer-nextpage" href="../../gist/">Gist »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.1 on <span class="colophon-date" title="Thursday 13 March 2025 02:44">Thursday 13 March 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

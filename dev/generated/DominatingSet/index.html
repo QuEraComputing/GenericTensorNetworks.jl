@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Dominating set problem · GenericTensorNetworks.jl</title><meta name="title" content="Dominating set problem · GenericTensorNetworks.jl"/><meta property="og:title" content="Dominating set problem · GenericTensorNetworks.jl"/><meta property="twitter:title" content="Dominating set problem · GenericTensorNetworks.jl"/><meta name="description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="twitter:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/DominatingSet/"/><meta property="twitter:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/DominatingSet/"/><link rel="canonical" href="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/DominatingSet/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GenericTensorNetworks.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Problems</span><ul><li><a class="tocitem" href="../IndependentSet/">Independent set problem</a></li><li><a class="tocitem" href="../MaximalIS/">Maximal independent set problem</a></li><li><a class="tocitem" href="../SpinGlass/">Spin glass problem</a></li><li><a class="tocitem" href="../MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../Matching/">Vertex matching problem</a></li><li><a class="tocitem" href="../PaintShop/">Binary paint shop problem</a></li><li><a class="tocitem" href="../Coloring/">Coloring problem</a></li><li class="is-active"><a class="tocitem" href>Dominating set problem</a><ul class="internal"><li><a class="tocitem" href="#Problem-definition"><span>Problem definition</span></a></li><li><a class="tocitem" href="#Generic-tensor-network-representation"><span>Generic tensor network representation</span></a></li><li><a class="tocitem" href="#Solving-properties"><span>Solving properties</span></a></li></ul></li><li><a class="tocitem" href="../Satisfiability/">Satisfiability problem</a></li><li><a class="tocitem" href="../SetCovering/">Set covering problem</a></li><li><a class="tocitem" href="../SetPacking/">Set packing problem</a></li></ul></li><li><span class="tocitem">Topics</span><ul><li><a class="tocitem" href="../../gist/">Gist</a></li><li><a class="tocitem" href="../saveload/">Save and load solutions</a></li><li><a class="tocitem" href="../../sumproduct/">Sum product tree representation</a></li><li><a class="tocitem" href="../weighted/">Weighted problems</a></li><li><a class="tocitem" href="../open/">Open and fixed degrees of freedom</a></li></ul></li><li><a class="tocitem" href="../../performancetips/">Performance Tips</a></li><li><a class="tocitem" href="../../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Problems</a></li><li class="is-active"><a href>Dominating set problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Dominating set problem</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/examples/DominatingSet.jl#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Dominating-set-problem"><a class="docs-heading-anchor" href="#Dominating-set-problem">Dominating set problem</a><a id="Dominating-set-problem-1"></a><a class="docs-heading-anchor-permalink" href="#Dominating-set-problem" title="Permalink"></a></h1><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>It is highly recommended to read the <a href="../IndependentSet/#Independent-set-problem">Independent set problem</a> chapter before reading this one.</p></div></div><h2 id="Problem-definition"><a class="docs-heading-anchor" href="#Problem-definition">Problem definition</a><a id="Problem-definition-1"></a><a class="docs-heading-anchor-permalink" href="#Problem-definition" title="Permalink"></a></h2><p>In graph theory, a <a href="https://en.wikipedia.org/wiki/Dominating_set">dominating set</a> for a graph <span>$G = (V, E)$</span> is a subset <span>$D$</span> of <span>$V$</span> such that every vertex not in <span>$D$</span> is adjacent to at least one member of <span>$D$</span>. The domination number <span>$\gamma(G)$</span> is the number of vertices in a smallest dominating set for <span>$G$</span>. The decision version of finding the minimum dominating set is an NP-complete. In the following, we are going to solve the dominating set problem on the Petersen graph.</p><pre><code class="language-julia hljs">using GenericTensorNetworks, Graphs
-
-graph = Graphs.smallgraph(:petersen)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{10, 15} undirected simple Int64 graph</code></pre><p>We can visualize this graph using the following function</p><pre><code class="language-julia hljs">rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Dominating set problem · GenericTensorNetworks.jl</title><meta name="title" content="Dominating set problem · GenericTensorNetworks.jl"/><meta property="og:title" content="Dominating set problem · GenericTensorNetworks.jl"/><meta property="twitter:title" content="Dominating set problem · GenericTensorNetworks.jl"/><meta name="description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="twitter:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/DominatingSet/"/><meta property="twitter:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/DominatingSet/"/><link rel="canonical" href="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/DominatingSet/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GenericTensorNetworks.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Problems</span><ul><li><a class="tocitem" href="../IndependentSet/">Independent set problem</a></li><li><a class="tocitem" href="../MaximalIS/">Maximal independent set problem</a></li><li><a class="tocitem" href="../SpinGlass/">Spin glass problem</a></li><li><a class="tocitem" href="../MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../Matching/">Vertex matching problem</a></li><li><a class="tocitem" href="../PaintShop/">Binary paint shop problem</a></li><li><a class="tocitem" href="../Coloring/">Coloring problem</a></li><li class="is-active"><a class="tocitem" href>Dominating set problem</a><ul class="internal"><li><a class="tocitem" href="#Overview"><span>Overview</span></a></li><li><a class="tocitem" href="#Tensor-Network-Formulation"><span>Tensor Network Formulation</span></a></li><li><a class="tocitem" href="#Mathematical-Background"><span>Mathematical Background</span></a></li><li><a class="tocitem" href="#Solution-Analysis"><span>Solution Analysis</span></a></li><li><a class="tocitem" href="#More-APIs"><span>More APIs</span></a></li></ul></li><li><a class="tocitem" href="../Satisfiability/">Satisfiability problem</a></li><li><a class="tocitem" href="../SetCovering/">Set covering problem</a></li><li><a class="tocitem" href="../SetPacking/">Set packing problem</a></li></ul></li><li><span class="tocitem">Topics</span><ul><li><a class="tocitem" href="../../gist/">Gist</a></li><li><a class="tocitem" href="../saveload/">Save and load solutions</a></li><li><a class="tocitem" href="../../sumproduct/">Sum product tree representation</a></li><li><a class="tocitem" href="../weighted/">Weighted problems</a></li><li><a class="tocitem" href="../open/">Open and fixed degrees of freedom</a></li></ul></li><li><a class="tocitem" href="../../performancetips/">Performance Tips</a></li><li><a class="tocitem" href="../../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Problems</a></li><li class="is-active"><a href>Dominating set problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Dominating set problem</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/examples/DominatingSet.jl#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Dominating-Set-Problem"><a class="docs-heading-anchor" href="#Dominating-Set-Problem">Dominating Set Problem</a><a id="Dominating-Set-Problem-1"></a><a class="docs-heading-anchor-permalink" href="#Dominating-Set-Problem" title="Permalink"></a></h1><h2 id="Overview"><a class="docs-heading-anchor" href="#Overview">Overview</a><a id="Overview-1"></a><a class="docs-heading-anchor-permalink" href="#Overview" title="Permalink"></a></h2><p>A dominating set in graph theory is a subset D of vertices where every vertex in the graph either belongs to D or is adjacent to a vertex in D. The domination number γ(G) is the size of the smallest possible dominating set. This example demonstrates how to:</p><ul><li>Find the domination number</li><li>Count and enumerate dominating sets</li><li>Compute the domination polynomial</li></ul><p>We&#39;ll explore these concepts using the Petersen graph as our example.</p><pre><code class="language-julia hljs">using GenericTensorNetworks, Graphs</code></pre><p>Create a Petersen graph instance</p><pre><code class="language-julia hljs">graph = Graphs.smallgraph(:petersen)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{10, 15} undirected simple Int64 graph</code></pre><p>Define vertex layout for visualization</p><pre><code class="language-julia hljs">rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
 locations = [[rot15(0.0, 60.0, i) for i=0:4]..., [rot15(0.0, 30, i) for i=0:4]...]
 show_graph(graph, locations; format=:svg)</code></pre><img src='data:image/svg+xml;utf-8,<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="155" height="149" viewBox="0 0 155 149">
@@ -32,15 +30,324 @@ show_graph(graph, locations; format=:svg)</code></pre><img src='data:image/svg+x
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 69.429688 44.269531 C 69.429688 49.792969 64.953125 54.269531 59.429688 54.269531 C 53.90625 54.269531 49.429688 49.792969 49.429688 44.269531 C 49.429688 38.746094 53.90625 34.269531 59.429688 34.269531 C 64.953125 34.269531 69.429688 38.746094 69.429688 44.269531 Z M 69.429688 44.269531 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 58.53125 77.8125 C 58.53125 83.335938 54.054688 87.8125 48.53125 87.8125 C 43.007812 87.8125 38.53125 83.335938 38.53125 77.8125 C 38.53125 72.289062 43.007812 67.8125 48.53125 67.8125 C 54.054688 67.8125 58.53125 72.289062 58.53125 77.8125 Z M 58.53125 77.8125 "/>
 </svg>
-'/><h2 id="Generic-tensor-network-representation"><a class="docs-heading-anchor" href="#Generic-tensor-network-representation">Generic tensor network representation</a><a id="Generic-tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Generic-tensor-network-representation" title="Permalink"></a></h2><p>We can use <a href="../../ref/#ProblemReductions.DominatingSet"><code>DominatingSet</code></a> to construct the tensor network for solving the dominating set problem as</p><pre><code class="language-julia hljs">dom = DominatingSet(graph)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">DominatingSet{SimpleGraph{Int64}, Int64, UnitWeight}(SimpleGraph{Int64}(15, [[2, 5, 6], [1, 3, 7], [2, 4, 8], [3, 5, 9], [1, 4, 10], [1, 8, 9], [2, 9, 10], [3, 6, 10], [4, 6, 7], [5, 7, 8]]), [1, 1, 1, 1, 1, 1, 1, 1, 1, 1])</code></pre><p>The tensor network representation of the dominating set problem can be obtained by</p><pre><code class="language-julia hljs">problem = GenericTensorNetwork(dom; optimizer=TreeSA())</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">GenericTensorNetwork{DominatingSet{SimpleGraph{Int64}, Int64, UnitWeight}, OMEinsum.SlicedEinsum{Int64, OMEinsum.DynamicNestedEinsum{Int64}}, Int64}
+'/><h2 id="Tensor-Network-Formulation"><a class="docs-heading-anchor" href="#Tensor-Network-Formulation">Tensor Network Formulation</a><a id="Tensor-Network-Formulation-1"></a><a class="docs-heading-anchor-permalink" href="#Tensor-Network-Formulation" title="Permalink"></a></h2><p>We represent the dominating set problem using tensor networks:</p><pre><code class="language-julia hljs">dom = DominatingSet(graph)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">DominatingSet{SimpleGraph{Int64}, Int64, UnitWeight}(SimpleGraph{Int64}(15, [[2, 5, 6], [1, 3, 7], [2, 4, 8], [3, 5, 9], [1, 4, 10], [1, 8, 9], [2, 9, 10], [3, 6, 10], [4, 6, 7], [5, 7, 8]]), [1, 1, 1, 1, 1, 1, 1, 1, 1, 1])</code></pre><p>The problem has two components:</p><ol><li>Domination constraints: Every vertex must be dominated</li><li>Optimization objective: Minimize the size of the dominating set</li></ol><pre><code class="language-julia hljs">constraints(dom)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{ProblemReductions.LocalConstraint}:
+ LocalConstraint on [1, 2, 5, 6]
+┌───────────────┬───────┐
+│<span class="sgr1"> Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ true  │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ true  │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ true  │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ true  │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ true  │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ true  │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ true  │
+└───────────────┴───────┘
+
+ LocalConstraint on [2, 1, 3, 7]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ true  │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ true  │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ true  │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ true  │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ true  │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ true  │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ true  │
+└───────────────┴───────┘
+
+ LocalConstraint on [3, 2, 4, 8]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ true  │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ true  │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ true  │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ true  │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ true  │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ true  │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ true  │
+└───────────────┴───────┘
+
+ LocalConstraint on [4, 3, 5, 9]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ true  │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ true  │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ true  │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ true  │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ true  │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ true  │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ true  │
+└───────────────┴───────┘
+
+ LocalConstraint on [5, 1, 4, 10]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ true  │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ true  │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ true  │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ true  │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ true  │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ true  │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ true  │
+└───────────────┴───────┘
+
+ LocalConstraint on [6, 1, 8, 9]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ true  │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ true  │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ true  │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ true  │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ true  │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ true  │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ true  │
+└───────────────┴───────┘
+
+ LocalConstraint on [7, 2, 9, 10]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ true  │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ true  │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ true  │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ true  │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ true  │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ true  │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ true  │
+└───────────────┴───────┘
+
+ LocalConstraint on [8, 3, 6, 10]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ true  │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ true  │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ true  │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ true  │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ true  │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ true  │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ true  │
+└───────────────┴───────┘
+
+ LocalConstraint on [9, 4, 6, 7]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ true  │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ true  │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ true  │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ true  │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ true  │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ true  │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ true  │
+└───────────────┴───────┘
+
+ LocalConstraint on [10, 5, 7, 8]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ true  │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ true  │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ true  │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ true  │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ true  │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ true  │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ true  │
+└───────────────┴───────┘
+</span></code></pre><pre><code class="language-julia hljs">objectives(dom)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{ProblemReductions.LocalSolutionSize{Int64}}:
+ LocalSolutionSize{Int64} on [1]
+┌───────────────┬──────┐
+│<span class="sgr1"> Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [2]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [3]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [4]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [5]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [6]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [7]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [8]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [9]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [10]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+</span></code></pre><p>Convert to tensor network representation with optimized contraction order:</p><pre><code class="language-julia hljs">problem = GenericTensorNetwork(dom; optimizer=TreeSA())</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">GenericTensorNetwork{DominatingSet{SimpleGraph{Int64}, Int64, UnitWeight}, OMEinsum.SlicedEinsum{Int64, OMEinsum.DynamicNestedEinsum{Int64}}, Int64}
 - open vertices: Int64[]
 - fixed vertices: Dict{Int64, Int64}()
-- contraction time = 2^11.119, space = 2^8.0, read-write = 2^11.334</code></pre><p>where the key word argument <code>optimizer</code> specifies the tensor network contraction order optimizer as a local search based optimizer <a href="../../ref/#OMEinsumContractionOrders.TreeSA"><code>TreeSA</code></a>.</p><h3 id="Theory-(can-skip)"><a class="docs-heading-anchor" href="#Theory-(can-skip)">Theory (can skip)</a><a id="Theory-(can-skip)-1"></a><a class="docs-heading-anchor-permalink" href="#Theory-(can-skip)" title="Permalink"></a></h3><p>Let <span>$G=(V,E)$</span> be the target graph that we want to solve. The tensor network representation map a vertex <span>$v\in V$</span> to a boolean degree of freedom <span>$s_v\in\{0, 1\}$</span>. We defined the restriction on a vertex and its neighboring vertices <span>$N(v)$</span>:</p><p class="math-container">\[T(x_v)_{s_1,s_2,\ldots,s_{|N(v)|},s_v} = \begin{cases}
-    0 &amp; s_1=s_2=\ldots=s_{|N(v)|}=s_v=0,\\
-    1 &amp; s_v=0,\\
-    x_v^{w_v} &amp; \text{otherwise},
-\end{cases}\]</p><p>where <span>$w_v$</span> is the weight of vertex <span>$v$</span>. This tensor means if both <span>$v$</span> and its neighboring vertices are not in <span>$D$</span>, i.e., <span>$s_1=s_2=\ldots=s_{|N(v)|}=s_v=0$</span>, this configuration is forbidden because <span>$v$</span> is not adjacent to any member in the set. otherwise, if <span>$v$</span> is in <span>$D$</span>, it has a contribution <span>$x_v^{w_v}$</span> to the final result. One can check the contraction time space complexity of a <a href="../../ref/#ProblemReductions.DominatingSet"><code>DominatingSet</code></a> instance by typing:</p><pre><code class="language-julia hljs">contraction_complexity(problem)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Time complexity: 2^11.118941072723507
+- contraction time = 2^11.119, space = 2^8.0, read-write = 2^11.334</code></pre><h2 id="Mathematical-Background"><a class="docs-heading-anchor" href="#Mathematical-Background">Mathematical Background</a><a id="Mathematical-Background-1"></a><a class="docs-heading-anchor-permalink" href="#Mathematical-Background" title="Permalink"></a></h2><p>For a graph <span>$G=(V,E)$</span>, we assign a boolean variable <span>$s_v \in \{0,1\}$</span> to each vertex <span>$v$</span>. The tensor network uses the following components:</p><ol><li>Vertex Tensors: For vertex <span>$v$</span> and its neighbors <span>$N(v)$</span>:<p class="math-container">\[T(x_v)_{s_1,...,s_{|N(v)|},s_v} =
+\begin{cases}
+    0 &amp; \text{if all } s \text{ values are } 0 \text{ (invalid configuration)} \\
+    1 &amp; \text{if } s_v = 0 \text{ (vertex not in set)} \\
+    x_v^{w_v} &amp; \text{otherwise (vertex in set)}
+\end{cases}\]</p></li></ol><p>Check the contraction complexity:</p><pre><code class="language-julia hljs">contraction_complexity(problem)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Time complexity: 2^11.118941072723507
 Space complexity: 2^8.0
-Read-write complexity: 2^11.33371442609397</code></pre><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="Domination-polynomial"><a class="docs-heading-anchor" href="#Domination-polynomial">Domination polynomial</a><a id="Domination-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#Domination-polynomial" title="Permalink"></a></h5><p>The graph polynomial for the dominating set problem is known as the domination polynomial (see <a href="https://arxiv.org/abs/0905.2251">arXiv:0905.2251</a>). It is defined as</p><p class="math-container">\[D(G, x) = \sum_{k=0}^{\gamma(G)} d_k x^k,\]</p><p>where <span>$d_k$</span> is the number of dominating sets of size <span>$k$</span> in graph <span>$G=(V, E)$</span>.</p><pre><code class="language-julia hljs">domination_polynomial = solve(problem, GraphPolynomial())[]</code></pre>10&#8729;x<sup>3</sup> &#43; 75&#8729;x<sup>4</sup> &#43; 192&#8729;x<sup>5</sup> &#43; 200&#8729;x<sup>6</sup> &#43; 120&#8729;x<sup>7</sup> &#43; 45&#8729;x<sup>8</sup> &#43; 10&#8729;x<sup>9</sup> &#43; x<sup>10</sup><p>The domination number <span>$\gamma(G)$</span> can be computed with the <a href="../../ref/#GenericTensorNetworks.SizeMin"><code>SizeMin</code></a> property:</p><pre><code class="language-julia hljs">domination_number = solve(problem, SizeMin())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3.0ₜ</code></pre><p>Similarly, we have its counting <a href="../../ref/#GenericTensorNetworks.CountingMin"><code>CountingMin</code></a>:</p><pre><code class="language-julia hljs">counting_min_dominating_set = solve(problem, CountingMin())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(3.0, 10.0)ₜ</code></pre><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="finding-minimum-dominating-set"><a class="docs-heading-anchor" href="#finding-minimum-dominating-set">finding minimum dominating set</a><a id="finding-minimum-dominating-set-1"></a><a class="docs-heading-anchor-permalink" href="#finding-minimum-dominating-set" title="Permalink"></a></h5><p>One can enumerate all minimum dominating sets with the <a href="../../ref/#GenericTensorNetworks.ConfigsMin"><code>ConfigsMin</code></a> property in the program.</p><pre><code class="language-julia hljs">min_configs = read_config(solve(problem, ConfigsMin())[])
-
-all(c-&gt;is_dominating_set(graph, c), min_configs)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">true</code></pre><pre><code class="language-julia hljs">show_configs(graph, locations, reshape(collect(min_configs), 2, 5); padding_left=20)</code></pre><img src="7086e456.svg" alt="Example block output"/><p>Similarly, if one is only interested in computing one of the minimum dominating sets, one can use the graph property <a href="../../ref/#GenericTensorNetworks.SingleConfigMin"><code>SingleConfigMin</code></a>.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Coloring/">« Coloring problem</a><a class="docs-footer-nextpage" href="../Satisfiability/">Satisfiability problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Saturday 28 December 2024 03:26">Saturday 28 December 2024</span>. Using Julia version 1.11.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+Read-write complexity: 2^11.333714426093968</code></pre><h2 id="Solution-Analysis"><a class="docs-heading-anchor" href="#Solution-Analysis">Solution Analysis</a><a id="Solution-Analysis-1"></a><a class="docs-heading-anchor-permalink" href="#Solution-Analysis" title="Permalink"></a></h2><h3 id="1.-Domination-Polynomial"><a class="docs-heading-anchor" href="#1.-Domination-Polynomial">1. Domination Polynomial</a><a id="1.-Domination-Polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#1.-Domination-Polynomial" title="Permalink"></a></h3><p>The domination polynomial <span>$D(G,x) = \sum_i d_i x^i$</span> counts dominating sets by size, where <span>$d_i$</span> is the number of dominating sets of size <span>$i$</span>.</p><pre><code class="language-julia hljs">domination_polynomial = solve(problem, GraphPolynomial())[]</code></pre>10&#8729;x<sup>3</sup> &#43; 75&#8729;x<sup>4</sup> &#43; 192&#8729;x<sup>5</sup> &#43; 200&#8729;x<sup>6</sup> &#43; 120&#8729;x<sup>7</sup> &#43; 45&#8729;x<sup>8</sup> &#43; 10&#8729;x<sup>9</sup> &#43; x<sup>10</sup><h3 id="2.-Minimum-Dominating-Set"><a class="docs-heading-anchor" href="#2.-Minimum-Dominating-Set">2. Minimum Dominating Set</a><a id="2.-Minimum-Dominating-Set-1"></a><a class="docs-heading-anchor-permalink" href="#2.-Minimum-Dominating-Set" title="Permalink"></a></h3><p>Find the domination number γ(G):</p><pre><code class="language-julia hljs">domination_number = solve(problem, SizeMin())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3.0ₜ</code></pre><p>Count minimum dominating sets:</p><pre><code class="language-julia hljs">counting_min_dominating_set = solve(problem, CountingMin())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(3.0, 10.0)ₜ</code></pre><h3 id="3.-Configuration-Analysis"><a class="docs-heading-anchor" href="#3.-Configuration-Analysis">3. Configuration Analysis</a><a id="3.-Configuration-Analysis-1"></a><a class="docs-heading-anchor-permalink" href="#3.-Configuration-Analysis" title="Permalink"></a></h3><p>Enumerate all minimum dominating sets:</p><pre><code class="language-julia hljs">min_configs = read_config(solve(problem, ConfigsMin())[])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{StaticBitVector{10, 1}}:
+ 1000000110
+ 0100000011
+ 0010100010
+ 0101000100
+ 1001000001
+ 0010010001
+ 0100110000
+ 0000101100
+ 1010001000
+ 0001011000</code></pre><p>Verify solutions are valid:</p><pre><code class="language-julia hljs">all(c-&gt;is_dominating_set(graph, c), min_configs)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">true</code></pre><p>Visualize all minimum dominating sets:</p><pre><code class="language-julia hljs">show_configs(graph, locations, reshape(collect(min_configs), 2, 5); padding_left=20)</code></pre><img src="a8528df7.svg" alt="Example block output"/><p>Note: For finding just one minimum dominating set, use SingleConfigMin property</p><h2 id="More-APIs"><a class="docs-heading-anchor" href="#More-APIs">More APIs</a><a id="More-APIs-1"></a><a class="docs-heading-anchor-permalink" href="#More-APIs" title="Permalink"></a></h2><p>The <a href="../IndependentSet/#Independent-Set-Problem">Independent Set Problem</a> chapter has more examples on how to use the APIs.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Coloring/">« Coloring problem</a><a class="docs-footer-nextpage" href="../Satisfiability/">Satisfiability problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.1 on <span class="colophon-date" title="Thursday 13 March 2025 02:44">Thursday 13 March 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

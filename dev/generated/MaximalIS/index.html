@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Maximal independent set problem · GenericTensorNetworks.jl</title><meta name="title" content="Maximal independent set problem · GenericTensorNetworks.jl"/><meta property="og:title" content="Maximal independent set problem · GenericTensorNetworks.jl"/><meta property="twitter:title" content="Maximal independent set problem · GenericTensorNetworks.jl"/><meta name="description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="twitter:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/MaximalIS/"/><meta property="twitter:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/MaximalIS/"/><link rel="canonical" href="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/MaximalIS/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GenericTensorNetworks.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Problems</span><ul><li><a class="tocitem" href="../IndependentSet/">Independent set problem</a></li><li class="is-active"><a class="tocitem" href>Maximal independent set problem</a><ul class="internal"><li><a class="tocitem" href="#Problem-definition"><span>Problem definition</span></a></li><li><a class="tocitem" href="#Generic-tensor-network-representation"><span>Generic tensor network representation</span></a></li><li><a class="tocitem" href="#Solving-properties"><span>Solving properties</span></a></li></ul></li><li><a class="tocitem" href="../SpinGlass/">Spin glass problem</a></li><li><a class="tocitem" href="../MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../Matching/">Vertex matching problem</a></li><li><a class="tocitem" href="../PaintShop/">Binary paint shop problem</a></li><li><a class="tocitem" href="../Coloring/">Coloring problem</a></li><li><a class="tocitem" href="../DominatingSet/">Dominating set problem</a></li><li><a class="tocitem" href="../Satisfiability/">Satisfiability problem</a></li><li><a class="tocitem" href="../SetCovering/">Set covering problem</a></li><li><a class="tocitem" href="../SetPacking/">Set packing problem</a></li></ul></li><li><span class="tocitem">Topics</span><ul><li><a class="tocitem" href="../../gist/">Gist</a></li><li><a class="tocitem" href="../saveload/">Save and load solutions</a></li><li><a class="tocitem" href="../../sumproduct/">Sum product tree representation</a></li><li><a class="tocitem" href="../weighted/">Weighted problems</a></li><li><a class="tocitem" href="../open/">Open and fixed degrees of freedom</a></li></ul></li><li><a class="tocitem" href="../../performancetips/">Performance Tips</a></li><li><a class="tocitem" href="../../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Problems</a></li><li class="is-active"><a href>Maximal independent set problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Maximal independent set problem</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/examples/MaximalIS.jl#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Maximal-independent-set-problem"><a class="docs-heading-anchor" href="#Maximal-independent-set-problem">Maximal independent set problem</a><a id="Maximal-independent-set-problem-1"></a><a class="docs-heading-anchor-permalink" href="#Maximal-independent-set-problem" title="Permalink"></a></h1><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>It is highly recommended to read the <a href="../IndependentSet/#Independent-set-problem">Independent set problem</a> chapter before reading this one.</p></div></div><h2 id="Problem-definition"><a class="docs-heading-anchor" href="#Problem-definition">Problem definition</a><a id="Problem-definition-1"></a><a class="docs-heading-anchor-permalink" href="#Problem-definition" title="Permalink"></a></h2><p>In graph theory, a <a href="https://en.wikipedia.org/wiki/Maximal_independent_set">maximal independent set</a> is an independent set that is not a subset of any other independent set. It is different from maximum independent set because it does not require the set to have the max size. In the following, we are going to solve the maximal independent set problem on the Petersen graph.</p><pre><code class="language-julia hljs">using GenericTensorNetworks, Graphs
-
-graph = Graphs.smallgraph(:petersen)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{10, 15} undirected simple Int64 graph</code></pre><p>We can visualize this graph using the following function</p><pre><code class="language-julia hljs">rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Maximal independent set problem · GenericTensorNetworks.jl</title><meta name="title" content="Maximal independent set problem · GenericTensorNetworks.jl"/><meta property="og:title" content="Maximal independent set problem · GenericTensorNetworks.jl"/><meta property="twitter:title" content="Maximal independent set problem · GenericTensorNetworks.jl"/><meta name="description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="twitter:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/MaximalIS/"/><meta property="twitter:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/MaximalIS/"/><link rel="canonical" href="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/MaximalIS/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GenericTensorNetworks.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Problems</span><ul><li><a class="tocitem" href="../IndependentSet/">Independent set problem</a></li><li class="is-active"><a class="tocitem" href>Maximal independent set problem</a><ul class="internal"><li><a class="tocitem" href="#Overview"><span>Overview</span></a></li><li><a class="tocitem" href="#Tensor-Network-Formulation"><span>Tensor Network Formulation</span></a></li><li><a class="tocitem" href="#Mathematical-Background"><span>Mathematical Background</span></a></li><li><a class="tocitem" href="#Solution-Analysis"><span>Solution Analysis</span></a></li><li><a class="tocitem" href="#More-APIs"><span>More APIs</span></a></li></ul></li><li><a class="tocitem" href="../SpinGlass/">Spin glass problem</a></li><li><a class="tocitem" href="../MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../Matching/">Vertex matching problem</a></li><li><a class="tocitem" href="../PaintShop/">Binary paint shop problem</a></li><li><a class="tocitem" href="../Coloring/">Coloring problem</a></li><li><a class="tocitem" href="../DominatingSet/">Dominating set problem</a></li><li><a class="tocitem" href="../Satisfiability/">Satisfiability problem</a></li><li><a class="tocitem" href="../SetCovering/">Set covering problem</a></li><li><a class="tocitem" href="../SetPacking/">Set packing problem</a></li></ul></li><li><span class="tocitem">Topics</span><ul><li><a class="tocitem" href="../../gist/">Gist</a></li><li><a class="tocitem" href="../saveload/">Save and load solutions</a></li><li><a class="tocitem" href="../../sumproduct/">Sum product tree representation</a></li><li><a class="tocitem" href="../weighted/">Weighted problems</a></li><li><a class="tocitem" href="../open/">Open and fixed degrees of freedom</a></li></ul></li><li><a class="tocitem" href="../../performancetips/">Performance Tips</a></li><li><a class="tocitem" href="../../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Problems</a></li><li class="is-active"><a href>Maximal independent set problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Maximal independent set problem</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/examples/MaximalIS.jl#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Maximal-Independent-Set-Problem"><a class="docs-heading-anchor" href="#Maximal-Independent-Set-Problem">Maximal Independent Set Problem</a><a id="Maximal-Independent-Set-Problem-1"></a><a class="docs-heading-anchor-permalink" href="#Maximal-Independent-Set-Problem" title="Permalink"></a></h1><h2 id="Overview"><a class="docs-heading-anchor" href="#Overview">Overview</a><a id="Overview-1"></a><a class="docs-heading-anchor-permalink" href="#Overview" title="Permalink"></a></h2><p>A maximal independent set is an independent set that cannot be expanded by including more vertices. Unlike a maximum independent set, it&#39;s not necessarily the largest possible independent set.</p><p>This example demonstrates:</p><ul><li>Finding maximal independent sets</li><li>Computing the independence polynomial</li><li>Finding minimum maximal independent sets</li><li>Comparing with traditional algorithms</li></ul><p>We&#39;ll explore these concepts using the Petersen graph.</p><pre><code class="language-julia hljs">using GenericTensorNetworks, Graphs</code></pre><p>Create a Petersen graph instance</p><pre><code class="language-julia hljs">graph = Graphs.smallgraph(:petersen)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">{10, 15} undirected simple Int64 graph</code></pre><p>Define vertex layout for visualization</p><pre><code class="language-julia hljs">rot15(a, b, i::Int) = cos(2i*π/5)*a + sin(2i*π/5)*b, cos(2i*π/5)*b - sin(2i*π/5)*a
 locations = [[rot15(0.0, 60.0, i) for i=0:4]..., [rot15(0.0, 30, i) for i=0:4]...]
 show_graph(graph, locations; format=:svg)</code></pre><img src='data:image/svg+xml;utf-8,<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="155" height="149" viewBox="0 0 155 149">
@@ -32,17 +30,331 @@ show_graph(graph, locations; format=:svg)</code></pre><img src='data:image/svg+x
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 69.429688 44.269531 C 69.429688 49.792969 64.953125 54.269531 59.429688 54.269531 C 53.90625 54.269531 49.429688 49.792969 49.429688 44.269531 C 49.429688 38.746094 53.90625 34.269531 59.429688 34.269531 C 64.953125 34.269531 69.429688 38.746094 69.429688 44.269531 Z M 69.429688 44.269531 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 58.53125 77.8125 C 58.53125 83.335938 54.054688 87.8125 48.53125 87.8125 C 43.007812 87.8125 38.53125 83.335938 38.53125 77.8125 C 38.53125 72.289062 43.007812 67.8125 48.53125 67.8125 C 54.054688 67.8125 58.53125 72.289062 58.53125 77.8125 Z M 58.53125 77.8125 "/>
 </svg>
-'/><h2 id="Generic-tensor-network-representation"><a class="docs-heading-anchor" href="#Generic-tensor-network-representation">Generic tensor network representation</a><a id="Generic-tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Generic-tensor-network-representation" title="Permalink"></a></h2><p>We can use <a href="../../ref/#ProblemReductions.MaximalIS"><code>MaximalIS</code></a> to construct the tensor network for solving the maximal independent set problem as</p><pre><code class="language-julia hljs">maximalis = MaximalIS(graph)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">MaximalIS{Int64, UnitWeight}(SimpleGraph{Int64}(15, [[2, 5, 6], [1, 3, 7], [2, 4, 8], [3, 5, 9], [1, 4, 10], [1, 8, 9], [2, 9, 10], [3, 6, 10], [4, 6, 7], [5, 7, 8]]), [1, 1, 1, 1, 1, 1, 1, 1, 1, 1])</code></pre><p>The tensor network representation of the maximal independent set problem can be obtained by</p><pre><code class="language-julia hljs">problem = GenericTensorNetwork(maximalis)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">GenericTensorNetwork{MaximalIS{Int64, UnitWeight}, OMEinsum.DynamicNestedEinsum{Int64}, Int64}
+'/><h2 id="Tensor-Network-Formulation"><a class="docs-heading-anchor" href="#Tensor-Network-Formulation">Tensor Network Formulation</a><a id="Tensor-Network-Formulation-1"></a><a class="docs-heading-anchor-permalink" href="#Tensor-Network-Formulation" title="Permalink"></a></h2><p>Define the maximal independent set problem:</p><pre><code class="language-julia hljs">maximalis = MaximalIS(graph)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">MaximalIS{Int64, UnitWeight}(SimpleGraph{Int64}(15, [[2, 5, 6], [1, 3, 7], [2, 4, 8], [3, 5, 9], [1, 4, 10], [1, 8, 9], [2, 9, 10], [3, 6, 10], [4, 6, 7], [5, 7, 8]]), [1, 1, 1, 1, 1, 1, 1, 1, 1, 1])</code></pre><p>The problem consists of:</p><ol><li>Independence constraints: No adjacent vertices can be selected</li><li>Maximality constraints: No more vertices can be added while maintaining independence</li></ol><pre><code class="language-julia hljs">constraints(maximalis)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{ProblemReductions.LocalConstraint}:
+ LocalConstraint on [1, 2, 5, 6]
+┌───────────────┬───────┐
+│<span class="sgr1"> Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ false │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ false │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ false │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ false │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ false │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ false │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [2, 1, 3, 7]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ false │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ false │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ false │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ false │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ false │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ false │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [3, 2, 4, 8]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ false │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ false │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ false │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ false │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ false │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ false │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [4, 3, 5, 9]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ false │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ false │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ false │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ false │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ false │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ false │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [5, 1, 4, 10]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ false │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ false │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ false │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ false │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ false │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ false │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [6, 1, 8, 9]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ false │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ false │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ false │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ false │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ false │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ false │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [7, 2, 9, 10]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ false │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ false │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ false │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ false │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ false │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ false │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [8, 3, 6, 10]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ false │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ false │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ false │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ false │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ false │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ false │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [9, 4, 6, 7]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ false │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ false │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ false │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ false │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ false │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ false │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ false │
+└───────────────┴───────┘
+
+ LocalConstraint on [10, 5, 7, 8]
+┌───────────────┬───────┐
+│ Configuration │ Valid │
+├───────────────┼───────┤
+│ [0, 0, 0, 0]  │ false │
+│ [1, 0, 0, 0]  │ true  │
+│ [0, 1, 0, 0]  │ true  │
+│ [1, 1, 0, 0]  │ false │
+│ [0, 0, 1, 0]  │ true  │
+│ [1, 0, 1, 0]  │ false │
+│ [0, 1, 1, 0]  │ true  │
+│ [1, 1, 1, 0]  │ false │
+│ [0, 0, 0, 1]  │ true  │
+│ [1, 0, 0, 1]  │ false │
+│ [0, 1, 0, 1]  │ true  │
+│ [1, 1, 0, 1]  │ false │
+│ [0, 0, 1, 1]  │ true  │
+│ [1, 0, 1, 1]  │ false │
+│ [0, 1, 1, 1]  │ true  │
+│ [1, 1, 1, 1]  │ false │
+└───────────────┴───────┘
+</span></code></pre><pre><code class="language-julia hljs">objectives(maximalis)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{ProblemReductions.LocalSolutionSize{Int64}}:
+ LocalSolutionSize{Int64} on [1]
+┌───────────────┬──────┐
+│<span class="sgr1"> Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [2]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [3]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [4]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [5]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [6]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [7]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [8]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [9]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+
+ LocalSolutionSize{Int64} on [10]
+┌───────────────┬──────┐
+│ Configuration │ Size │
+├───────────────┼──────┤
+│      [0]      │  0   │
+│      [1]      │  1   │
+└───────────────┴──────┘
+</span></code></pre><p>Convert to tensor network representation:</p><pre><code class="language-julia hljs">problem = GenericTensorNetwork(maximalis)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">GenericTensorNetwork{MaximalIS{Int64, UnitWeight}, OMEinsum.DynamicNestedEinsum{Int64}, Int64}
 - open vertices: Int64[]
 - fixed vertices: Dict{Int64, Int64}()
-- contraction time = 2^11.229, space = 2^9.0, read-write = 2^11.518</code></pre><h3 id="Theory-(can-skip)"><a class="docs-heading-anchor" href="#Theory-(can-skip)">Theory (can skip)</a><a id="Theory-(can-skip)-1"></a><a class="docs-heading-anchor-permalink" href="#Theory-(can-skip)" title="Permalink"></a></h3><p>Let <span>$G=(V,E)$</span> be the target graph that we want to solve. The tensor network representation map a vertex <span>$v\in V$</span> to a boolean degree of freedom <span>$s_v\in\{0, 1\}$</span>. We defined the restriction on its neighborhood <span>$N(v)$</span>:</p><p class="math-container">\[T(x_v)_{s_1,s_2,\ldots,s_{|N(v)|},s_v} = \begin{cases}
-    s_vx_v^{w_v} &amp; s_1=s_2=\ldots=s_{|N(v)|}=0,\\
-    1-s_v&amp; \text{otherwise}.
-\end{cases}\]</p><p>The first case corresponds to all the neighborhood vertices of <span>$v$</span> are not in <span>$I_{m}$</span>, then <span>$v$</span> must be in <span>$I_{m}$</span> and contribute a factor <span>$x_{v}^{w_v}$</span>, where <span>$w_v$</span> is the weight of vertex <span>$v$</span>. Otherwise, if any of the neighboring vertices of <span>$v$</span> is in <span>$I_{m}$</span>, <span>$v$</span> must not be in <span>$I_{m}$</span> by the independence requirement.</p><p>Its contraction time space complexity of a <a href="../../ref/#ProblemReductions.MaximalIS"><code>MaximalIS</code></a> instance is no longer determined by the tree-width of the original graph <span>$G$</span>. It is often harder to contract this tensor network than to contract the one for regular independent set problem.</p><pre><code class="language-julia hljs">contraction_complexity(problem)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Time complexity: 2^11.22881869049588
+- contraction time = 2^11.229, space = 2^9.0, read-write = 2^11.518</code></pre><h2 id="Mathematical-Background"><a class="docs-heading-anchor" href="#Mathematical-Background">Mathematical Background</a><a id="Mathematical-Background-1"></a><a class="docs-heading-anchor-permalink" href="#Mathematical-Background" title="Permalink"></a></h2><p>For a graph <span>$G=(V,E)$</span>, we assign a boolean variable <span>$s_v ∈ \{0,1\}$</span> to each vertex. For vertex <span>$v$</span> with neighborhood <span>$N(v)$</span>, we define tensor:</p><p class="math-container">\[T(x_v)_{s_1,...,s_{|N(v)|},s_v} =
+\begin{cases}
+s_v x_v^{w_v} &amp; \text{if all neighbors are 0 (v must be included for maximality)} \\
+1-s_v &amp; \text{if any neighbor is 1 (v must be excluded for independence)}
+\end{cases}\]</p><p>Note: This tensor network is often more complex to contract than the regular independent set problem, as its complexity isn&#39;t directly tied to the graph&#39;s tree-width.</p><pre><code class="language-julia hljs">contraction_complexity(problem)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Time complexity: 2^11.228818690495881
 Space complexity: 2^9.0
-Read-write complexity: 2^11.518161355756956</code></pre><h2 id="Solving-properties"><a class="docs-heading-anchor" href="#Solving-properties">Solving properties</a><a id="Solving-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-properties" title="Permalink"></a></h2><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="maximal-independence-polynomial"><a class="docs-heading-anchor" href="#maximal-independence-polynomial">maximal independence polynomial</a><a id="maximal-independence-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#maximal-independence-polynomial" title="Permalink"></a></h5><p>The graph polynomial defined for the maximal independent set problem is</p><p class="math-container">\[I_{\rm max}(G, x) = \sum_{k=0}^{\alpha(G)} b_k x^k,\]</p><p>where <span>$b_k$</span> is the number of maximal independent sets of size <span>$k$</span> in graph <span>$G=(V, E)$</span>.</p><pre><code class="language-julia hljs">maximal_indenpendence_polynomial = solve(problem, GraphPolynomial())[]</code></pre>10&#8729;x<sup>3</sup> &#43; 5&#8729;x<sup>4</sup><p>One can see the first several coefficients are 0, because it only counts the maximal independent sets, The minimum maximal independent set size is also known as the independent domination number. It can be computed with the <a href="../../ref/#GenericTensorNetworks.SizeMin"><code>SizeMin</code></a> property:</p><pre><code class="language-julia hljs">independent_domination_number = solve(problem, SizeMin())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3.0ₜ</code></pre><p>Similarly, we have its counting <a href="../../ref/#GenericTensorNetworks.CountingMin"><code>CountingMin</code></a>:</p><pre><code class="language-julia hljs">counting_min_maximal_independent_set = solve(problem, CountingMin())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(3.0, 10.0)ₜ</code></pre><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="finding-all-maximal-independent-set"><a class="docs-heading-anchor" href="#finding-all-maximal-independent-set">finding all maximal independent set</a><a id="finding-all-maximal-independent-set-1"></a><a class="docs-heading-anchor-permalink" href="#finding-all-maximal-independent-set" title="Permalink"></a></h5><pre><code class="language-julia hljs">maximal_configs = read_config(solve(problem, ConfigsAll())[])
-
-all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">true</code></pre><pre><code class="language-julia hljs">show_configs(graph, locations, reshape(collect(maximal_configs), 3, 5); padding_left=20)</code></pre><img src="01be0764.svg" alt="Example block output"/><p>This result should be consistent with that given by the <a href="https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm">Bron Kerbosch algorithm</a> on the complement of Petersen graph.</p><pre><code class="language-julia hljs">cliques = maximal_cliques(complement(graph))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">15-element Vector{Vector{Int64}}:
+Read-write complexity: 2^11.518161355756956</code></pre><h2 id="Solution-Analysis"><a class="docs-heading-anchor" href="#Solution-Analysis">Solution Analysis</a><a id="Solution-Analysis-1"></a><a class="docs-heading-anchor-permalink" href="#Solution-Analysis" title="Permalink"></a></h2><h3 id="1.-Independence-Polynomial"><a class="docs-heading-anchor" href="#1.-Independence-Polynomial">1. Independence Polynomial</a><a id="1.-Independence-Polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#1.-Independence-Polynomial" title="Permalink"></a></h3><p>The maximal independence polynomial <span>$I_{\text{max}}(G,x) = \sum_i b_i x^i$</span> counts maximal independent sets by size, where <span>$b_i$</span> is the number of sets of size <span>$i$</span></p><pre><code class="language-julia hljs">maximal_indenpendence_polynomial = solve(problem, GraphPolynomial())[]</code></pre>10&#8729;x<sup>3</sup> &#43; 5&#8729;x<sup>4</sup><h3 id="2.-Independent-Domination-Number"><a class="docs-heading-anchor" href="#2.-Independent-Domination-Number">2. Independent Domination Number</a><a id="2.-Independent-Domination-Number-1"></a><a class="docs-heading-anchor-permalink" href="#2.-Independent-Domination-Number" title="Permalink"></a></h3><p>Find the size of the smallest maximal independent set:</p><pre><code class="language-julia hljs">independent_domination_number = solve(problem, SizeMin())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3.0ₜ</code></pre><p>Count minimum maximal independent sets:</p><pre><code class="language-julia hljs">counting_min_maximal_independent_set = solve(problem, CountingMin())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(3.0, 10.0)ₜ</code></pre><h3 id="3.-Configuration-Analysis"><a class="docs-heading-anchor" href="#3.-Configuration-Analysis">3. Configuration Analysis</a><a id="3.-Configuration-Analysis-1"></a><a class="docs-heading-anchor-permalink" href="#3.-Configuration-Analysis" title="Permalink"></a></h3><p>Find all maximal independent sets:</p><pre><code class="language-julia hljs">maximal_configs = read_config(solve(problem, ConfigsAll())[])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">15-element Vector{StaticBitVector{10, 1}}:
+ 0101000100
+ 0100110000
+ 0100100110
+ 0010100010
+ 1000000110
+ 0101010001
+ 0010010001
+ 0100000011
+ 1001000001
+ 1010000011
+ 0000101100
+ 0001011000
+ 0010111000
+ 1001001100
+ 1010001000</code></pre><p>Verify solutions are valid:</p><pre><code class="language-julia hljs">all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">true</code></pre><p>Visualize all maximal independent sets:</p><pre><code class="language-julia hljs">show_configs(graph, locations, reshape(collect(maximal_configs), 3, 5); padding_left=20)</code></pre><img src="1d0e1191.svg" alt="Example block output"/><h3 id="4.-Comparison-with-Classical-Algorithms"><a class="docs-heading-anchor" href="#4.-Comparison-with-Classical-Algorithms">4. Comparison with Classical Algorithms</a><a id="4.-Comparison-with-Classical-Algorithms-1"></a><a class="docs-heading-anchor-permalink" href="#4.-Comparison-with-Classical-Algorithms" title="Permalink"></a></h3><p>Compare with Bron-Kerbosch algorithm on complement graph:</p><pre><code class="language-julia hljs">cliques = maximal_cliques(complement(graph))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">15-element Vector{Vector{Int64}}:
  [5, 6, 7, 3]
  [5, 6, 2]
  [5, 9, 2, 8]
@@ -57,6 +369,14 @@ all(c-&gt;is_maximal_independent_set(graph, c), maximal_configs)</code></pre><pr
  [1, 4, 10]
  [1, 9, 10, 3]
  [1, 9, 8]
- [1, 3, 7]</code></pre><p>For sparse graphs, the generic tensor network approach is usually much faster and memory efficient than the Bron Kerbosch algorithm.</p><h5 id="finding-minimum-maximal-independent-set"><a class="docs-heading-anchor" href="#finding-minimum-maximal-independent-set">finding minimum maximal independent set</a><a id="finding-minimum-maximal-independent-set-1"></a><a class="docs-heading-anchor-permalink" href="#finding-minimum-maximal-independent-set" title="Permalink"></a></h5><p>It is the <a href="../../ref/#GenericTensorNetworks.ConfigsMin"><code>ConfigsMin</code></a> property in the program.</p><pre><code class="language-julia hljs">minimum_maximal_configs = read_config(solve(problem, ConfigsMin())[])
-
-show_configs(graph, locations, reshape(collect(minimum_maximal_configs), 2, 5); padding_left=20)</code></pre><img src="85c6dd4d.svg" alt="Example block output"/><p>Similarly, if one is only interested in computing one of the minimum sets, one can use the graph property <a href="../../ref/#GenericTensorNetworks.SingleConfigMin"><code>SingleConfigMin</code></a>.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../IndependentSet/">« Independent set problem</a><a class="docs-footer-nextpage" href="../SpinGlass/">Spin glass problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Saturday 28 December 2024 03:26">Saturday 28 December 2024</span>. Using Julia version 1.11.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ [1, 3, 7]</code></pre><p>Note: For sparse graphs, our tensor network approach is typically faster and more memory efficient than Bron-Kerbosch.</p><h3 id="5.-Minimum-Maximal-Independent-Sets"><a class="docs-heading-anchor" href="#5.-Minimum-Maximal-Independent-Sets">5. Minimum Maximal Independent Sets</a><a id="5.-Minimum-Maximal-Independent-Sets-1"></a><a class="docs-heading-anchor-permalink" href="#5.-Minimum-Maximal-Independent-Sets" title="Permalink"></a></h3><p>Find all minimum maximal independent sets:</p><pre><code class="language-julia hljs">minimum_maximal_configs = read_config(solve(problem, ConfigsMin())[])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{StaticBitVector{10, 1}}:
+ 0101000100
+ 0100110000
+ 0010100010
+ 1000000110
+ 0010010001
+ 0100000011
+ 1001000001
+ 0000101100
+ 0001011000
+ 1010001000</code></pre><p>Visualize minimum maximal independent sets:</p><pre><code class="language-julia hljs">show_configs(graph, locations, reshape(collect(minimum_maximal_configs), 2, 5); padding_left=20)</code></pre><img src="fdcc98e6.svg" alt="Example block output"/><p>Note: For finding just one minimum maximal independent set, use the SingleConfigMin property instead</p><h2 id="More-APIs"><a class="docs-heading-anchor" href="#More-APIs">More APIs</a><a id="More-APIs-1"></a><a class="docs-heading-anchor-permalink" href="#More-APIs" title="Permalink"></a></h2><p>The <a href="../IndependentSet/#Independent-Set-Problem">Independent Set Problem</a> chapter has more examples on how to use the APIs.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../IndependentSet/">« Independent set problem</a><a class="docs-footer-nextpage" href="../SpinGlass/">Spin glass problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.1 on <span class="colophon-date" title="Thursday 13 March 2025 02:44">Thursday 13 March 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

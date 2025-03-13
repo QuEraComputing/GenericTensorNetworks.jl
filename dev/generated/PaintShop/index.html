@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Binary paint shop problem · GenericTensorNetworks.jl</title><meta name="title" content="Binary paint shop problem · GenericTensorNetworks.jl"/><meta property="og:title" content="Binary paint shop problem · GenericTensorNetworks.jl"/><meta property="twitter:title" content="Binary paint shop problem · GenericTensorNetworks.jl"/><meta name="description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="twitter:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/PaintShop/"/><meta property="twitter:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/PaintShop/"/><link rel="canonical" href="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/PaintShop/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GenericTensorNetworks.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Problems</span><ul><li><a class="tocitem" href="../IndependentSet/">Independent set problem</a></li><li><a class="tocitem" href="../MaximalIS/">Maximal independent set problem</a></li><li><a class="tocitem" href="../SpinGlass/">Spin glass problem</a></li><li><a class="tocitem" href="../MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../Matching/">Vertex matching problem</a></li><li class="is-active"><a class="tocitem" href>Binary paint shop problem</a><ul class="internal"><li><a class="tocitem" href="#Problem-Definition"><span>Problem Definition</span></a></li><li><a class="tocitem" href="#Generic-tensor-network-representation"><span>Generic tensor network representation</span></a></li></ul></li><li><a class="tocitem" href="../Coloring/">Coloring problem</a></li><li><a class="tocitem" href="../DominatingSet/">Dominating set problem</a></li><li><a class="tocitem" href="../Satisfiability/">Satisfiability problem</a></li><li><a class="tocitem" href="../SetCovering/">Set covering problem</a></li><li><a class="tocitem" href="../SetPacking/">Set packing problem</a></li></ul></li><li><span class="tocitem">Topics</span><ul><li><a class="tocitem" href="../../gist/">Gist</a></li><li><a class="tocitem" href="../saveload/">Save and load solutions</a></li><li><a class="tocitem" href="../../sumproduct/">Sum product tree representation</a></li><li><a class="tocitem" href="../weighted/">Weighted problems</a></li><li><a class="tocitem" href="../open/">Open and fixed degrees of freedom</a></li></ul></li><li><a class="tocitem" href="../../performancetips/">Performance Tips</a></li><li><a class="tocitem" href="../../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Problems</a></li><li class="is-active"><a href>Binary paint shop problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Binary paint shop problem</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/examples/PaintShop.jl#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Binary-paint-shop-problem"><a class="docs-heading-anchor" href="#Binary-paint-shop-problem">Binary paint shop problem</a><a id="Binary-paint-shop-problem-1"></a><a class="docs-heading-anchor-permalink" href="#Binary-paint-shop-problem" title="Permalink"></a></h1><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>It is highly recommended to read the <a href="../IndependentSet/#Independent-set-problem">Independent set problem</a> chapter before reading this one.</p></div></div><h2 id="Problem-Definition"><a class="docs-heading-anchor" href="#Problem-Definition">Problem Definition</a><a id="Problem-Definition-1"></a><a class="docs-heading-anchor-permalink" href="#Problem-Definition" title="Permalink"></a></h2><p>The <a href="http://m-hikari.com/ams/ams-2012/ams-93-96-2012/popovAMS93-96-2012-2.pdf">binary paint shop problem</a> is defined as follows: we are given a <span>$2m$</span> length sequence containing <span>$m$</span> cars, where each car appears twice. Each car need to be colored red in one occurrence, and blue in the other. We need to choose which occurrence for each car to color with which color — the goal is to minimize the number of times we need to change the current color.</p><p>In the following, we use a character to represent a car, and defined a binary paint shop problem as a string that each character appear exactly twice.</p><pre><code class="language-julia hljs">using GenericTensorNetworks, Graphs, GenericTensorNetworks.ProblemReductions
-
-sequence = collect(&quot;iadgbeadfcchghebif&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">18-element Vector{Char}:
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Binary paint shop problem · GenericTensorNetworks.jl</title><meta name="title" content="Binary paint shop problem · GenericTensorNetworks.jl"/><meta property="og:title" content="Binary paint shop problem · GenericTensorNetworks.jl"/><meta property="twitter:title" content="Binary paint shop problem · GenericTensorNetworks.jl"/><meta name="description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="twitter:description" content="Documentation for GenericTensorNetworks.jl."/><meta property="og:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/PaintShop/"/><meta property="twitter:url" content="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/PaintShop/"/><link rel="canonical" href="https://QuEraComputing.github.io/GenericTensorNetworks.jl/generated/PaintShop/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/indigo.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GenericTensorNetworks.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Problems</span><ul><li><a class="tocitem" href="../IndependentSet/">Independent set problem</a></li><li><a class="tocitem" href="../MaximalIS/">Maximal independent set problem</a></li><li><a class="tocitem" href="../SpinGlass/">Spin glass problem</a></li><li><a class="tocitem" href="../MaxCut/">Cutting problem</a></li><li><a class="tocitem" href="../Matching/">Vertex matching problem</a></li><li class="is-active"><a class="tocitem" href>Binary paint shop problem</a><ul class="internal"><li><a class="tocitem" href="#Overview"><span>Overview</span></a></li><li><a class="tocitem" href="#Problem-Visualization"><span>Problem Visualization</span></a></li><li><a class="tocitem" href="#Tensor-Network-Formulation"><span>Tensor Network Formulation</span></a></li><li><a class="tocitem" href="#Mathematical-Background"><span>Mathematical Background</span></a></li><li><a class="tocitem" href="#Solution-Analysis"><span>Solution Analysis</span></a></li><li><a class="tocitem" href="#More-APIs"><span>More APIs</span></a></li></ul></li><li><a class="tocitem" href="../Coloring/">Coloring problem</a></li><li><a class="tocitem" href="../DominatingSet/">Dominating set problem</a></li><li><a class="tocitem" href="../Satisfiability/">Satisfiability problem</a></li><li><a class="tocitem" href="../SetCovering/">Set covering problem</a></li><li><a class="tocitem" href="../SetPacking/">Set packing problem</a></li></ul></li><li><span class="tocitem">Topics</span><ul><li><a class="tocitem" href="../../gist/">Gist</a></li><li><a class="tocitem" href="../saveload/">Save and load solutions</a></li><li><a class="tocitem" href="../../sumproduct/">Sum product tree representation</a></li><li><a class="tocitem" href="../weighted/">Weighted problems</a></li><li><a class="tocitem" href="../open/">Open and fixed degrees of freedom</a></li></ul></li><li><a class="tocitem" href="../../performancetips/">Performance Tips</a></li><li><a class="tocitem" href="../../ref/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Problems</a></li><li class="is-active"><a href>Binary paint shop problem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Binary paint shop problem</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/QuEraComputing/GenericTensorNetworks.jl/blob/master/examples/PaintShop.jl#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Binary-Paint-Shop-Problem"><a class="docs-heading-anchor" href="#Binary-Paint-Shop-Problem">Binary Paint Shop Problem</a><a id="Binary-Paint-Shop-Problem-1"></a><a class="docs-heading-anchor-permalink" href="#Binary-Paint-Shop-Problem" title="Permalink"></a></h1><h2 id="Overview"><a class="docs-heading-anchor" href="#Overview">Overview</a><a id="Overview-1"></a><a class="docs-heading-anchor-permalink" href="#Overview" title="Permalink"></a></h2><p>The Binary Paint Shop Problem involves a sequence of cars, each appearing exactly twice. Each car must be painted red in one occurrence and blue in the other. The goal is to minimize the number of color changes when processing the sequence in order.</p><p>This example demonstrates:</p><ul><li>Formulating the paint shop problem</li><li>Converting it to a tensor network</li><li>Finding optimal coloring sequences</li><li>Visualizing solutions</li></ul><p>We&#39;ll use a character sequence where each character represents a car.</p><pre><code class="language-julia hljs">using GenericTensorNetworks, Graphs, GenericTensorNetworks.ProblemReductions</code></pre><p>Define our sequence (each character appears exactly twice)</p><pre><code class="language-julia hljs">sequence = collect(&quot;iadgbeadfcchghebif&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">18-element Vector{Char}:
  &#39;i&#39;: ASCII/Unicode U+0069 (category Ll: Letter, lowercase)
  &#39;a&#39;: ASCII/Unicode U+0061 (category Ll: Letter, lowercase)
  &#39;d&#39;: ASCII/Unicode U+0064 (category Ll: Letter, lowercase)
@@ -19,7 +17,7 @@ sequence = collect(&quot;iadgbeadfcchghebif&quot;)</code></pre><pre class="docum
  &#39;e&#39;: ASCII/Unicode U+0065 (category Ll: Letter, lowercase)
  &#39;b&#39;: ASCII/Unicode U+0062 (category Ll: Letter, lowercase)
  &#39;i&#39;: ASCII/Unicode U+0069 (category Ll: Letter, lowercase)
- &#39;f&#39;: ASCII/Unicode U+0066 (category Ll: Letter, lowercase)</code></pre><p>We can visualize this paint shop problem as a graph</p><pre><code class="language-julia hljs">rot(a, b, θ) = cos(θ)*a + sin(θ)*b, cos(θ)*b - sin(θ)*a
+ &#39;f&#39;: ASCII/Unicode U+0066 (category Ll: Letter, lowercase)</code></pre><h2 id="Problem-Visualization"><a class="docs-heading-anchor" href="#Problem-Visualization">Problem Visualization</a><a id="Problem-Visualization-1"></a><a class="docs-heading-anchor-permalink" href="#Problem-Visualization" title="Permalink"></a></h2><p>We can represent this problem as a graph:</p><ul><li>Vertices are positions in the sequence</li><li>Blue edges connect the same car&#39;s two occurrences</li><li>Black edges connect adjacent positions in the sequence</li></ul><pre><code class="language-julia hljs">rot(a, b, θ) = cos(θ)*a + sin(θ)*b, cos(θ)*b - sin(θ)*a
 locations = [rot(0.0, 100.0, -0.25π - 1.5*π*(i-0.5)/length(sequence)) for i=1:length(sequence)]
 graph = path_graph(length(sequence))
 for i=1:length(sequence)
@@ -27,17 +25,204 @@ for i=1:length(sequence)
     i != j &amp;&amp; add_edge!(graph, i, j)
 end
 show_graph(graph, locations; texts=string.(sequence), format=:svg, edge_colors=
-    [sequence[e.src] == sequence[e.dst] ? &quot;blue&quot; : &quot;black&quot; for e in edges(graph)])</code></pre><img src="44885d54.svg" alt="Example block output"/><p>Vertices connected by blue edges must have different colors, and the goal becomes a min-cut problem defined on black edges.</p><h2 id="Generic-tensor-network-representation"><a class="docs-heading-anchor" href="#Generic-tensor-network-representation">Generic tensor network representation</a><a id="Generic-tensor-network-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Generic-tensor-network-representation" title="Permalink"></a></h2><p>We can define the binary paint shop problem with the <a href="../../ref/#ProblemReductions.PaintShop"><code>PaintShop</code></a> type as</p><pre><code class="language-julia hljs">pshop = PaintShop(sequence)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">PaintShop{Char}([&#39;i&#39;, &#39;a&#39;, &#39;d&#39;, &#39;g&#39;, &#39;b&#39;, &#39;e&#39;, &#39;a&#39;, &#39;d&#39;, &#39;f&#39;, &#39;c&#39;, &#39;c&#39;, &#39;h&#39;, &#39;g&#39;, &#39;h&#39;, &#39;e&#39;, &#39;b&#39;, &#39;i&#39;, &#39;f&#39;], Bool[1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0])</code></pre><p>The tensor network representation of the binary paint shop problem can be obtained by</p><pre><code class="language-julia hljs">problem = GenericTensorNetwork(pshop)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">GenericTensorNetwork{PaintShop{Char}, OMEinsum.DynamicNestedEinsum{Int64}, Int64}
+    [sequence[e.src] == sequence[e.dst] ? &quot;blue&quot; : &quot;black&quot; for e in edges(graph)])</code></pre><img src="bff07a7e.svg" alt="Example block output"/><p>Note: Vertices connected by blue edges must have different colors, and our goal becomes a min-cut problem on the black edges.</p><h2 id="Tensor-Network-Formulation"><a class="docs-heading-anchor" href="#Tensor-Network-Formulation">Tensor Network Formulation</a><a id="Tensor-Network-Formulation-1"></a><a class="docs-heading-anchor-permalink" href="#Tensor-Network-Formulation" title="Permalink"></a></h2><p>Define the binary paint shop problem:</p><pre><code class="language-julia hljs">pshop = PaintShop(sequence)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">PaintShop{Char}([&#39;i&#39;, &#39;a&#39;, &#39;d&#39;, &#39;g&#39;, &#39;b&#39;, &#39;e&#39;, &#39;a&#39;, &#39;d&#39;, &#39;f&#39;, &#39;c&#39;, &#39;c&#39;, &#39;h&#39;, &#39;g&#39;, &#39;h&#39;, &#39;e&#39;, &#39;b&#39;, &#39;i&#39;, &#39;f&#39;], Bool[1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0])</code></pre><p>The objective is to minimize color changes:</p><pre><code class="language-julia hljs">objectives(pshop)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">17-element Vector{ProblemReductions.LocalSolutionSize{Bool}}:
+ LocalSolutionSize{Bool} on [1, 2]
+┌───────────────┬───────┐
+│<span class="sgr1"> Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ false │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [2, 3]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ false │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [3, 4]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ false │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [4, 5]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ false │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [5, 6]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ false │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [6, 2]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ true  │
+│    [1, 0]     │ false │
+│    [0, 1]     │ false │
+│    [1, 1]     │ true  │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [2, 3]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ false │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [3, 7]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ true  │
+│    [1, 0]     │ false │
+│    [0, 1]     │ false │
+│    [1, 1]     │ true  │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [7, 8]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ false │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [8, 8]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ true  │
+│    [1, 0]     │ false │
+│    [0, 1]     │ false │
+│    [1, 1]     │ true  │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [8, 9]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ true  │
+│    [1, 0]     │ false │
+│    [0, 1]     │ false │
+│    [1, 1]     │ true  │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [9, 4]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ true  │
+│    [1, 0]     │ false │
+│    [0, 1]     │ false │
+│    [1, 1]     │ true  │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [4, 9]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ false │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [9, 6]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ false │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [6, 5]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ false │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [5, 1]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ false │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+
+ LocalSolutionSize{Bool} on [1, 7]
+┌───────────────┬───────┐
+│ Configuration │ Size  │
+├───────────────┼───────┤
+│    [0, 0]     │ false │
+│    [1, 0]     │ true  │
+│    [0, 1]     │ true  │
+│    [1, 1]     │ false │
+└───────────────┴───────┘
+</span></code></pre><p>Convert to tensor network representation:</p><pre><code class="language-julia hljs">problem = GenericTensorNetwork(pshop)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">GenericTensorNetwork{PaintShop{Char}, OMEinsum.DynamicNestedEinsum{Int64}, Int64}
 - open vertices: Int64[]
 - fixed vertices: Dict{Int64, Int64}()
-- contraction time = 2^7.459, space = 2^4.0, read-write = 2^8.234</code></pre><h3 id="Theory-(can-skip)"><a class="docs-heading-anchor" href="#Theory-(can-skip)">Theory (can skip)</a><a id="Theory-(can-skip)-1"></a><a class="docs-heading-anchor-permalink" href="#Theory-(can-skip)" title="Permalink"></a></h3><p>Type <a href="../../ref/#ProblemReductions.PaintShop"><code>PaintShop</code></a> can be used for constructing the tensor network with optimized contraction order for solving a binary paint shop problem. To obtain its tensor network representation, we associating car <span>$c_i$</span> (the <span>$i$</span>-th character in our example) with a degree of freedom <span>$s_{c_i} \in \{0, 1\}$</span>, where we use <span>$0$</span> to denote the first appearance of a car is colored red and <span>$1$</span> to denote the first appearance of a car is colored blue. For each black edges <span>$(i, i+1)$</span>, we define an edge tensor labeled by <span>$(s_{c_i}, s_{c_{i+1}})$</span> as follows: If both cars on this edge are their first or second appearance</p><p class="math-container">\[B^{\rm parallel} = \left(\begin{matrix}
-x &amp; 1 \\
-1 &amp; x \\
-\end{matrix}\right),\]</p><p>otherwise,</p><p class="math-container">\[B^{\rm anti-parallel} = \left(\begin{matrix}
-1 &amp; x \\
-x &amp; 1 \\
-\end{matrix}\right).\]</p><p>It can be understood as, when both cars are their first appearance, they tend to have the same configuration so that the color is not changed. Otherwise, they tend to have different configuration to keep the color unchanged.</p><h3 id="Counting-properties"><a class="docs-heading-anchor" href="#Counting-properties">Counting properties</a><a id="Counting-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-properties" title="Permalink"></a></h3><h5 id="graph-polynomial"><a class="docs-heading-anchor" href="#graph-polynomial">graph polynomial</a><a id="graph-polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#graph-polynomial" title="Permalink"></a></h5><p>The graph polynomial defined for the maximal independent set problem is</p><p class="math-container">\[I_{\rm max}(G, x) = \sum_{k=0}^{\alpha(G)} b_k x^k,\]</p><p>where <span>$b_k$</span> is the number of maximal independent sets of size <span>$k$</span> in graph <span>$G=(V, E)$</span>.</p><pre><code class="language-julia hljs">max_config = solve(problem, GraphPolynomial())[]</code></pre>2&#8729;x<sup>4</sup> &#43; 28&#8729;x<sup>5</sup> &#43; 32&#8729;x<sup>6</sup> &#43; 80&#8729;x<sup>7</sup> &#43; 60&#8729;x<sup>8</sup> &#43; 88&#8729;x<sup>9</sup> &#43; 104&#8729;x<sup>10</sup> &#43; 48&#8729;x<sup>11</sup> &#43; 50&#8729;x<sup>12</sup> &#43; 12&#8729;x<sup>13</sup> &#43; 8&#8729;x<sup>14</sup><p>Since it only counts the maximal independent sets, the first several coefficients are 0.</p><h3 id="Counting-properties-2"><a class="docs-heading-anchor" href="#Counting-properties-2">Counting properties</a><a class="docs-heading-anchor-permalink" href="#Counting-properties-2" title="Permalink"></a></h3><h5 id="graph-polynomial-2"><a class="docs-heading-anchor" href="#graph-polynomial-2">graph polynomial</a><a class="docs-heading-anchor-permalink" href="#graph-polynomial-2" title="Permalink"></a></h5><p>The graph polynomial of the binary paint shop problem in our convention is defined as</p><p class="math-container">\[P(G, x) = \sum_{k=0}^{\delta(G)} p_k x^k\]</p><p>where <span>$p_k$</span> is the number of possible coloring with number of color changes <span>$2m-1-k$</span>.</p><pre><code class="language-julia hljs">paint_polynomial = solve(problem, GraphPolynomial())[]</code></pre>2&#8729;x<sup>4</sup> &#43; 28&#8729;x<sup>5</sup> &#43; 32&#8729;x<sup>6</sup> &#43; 80&#8729;x<sup>7</sup> &#43; 60&#8729;x<sup>8</sup> &#43; 88&#8729;x<sup>9</sup> &#43; 104&#8729;x<sup>10</sup> &#43; 48&#8729;x<sup>11</sup> &#43; 50&#8729;x<sup>12</sup> &#43; 12&#8729;x<sup>13</sup> &#43; 8&#8729;x<sup>14</sup><h3 id="Configuration-properties"><a class="docs-heading-anchor" href="#Configuration-properties">Configuration properties</a><a id="Configuration-properties-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-properties" title="Permalink"></a></h3><h5 id="finding-best-solutions"><a class="docs-heading-anchor" href="#finding-best-solutions">finding best solutions</a><a id="finding-best-solutions-1"></a><a class="docs-heading-anchor-permalink" href="#finding-best-solutions" title="Permalink"></a></h5><pre><code class="language-julia hljs">best_configs = solve(problem, ConfigsMin())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, {000000110, 111111001})ₜ</code></pre><p>One can see to identical bitstrings corresponding two different vertex configurations, they are related to bit-flip symmetry.</p><pre><code class="language-julia hljs">painting1 = ProblemReductions.paint_shop_coloring_from_config(pshop, read_config(best_configs)[1])
-
-show_graph(graph, locations; format=:svg, texts=string.(sequence),
+- contraction time = 2^7.524, space = 2^4.0, read-write = 2^8.234</code></pre><h2 id="Mathematical-Background"><a class="docs-heading-anchor" href="#Mathematical-Background">Mathematical Background</a><a id="Mathematical-Background-1"></a><a class="docs-heading-anchor-permalink" href="#Mathematical-Background" title="Permalink"></a></h2><p>For each car <span>$c_i$</span>, we assign a boolean variable <span>$s_{c_i} \in \{0,1\}$</span>, where:</p><ul><li><span>$0$</span> means the first appearance is colored red</li><li><span>$1$</span> means the first appearance is colored blue</li></ul><p>For adjacent positions <span>$(i,i+1)$</span>, we define edge tensors:</p><ol><li><p>If both cars are at their first or both at their second appearance:</p><p class="math-container">\[B^{\text{parallel}} = \begin{pmatrix}
+    x &amp; 1 \\
+    1 &amp; x
+\end{pmatrix}\]</p><p>(Cars tend to have the same configuration to avoid color changes)</p></li><li><p>Otherwise (one first, one second appearance):</p><p class="math-container">\[B^{\text{anti-parallel}} = \begin{pmatrix}
+    1 &amp; x \\
+    x &amp; 1
+\end{pmatrix}\]</p><p>(Cars tend to have different configurations to avoid color changes)</p></li></ol><h2 id="Solution-Analysis"><a class="docs-heading-anchor" href="#Solution-Analysis">Solution Analysis</a><a id="Solution-Analysis-1"></a><a class="docs-heading-anchor-permalink" href="#Solution-Analysis" title="Permalink"></a></h2><h3 id="1.-Paint-Shop-Polynomial"><a class="docs-heading-anchor" href="#1.-Paint-Shop-Polynomial">1. Paint Shop Polynomial</a><a id="1.-Paint-Shop-Polynomial-1"></a><a class="docs-heading-anchor-permalink" href="#1.-Paint-Shop-Polynomial" title="Permalink"></a></h3><p>The paint shop polynomial <span>$P(G,x) = \sum_i p_i x^i$</span> counts colorings by number of color changes, where <span>$p_i$</span> is the number of colorings with <span>$(2m-1-i)$</span> color changes</p><pre><code class="language-julia hljs">paint_polynomial = solve(problem, GraphPolynomial())[]</code></pre>2&#8729;x<sup>4</sup> &#43; 28&#8729;x<sup>5</sup> &#43; 32&#8729;x<sup>6</sup> &#43; 80&#8729;x<sup>7</sup> &#43; 60&#8729;x<sup>8</sup> &#43; 88&#8729;x<sup>9</sup> &#43; 104&#8729;x<sup>10</sup> &#43; 48&#8729;x<sup>11</sup> &#43; 50&#8729;x<sup>12</sup> &#43; 12&#8729;x<sup>13</sup> &#43; 8&#8729;x<sup>14</sup><h3 id="2.-Optimal-Coloring-Configurations"><a class="docs-heading-anchor" href="#2.-Optimal-Coloring-Configurations">2. Optimal Coloring Configurations</a><a id="2.-Optimal-Coloring-Configurations-1"></a><a class="docs-heading-anchor-permalink" href="#2.-Optimal-Coloring-Configurations" title="Permalink"></a></h3><p>Find all optimal coloring configurations:</p><pre><code class="language-julia hljs">best_configs = solve(problem, ConfigsMin())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(4.0, {000000110, 111111001})ₜ</code></pre><p>Note: We get two identical bitstrings corresponding to different vertex configurations due to bit-flip symmetry (we can start with either red or blue)</p><h3 id="3.-Solution-Visualization"><a class="docs-heading-anchor" href="#3.-Solution-Visualization">3. Solution Visualization</a><a id="3.-Solution-Visualization-1"></a><a class="docs-heading-anchor-permalink" href="#3.-Solution-Visualization" title="Permalink"></a></h3><p>Convert the optimal configuration to a coloring sequence:</p><pre><code class="language-julia hljs">painting1 = ProblemReductions.paint_shop_coloring_from_config(pshop, read_config(best_configs)[1])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">18-element Vector{Bool}:
+ 0
+ 0
+ 0
+ 0
+ 0
+ 0
+ 1
+ 1
+ 1
+ 1
+ 0
+ 0
+ 1
+ 1
+ 1
+ 1
+ 1
+ 0</code></pre><p>Visualize the optimal coloring:</p><pre><code class="language-julia hljs">show_graph(graph, locations; format=:svg, texts=string.(sequence),
     edge_colors=[sequence[e.src] == sequence[e.dst] ? &quot;blue&quot; : &quot;black&quot; for e in edges(graph)],
-    vertex_colors=[isone(c) ? &quot;red&quot; : &quot;black&quot; for c in painting1], config=GraphDisplayConfig(;vertex_text_color=&quot;white&quot;))</code></pre><img src="e33e2a7b.svg" alt="Example block output"/><p>Since we have different choices of initial color, the number of best solution is 2.</p><p>The following function will check the solution and return you the number of color switches</p><pre><code class="language-julia hljs">num_paint_shop_color_switch(sequence, painting1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Matching/">« Vertex matching problem</a><a class="docs-footer-nextpage" href="../Coloring/">Coloring problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Saturday 28 December 2024 03:26">Saturday 28 December 2024</span>. Using Julia version 1.11.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+    vertex_colors=[isone(c) ? &quot;red&quot; : &quot;black&quot; for c in painting1],
+    config=GraphDisplayConfig(;vertex_text_color=&quot;white&quot;))</code></pre><img src="ed116724.svg" alt="Example block output"/><h3 id="4.-Verification"><a class="docs-heading-anchor" href="#4.-Verification">4. Verification</a><a id="4.-Verification-1"></a><a class="docs-heading-anchor-permalink" href="#4.-Verification" title="Permalink"></a></h3><p>Verify the solution by counting the number of color switches:</p><pre><code class="language-julia hljs">num_paint_shop_color_switch(sequence, painting1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4</code></pre><h2 id="More-APIs"><a class="docs-heading-anchor" href="#More-APIs">More APIs</a><a id="More-APIs-1"></a><a class="docs-heading-anchor-permalink" href="#More-APIs" title="Permalink"></a></h2><p>The <a href="../IndependentSet/#Independent-Set-Problem">Independent Set Problem</a> chapter has more examples on how to use the APIs.</p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../Matching/">« Vertex matching problem</a><a class="docs-footer-nextpage" href="../Coloring/">Coloring problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.1 on <span class="colophon-date" title="Thursday 13 March 2025 02:44">Thursday 13 March 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

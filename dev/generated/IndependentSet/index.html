@@ -272,12 +272,12 @@ show_graph(graph, locations; format=:svg)</code></pre><img src='data:image/svg+x
     \end{matrix}\right)\]</p><p>where <span>$x_v$</span> is a variable associated with <span>$v$</span>. Similarly, for each edge <span>$(u, v) \in E$</span>, we define a matrix <span>$B$</span> indexed by <span>$s_u$</span> and <span>$s_v$</span> as</p><p class="math-container">\[B = \left(\begin{matrix}
 1  &amp; 1\\
 1 &amp; 0
-\end{matrix}\right).\]</p><p>Ideally, an optimal contraction order has a space complexity <span>$2^{{\rm tw}(G)}$</span>, where <span>${\rm tw(G)}$</span> is the <a href="https://en.wikipedia.org/wiki/Treewidth">tree-width</a> of <span>$G$</span> (or <code>graph</code> in the code). We can check the time, space and read-write complexities by typing</p><pre><code class="language-julia hljs">contraction_complexity(problem)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Time complexity: 2^7.977279923499916
+\end{matrix}\right).\]</p><p>Ideally, an optimal contraction order has a space complexity <span>$2^{{\rm tw}(G)}$</span>, where <span>${\rm tw(G)}$</span> is the <a href="https://en.wikipedia.org/wiki/Treewidth">tree-width</a> of <span>$G$</span> (or <code>graph</code> in the code). We can check the time, space and read-write complexities by typing</p><pre><code class="language-julia hljs">contraction_complexity(problem)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Time complexity: 2^7.977279923499917
 Space complexity: 2^4.0
 Read-write complexity: 2^8.675957032941747</code></pre><p>For more information about how to improve the contraction order, please check the <a href="../../performancetips/#Performance-Tips">Performance Tips</a>.</p><h2 id="Solution-Space-Analysis"><a class="docs-heading-anchor" href="#Solution-Space-Analysis">Solution Space Analysis</a><a id="Solution-Space-Analysis-1"></a><a class="docs-heading-anchor-permalink" href="#Solution-Space-Analysis" title="Permalink"></a></h2><h3 id="1.-Maximum-Independent-Set-Size-(α(G))"><a class="docs-heading-anchor" href="#1.-Maximum-Independent-Set-Size-(α(G))">1. Maximum Independent Set Size (<span>$α(G)$</span>)</a><a id="1.-Maximum-Independent-Set-Size-(α(G))-1"></a><a class="docs-heading-anchor-permalink" href="#1.-Maximum-Independent-Set-Size-(α(G))" title="Permalink"></a></h3><p>First, we compute the size of the largest independent set:</p><pre><code class="language-julia hljs">maximum_independent_set_size = solve(problem, SizeMax())[]
 read_size(maximum_independent_set_size)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4.0</code></pre><h3 id="2.-Counting-Solutions"><a class="docs-heading-anchor" href="#2.-Counting-Solutions">2. Counting Solutions</a><a id="2.-Counting-Solutions-1"></a><a class="docs-heading-anchor-permalink" href="#2.-Counting-Solutions" title="Permalink"></a></h3><p>We can analyze the solution space in several ways:</p><h4 id="a.-Total-Count"><a class="docs-heading-anchor" href="#a.-Total-Count">a. Total Count</a><a id="a.-Total-Count-1"></a><a class="docs-heading-anchor-permalink" href="#a.-Total-Count" title="Permalink"></a></h4><p>Count all possible independent sets:</p><pre><code class="language-julia hljs">count_all_independent_sets = solve(problem, CountingAll())[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">76</code></pre><h4 id="b.-Maximum-Solutions"><a class="docs-heading-anchor" href="#b.-Maximum-Solutions">b. Maximum Solutions</a><a id="b.-Maximum-Solutions-1"></a><a class="docs-heading-anchor-permalink" href="#b.-Maximum-Solutions" title="Permalink"></a></h4><p>Count independent sets of maximum size:</p><pre><code class="language-julia hljs">count_maximum_independent_sets = solve(problem, CountingMax())[]
 read_size_count(count_maximum_independent_sets)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4.0 =&gt; 5.0</code></pre><h2 id="Configuration-Analysis"><a class="docs-heading-anchor" href="#Configuration-Analysis">Configuration Analysis</a><a id="Configuration-Analysis-1"></a><a class="docs-heading-anchor-permalink" href="#Configuration-Analysis" title="Permalink"></a></h2><h3 id="1.-Finding-Optimal-Solutions"><a class="docs-heading-anchor" href="#1.-Finding-Optimal-Solutions">1. Finding Optimal Solutions</a><a id="1.-Finding-Optimal-Solutions-1"></a><a class="docs-heading-anchor-permalink" href="#1.-Finding-Optimal-Solutions" title="Permalink"></a></h3><p>We can find a single optimal solution using SingleConfigMax:</p><pre><code class="language-julia hljs">max_config = solve(problem, SingleConfigMax(; bounded=false))[]
-single_solution = read_config(max_config)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0101010001</code></pre><p>Visualize the maximum independent set:</p><pre><code class="language-julia hljs">show_graph(graph, locations; format=:svg, vertex_colors=
+single_solution = read_config(max_config)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1001001100</code></pre><p>Visualize the maximum independent set:</p><pre><code class="language-julia hljs">show_graph(graph, locations; format=:svg, vertex_colors=
     [iszero(single_solution[i]) ? &quot;white&quot; : &quot;red&quot; for i=1:nv(graph)])</code></pre><img src='data:image/svg+xml;utf-8,<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="155" height="149" viewBox="0 0 155 149">
 <rect x="-15.5" y="-14.9" width="186" height="178.8" fill="rgb(100%25, 100%25, 100%25)" fill-opacity="1"/>
@@ -296,19 +296,19 @@ single_solution = read_config(max_config)</code></pre><pre class="documenter-exa
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 97.503906 71.933594 L 67.519531 50.148438 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 95.59375 77.8125 L 58.53125 77.8125 "/>
 <path fill="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 86.605469 50.148438 L 56.621094 71.933594 "/>
-<path fill-rule="nonzero" fill="rgb(100%25, 100%25, 100%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 87.0625 128.542969 C 87.0625 134.0625 82.585938 138.542969 77.0625 138.542969 C 71.539062 138.542969 67.0625 134.0625 67.0625 128.542969 C 67.0625 123.019531 71.539062 118.542969 77.0625 118.542969 C 82.585938 118.542969 87.0625 123.019531 87.0625 128.542969 Z M 87.0625 128.542969 "/>
-<path fill-rule="nonzero" fill="rgb(100%25, 0%25, 0%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 144.125 87.082031 C 144.125 92.605469 139.648438 97.082031 134.125 97.082031 C 128.605469 97.082031 124.125 92.605469 124.125 87.082031 C 124.125 81.558594 128.605469 77.082031 134.125 77.082031 C 139.648438 77.082031 144.125 81.558594 144.125 87.082031 Z M 144.125 87.082031 "/>
+<path fill-rule="nonzero" fill="rgb(100%25, 0%25, 0%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 87.0625 128.542969 C 87.0625 134.0625 82.585938 138.542969 77.0625 138.542969 C 71.539062 138.542969 67.0625 134.0625 67.0625 128.542969 C 67.0625 123.019531 71.539062 118.542969 77.0625 118.542969 C 82.585938 118.542969 87.0625 123.019531 87.0625 128.542969 Z M 87.0625 128.542969 "/>
+<path fill-rule="nonzero" fill="rgb(100%25, 100%25, 100%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 144.125 87.082031 C 144.125 92.605469 139.648438 97.082031 134.125 97.082031 C 128.605469 97.082031 124.125 92.605469 124.125 87.082031 C 124.125 81.558594 128.605469 77.082031 134.125 77.082031 C 139.648438 77.082031 144.125 81.558594 144.125 87.082031 Z M 144.125 87.082031 "/>
 <path fill-rule="nonzero" fill="rgb(100%25, 100%25, 100%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 122.332031 20 C 122.332031 25.523438 117.851562 30 112.332031 30 C 106.808594 30 102.332031 25.523438 102.332031 20 C 102.332031 14.476562 106.808594 10 112.332031 10 C 117.851562 10 122.332031 14.476562 122.332031 20 Z M 122.332031 20 "/>
 <path fill-rule="nonzero" fill="rgb(100%25, 0%25, 0%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 51.796875 20 C 51.796875 25.523438 47.320312 30 41.796875 30 C 36.273438 30 31.796875 25.523438 31.796875 20 C 31.796875 14.476562 36.273438 10 41.796875 10 C 47.320312 10 51.796875 14.476562 51.796875 20 Z M 51.796875 20 "/>
 <path fill-rule="nonzero" fill="rgb(100%25, 100%25, 100%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 30 87.082031 C 30 92.605469 25.523438 97.082031 20 97.082031 C 14.476562 97.082031 10 92.605469 10 87.082031 C 10 81.558594 14.476562 77.082031 20 77.082031 C 25.523438 77.082031 30 81.558594 30 87.082031 Z M 30 87.082031 "/>
-<path fill-rule="nonzero" fill="rgb(100%25, 0%25, 0%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 87.0625 98.542969 C 87.0625 104.0625 82.585938 108.542969 77.0625 108.542969 C 71.539062 108.542969 67.0625 104.0625 67.0625 98.542969 C 67.0625 93.019531 71.539062 88.542969 77.0625 88.542969 C 82.585938 88.542969 87.0625 93.019531 87.0625 98.542969 Z M 87.0625 98.542969 "/>
-<path fill-rule="nonzero" fill="rgb(100%25, 100%25, 100%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 115.59375 77.8125 C 115.59375 83.335938 111.117188 87.8125 105.59375 87.8125 C 100.070312 87.8125 95.59375 83.335938 95.59375 77.8125 C 95.59375 72.289062 100.070312 67.8125 105.59375 67.8125 C 111.117188 67.8125 115.59375 72.289062 115.59375 77.8125 Z M 115.59375 77.8125 "/>
-<path fill-rule="nonzero" fill="rgb(100%25, 100%25, 100%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 104.695312 44.269531 C 104.695312 49.792969 100.21875 54.269531 94.695312 54.269531 C 89.175781 54.269531 84.695312 49.792969 84.695312 44.269531 C 84.695312 38.746094 89.175781 34.269531 94.695312 34.269531 C 100.21875 34.269531 104.695312 38.746094 104.695312 44.269531 Z M 104.695312 44.269531 "/>
+<path fill-rule="nonzero" fill="rgb(100%25, 100%25, 100%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 87.0625 98.542969 C 87.0625 104.0625 82.585938 108.542969 77.0625 108.542969 C 71.539062 108.542969 67.0625 104.0625 67.0625 98.542969 C 67.0625 93.019531 71.539062 88.542969 77.0625 88.542969 C 82.585938 88.542969 87.0625 93.019531 87.0625 98.542969 Z M 87.0625 98.542969 "/>
+<path fill-rule="nonzero" fill="rgb(100%25, 0%25, 0%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 115.59375 77.8125 C 115.59375 83.335938 111.117188 87.8125 105.59375 87.8125 C 100.070312 87.8125 95.59375 83.335938 95.59375 77.8125 C 95.59375 72.289062 100.070312 67.8125 105.59375 67.8125 C 111.117188 67.8125 115.59375 72.289062 115.59375 77.8125 Z M 115.59375 77.8125 "/>
+<path fill-rule="nonzero" fill="rgb(100%25, 0%25, 0%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 104.695312 44.269531 C 104.695312 49.792969 100.21875 54.269531 94.695312 54.269531 C 89.175781 54.269531 84.695312 49.792969 84.695312 44.269531 C 84.695312 38.746094 89.175781 34.269531 94.695312 34.269531 C 100.21875 34.269531 104.695312 38.746094 104.695312 44.269531 Z M 104.695312 44.269531 "/>
 <path fill-rule="nonzero" fill="rgb(100%25, 100%25, 100%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 69.429688 44.269531 C 69.429688 49.792969 64.953125 54.269531 59.429688 54.269531 C 53.90625 54.269531 49.429688 49.792969 49.429688 44.269531 C 49.429688 38.746094 53.90625 34.269531 59.429688 34.269531 C 64.953125 34.269531 69.429688 38.746094 69.429688 44.269531 Z M 69.429688 44.269531 "/>
-<path fill-rule="nonzero" fill="rgb(100%25, 0%25, 0%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 58.53125 77.8125 C 58.53125 83.335938 54.054688 87.8125 48.53125 87.8125 C 43.007812 87.8125 38.53125 83.335938 38.53125 77.8125 C 38.53125 72.289062 43.007812 67.8125 48.53125 67.8125 C 54.054688 67.8125 58.53125 72.289062 58.53125 77.8125 Z M 58.53125 77.8125 "/>
+<path fill-rule="nonzero" fill="rgb(100%25, 100%25, 100%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 58.53125 77.8125 C 58.53125 83.335938 54.054688 87.8125 48.53125 87.8125 C 43.007812 87.8125 38.53125 83.335938 38.53125 77.8125 C 38.53125 72.289062 43.007812 67.8125 48.53125 67.8125 C 54.054688 67.8125 58.53125 72.289062 58.53125 77.8125 Z M 58.53125 77.8125 "/>
 </svg>
 '/><h3 id="2.-Solution-Enumeration"><a class="docs-heading-anchor" href="#2.-Solution-Enumeration">2. Solution Enumeration</a><a id="2.-Solution-Enumeration-1"></a><a class="docs-heading-anchor-permalink" href="#2.-Solution-Enumeration" title="Permalink"></a></h3><p>We can enumerate all optimal solutions or generate samples:</p><p>a. Find all maximum independent sets:</p><pre><code class="language-julia hljs">all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]
-_, configs_vector = read_size_config(all_max_configs)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4.0 =&gt; StaticBitVector{10, 1}[1010000011, 1001001100, 0010111000, 0101010001, 0100100110]</code></pre><p>b. Store all independent sets efficiently using a tree structure:</p><pre><code class="language-julia hljs">all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (count = 76.0)
+_, configs_vector = read_size_config(all_max_configs)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4.0 =&gt; StaticBitVector{10, 1}[0100100110, 1010000011, 1001001100, 0101010001, 0010111000]</code></pre><p>b. Store all independent sets efficiently using a tree structure:</p><pre><code class="language-julia hljs">all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (count = 76.0)
 ├─ + (count = 58.0)
 │  ├─ + (count = 40.0)
 │  │  ├─ * (count = 13.0)
@@ -319,9 +319,7 @@ _, configs_vector = read_size_config(all_max_configs)</code></pre><pre class="do
 │  │  │  │  └─ + (count = 12.0)
 │  │  │  │     ⋮
 │  │  │  │     
-│  │  │  └─ * (count = 1.0)
-│  │  │     ├─ OnehotVec{10, 2}(1, 1)
-│  │  │     └─ OnehotVec{10, 2}(1, 1)
+│  │  │  └─ OnehotVec{10, 2}(9, 1)
 │  │  └─ + (count = 27.0)
 │  │     ├─ * (count = 1.0)
 │  │     │  ├─ * (count = 1.0)
@@ -338,53 +336,49 @@ _, configs_vector = read_size_config(all_max_configs)</code></pre><pre class="do
 │  │           ⋮
 │  │           
 │  └─ * (count = 18.0)
-│     ├─ + (count = 18.0)
-│     │  ├─ * (count = 5.0)
-│     │  │  ├─ + (count = 5.0)
-│     │  │  │  ⋮
-│     │  │  │  
-│     │  │  └─ * (count = 1.0)
-│     │  │     ⋮
-│     │  │     
-│     │  └─ + (count = 13.0)
-│     │     ├─ * (count = 1.0)
-│     │     │  ⋮
-│     │     │  
-│     │     └─ + (count = 12.0)
-│     │        ⋮
-│     │        
-│     └─ * (count = 1.0)
-│        ├─ OnehotVec{10, 2}(7, 1)
-│        └─ OnehotVec{10, 2}(7, 1)
+│     ├─ OnehotVec{10, 2}(1, 1)
+│     └─ + (count = 18.0)
+│        ├─ * (count = 5.0)
+│        │  ├─ + (count = 5.0)
+│        │  │  ⋮
+│        │  │  
+│        │  └─ OnehotVec{10, 2}(9, 1)
+│        └─ + (count = 13.0)
+│           ├─ * (count = 1.0)
+│           │  ⋮
+│           │  
+│           └─ + (count = 12.0)
+│              ⋮
+│              
 └─ * (count = 18.0)
-   ├─ * (count = 18.0)
-   │  ├─ + (count = 18.0)
-   │  │  ├─ * (count = 1.0)
-   │  │  │  ├─ * (count = 1.0)
-   │  │  │  │  ⋮
-   │  │  │  │  
-   │  │  │  └─ * (count = 1.0)
-   │  │  │     ⋮
-   │  │  │     
-   │  │  └─ + (count = 17.0)
-   │  │     ├─ * (count = 4.0)
-   │  │     │  ⋮
-   │  │     │  
-   │  │     └─ + (count = 13.0)
-   │  │        ⋮
-   │  │        
-   │  └─ * (count = 1.0)
-   │     ├─ OnehotVec{10, 2}(2, 1)
-   │     └─ OnehotVec{10, 2}(2, 1)
-   └─ OnehotVec{10, 2}(2, 1)
+   ├─ * (count = 1.0)
+   │  ├─ OnehotVec{10, 2}(6, 1)
+   │  └─ OnehotVec{10, 2}(6, 1)
+   └─ * (count = 18.0)
+      ├─ + (count = 18.0)
+      │  ├─ * (count = 1.0)
+      │  │  ├─ * (count = 1.0)
+      │  │  │  ⋮
+      │  │  │  
+      │  │  └─ * (count = 1.0)
+      │  │     ⋮
+      │  │     
+      │  └─ + (count = 17.0)
+      │     ├─ * (count = 4.0)
+      │     │  ⋮
+      │     │  
+      │     └─ + (count = 13.0)
+      │        ⋮
+      │        
+      └─ OnehotVec{10, 2}(6, 1)
 </code></pre><p>Generate a sample of 10 random solutions:</p><pre><code class="language-julia hljs">generate_samples(all_independent_sets_tree, 10)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{StaticBitVector{10, 1}}:
- 1001000000
- 1000000100
- 1010000011
- 1010000001
- 1010000000
- 0001000001
- 0000000011
+ 0000100110
+ 0100000010
  0010101000
- 0010001000
- 0100000010</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../MaximalIS/">Maximal independent set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.1 on <span class="colophon-date" title="Thursday 13 March 2025 02:44">Thursday 13 March 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 0010000000
+ 0100000100
+ 0100100000
+ 1001001000
+ 0001010001
+ 0001010001
+ 0000011000</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../MaximalIS/">Maximal independent set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.9.0 on <span class="colophon-date" title="Friday 21 March 2025 07:46">Friday 21 March 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

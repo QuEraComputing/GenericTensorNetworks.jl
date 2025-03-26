@@ -90,13 +90,13 @@ Examples
 ------------------------
 ```jldoctest; setup=(using GenericTensorNetworks)
 julia> TruncatedPoly((1,2,3), 6)
-x^4 + 2*x^5 + 3*x^6
+x⁴ + 2*x⁵ + 3*x⁶
 
 julia> TruncatedPoly((1,2,3), 6) * TruncatedPoly((5,2,1), 3)
-20*x^7 + 8*x^8 + 3*x^9
+20*x⁷ + 8*x⁸ + 3*x⁹
 
 julia> TruncatedPoly((1,2,3), 6) + TruncatedPoly((5,2,1), 3)
-x^4 + 2*x^5 + 3*x^6
+x⁴ + 2*x⁵ + 3*x⁶
 ```
 """
 struct TruncatedPoly{K,T,TO} <: Number

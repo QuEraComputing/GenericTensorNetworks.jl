@@ -3,6 +3,8 @@ using GenericTensorNetworks.Mods
 
 @testset "Constructors" begin
     @test one(Mod{17}) == Mod{17}(1)
+    @test one(Mod{17}) != Mod{17}(2)
+    @test one(Mod{17}) == Mod{17}(18)
     @test oneunit(Mod{17}) == Mod{17}(1)
     @test zero(Mod{17}) == 0
     @test iszero(zero(Mod{17}))

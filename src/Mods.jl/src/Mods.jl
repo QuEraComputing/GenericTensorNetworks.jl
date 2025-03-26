@@ -60,7 +60,7 @@ julia> value(a)
 11
 ```
 """
-value(a::Mod{N}) where {N} = a.val
+value(a::Mod{N}) where {N} = mod(a.val, N)
 
 Base.abs(a::Mod{N,<:Real} where {N}) = abs(value(a))
 
@@ -71,8 +71,8 @@ function hash(x::Mod, h::UInt64 = UInt64(0))
 end
 
 # Test for equality
-iszero(x::Mod{N}) where {N} = iszero(x.val)
-==(x::Mod, y::Mod) = modulus(x) == modulus(y) && value(y) == value(y)
+iszero(x::Mod{N}) where {N} = iszero(value(x))
+==(x::Mod, y::Mod) = modulus(x) == modulus(y) && value(x) == value(y)
 # ==(x::Mod{N}, y::Mod{N}) where {N} = iszero(value(x - y))
 
 # Apporximate equality

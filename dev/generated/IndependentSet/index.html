@@ -308,11 +308,11 @@ single_solution = read_config(max_config)</code></pre><pre class="documenter-exa
 <path fill-rule="nonzero" fill="rgb(100%25, 0%25, 0%25)" fill-opacity="1" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(0%25, 0%25, 0%25)" stroke-opacity="1" stroke-miterlimit="10" d="M 58.53125 77.8125 C 58.53125 83.335938 54.054688 87.8125 48.53125 87.8125 C 43.007812 87.8125 38.53125 83.335938 38.53125 77.8125 C 38.53125 72.289062 43.007812 67.8125 48.53125 67.8125 C 54.054688 67.8125 58.53125 72.289062 58.53125 77.8125 Z M 58.53125 77.8125 "/>
 </svg>
 '/><h3 id="2.-Solution-Enumeration"><a class="docs-heading-anchor" href="#2.-Solution-Enumeration">2. Solution Enumeration</a><a id="2.-Solution-Enumeration-1"></a><a class="docs-heading-anchor-permalink" href="#2.-Solution-Enumeration" title="Permalink"></a></h3><p>We can enumerate all optimal solutions or generate samples:</p><p>a. Find all maximum independent sets:</p><pre><code class="language-julia hljs">all_max_configs = solve(problem, ConfigsMax(; bounded=true))[]
-_, configs_vector = read_size_config(all_max_configs)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4.0 =&gt; StaticBitVector{10, 1}[1001001100, 0100100110, 0010111000, 1010000011, 0101010001]</code></pre><p>b. Store all independent sets efficiently using a tree structure:</p><pre><code class="language-julia hljs">all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (count = 76.0)
+_, configs_vector = read_size_config(all_max_configs)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4.0 =&gt; StaticBitVector{10, 1}[0010111000, 0100100110, 1001001100, 0101010001, 1010000011]</code></pre><p>b. Store all independent sets efficiently using a tree structure:</p><pre><code class="language-julia hljs">all_independent_sets_tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">+ (count = 76.0)
 ├─ + (count = 58.0)
 │  ├─ + (count = 40.0)
 │  │  ├─ * (count = 13.0)
-│  │  │  ├─ OnehotVec{10, 2}(1, 1)
+│  │  │  ├─ OnehotVec{10, 2}(5, 1)
 │  │  │  └─ + (count = 13.0)
 │  │  │     ├─ * (count = 1.0)
 │  │  │     │  ⋮
@@ -336,33 +336,27 @@ _, configs_vector = read_size_config(all_max_configs)</code></pre><pre class="do
 │  │           ⋮
 │  │           
 │  └─ * (count = 18.0)
-│     ├─ OnehotVec{10, 2}(5, 1)
-│     └─ * (count = 18.0)
-│        ├─ * (count = 1.0)
+│     ├─ OnehotVec{10, 2}(8, 1)
+│     └─ + (count = 18.0)
+│        ├─ * (count = 5.0)
 │        │  ├─ OnehotVec{10, 2}(5, 1)
-│        │  └─ OnehotVec{10, 2}(5, 1)
-│        └─ + (count = 18.0)
+│        │  └─ + (count = 5.0)
+│        │     ⋮
+│        │     
+│        └─ + (count = 13.0)
 │           ├─ * (count = 1.0)
 │           │  ⋮
 │           │  
-│           └─ + (count = 17.0)
+│           └─ + (count = 12.0)
 │              ⋮
 │              
 └─ * (count = 18.0)
-   ├─ * (count = 1.0)
-   │  ├─ OnehotVec{10, 2}(10, 1)
-   │  └─ OnehotVec{10, 2}(10, 1)
-   └─ + (count = 18.0)
-      ├─ * (count = 5.0)
-      │  ├─ OnehotVec{10, 2}(1, 1)
-      │  └─ + (count = 5.0)
-      │     ├─ * (count = 1.0)
-      │     │  ⋮
-      │     │  
-      │     └─ + (count = 4.0)
-      │        ⋮
-      │        
-      └─ + (count = 13.0)
+   ├─ OnehotVec{10, 2}(10, 1)
+   └─ * (count = 18.0)
+      ├─ * (count = 1.0)
+      │  ├─ OnehotVec{10, 2}(10, 1)
+      │  └─ OnehotVec{10, 2}(10, 1)
+      └─ + (count = 18.0)
          ├─ * (count = 1.0)
          │  ├─ * (count = 1.0)
          │  │  ⋮
@@ -370,21 +364,21 @@ _, configs_vector = read_size_config(all_max_configs)</code></pre><pre class="do
          │  └─ * (count = 1.0)
          │     ⋮
          │     
-         └─ + (count = 12.0)
-            ├─ * (count = 2.0)
+         └─ + (count = 17.0)
+            ├─ * (count = 4.0)
             │  ⋮
             │  
-            └─ + (count = 10.0)
+            └─ + (count = 13.0)
                ⋮
                
 </code></pre><p>Generate a sample of 10 random solutions:</p><pre><code class="language-julia hljs">generate_samples(all_independent_sets_tree, 10)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10-element Vector{StaticBitVector{10, 1}}:
- 0100000110
- 0100000010
- 0010011000
- 0000011000
+ 0100110000
+ 0100000000
  0100010000
- 0001010000
- 0100010000
- 0101000000
- 0010100010
- 0100000001</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../MaximalIS/">Maximal independent set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.9.0 on <span class="colophon-date" title="Wednesday 26 March 2025 17:47">Wednesday 26 March 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 0010001000
+ 0100100110
+ 0000101100
+ 0001001100
+ 0001000100
+ 0000000100
+ 0001010001</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../MaximalIS/">Maximal independent set problem »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.9.0 on <span class="colophon-date" title="Thursday 27 March 2025 02:16">Thursday 27 March 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

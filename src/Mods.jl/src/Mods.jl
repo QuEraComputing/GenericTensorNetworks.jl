@@ -31,8 +31,6 @@ function Mod{N}(x::T) where {T<:Complex{<:Integer},N}
     Mod{N,S}(v)
 end
 
-
-
 # type casting
 Mod{N,T}(x::Mod{N,T2}) where {T,N,T2} = Mod{N,T}(T(x.val))
 Mod{N,T}(x::Mod{N,T}) where {T,N} = x
@@ -49,12 +47,12 @@ julia> modulus(a)
 13
 ```
 """
-modulus(a::Mod{N}) where {N} = N
+modulus(::Mod{N}) where {N} = N
 
 """
 `value(a::Mod)` returns the value of this `Mod` number.
 ```
-julia> a = Mod{13}(11);
+julia> a = Mod{13}(24);
 
 julia> value(a)
 11
@@ -73,7 +71,6 @@ end
 # Test for equality
 iszero(x::Mod{N}) where {N} = iszero(value(x))
 ==(x::Mod, y::Mod) = modulus(x) == modulus(y) && value(x) == value(y)
-# ==(x::Mod{N}, y::Mod{N}) where {N} = iszero(value(x - y))
 
 # Apporximate equality
 rtoldefault(::Type{Mod{N,T}}) where {N,T} = rtoldefault(T)

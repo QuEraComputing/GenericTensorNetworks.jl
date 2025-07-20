@@ -123,6 +123,23 @@ function dict_deserialize_tree(id::UInt, d::Dict)
     end
 end
 
+"""
+    save_tensor_network(tn::GenericTensorNetwork; folder::String)
+
+Serialize a tensor network to disk for storage/reloading. Creates three structured files:
+- `code.json`: OMEinsum contraction code (tree structure and contraction order)
+- `fixedvertices.json`: JSON-serialized Dict of pinned vertex configurations
+- `problem.json`: Problem specification using ProblemReductions serialization
+
+The target folder will be created recursively if it doesn't exist. Files are overwritten
+if they already exist. Uses JSON for human-readable serialization with type preservation.
+
+The saved files can be loaded using [`load_tensor_network`](@ref).
+
+# Arguments
+- `tn::GenericTensorNetwork`: a [`GenericTensorNetwork`](@ref) instance to serialize. Must contain valid code, problem, and fixedvertices fields.
+- `folder::String`: Destination directory path. Parent directories will be created as needed.
+"""
 function save_tensor_network(tn::GenericTensorNetwork; folder::String)
     !isdir(folder) && mkpath(folder)
 
@@ -136,6 +153,21 @@ function save_tensor_network(tn::GenericTensorNetwork; folder::String)
     return nothing
 end
 
+"""
+    load_tensor_network(folder::String) -> GenericTensorNetwork
+
+Load a tensor network from disk that was previously saved using [`save_tensor_network`](@ref).
+Reconstructs the network from three required files: contraction code, fixed vertices mapping, and problem specification.
+
+# Arguments
+- `folder::String`: Path to directory containing saved network files. Must contain:
+  - `code.json`: Contraction order/structure from OMEinsum
+  - `fixedvertices.json`: Dictionary of pinned vertex states
+  - `problem.json`: Problem specification and parameters
+
+# Returns
+- `GenericTensorNetwork`: Reconstructed tensor network.
+"""
 function load_tensor_network(folder::String)
     !isdir(folder) && throw(SystemError("Folder not found: $folder"))
     

@@ -123,3 +123,37 @@ function dict_deserialize_tree(id::UInt, d::Dict)
     end
 end
 
+function save_tensor_network(tn::GenericTensorNetwork; folder::String)
+    !isdir(folder) && mkpath(folder)
+
+    OMEinsum.writejson(joinpath(folder, "code.json"), tn.code)
+    
+    open(joinpath(folder, "fixedvertices.json"), "w") do io
+        JSON.print(io, tn.fixedvertices, 2)
+    end
+    
+    ProblemReductions.writejson(joinpath(folder, "problem.json"), tn.problem)
+    return nothing
+end
+
+function load_tensor_network(folder::String)
+    !isdir(folder) && throw(SystemError("Folder not found: $folder"))
+    
+    code_path = joinpath(folder, "code.json")
+    fixed_path = joinpath(folder, "fixedvertices.json")
+    problem_path = joinpath(folder, "problem.json")
+    
+    !isfile(code_path) && throw(SystemError("Code file not found: $code_path"))
+    !isfile(fixed_path) && throw(SystemError("Fixedvertices file not found: $fixed_path"))
+    !isfile(problem_path) && throw(SystemError("Problem file not found: $problem_path"))
+    
+    code = OMEinsum.readjson(code_path)
+    
+    fixed_dict = JSON.parsefile(fixed_path)
+    fixedvertices = Dict{labeltype(code),Int}(parse(Int, k) => v for (k, v) in fixed_dict)
+    
+    problem = ProblemReductions.readjson(problem_path)
+    
+    return GenericTensorNetwork(problem, code, fixedvertices)
+end
+

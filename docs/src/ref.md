@@ -144,6 +144,14 @@ SABipartite
 KaHyParBipartite
 MergeVectors
 MergeGreedy
+TreeSASlicer
+ScoreFunction
+```
+
+## FileIO
+```@docs
+save_tensor_network
+load_tensor_network
 ```
 
 ## Others

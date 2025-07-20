@@ -51,3 +51,30 @@ end
     @test ma == tree
 end
 
+@testset "save load GenericTensorNetwork" begin
+    g = smallgraph(:petersen)
+    problem = IndependentSet(g, UnitWeight(10))
+    tn = GenericTensorNetwork(problem; fixedvertices=Dict(1=>0, 2=>1))
+    folder = tempname()
+    GenericTensorNetworks.save_tensor_network(tn; folder=folder)
+    tn2 = GenericTensorNetworks.load_tensor_network(folder)
+    @test tn.problem == tn2.problem
+    @test tn.code == tn2.code
+    @test tn.fixedvertices == tn2.fixedvertices
+    @test solve(tn, SizeMax()) == solve(tn2, SizeMax())
+
+    # test with empty fixedvertices
+    tn3 = GenericTensorNetwork(problem)
+    folder2 = tempname()
+    GenericTensorNetworks.save_tensor_network(tn3; folder=folder2)
+    tn4 = GenericTensorNetworks.load_tensor_network(folder2)
+    @test tn3.problem == tn4.problem
+    @test tn3.code == tn4.code
+    @test tn3.fixedvertices == tn4.fixedvertices
+
+    # test error cases
+    empty_folder = tempname()
+    mkpath(empty_folder)
+    @test_throws SystemError GenericTensorNetworks.load_tensor_network(empty_folder)
+end
+

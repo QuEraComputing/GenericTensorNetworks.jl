@@ -16,29 +16,36 @@ end
 
 """
 $TYPEDEF
-    GenericTensorNetwork(problem::ConstraintSatisfactionProblem; openvertices=(), fixedvertices=Dict(), optimizer=GreedyMethod())
+    GenericTensorNetwork(problem::ConstraintSatisfactionProblem; openvertices=(), fixedvertices=Dict(), optimizer=GreedyMethod(), slicer=nothing)
 
 The generic tensor network that generated from a [`ConstraintSatisfactionProblem`](@ref).
 
 Positional arguments
 -------------------------------
-* `problem` is the graph problem.
-* `code` is the tensor network contraction code.
-* `fixedvertices` is a dictionary specifying the fixed dimensions.
+- `problem` is the constraint satisfaction problem.
+
+Keyword arguments
+-------------------------------
+- `openvertices` is a vector of open indices, which are the degrees of freedoms that appears in the output tensor.
+- `fixedvertices` is a dictionary specifying the fixed degrees of freedom. For example, If I want to fix the variable `5` to be 0, I can set `fixedvertices = Dict(5 => 0)`.
+- `optimizer` is the contraction order optimizer for the generated tensor network.
+- `slicer` is the slicer for the tensor network, it can reduce the memory usage at the cost of computing time by slicing the tensor network.
+
+For more information about contraction order optimization and slicing, please refer to the [OMEinsumContractionOrders documentation](https://tensorbfs.github.io/OMEinsumContractionOrders.jl/dev/).
 """
 struct GenericTensorNetwork{CFG, CT, LT}
     problem::CFG
     code::CT
     fixedvertices::Dict{LT,Int}
 end
-function GenericTensorNetwork(problem::ConstraintSatisfactionProblem; openvertices=(), fixedvertices=Dict(), optimizer=GreedyMethod())
+function GenericTensorNetwork(problem::ConstraintSatisfactionProblem; openvertices=(), fixedvertices=Dict(), optimizer=GreedyMethod(), slicer=nothing)
     rcode = rawcode(problem; openvertices)
-    code = _optimize_code(rcode, uniformsize_fix(rcode, num_flavors(problem), fixedvertices), optimizer, MergeVectors())
+    code = _optimize_code(rcode, uniformsize_fix(rcode, num_flavors(problem), fixedvertices), optimizer, MergeVectors(), slicer)
     return GenericTensorNetwork(problem, code, Dict{labeltype(code),Int}(fixedvertices))
 end
 # a unified interface to optimize the contraction code
-_optimize_code(code, size_dict, optimizer::Nothing, simplifier) = code
-_optimize_code(code, size_dict, optimizer, simplifier) = optimize_code(code, size_dict, optimizer, simplifier)
+_optimize_code(code, size_dict, optimizer::Nothing, simplifier, slicer) = code
+_optimize_code(code, size_dict, optimizer, simplifier, slicer) = optimize_code(code, size_dict, optimizer; simplifier, slicer)
 
 function Base.show(io::IO, tn::GenericTensorNetwork)
     println(io, "$(typeof(tn))")

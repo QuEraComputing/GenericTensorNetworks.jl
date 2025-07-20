@@ -86,7 +86,7 @@ end
 
 @testset "slicing" begin
     g = Graphs.smallgraph("petersen")
-    gp = GenericTensorNetwork(IndependentSet(g), optimizer=TreeSA(nslices=5, ntrials=1))
+    gp = GenericTensorNetwork(IndependentSet(g), optimizer=TreeSA(ntrials=1), slicer=TreeSASlicer(score=ScoreFunction(sc_target=2)))
     res1 = solve(gp, SizeMax())[]
     res2 = solve(gp, CountingAll())[]
     res3 = solve(gp, CountingMax(Single))[]

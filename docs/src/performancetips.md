@@ -20,7 +20,7 @@ using GenericTensorNetworks, Graphs, Random
 graph = random_regular_graph(120, 3)
 iset = IndependentSet(graph)
 problem = GenericTensorNetwork(iset; optimizer=TreeSA(
-    sc_target=20, sc_weight=1.0, rw_weight=3.0, ntrials=10, βs=0.01:0.1:15.0, niters=20))
+    score=ScoreFunction(sc_target=20, sc_weight=1.0, rw_weight=3.0), ntrials=10, βs=0.01:0.1:15.0, niters=20))
 ```
 
 The `GenericTensorNetwork` constructor maps a problem to a tensor network with an optimized contraction order. The `optimizer` parameter specifies the algorithm to use:
@@ -75,8 +75,7 @@ The finite field approach requires only 298 KB, while using the `Polynomial` typ
 ## 2. Slicing Technique for Large Problems
 
 For large-scale applications, you can slice over certain degrees of freedom to reduce space complexity. This approach loops and accumulates over selected degrees of freedom, resulting in smaller tensor networks inside the loop.
-
-In the `TreeSA` optimizer, set `nslices` to a value greater than zero:
+This can be achieved by setting the `slicer` parameter of the `GenericTensorNetwork` constructor.
 
 ```julia
 # Without slicing
@@ -84,11 +83,11 @@ problem = GenericTensorNetwork(iset; optimizer=TreeSA(βs=0.01:0.1:25.0, ntrials
 contraction_complexity(problem)
 
 # With slicing over 5 degrees of freedom
-problem = GenericTensorNetwork(iset; optimizer=TreeSA(βs=0.01:0.1:25.0, ntrials=10, niters=10, nslices=5))
+problem = GenericTensorNetwork(iset; optimizer=TreeSA(βs=0.01:0.1:25.0, ntrials=10, niters=10), slicer=TreeSASlicer(score=ScoreFunction(sc_target=10)))
 contraction_complexity(problem)
 ```
 
-In this example, slicing over 5 degrees of freedom reduces space complexity by a factor of 32 (2^5), while increasing computation time by less than a factor of 2.
+In this example, slicing with the `TreeSASlicer` to reach space complexity of 2^10, at the cost of increased time complexity.
 
 ## 3. Accelerating Tropical Number Operations
 

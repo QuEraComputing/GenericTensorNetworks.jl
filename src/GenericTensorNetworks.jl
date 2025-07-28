@@ -4,6 +4,7 @@ using Core: Argument
 using TropicalNumbers
 using OMEinsum
 using OMEinsum: contraction_complexity, timespace_complexity, timespacereadwrite_complexity, getixsv, NestedEinsum, getixs, getiy, DynamicEinCode
+using OMEinsum.OMEinsumContractionOrders.JSON
 using Graphs, Random
 using DelimitedFiles, Serialization
 using LuxorGraphPlot
@@ -26,7 +27,7 @@ import StatsBase
 
 # OMEinsum
 export timespace_complexity, timespacereadwrite_complexity, contraction_complexity, @ein_str, getixsv, getiyv
-export GreedyMethod, TreeSA, SABipartite, KaHyParBipartite, MergeVectors, MergeGreedy
+export GreedyMethod, TreeSA, SABipartite, KaHyParBipartite, MergeVectors, MergeGreedy, TreeSASlicer, ScoreFunction
 
 # estimate memory
 export estimate_memory
@@ -79,6 +80,9 @@ export read_size, read_count, read_config, read_size_count, read_size_config
 # Visualization
 export show_graph, show_configs, show_einsum, GraphDisplayConfig, render_locs, show_landscape
 export AbstractLayout, SpringLayout, StressLayout, SpectralLayout, Layered, LayeredSpringLayout, LayeredStressLayout
+
+# FileIO
+export save_tensor_network, load_tensor_network
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 

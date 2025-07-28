@@ -123,3 +123,69 @@ function dict_deserialize_tree(id::UInt, d::Dict)
     end
 end
 
+"""
+    save_tensor_network(tn::GenericTensorNetwork; folder::String)
+
+Serialize a tensor network to disk for storage/reloading. Creates three structured files:
+- `code.json`: OMEinsum contraction code (tree structure and contraction order)
+- `fixedvertices.json`: JSON-serialized Dict of pinned vertex configurations
+- `problem.json`: Problem specification using ProblemReductions serialization
+
+The target folder will be created recursively if it doesn't exist. Files are overwritten
+if they already exist. Uses JSON for human-readable serialization with type preservation.
+
+The saved files can be loaded using [`load_tensor_network`](@ref).
+
+# Arguments
+- `tn::GenericTensorNetwork`: a [`GenericTensorNetwork`](@ref) instance to serialize. Must contain valid code, problem, and fixedvertices fields.
+- `folder::String`: Destination directory path. Parent directories will be created as needed.
+"""
+function save_tensor_network(tn::GenericTensorNetwork; folder::String)
+    !isdir(folder) && mkpath(folder)
+
+    OMEinsum.writejson(joinpath(folder, "code.json"), tn.code)
+    
+    open(joinpath(folder, "fixedvertices.json"), "w") do io
+        JSON.print(io, tn.fixedvertices, 2)
+    end
+    
+    ProblemReductions.writejson(joinpath(folder, "problem.json"), tn.problem)
+    return nothing
+end
+
+"""
+    load_tensor_network(folder::String) -> GenericTensorNetwork
+
+Load a tensor network from disk that was previously saved using [`save_tensor_network`](@ref).
+Reconstructs the network from three required files: contraction code, fixed vertices mapping, and problem specification.
+
+# Arguments
+- `folder::String`: Path to directory containing saved network files. Must contain:
+  - `code.json`: Contraction order/structure from OMEinsum
+  - `fixedvertices.json`: Dictionary of pinned vertex states
+  - `problem.json`: Problem specification and parameters
+
+# Returns
+- `GenericTensorNetwork`: Reconstructed tensor network.
+"""
+function load_tensor_network(folder::String)
+    !isdir(folder) && throw(SystemError("Folder not found: $folder"))
+    
+    code_path = joinpath(folder, "code.json")
+    fixed_path = joinpath(folder, "fixedvertices.json")
+    problem_path = joinpath(folder, "problem.json")
+    
+    !isfile(code_path) && throw(SystemError("Code file not found: $code_path"))
+    !isfile(fixed_path) && throw(SystemError("Fixedvertices file not found: $fixed_path"))
+    !isfile(problem_path) && throw(SystemError("Problem file not found: $problem_path"))
+    
+    code = OMEinsum.readjson(code_path)
+    
+    fixed_dict = JSON.parsefile(fixed_path)
+    fixedvertices = Dict{labeltype(code),Int}(parse(Int, k) => v for (k, v) in fixed_dict)
+    
+    problem = ProblemReductions.readjson(problem_path)
+    
+    return GenericTensorNetwork(problem, code, fixedvertices)
+end
+

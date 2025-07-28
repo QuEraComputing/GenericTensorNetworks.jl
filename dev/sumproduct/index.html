@@ -9,99 +9,84 @@ dist = hamming_distribution(samples, samples)
 fig = Figure()
 ax = Axis(fig[1, 1]; xlabel=&quot;Hamming Distance&quot;, ylabel=&quot;Frequency&quot;)
 barplot!(ax, 0:length(dist)-1, dist)
-fig</code></pre><p>This visualization reveals the structure of the solution space by showing how similar or dissimilar the independent set configurations tend to be to each other.</p><h2 id="Applications"><a class="docs-heading-anchor" href="#Applications">Applications</a><a id="Applications-1"></a><a class="docs-heading-anchor-permalink" href="#Applications" title="Permalink"></a></h2><p>The <code>SumProductTree</code> approach is particularly valuable for:</p><ul><li>Analyzing very large problem instances</li><li>Estimating statistical properties of solution spaces</li><li>Performing Monte Carlo sampling for approximation algorithms</li><li>Studying the structure of configuration spaces without exhaustive enumeration</li></ul><p>By combining compact representation with efficient sampling, <code>SumProductTree</code> enables analysis of problem instances that would otherwise be computationally intractable.</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using GenericTensorNetworks</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; graph = random_regular_graph(70, 3)</code><code class="nohighlight hljs ansi" style="display:block;">{70, 105} undirected simple Int64 graph</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; problem = GenericTensorNetwork(IndependentSet(graph); optimizer=TreeSA());</code><code class="nohighlight hljs ansi" style="display:block;"></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code><code class="nohighlight hljs ansi" style="display:block;">+ (count = 1.7013023062945e13)
-├─ + (count = 1.2927158771414e13)
-│  ├─ + (count = 8.786513589163e12)
-│  │  ├─ * (count = 2.734834451016e12)
-│  │  │  ├─ + (count = 2.734834451016e12)
-│  │  │  │  ├─ * (count = 8.5124841493e11)
-│  │  │  │  │  ⋮
-│  │  │  │  │
-│  │  │  │  └─ + (count = 1.883586036086e12)
-│  │  │  │     ⋮
-│  │  │  │
-│  │  │  └─ * (count = 1.0)
-│  │  │     ├─ OnehotVec{70, 2}(24, 1)
-│  │  │     └─ OnehotVec{70, 2}(24, 1)
-│  │  └─ + (count = 6.051679138147e12)
-│  │     ├─ * (count = 1.911033955896e12)
-│  │     │  ├─ * (count = 1.0)
-│  │     │  │  ⋮
-│  │     │  │
-│  │     │  └─ + (count = 1.911033955896e12)
+fig</code></pre><p>This visualization reveals the structure of the solution space by showing how similar or dissimilar the independent set configurations tend to be to each other.</p><h2 id="Applications"><a class="docs-heading-anchor" href="#Applications">Applications</a><a id="Applications-1"></a><a class="docs-heading-anchor-permalink" href="#Applications" title="Permalink"></a></h2><p>The <code>SumProductTree</code> approach is particularly valuable for:</p><ul><li>Analyzing very large problem instances</li><li>Estimating statistical properties of solution spaces</li><li>Performing Monte Carlo sampling for approximation algorithms</li><li>Studying the structure of configuration spaces without exhaustive enumeration</li></ul><p>By combining compact representation with efficient sampling, <code>SumProductTree</code> enables analysis of problem instances that would otherwise be computationally intractable.</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; using GenericTensorNetworks</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; graph = random_regular_graph(70, 3)</code><code class="nohighlight hljs ansi" style="display:block;">{70, 105} undirected simple Int64 graph</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; problem = GenericTensorNetwork(IndependentSet(graph); optimizer=TreeSA());</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; tree = solve(problem, ConfigsAll(; tree_storage=true))[]</code><code class="nohighlight hljs ansi" style="display:block;">+ (count = 1.7253411893466e13)
+├─ + (count = 1.3102024693332e13)
+│  ├─ + (count = 8.952936330692e12)
+│  │  ├─ * (count = 2.848983824037e12)
+│  │  │  ├─ OnehotVec{70, 2}(45, 1)
+│  │  │  └─ + (count = 2.848983824037e12)
+│  │  │     ├─ * (count = 9.03818096225e11)
+│  │  │     │  ⋮
+│  │  │     │
+│  │  │     └─ + (count = 1.945165727812e12)
+│  │  │        ⋮
+│  │  │
+│  │  └─ + (count = 6.103952506655e12)
+│  │     ├─ * (count = 1.952565306521e12)
+│  │     │  ├─ OnehotVec{70, 2}(37, 1)
+│  │     │  └─ + (count = 1.952565306521e12)
 │  │     │     ⋮
 │  │     │
-│  │     └─ + (count = 4.140645182251e12)
-│  │        ├─ * (count = 3.93063450134e11)
+│  │     └─ + (count = 4.151387200134e12)
+│  │        ├─ * (count = 9.2000819509e10)
 │  │        │  ⋮
 │  │        │
-│  │        └─ + (count = 3.747581732117e12)
+│  │        └─ + (count = 4.059386380625e12)
 │  │           ⋮
 │  │
-│  └─ * (count = 4.140645182251e12)
-│     ├─ OnehotVec{70, 2}(8, 1)
-│     └─ * (count = 4.140645182251e12)
-│        ├─ * (count = 4.140645182251e12)
-│        │  ├─ OnehotVec{70, 2}(8, 1)
-│        │  └─ + (count = 4.140645182251e12)
-│        │     ⋮
-│        │
-│        └─ * (count = 1.0)
-│           ├─ OnehotVec{70, 2}(8, 1)
-│           └─ OnehotVec{70, 2}(8, 1)
-└─ * (count = 4.085864291531e12)
-   ├─ * (count = 1.0)
-   │  ├─ OnehotVec{70, 2}(48, 1)
-   │  └─ OnehotVec{70, 2}(48, 1)
-   └─ + (count = 4.085864291531e12)
-      ├─ * (count = 1.303378308615e12)
-      │  ├─ + (count = 1.303378308615e12)
-      │  │  ├─ * (count = 4.20468046361e11)
-      │  │  │  ⋮
-      │  │  │
-      │  │  └─ * (count = 8.82910262254e11)
-      │  │     ⋮
-      │  │
-      │  └─ * (count = 1.0)
-      │     ├─ OnehotVec{70, 2}(24, 1)
-      │     └─ OnehotVec{70, 2}(24, 1)
-      └─ + (count = 2.782485982916e12)
-         ├─ * (count = 9.12855360321e11)
-         │  ├─ * (count = 1.0)
-         │  │  ⋮
-         │  │
-         │  └─ * (count = 9.12855360321e11)
-         │     ⋮
-         │
-         └─ * (count = 1.869630622595e12)
-            ├─ + (count = 1.869630622595e12)
-            │  ⋮
-            │
-            └─ * (count = 1.0)
-               ⋮</code></pre><p>If one wants to store these configurations, he will need a hard disk of size 256 TB! However, this sum-product binary tree structure supports efficient and unbiased direct sampling.</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; samples = generate_samples(tree, 1000)</code><code class="nohighlight hljs ansi" style="display:block;">1000-element Vector{StaticBitVector{70, 2}}:
- 0000001000000000000010111000000000011111100000000100010000000010001100
- 0010001000000000000000110001000000011001110000001110000000110010000100
- 0001000000000000000000110011000100010001000001000000110000100110010100
- 0000001000000011110000110001100010110111000000000000000000010110100100
- 0000000011000000100001010010000000111001000010000101001010100010000100
- 0100110011000000001001010010000000011100000000000011000000000010000100
- 0001110000010001000000010001000100110001110000000000000000000111010100
- 0000001000000100000011110000101100011101001001001000000000000010000010
- 1100000000010110000101110000000100010000101000001000110100000110000010
- 1101000000000010011011111000000000010000001010000000110100000010000010
+│  └─ * (count = 4.14908836264e12)
+│     ├─ + (count = 4.14908836264e12)
+│     │  ├─ * (count = 1.305217020082e12)
+│     │  │  ├─ OnehotVec{70, 2}(45, 1)
+│     │  │  └─ + (count = 1.305217020082e12)
+│     │  │     ⋮
+│     │  │
+│     │  └─ + (count = 2.843871342558e12)
+│     │     ├─ * (count = 8.96804839853e11)
+│     │     │  ⋮
+│     │     │
+│     │     └─ + (count = 1.947066502705e12)
+│     │        ⋮
+│     │
+│     └─ OnehotVec{70, 2}(64, 1)
+└─ * (count = 4.151387200134e12)
+   ├─ * (count = 4.151387200134e12)
+   │  ├─ OnehotVec{70, 2}(68, 1)
+   │  └─ * (count = 4.151387200134e12)
+   │     ├─ * (count = 1.0)
+   │     │  ├─ OnehotVec{70, 2}(68, 1)
+   │     │  └─ OnehotVec{70, 2}(68, 1)
+   │     └─ + (count = 4.151387200134e12)
+   │        ├─ * (count = 9.2000819509e10)
+   │        │  ⋮
+   │        │
+   │        └─ + (count = 4.059386380625e12)
+   │           ⋮
+   │
+   └─ OnehotVec{70, 2}(68, 1)</code></pre><p>If one wants to store these configurations, he will need a hard disk of size 256 TB! However, this sum-product binary tree structure supports efficient and unbiased direct sampling.</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; samples = generate_samples(tree, 1000)</code><code class="nohighlight hljs ansi" style="display:block;">1000-element Vector{StaticBitVector{70, 2}}:
+ 0111000001000100011101110000001010001000000010000100000101000000100011
+ 1000100000101000011000110011001010001000100010000010010010100000010000
+ 0100010000010100010001000100000110101001100010000010010000100100000001
+ 0000011000110000010000000001000010101000000010001011011010111000100011
+ 0110000000110001010100100001000010001001000010000000000000000010010011
+ 0001010000000100010000000100101011001001000110011000000000000000110001
+ 0010101000100000011010000010000100001000100010101100010010110000000011
+ 1000100000000000011001000010000001001000010110101011000110010000010001
+ 1100001000110100111010000101100000001000101111001000000000000100000001
+ 0010000100111000011001100100000100001000000010000000010000010010010010
  ⋮
- 0110000001001000110100000000000010000000000001010000010010000100100000
- 0000100001010011010000000000001010000100010101010001000000000100101001
- 0010100010110001000000000110010000100000010000010010000000000000000000
- 0100000000000100000000000000010000000000000010010001001010010000010000
- 0000000000001000010000000010100100000000001000010010100000100000100000
- 1000011010000000001000000000000010001000001110010010000100000000010001
- 0111110000111010011000000010010010000000011000011000000000000001100000
- 1000000000000010000100001000010000000000100010110000101100000000010001
- 1000100001000100000100000101001000000111110000010000001100000000001010</code></pre><p>With these samples, one can already compute useful properties like Hamming distance (see <a href="../ref/#GenericTensorNetworks.hamming_distribution"><code>hamming_distribution</code></a>) distribution. The following code visualizes this distribution with <code>CairoMakie</code>.</p><pre><code class="language-julia hljs">using CairoMakie
+ 1000100000010000100000000000010000010100011001000001000000000000000101
+ 1000101010000000100000000000000000000100000000111001000101000000010100
+ 1100000001101000000100110010011000000010101100000100000001001000000100
+ 0010100000000000000000001010000000110000010000000001010100011010100100
+ 0000100100000000000000010010110100110000011001010000001100000100000101
+ 0100000000101100000000010000110100110000101001001100001000000100000100
+ 0010000111000001000000010000000000000000000000110000000100000010100101
+ 0010000000010000000101000011010000000010010000001100100000000000000100
+ 0100011000010001000001001000000101000000000000001000101000001010000100</code></pre><p>With these samples, one can already compute useful properties like Hamming distance (see <a href="../ref/#GenericTensorNetworks.hamming_distribution"><code>hamming_distribution</code></a>) distribution. The following code visualizes this distribution with <code>CairoMakie</code>.</p><pre><code class="language-julia hljs">using CairoMakie
 dist = hamming_distribution(samples, samples)
 # bar plot
 fig = Figure()
 ax = Axis(fig[1, 1]; xlabel=&quot;Hamming distance&quot;, ylabel=&quot;Frequency&quot;)
 barplot!(ax, 0:length(dist)-1, dist)
-fig</code></pre><img src="ade32736.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../generated/saveload/">« Save and load solutions</a><a class="docs-footer-nextpage" href="../generated/weighted/">Weighted problems »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.9.0 on <span class="colophon-date" title="Thursday 27 March 2025 02:16">Thursday 27 March 2025</span>. Using Julia version 1.11.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+fig</code></pre><img src="53710797.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../generated/saveload/">« Save and load solutions</a><a class="docs-footer-nextpage" href="../generated/weighted/">Weighted problems »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Monday 28 July 2025 13:17">Monday 28 July 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

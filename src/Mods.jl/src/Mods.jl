@@ -62,7 +62,7 @@ value(a::Mod{N}) where {N} = mod(a.val, N)
 
 Base.abs(a::Mod{N,<:Real} where {N}) = abs(value(a))
 
-function hash(x::Mod, h::UInt64 = UInt64(0))
+function hash(x::Mod, h::UInt)
     v = value(x)
     m = modulus(x)
     return hash(v, hash(m, h))
